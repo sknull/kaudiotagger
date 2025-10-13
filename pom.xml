@@ -225,6 +225,35 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>github</id>
+      <repositories>
+        <repository>
+          <id>github</id>
+          <name>GitHub sknull Apache Maven Packages</name>
+          <url>https://maven.pkg.github.com/sknull/jaudiotagger</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>central</id>
+          <url>https://repo1.maven.org/maven2</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+
   <scm>
     <connection>scm:git@github.com:sknull/kaudiotagger.git</connection>
     <developerConnection>scm:git@github.com:sknull/kaudiotagger.git</developerConnection>
