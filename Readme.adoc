@@ -1,0 +1,13 @@
+= KAudioTagger
+:doctype: book
+:description: Documentation for kaudiotagger
+:keywords: kotlin, audio
+:icons: font
+:toc:
+:toc-title: Contents
+:toclevels: 10
+
+== Introduction
+
+This is a thin wrapper around link:https://github.com/RouHim/jaudiotagger[jaudiotagger] to make usage in kotlin more convenient.
+
