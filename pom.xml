@@ -40,12 +40,7 @@
   <repositories>
     <repository>
       <id>github</id>
-      <url>https://github.com/sknull/essence</url>
-    </repository>
-
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
+      <url>https://github.com/sknull/jaudiotagger</url>
     </repository>
 
     <repository>
