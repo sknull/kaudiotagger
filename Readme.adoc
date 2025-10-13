@@ -7,6 +7,10 @@
 :toc-title: Contents
 :toclevels: 10
 
+== Status
+
+https://github.com/sknull/kaudiotagger/actions/workflows/github-ci.yml[image:https://github.com/sknull/kaudiotagger/actions/workflows/github-ci.yml/badge.svg[Klanglicht Kt]]
+
 == Introduction
 
 This is a thin wrapper around link:https://github.com/RouHim/jaudiotagger[jaudiotagger] to make usage in kotlin more convenient.
