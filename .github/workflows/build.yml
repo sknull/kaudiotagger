@@ -3,7 +3,8 @@ name: CI/CD
 on:
   push:
     branches:
-      - code-cleanup-sknull
+      - main
+      - develop
 jobs:
   publish:
     runs-on: ubuntu-latest
