@@ -1,0 +1,95 @@
+package de.visualdigits.kaudiotagger.model.datatype
+
+import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
+import java.nio.ByteBuffer
+import java.nio.charset.Charset
+import java.nio.charset.CharsetDecoder
+import java.nio.charset.StandardCharsets
+
+abstract class AbstractString: AbstractDataType {
+
+    constructor(
+        identifier: String,
+        frameBody: AbstractTagFrameBody? = null,
+        value: Any? = null
+    ): super(identifier, frameBody, value)
+
+    /**
+     * Copy constructor
+     *
+     * @param `object`
+     */
+    constructor(copyObject: AbstractString): super(copyObject)
+
+    /**
+     * Check the value can be encoded with the specified encoding
+     *
+     * @return
+     */
+    fun canBeEncoded(): Boolean {
+        return frameBody?.getTextEncoding()?.let { te ->
+            TextEncoding
+                .fromId(te)
+                ?.charSet
+                ?.newEncoder()
+                ?.canEncode(value as String) == true
+        }?:false
+    }
+
+    /**
+     * If they have specified UTF-16 then decoder works out by looking at BOM
+     * but if missing we have to make an educated guess otherwise just use
+     * specified decoder
+     *
+     * @param inBuffer
+     * @return
+     */
+    fun getCorrectDecoder(inBuffer: ByteBuffer): CharsetDecoder? {
+        val decoder = if (inBuffer.remaining() <= 2) {
+            getTextEncodingCharSet()?.newDecoder()
+        } else if (getTextEncodingCharSet() == StandardCharsets.UTF_16) {
+            if (inBuffer.getChar(0).code == 0xfffe || inBuffer.getChar(0).code == 0xfeff) {
+                //Get the Specified Decoder
+                getTextEncodingCharSet()?.newDecoder()
+            } else {
+                if (inBuffer.get(0).toInt() == 0) {
+                    StandardCharsets.UTF_16BE.newDecoder()
+                } else {
+                    StandardCharsets.UTF_16LE.newDecoder()
+                }
+            }
+        } else {
+            getTextEncodingCharSet()?.newDecoder()
+        }
+        decoder?.reset()
+
+        return decoder
+    }
+
+    /**
+     * Get the text encoding being used.
+     *
+     *
+     * The text encoding is defined by the frame body that the text field belongs to.
+     *
+     * @return the text encoding charset
+     */
+    open fun getTextEncodingCharSet(): Charset? {
+        val textEncoding = frameBody?.getTextEncoding()
+        val charSetName = textEncoding?.let { te -> TextEncoding.fromId(te) }?.charSet
+        log.debug("text encoding:$textEncoding charset:${charSetName?.name()}")
+
+        return charSetName
+    }
+
+    /**
+     * Return the size in bytes of this datatype as it was/is held in file this
+     * will be effected by the encoding type.
+     *
+     * @return the size
+     */
+    override fun getSize(): Int {
+        return size
+    }
+}
