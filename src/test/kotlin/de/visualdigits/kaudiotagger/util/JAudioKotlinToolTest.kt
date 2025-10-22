@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.frame.ID3v22KFrame
-import de.visualdigits.kaudiotagger.model.frame.ID3v23KFrame
-import de.visualdigits.kaudiotagger.model.frame.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.kframe.ID3v22KFrame
+import de.visualdigits.kaudiotagger.model.kframe.ID3v23KFrame
+import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File

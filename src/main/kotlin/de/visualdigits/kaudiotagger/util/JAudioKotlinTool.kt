@@ -1,33 +1,29 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.field.AbstractKField
-import de.visualdigits.kaudiotagger.model.field.BinaryKField
-import de.visualdigits.kaudiotagger.model.field.CommonKField
-import de.visualdigits.kaudiotagger.model.field.KFieldKey
-import de.visualdigits.kaudiotagger.model.frame.ID3v22KFrame
-import de.visualdigits.kaudiotagger.model.frame.ID3v23KFrame
-import de.visualdigits.kaudiotagger.model.frame.ID3v24KFrame
-import de.visualdigits.kaudiotagger.model.frame.KFrame
-import org.jaudiotagger.audio.AudioFile
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.Tag
-import org.jaudiotagger.tag.TagField
-import org.jaudiotagger.tag.id3.ID3v22Frame
-import org.jaudiotagger.tag.id3.ID3v23Frame
-import org.jaudiotagger.tag.id3.ID3v24Frame
-import org.jaudiotagger.tag.id3.framebody.FrameBodyAPIC
-import org.jaudiotagger.tag.id3.framebody.FrameBodyPIC
-import org.jaudiotagger.tag.id3.valuepair.ImageFormats
+import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
+import de.visualdigits.kaudiotagger.model.kfield.AbstractKField
+import de.visualdigits.kaudiotagger.model.kfield.BinaryKField
+import de.visualdigits.kaudiotagger.model.kfield.CommonKField
+import de.visualdigits.kaudiotagger.model.kfield.KFieldKey
+import de.visualdigits.kaudiotagger.model.kframe.ID3v22KFrame
+import de.visualdigits.kaudiotagger.model.kframe.ID3v23KFrame
+import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.kframe.KFrame
+import de.visualdigits.kaudiotagger.model.tag.Tag
 import java.awt.image.BufferedImage
 import java.io.File
+import kotlin.collections.toList
+import kotlin.sequences.toList
+import kotlin.text.toList
+import kotlin.toList
 
-fun File.toAudioFile(): AudioFile = AudioFileIO.read(this)
+inline fun <reified T : AudioFile<T>> File.toAudioFile(): T? = AudioFile.read<T>(this)
 
-fun File.getAudioTag(): Tag = toAudioFile().tag
+inline fun <reified T : AudioFile<T>> File.getAudioTag(): Tag? = toAudioFile<T>()?.tag
 
-fun File.tagMap(): Map<KFrame<*>, AbstractKField<*>> {
-    return getAudioTag()
-        .fields
+inline fun <reified T : AudioFile<T>> File.tagMap(): Map<KFrame<*>, AbstractKField<*>> {
+    return getAudioTag<T>()
+        ?.fields
         ?.asSequence()
         ?.toList()
         ?.mapNotNull { tagField -> tagField.toKField() }
@@ -35,15 +31,15 @@ fun File.tagMap(): Map<KFrame<*>, AbstractKField<*>> {
         ?:mapOf()
 }
 
-fun File.commonTagMap(): Map<KFieldKey, AbstractKField<*>> {
-    return tagMap()
+inline fun <reified T : AudioFile<T>> File.commonTagMap(): Map<KFieldKey, AbstractKField<*>> {
+    return tagMap<T>()
         .filter { (k, v) -> k.fieldKey != null }
         .map { (k, v) -> Pair(k.fieldKey!!, v) }
         .toMap()
 }
 
-fun File.getArtworks(): List<Pair<BufferedImage, String>> {
-    return getAudioTag().artworkList.mapNotNull { aw ->
+inline fun <reified T : AudioFile<T>> File.getArtworks(): List<Pair<BufferedImage, String>> {
+    return getAudioTag<T>().artworkList.mapNotNull { aw ->
         when (aw.mimeType) {
             "image/jpeg" -> "jpg"
             "image/jpg" -> "jpg"
