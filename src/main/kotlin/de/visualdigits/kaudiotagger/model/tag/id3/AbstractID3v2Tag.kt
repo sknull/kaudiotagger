@@ -274,13 +274,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @return size of the tag
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         var sum = 0
         frameMap.values.forEach { frame ->
             when (frame) {
-                is AbstractID3v2Frame -> frame.getSizeValue()
-                is AggregatedFrame -> frame.getFrames().sumOf { f -> f.getSizeValue() }
-                is MutableList<*> -> (frame as? java.util.ArrayList<AbstractID3v2Frame>)?.let { f -> f.sumOf { e -> e.getSizeValue() } }
+                is AbstractID3v2Frame -> frame.getSize()
+                is AggregatedFrame -> frame.getFrames().sumOf { f -> f.getSize() }
+                is MutableList<*> -> (frame as? java.util.ArrayList<AbstractID3v2Frame>)?.let { f -> f.sumOf { e -> e.getSize() } }
                 else -> 0
             }
         }

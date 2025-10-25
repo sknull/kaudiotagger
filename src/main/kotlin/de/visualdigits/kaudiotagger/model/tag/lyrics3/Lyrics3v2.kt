@@ -226,7 +226,7 @@ class Lyrics3v2 : AbstractLyrics3 {
     override fun toString(): String {
         val iterator = fieldMap.values.iterator()
         var field: Lyrics3v2Field
-        var str = getIdentifier() + " " + this.getSizeValue() + "\n"
+        var str = getIdentifier() + " " + this.getSize() + "\n"
 
         while (iterator.hasNext()) {
             field = iterator.next()
@@ -246,14 +246,14 @@ class Lyrics3v2 : AbstractLyrics3 {
     /**
      * @return
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         var size = 0
         val iterator = fieldMap.values.iterator()
         var field: Lyrics3v2Field
 
         while (iterator.hasNext()) {
             field = iterator.next()
-            size += field.getSizeValue()
+            size += field.getSize()
         }
 
         // include LYRICSBEGIN, but not 6 char size or LYRICSEND

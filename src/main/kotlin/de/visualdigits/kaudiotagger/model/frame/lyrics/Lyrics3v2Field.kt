@@ -165,8 +165,8 @@ class Lyrics3v2Field: AbstractTagFrame {
     /**
      * @return
      */
-    override fun getSizeValue(): Int {
-        return (frameBody?.getSizeValue()?:0) + 5 + (getIdentifier()?.length?:0)
+    override fun getSize(): Int {
+        return (frameBody?.getSize()?:0) + 5 + (getIdentifier()?.length?:0)
     }
 
     /**
@@ -181,7 +181,7 @@ class Lyrics3v2Field: AbstractTagFrame {
      * @throws IOException
      */
     fun write(file: RandomAccessFile) {
-        if (((frameBody?.getSizeValue()?:0) > 0) ||
+        if (((frameBody?.getSize()?:0) > 0) ||
             TagOptionSingleton.lyrics3SaveEmptyField
         ) {
             val buffer = ByteArray(3)

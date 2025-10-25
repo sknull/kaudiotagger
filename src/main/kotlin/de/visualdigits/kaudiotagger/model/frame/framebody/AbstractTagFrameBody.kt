@@ -153,15 +153,6 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
     }
 
     /**
-     * Returns the size in bytes of this fragmentbody
-     *
-     * @return estimated size in bytes of this datatype
-     */
-    override fun getSizeValue(): Int {
-        return size
-    }
-
-    /**
      * Returns true if this instance and its entire DataType
      * array list is a subset of the argument. This class is a subset if it is
      * the same class as the argument.

@@ -154,7 +154,7 @@ class Lyrics3v1: AbstractLyrics3 {
     /**
      * @return
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         return "LYRICSBEGIN".length + lyric.length + "LYRICSEND".length
     }
 

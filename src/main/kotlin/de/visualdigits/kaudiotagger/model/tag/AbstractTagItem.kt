@@ -7,7 +7,7 @@ abstract class AbstractTagItem {
 
     val log = LoggerFactory.getLogger(javaClass)
 
-    var size: Int = 0
+    private var size: Int = 0
 
     private var identifier: String? = null
     var byteBuffer: ByteBuffer? = null
@@ -62,10 +62,14 @@ abstract class AbstractTagItem {
      *
      * @return size of this item
      */
-    open fun getSizeValue(): Int = size
+    open fun getSize(): Int = size
 
-    open fun setSizeValue(size: Int) {
+    open fun setSize(size: Int) {
         this.size = size
+    }
+
+    open fun addSize(amount: Int) {
+        this.size += amount
     }
 
     /**

@@ -23,7 +23,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         byteBuffer: ByteBuffer? = null,
         frameSize: Int = 0
     ): this() {
-        size = frameSize
+        setSize(frameSize)
         read(byteBuffer)
     }
 
@@ -58,7 +58,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         if (byteBuffer == null) {
             return
         }
-        val sizeValue = getSizeValue()
+        val sizeValue = getSize()
         log.debug("Reading body for${this.getIdentifier()}:$sizeValue")
 
         //Allocate a buffer to the size of the Frame Body and read from file
@@ -112,7 +112,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
      */
     open fun write(tagBuffer: ByteArrayOutputStream) {
         log.debug(
-            "Writing frame body for${this.getIdentifier()}:Est Size:${getSizeValue()}"
+            "Writing frame body for${this.getIdentifier()}:Est Size:${getSize()}"
         )
         //Write the various fields to file in order
         for (`object` in objectList) {
@@ -128,7 +128,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         }
         setDataSize()
         log.debug(
-            "Written frame body for${this.getIdentifier()}:Real Size:${getSizeValue()}"
+            "Written frame body for${this.getIdentifier()}:Real Size:${getSize()}"
         )
     }
 
@@ -136,9 +136,9 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
      * Set size based on size of the DataTypes making up the body,done after write
      */
     fun setDataSize() {
-        size = 0
+        setSize(0)
         for (`object` in objectList) {
-            size += `object`.getSizeValue()
+            addSize(`object`.getSizeValue())
         }
     }
 

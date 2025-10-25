@@ -450,8 +450,8 @@ class ID3v24Frame: AbstractID3v2Frame {
      *
      * @return val frame size
      */
-    override fun getSizeValue(): Int {
-        return (frameBody?.getSizeValue()?:0) + FRAME_HEADER_SIZE
+    override fun getSize(): Int {
+        return (frameBody?.getSize()?:0) + FRAME_HEADER_SIZE
     }
 
     /**

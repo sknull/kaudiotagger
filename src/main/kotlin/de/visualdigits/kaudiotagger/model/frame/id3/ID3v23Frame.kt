@@ -509,8 +509,8 @@ class ID3v23Frame: AbstractID3v2Frame {
      *
      * @return int frame size
      */
-    override fun getSizeValue(): Int {
-        return (frameBody?.getSizeValue()?:0) + FRAME_HEADER_SIZE
+    override fun getSize(): Int {
+        return (frameBody?.getSize()?:0) + FRAME_HEADER_SIZE
     }
 
     /**
@@ -535,9 +535,9 @@ class ID3v23Frame: AbstractID3v2Frame {
             FRAME_ID_SIZE
         )
         //Write Frame Size
-        val size = frameBody?.getSizeValue()
+        val size = frameBody?.getSize()
         log.debug("Frame Size Is:" + size)
-        headerBuffer.putInt(frameBody?.getSizeValue()?:0)
+        headerBuffer.putInt(frameBody?.getSize()?:0)
 
         //Write the Flags
         //Status Flags:leave as they were when we read

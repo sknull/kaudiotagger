@@ -247,7 +247,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
     /**
      * @return
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         var size = 0
         var line: Lyrics3Line
 

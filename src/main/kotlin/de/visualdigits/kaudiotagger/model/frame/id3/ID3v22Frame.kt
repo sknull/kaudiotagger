@@ -183,8 +183,8 @@ class ID3v22Frame: AbstractID3v2Frame {
      *
      * @return int size of frame
      */
-    override fun getSizeValue(): Int {
-        return (frameBody?.getSizeValue()?:0) + getFrameHeaderSize()
+    override fun getSize(): Int {
+        return (frameBody?.getSize()?:0) + getFrameHeaderSize()
     }
 
     /**
@@ -299,7 +299,7 @@ class ID3v22Frame: AbstractID3v2Frame {
             0,
             getFrameIdSize()
         )
-        encodeSize(headerBuffer, frameBody?.getSizeValue()?:0)
+        encodeSize(headerBuffer, frameBody?.getSize()?:0)
 
         //Add header to the Byte Array Output Stream
         try {

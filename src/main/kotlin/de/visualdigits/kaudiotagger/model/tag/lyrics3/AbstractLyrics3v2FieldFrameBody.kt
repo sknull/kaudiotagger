@@ -56,7 +56,7 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
         if (byteBuffer == null) {
             return
         }
-        val size = getSizeValue()
+        val size = getSize()
         //Allocate a buffer to the size of the Frame Body and read from file
         val buffer = ByteArray(size)
         byteBuffer.get(buffer)

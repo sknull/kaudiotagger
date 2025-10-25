@@ -216,7 +216,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         var buffer = ByteArray(5)
         var str: String?
 
-        size = getSizeValue()
+        size = getSize()
         str = size.toString()
 
         for (i in 0..<(5 - str.length)) {
@@ -248,7 +248,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
     /**
      * @return
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         var size = 0
         var image: Lyrics3Image
 

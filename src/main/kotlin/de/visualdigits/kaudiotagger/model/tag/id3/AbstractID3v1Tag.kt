@@ -54,7 +54,7 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
      *
      * @return size of this tag in bytes
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         return TAG_LENGTH
     }
 

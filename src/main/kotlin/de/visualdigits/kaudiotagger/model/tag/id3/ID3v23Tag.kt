@@ -280,7 +280,7 @@ class ID3v23Tag : AbstractID3v2Tag {
      *
      * @return size of tag
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         var size = TAG_HEADER_LENGTH
         if (isExtended) {
             size += TAG_EXT_HEADER_LENGTH
@@ -288,7 +288,7 @@ class ID3v23Tag : AbstractID3v2Tag {
                 size += TAG_EXT_HEADER_CRC_LENGTH
             }
         }
-        size += super.getSizeValue()
+        size += super.getSize()
         return size
     }
 

@@ -33,8 +33,8 @@ class FrameBodyDeprecated : AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23Frame
      *
      * @return size in bytes of this frame body
      */
-    override fun getSizeValue(): Int {
-        return originalFrameBody?.getSizeValue()?:0
+    override fun getSize(): Int {
+        return originalFrameBody?.getSize()?:0
     }
 
     /**

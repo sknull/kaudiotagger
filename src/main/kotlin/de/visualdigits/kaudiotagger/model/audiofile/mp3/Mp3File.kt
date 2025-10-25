@@ -655,7 +655,7 @@ class MP3File : AudioFile {
 
         var id3v1tagSize = 0
         if (hasid3v1tag()) {
-            id3v1tagSize = id3v1tag?.size?:0
+            id3v1tagSize = id3v1tag?.getSize()?:0
         }
 
         val inStream: InputStream = FileInputStream(file)
