@@ -33,12 +33,6 @@ class FrameBodyIPLS: AbstractFrameBodyPairs, ID3v23FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     /**
      * Convert from V4 to V3 Frame
      *

@@ -19,11 +19,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
      */
     constructor()
 
-    constructor(
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(byteBuffer, frameSize)
-
     constructor(copyObject: FieldFrameBodyIMG) : super(copyObject) {
         var old: Lyrics3Image?
 
@@ -254,7 +249,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
 
         for (image1 in images) {
             image = image1
-            size += (image.getSizeValue() + 2) // addField CRLF pair
+            size += (image.getSize() + 2) // addField CRLF pair
         }
 
         return size - 2 // cut off trailing crlf pair

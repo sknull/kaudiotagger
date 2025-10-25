@@ -89,8 +89,8 @@ open class TextEncodedStringSizeTerminated : AbstractString {
             outBuffer.toString()
         })
         //SetSize, important this is correct for finding the next datatype
-        size = (arr.size - offset)
-        log.debug("Read SizeTerminatedString:{} size:{}", getValue(), getSizeValue())
+        setSize(arr.size - offset)
+        log.debug("Read SizeTerminatedString:{} size:{}", getValue(), getSize())
     }
 
     override fun getTextEncodingCharSet(): Charset? {

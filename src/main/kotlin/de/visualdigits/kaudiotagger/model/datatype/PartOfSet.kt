@@ -9,7 +9,6 @@ import java.nio.charset.Charset
 import java.nio.charset.CharsetEncoder
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
-import kotlin.Any
 
 class PartOfSet : AbstractString {
 
@@ -70,7 +69,7 @@ class PartOfSet : AbstractString {
 
         //SetSize, important this is correct for finding the next datatype
         setValue(arr.size - offset)
-        log.debug("Read SizeTerminatedString:${getValue()} size:${getSizeValue()}")
+        log.debug("Read SizeTerminatedString:${getValue()} size:${getSize()}")
     }
 
     /**

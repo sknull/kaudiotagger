@@ -29,7 +29,13 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         const val UNSUPPORTED_ID: String = "Unsupported"
 
     }
-    
+
+    //Frame identifier
+    private var identifier: String? = ""
+
+    //Frame Size
+    var frameSize: Int = 0
+
     /**
      * This holds the Status flags (not supported in v2.20
      */
@@ -69,7 +75,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
     //TODO the identifier checks should be done in the relevent subclasses
     constructor(
         identifier: String
-    ): super(identifier) {
+    ) {
         log.debug("Creating empty frame of type$identifier")
 
         // Use reflection to map id to frame body, which makes things much easier
@@ -134,10 +140,23 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
             )
         }
 
-        setIdentifier(String(buffer))
+        identifier = String(buffer)
         log.debug("Identifier is${this.getIdentifier()}")
 
         return this.getIdentifier()
+    }
+
+    /**
+     * Return the frame identifier
+     *
+     * @return the frame identifier
+     */
+    override fun getIdentifier(): String? {
+        return identifier
+    }
+
+    fun setIdentifier(identifier: String?) {
+        this.identifier = identifier
     }
 
     /**

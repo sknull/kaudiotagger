@@ -59,9 +59,9 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                 val key =
                     TextEncodedStringNullTerminated(identifier, frameBody?:error("No frame body"))
                 key.readByteArray(arr, offset)
-                size += (key.getSizeValue())
-                offset += key.getSizeValue()
-                if (key.getSizeValue() == 0) {
+                addSize(key.getSize())
+                offset += key.getSize()
+                if (key.getSize() == 0) {
                     break
                 }
 
@@ -70,9 +70,9 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                     val result =
                         TextEncodedStringNullTerminated(identifier, frameBody?:error("No frame body"))
                     result.readByteArray(arr, offset)
-                    size += (result.getSizeValue())
-                    offset += result.getSizeValue()
-                    if (result.getSizeValue() == 0) {
+                    addSize(result.getSize())
+                    offset += result.getSize()
+                    if (result.getSize() == 0) {
                         break
                     }
                     //Add to value
@@ -89,9 +89,9 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                     val result =
                         TextEncodedStringSizeTerminated(identifier, frameBody?:error("No frame body"))
                     result.readByteArray(arr, offset)
-                    size += (result.getSizeValue())
-                    offset += result.getSizeValue()
-                    if (result.getSizeValue() == 0) {
+                    addSize(result.getSize())
+                    offset += result.getSize()
+                    if (result.getSize() == 0) {
                         break
                     }
                     //Add to value
@@ -105,13 +105,13 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                 break
             }
 
-            if (getSizeValue() == 0) {
+            if (getSize() == 0) {
                 log.warn("No null terminated Strings found")
                 throw InvalidDataTypeException("No null terminated Strings found")
             }
         }
         log.debug(
-            "Read  PairTextEncodedStringNullTerminated:${getValue()} size:${getSizeValue()}"
+            "Read  PairTextEncodedStringNullTerminated:${getValue()} size:${getSize()}"
         )
     }
 
@@ -133,14 +133,14 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                         pair.first
                     );
                 buffer.write(next.writeByteArray());
-                localSize += next.getSizeValue();
+                localSize += next.getSize();
                 next = TextEncodedStringNullTerminated(
                         identifier,
                 frameBody,
                 pair.second
                 );
                 buffer.write(next.writeByteArray());
-                localSize += next.getSizeValue();
+                localSize += next.getSize();
             }
         } catch (ioe: IOException) {
             //This should never happen because the write is internal with the JVM it is not to a file
@@ -152,7 +152,7 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
         }
 
         //Update size member variable
-        size = localSize;
+        setSize(localSize)
 
         log.debug("Written PairTextEncodedStringNullTerminated");
         return buffer.toByteArray();

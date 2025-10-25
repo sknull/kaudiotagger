@@ -38,7 +38,7 @@ class Lyrics3Line : AbstractDataType {
     /**
      * @return
      */
-    override fun getSizeValue(): Int = timeStamp.sumOf<Lyrics3TimeStamp> { aTimeStamp -> aTimeStamp.getSizeValue() } + (lyric?.length ?: 0)
+    override fun getSize(): Int = timeStamp.sumOf<Lyrics3TimeStamp> { aTimeStamp -> aTimeStamp.getSize() } + (lyric?.length ?: 0)
 
     /**
      * @return

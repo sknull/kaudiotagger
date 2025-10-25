@@ -127,12 +127,6 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
 
     /**
      * Get a description of the image

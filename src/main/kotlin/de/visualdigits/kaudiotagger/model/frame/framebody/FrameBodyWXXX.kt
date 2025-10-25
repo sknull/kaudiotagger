@@ -58,12 +58,6 @@ class FrameBodyWXXX: AbstractFrameBodyUrlLink, ID3v24FrameBody, ID3v23FrameBody 
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     /**
      * @return a description of the hyperlink
      */

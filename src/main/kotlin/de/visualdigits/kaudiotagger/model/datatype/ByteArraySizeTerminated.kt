@@ -54,7 +54,7 @@ class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
      * @return the number of bytes
      */
     override fun toString(): String {
-        return size.toString() + " bytes"
+        return getSize().toString() + " bytes"
     }
 
     /**
@@ -62,7 +62,7 @@ class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
      *
      * @return the size in bytes
      */
-    override fun getSizeValue(): Int = getValue()?.let { v -> (v as ByteArray).size}?:0
+    override fun getSize(): Int = getValue()?.let { v -> (v as ByteArray).size}?:0
 
     /**
      * Write contents to a byte array

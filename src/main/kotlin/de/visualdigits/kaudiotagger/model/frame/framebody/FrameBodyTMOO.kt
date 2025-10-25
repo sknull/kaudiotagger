@@ -33,12 +33,6 @@ class FrameBodyTMOO: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     /**
      * The ID3v2 frame identifier
      *

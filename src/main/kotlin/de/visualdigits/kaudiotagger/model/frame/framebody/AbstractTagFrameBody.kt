@@ -5,7 +5,6 @@ import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.tag.AbstractTagItem
 import de.visualdigits.kaudiotagger.util.ID3Tags
-import java.nio.ByteBuffer
 
 abstract class AbstractTagFrameBody : AbstractTagItem {
 
@@ -25,19 +24,6 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
     constructor() {
         setupObjectList()
     }
-
-    constructor(
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ) : super(byteBuffer, frameSize)
-
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ) : super(identifier, byteBuffer, frameSize)
-
-    constructor(size: Int) : super(size)
 
     /**
      * Copy Constructor for fragment body. Copies all objects in the
@@ -174,6 +160,22 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
             }
         }
         return true
+    }
+
+    /**
+     * Returns the size in bytes of this fragmentbody
+     *
+     * @return estimated size in bytes of this datatype
+     */
+    override fun getSize(): Int {
+        var size = 0
+        var `object`: AbstractDataType
+        val iterator: MutableIterator<AbstractDataType> = objectList.listIterator()
+        while (iterator.hasNext()) {
+            `object` = iterator.next()
+            size += `object`.getSize()
+        }
+        return size
     }
 
     /**

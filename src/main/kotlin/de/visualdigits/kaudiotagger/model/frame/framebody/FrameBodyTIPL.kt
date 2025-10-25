@@ -40,12 +40,6 @@ class FrameBodyTIPL: AbstractFrameBodyPairs, ID3v24FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     /**
      * Convert from V3 to V4 Frame
      *

@@ -116,7 +116,7 @@ class NumberVariableLength : AbstractDataType {
      * @return the datatype converted to a byte array
      */
     override fun writeByteArray(): ByteArray {
-        val size = getSizeValue()
+        val size = getSize()
         val arr: ByteArray?
 
         if (size == 0) {
@@ -147,7 +147,7 @@ class NumberVariableLength : AbstractDataType {
     /**
      * @return the number of bytes required to write this to a file
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         if (getValue() == null) {
             return 0
         } else {

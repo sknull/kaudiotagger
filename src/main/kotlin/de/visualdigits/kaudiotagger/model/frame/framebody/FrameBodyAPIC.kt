@@ -149,12 +149,6 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     override fun getUserFriendlyValue(): String {
         if (this.getImageData() != null) {
             return (this.getMimeType() + ":" + this.getDescription() + ":" + this.getImageData()?.size

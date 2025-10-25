@@ -15,23 +15,21 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         const val TYPE_BODY: String = "body"
     }
 
-    constructor()
+    /**
+     * Frame Body Size, originally this is size as indicated in frame header
+     * when we come to writing data we recalculate it.
+     */
+    private var size = 0
 
-    constructor(size: Int): super(size)
+    constructor()
 
     constructor(
         byteBuffer: ByteBuffer? = null,
         frameSize: Int = 0
     ): this() {
-        setSize(frameSize)
+        size = (frameSize)
         read(byteBuffer)
     }
-
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
 
     /**
      * Create Body based on another body
@@ -92,7 +90,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
                 throw e
             }
             //Increment Offset to start of next datatype.
-            offset += `object`.getSizeValue()
+            offset += `object`.getSize()
         }
     }
 
@@ -103,6 +101,36 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
      */
     override fun equals(obj: Any?): Boolean {
         return (obj is AbstractID3v2FrameBody) && super.equals(obj)
+    }
+
+    /**
+     * Return size of frame body,if frameBody already exist will take this value from the frame header
+     * but it is always recalculated before writing any changes back to disk.
+     *
+     * @return size in bytes of this frame body
+     */
+    override fun getSize(): Int {
+        return size
+    }
+
+    /**
+     * Set size based on size passed as parameter from frame header,
+     * done before read
+     *
+     * @param size
+     */
+    fun setSize(size: Int) {
+        this.size = size
+    }
+
+    /**
+     * Set size based on size passed as parameter from frame header,
+     * done before read
+     *
+     * @param amount
+     */
+    fun addSize(amount: Int) {
+        this.size += amount
     }
 
     /**
@@ -138,7 +166,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
     fun setDataSize() {
         setSize(0)
         for (`object` in objectList) {
-            addSize(`object`.getSizeValue())
+            addSize(`object`.getSize())
         }
     }
 

@@ -18,7 +18,7 @@ class BooleanString : AbstractDataType {
     /**
      * @return
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         return 1
     }
 

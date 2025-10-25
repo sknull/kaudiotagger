@@ -49,12 +49,6 @@ abstract class AbstractFrameBodyNumberTotal: AbstractID3v2FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     override fun getUserFriendlyValue(): String? {
         val value = getObjectValue(
             DataTypes.OBJ_TEXT

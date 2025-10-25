@@ -30,7 +30,7 @@ abstract class AbstractDataType {
     /**
      * Holds the size of the data in file when read/written
      */
-    var size: Int = 0
+    private var size: Int = 0
 
     /**
      * This is used by subclasses, to clone the data within the copyObject
@@ -101,7 +101,15 @@ abstract class AbstractDataType {
      *
      * @return the size in bytes of the datatype
      */
-    open fun getSizeValue(): Int = size
+    open fun getSize(): Int = size
+
+    fun setSize(size: Int) {
+        this.size = size
+    }
+
+    fun addSize(amount: Int) {
+        this.size += amount
+    }
 
     fun getValue(): Any? = value
 

@@ -11,11 +11,6 @@ class FieldFrameBodyINF : AbstractLyrics3v2FieldFrameBody {
      */
     constructor()
 
-    constructor(
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(byteBuffer, frameSize)
-
     constructor(body: FieldFrameBodyINF) : super(body)
 
     /**

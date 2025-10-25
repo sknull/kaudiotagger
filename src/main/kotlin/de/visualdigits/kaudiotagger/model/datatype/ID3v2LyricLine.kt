@@ -91,7 +91,7 @@ class ID3v2LyricLine : AbstractDataType {
      */
     override fun writeByteArray(): ByteArray {
         var i: Int
-        val arr = ByteArray(getSizeValue())
+        val arr = ByteArray(getSize())
 
         i = 0
         while (i < text.length) {
@@ -111,5 +111,5 @@ class ID3v2LyricLine : AbstractDataType {
     /**
      * @return
      */
-    override fun getSizeValue(): Int = text.length + 1 + 4
+    override fun getSize(): Int = text.length + 1 + 4
 }

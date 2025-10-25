@@ -14,11 +14,6 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
 
     constructor(copyObject: AbstractLyrics3v2FieldFrameBody): super(copyObject)
 
-    constructor(
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(byteBuffer, frameSize)
-
     /**
      * This is called by superclass when attempt to read data from file.
      *
@@ -77,7 +72,7 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
             `object` = iterator.next()
             `object`.readByteArray(buffer, offset)
             //Increment Offset to start of next datatype.
-            offset += `object`.getSizeValue()
+            offset += `object`.getSize()
         }
     }
 

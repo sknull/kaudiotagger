@@ -11,12 +11,6 @@ abstract class AbstractTagFrame: AbstractTagItem {
 
     constructor()
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     /**
      * This constructs the bodies copy constructor this in turn invokes
      * * bodies objectlist.

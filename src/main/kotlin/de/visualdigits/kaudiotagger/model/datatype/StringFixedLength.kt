@@ -31,7 +31,7 @@ open class StringFixedLength: AbstractString {
     }
 
     constructor(copyObject: StringFixedLength): super(copyObject) {
-        setValue(copyObject.getSizeValue())
+        setValue(copyObject.getSize())
     }
 
     /**
@@ -48,16 +48,16 @@ open class StringFixedLength: AbstractString {
             //Decode buffer if runs into problems should through exception which we
             //catch and then set value to empty string.
             log.debug(
-                "Array length is:${arr.size}offset is:${offset}Size is:${getSizeValue()}()"
+                "Array length is:${arr.size}offset is:${offset}Size is:${getSize()}()"
             )
 
-            if (arr.size - offset < getSizeValue()) {
+            if (arr.size - offset < getSize()) {
                 throw InvalidDataTypeException(
-                    "byte array is to small to retrieve string of declared length:${getSizeValue()}"
+                    "byte array is to small to retrieve string of declared length:${getSize()}"
                 )
             }
             val str = decoder
-                ?.decode(ByteBuffer.wrap(arr, offset, getSizeValue()))
+                ?.decode(ByteBuffer.wrap(arr, offset, getSize()))
                 ?.toString()
             if (str == null) {
                 throw NullPointerException("String is null")
@@ -101,8 +101,8 @@ open class StringFixedLength: AbstractString {
             log.warn(
                 "Value of StringFixedlength Field is null using default value instead"
             )
-            data = ByteArray(getSizeValue())
-            (0..<getSizeValue()).forEach { i ->
+            data = ByteArray(getSize())
+            (0..<getSize()).forEach { i ->
                 data[i] = ' '.code.toByte()
             }
             return data
@@ -123,9 +123,9 @@ open class StringFixedLength: AbstractString {
             log.warn(
                 "There was a problem writing the following StringFixedlength Field:${getValue()}:${ce.message}using default value instead"
             )
-            data = ByteArray(getSizeValue())
+            data = ByteArray(getSize())
             var i = 0
-            while (i < getSizeValue()) {
+            while (i < getSize()) {
                 data[i] = ' '.code.toByte()
                 i++
             }
@@ -136,26 +136,26 @@ open class StringFixedLength: AbstractString {
         // To check now because size is in bytes not chars
         if (dataBuffer != null) {
             //Everything ok
-            if (dataBuffer.limit() == getSizeValue()) {
+            if (dataBuffer.limit() == getSize()) {
                 data = ByteArray(dataBuffer.limit())
                 dataBuffer.get(data, 0, dataBuffer.limit())
                 return data
-            } else if (dataBuffer.limit() > getSizeValue()) {
+            } else if (dataBuffer.limit() > getSize()) {
                 log.warn(
-                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:${getSizeValue()} too long so stripping extra length"
+                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:${getSize()} too long so stripping extra length"
                 )
-                data = ByteArray(getSizeValue())
-                dataBuffer.get(data, 0, getSizeValue())
+                data = ByteArray(getSize())
+                dataBuffer.get(data, 0, getSize())
                 return data
             } else {
                 log.warn(
-                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:${getSizeValue()} too short so padding with spaces to make up extra length"
+                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:${getSize()} too short so padding with spaces to make up extra length"
                 )
 
-                data = ByteArray(getSizeValue())
+                data = ByteArray(getSize())
                 dataBuffer.get(data, 0, dataBuffer.limit())
 
-                for (i in dataBuffer.limit()..<getSizeValue()) {
+                for (i in dataBuffer.limit()..<getSize()) {
                     data[i] = ' '.code.toByte()
                 }
                 return data
@@ -164,8 +164,8 @@ open class StringFixedLength: AbstractString {
             log.warn(
                 "There was a serious problem writing the following StringFixedlength Field:${getValue()}:using default value instead"
             )
-            data = ByteArray(getSizeValue())
-            for (i in 0..<getSizeValue()) {
+            data = ByteArray(getSize())
+            for (i in 0..<getSize()) {
                 data[i] = ' '.code.toByte()
             }
             return data

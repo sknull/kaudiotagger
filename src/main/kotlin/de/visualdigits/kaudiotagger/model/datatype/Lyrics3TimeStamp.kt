@@ -47,7 +47,7 @@ class Lyrics3TimeStamp : AbstractDataType {
     /**
      * @return
      */
-    override fun getSizeValue(): Int = 7
+    override fun getSize(): Int = 7
 
     /**
      * Creates a new ObjectLyrics3TimeStamp datatype.

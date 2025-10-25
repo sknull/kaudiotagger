@@ -29,10 +29,10 @@ class Lyrics3Image : AbstractDataType {
     /**
      * @return
      */
-    override fun getSizeValue(): Int {
+    override fun getSize(): Int {
         var size: Int = (filename?.length?:0) + 2 + (description?.length?:0) + 2
         if (this.timeStamp != null) {
-            size += timeStamp?.getSizeValue()?:0
+            size += timeStamp?.getSize()?:0
         }
 
         return size

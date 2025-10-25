@@ -37,12 +37,6 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    constructor(
-        identifier: String? = null,
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(identifier, byteBuffer, frameSize)
-
     /**
      * Parse text as a null separated pairing of function and name
      *

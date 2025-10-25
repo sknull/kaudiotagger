@@ -16,11 +16,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
      */
     constructor()
 
-    constructor(
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(byteBuffer, frameSize)
-
     constructor(copyObject: FieldFrameBodyUnsupported) : super(copyObject) {
         this.value = copyObject.value?.clone()
     }

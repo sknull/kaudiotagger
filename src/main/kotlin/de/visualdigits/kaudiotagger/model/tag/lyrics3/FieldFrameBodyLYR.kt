@@ -19,11 +19,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
      */
     constructor()
 
-    constructor(
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): super(byteBuffer, frameSize)
-
     constructor(copyObject: FieldFrameBodyLYR): super(copyObject) {
         var old: Lyrics3Line?
         copyObject.lines.indices.forEach { i ->
@@ -253,7 +248,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
 
         for (line1 in lines) {
             line = line1 as Lyrics3Line
-            size += (line.getSizeValue() + 2)
+            size += (line.getSize() + 2)
         }
 
         return size
