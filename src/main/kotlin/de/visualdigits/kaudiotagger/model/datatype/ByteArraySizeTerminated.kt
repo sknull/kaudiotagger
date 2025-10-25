@@ -1,17 +1,15 @@
 package de.visualdigits.kaudiotagger.model.datatype
 
-import de.visualdigits.kaudiotagger.model.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 
-class ByteArraySizeTerminated(
-    identifier: String,
-    frameBody: AbstractTagFrameBody? = null,
-    value: Any? = null
-): TextEncodedStringSizeTerminated(
-    identifier,
-    frameBody,
-    value
-)  {
+class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
+
+    constructor(
+        identifier: String,
+        frameBody: AbstractTagFrameBody
+    ) : super(identifier, frameBody)
+
+    constructor(copyObject: ByteArraySizeTerminated) : super(copyObject)
 
     override fun equals(obj: Any?): Boolean {
         return obj is ByteArraySizeTerminated && super.equals(obj)
@@ -23,7 +21,6 @@ class ByteArraySizeTerminated(
      * @throws NullPointerException
      * @throws IndexOutOfBoundsException
      */
-    @Throws(InvalidDataTypeException::class)
     override fun readByteArray(arr: ByteArray, offset: Int) {
         if (arr == null) {
             throw NullPointerException("Byte array is null")
@@ -40,13 +37,14 @@ class ByteArraySizeTerminated(
 
         //Empty Byte Array
         if (offset >= arr.size) {
-            value = null
+            setValue(null)
             return
         }
 
         val len = arr.size - offset
-        value = ByteArray(len)
+        val value = ByteArray(len)
         System.arraycopy(arr, offset, value, 0, len)
+        setValue(value)
     }
 
     /**
@@ -56,7 +54,7 @@ class ByteArraySizeTerminated(
      * @return the number of bytes
      */
     override fun toString(): String {
-        return getSize().toString() + " bytes"
+        return size.toString() + " bytes"
     }
 
     /**
@@ -64,15 +62,7 @@ class ByteArraySizeTerminated(
      *
      * @return the size in bytes
      */
-    override fun getSize(): Int {
-        var len = 0
-
-        if (value != null) {
-            len = (value as ByteArray).size
-        }
-
-        return len
-    }
+    override fun getSizeValue(): Int = getValue()?.let { v -> (v as ByteArray).size}?:0
 
     /**
      * Write contents to a byte array
@@ -81,6 +71,6 @@ class ByteArraySizeTerminated(
      */
     override fun writeByteArray(): ByteArray {
         log.debug("Writing byte array" + identifier)
-        return value as ByteArray
+        return getValue() as ByteArray
     }
 }

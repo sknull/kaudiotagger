@@ -16,7 +16,7 @@ interface TagField {
      *
      * @return Unique identifier for the fields type. (title, artist...)
      */
-    fun getId(): String?
+    fun getIdentifier(): String?
 
     /**
      * This method delivers the binary representation of the fields data in

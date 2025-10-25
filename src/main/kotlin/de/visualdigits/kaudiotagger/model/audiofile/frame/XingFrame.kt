@@ -5,9 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 
-class XingFrame(
-    val header: ByteBuffer
-) {
+class XingFrame {
 
     companion object {
 
@@ -50,9 +48,8 @@ class XingFrame(
          *
          * @return XingFrame
          */
-        fun parseXingFrame(header: ByteBuffer): XingFrame {
-            val xingFrame = XingFrame(header)
-            return xingFrame
+        fun parseXingFrame(header: ByteBuffer?): XingFrame? {
+            return header?.let { h -> XingFrame(h) }
         }
 
         /**
@@ -109,14 +106,17 @@ class XingFrame(
         }
     }
 
-    var vbr = false
+    var isVbr = false
     var isFrameCountEnabled = false
     var frameCount = -1
     var isAudioSizeEnabled = false
     var audioSize = -1
     var lameFrame: LameFrame? = null
 
-    init {
+    val header: ByteBuffer
+
+    constructor(header: ByteBuffer) {
+        this.header = header
         //Go to start of Buffer
         header.rewind()
 
@@ -158,7 +158,7 @@ class XingFrame(
         header.get(identifier)
         if (identifier.contentEquals(XING_VBR_ID)) {
             log.debug("Is Vbr")
-            vbr = true
+            isVbr = true
         }
     }
 
@@ -186,5 +186,12 @@ class XingFrame(
                     ((frameSizeBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or
                     ((frameSizeBuffer[BYTE_3].toInt() shl 8) and 0x0000FF00) or
                     (frameSizeBuffer[BYTE_4].toInt() and 0x000000FF)
+    }
+
+    /**
+     * @return a string representation
+     */
+    override fun toString(): String {
+        return ("xingheader vbr:$isVbr frameCountEnabled:$isFrameCountEnabled frameCount:$frameCount audioSizeEnabled:$isAudioSizeEnabled audioFileSize:$audioSize")
     }
 }

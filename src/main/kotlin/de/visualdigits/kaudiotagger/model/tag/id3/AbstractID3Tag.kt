@@ -25,19 +25,19 @@ abstract class AbstractID3Tag: AbstractTag {
      *
      * @return
      */
-    abstract fun getRelease(): Byte
+    abstract fun getRelease(): Int
 
     /**
      * Retrieve the Major Version
      *
      * @return
      */
-    abstract fun getMajorVersion(): Byte
+    abstract fun getMajorVersion(): Int
 
     /**
      * Retrieve the Revision
      *
      * @return
      */
-    abstract fun getRevision(): Byte
+    abstract fun getRevision(): Int
 }

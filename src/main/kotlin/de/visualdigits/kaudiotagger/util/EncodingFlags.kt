@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.util
 import org.slf4j.LoggerFactory
 
 open class EncodingFlags(
-    var flags: Byte = 0
+    var flags: Int = 0
 ) {
 
     val log = LoggerFactory.getLogger(javaClass)
@@ -13,8 +13,11 @@ open class EncodingFlags(
         const val TYPE_FLAGS: String = "encodingFlags"
     }
 
+    open fun createStructure() {
+    }
+
     fun resetFlags() {
-        flags = 0.toByte()
+        flags = 0
     }
 
     override fun equals(obj: Any?): Boolean {

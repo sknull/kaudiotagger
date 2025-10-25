@@ -3,6 +3,7 @@ package de.visualdigits.kaudiotagger.model.frame
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.tag.AbstractTagItem
 import de.visualdigits.kaudiotagger.util.ID3Tags
+import java.nio.ByteBuffer
 
 abstract class AbstractTagFrame: AbstractTagItem {
 
@@ -10,7 +11,11 @@ abstract class AbstractTagFrame: AbstractTagItem {
 
     constructor()
 
-
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     /**
      * This constructs the bodies copy constructor this in turn invokes
@@ -45,8 +50,10 @@ abstract class AbstractTagFrame: AbstractTagItem {
             return false
         }
 
-        return (frameBody!!.isSubsetOf(obj.frameBody) &&
-                super.isSubsetOf(obj)
-                )
+        return (frameBody?.isSubsetOf(obj.frameBody) == true && super.isSubsetOf(obj))
+    }
+
+    override fun toString(): String {
+        return frameBody?.toString()?:""
     }
 }

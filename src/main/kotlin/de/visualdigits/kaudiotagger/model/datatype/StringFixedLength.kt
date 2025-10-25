@@ -27,11 +27,11 @@ open class StringFixedLength: AbstractString {
         if (size < 0) {
             throw IllegalArgumentException("size is less than zero: " + size);
         }
-        this.size = size
+        setValue(size)
     }
 
     constructor(copyObject: StringFixedLength): super(copyObject) {
-        this.size = copyObject.size
+        setValue(copyObject.getSizeValue())
     }
 
     /**
@@ -48,26 +48,26 @@ open class StringFixedLength: AbstractString {
             //Decode buffer if runs into problems should through exception which we
             //catch and then set value to empty string.
             log.debug(
-                "Array length is:${arr.size}offset is:${offset}Size is:$size"
+                "Array length is:${arr.size}offset is:${offset}Size is:${getSizeValue()}()"
             )
 
-            if (arr.size - offset < size) {
+            if (arr.size - offset < getSizeValue()) {
                 throw InvalidDataTypeException(
-                    "byte array is to small to retrieve string of declared length:$size"
+                    "byte array is to small to retrieve string of declared length:${getSizeValue()}"
                 )
             }
             val str = decoder
-                ?.decode(ByteBuffer.wrap(arr, offset, size))
+                ?.decode(ByteBuffer.wrap(arr, offset, getSizeValue()))
                 ?.toString()
             if (str == null) {
                 throw NullPointerException("String is null")
             }
-            value = str
+            setValue(str)
         } catch (ce: CharacterCodingException) {
             log.error(ce.message)
-            value = ""
+            setValue("")
         }
-        log.debug("Read StringFixedLength:$value")
+        log.debug("Read StringFixedLength:${getValue()}")
     }
 
     /**
@@ -97,12 +97,12 @@ open class StringFixedLength: AbstractString {
         val data: ByteArray
 
         //Create with a series of empty of spaces to try and ensure integrity of field
-        if (value == null) {
+        if (getValue() == null) {
             log.warn(
                 "Value of StringFixedlength Field is null using default value instead"
             )
-            data = ByteArray(size)
-            for (i in 0..<size) {
+            data = ByteArray(getSizeValue())
+            (0..<getSizeValue()).forEach { i ->
                 data[i] = ' '.code.toByte()
             }
             return data
@@ -114,18 +114,18 @@ open class StringFixedLength: AbstractString {
             if (StandardCharsets.UTF_16 == charset) {
                 //Note remember LE BOM is ff fe but tis is handled by encoder Unicode char is fe ff
                 encoder = StandardCharsets.UTF_16LE.newEncoder()
-                dataBuffer = encoder.encode(CharBuffer.wrap('\ufeff'.toString() + value as String?))
+                dataBuffer = encoder.encode(CharBuffer.wrap("\uFEFF${getValue() as String?}"))
             } else {
                 encoder = charset?.newEncoder()
-                dataBuffer = encoder?.encode(CharBuffer.wrap(value as? String))
+                dataBuffer = encoder?.encode(CharBuffer.wrap(getValue() as? String))
             }
         } catch (ce: CharacterCodingException) {
             log.warn(
-                "There was a problem writing the following StringFixedlength Field:$value:${ce.message}using default value instead"
+                "There was a problem writing the following StringFixedlength Field:${getValue()}:${ce.message}using default value instead"
             )
-            data = ByteArray(size)
+            data = ByteArray(getSizeValue())
             var i = 0
-            while (i < size) {
+            while (i < getSizeValue()) {
                 data[i] = ' '.code.toByte()
                 i++
             }
@@ -136,36 +136,36 @@ open class StringFixedLength: AbstractString {
         // To check now because size is in bytes not chars
         if (dataBuffer != null) {
             //Everything ok
-            if (dataBuffer.limit() == size) {
+            if (dataBuffer.limit() == getSizeValue()) {
                 data = ByteArray(dataBuffer.limit())
                 dataBuffer.get(data, 0, dataBuffer.limit())
                 return data
-            } else if (dataBuffer.limit() > size) {
+            } else if (dataBuffer.limit() > getSizeValue()) {
                 log.warn(
-                    "There was a problem writing the following StringFixedlength Field:$value when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:$size too long so stripping extra length"
+                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:${getSizeValue()} too long so stripping extra length"
                 )
-                data = ByteArray(size)
-                dataBuffer.get(data, 0, size)
+                data = ByteArray(getSizeValue())
+                dataBuffer.get(data, 0, getSizeValue())
                 return data
             } else {
                 log.warn(
-                    "There was a problem writing the following StringFixedlength Field:$value when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:$size too short so padding with spaces to make up extra length"
+                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${dataBuffer.limit()} but field was defined with length of:${getSizeValue()} too short so padding with spaces to make up extra length"
                 )
 
-                data = ByteArray(size)
+                data = ByteArray(getSizeValue())
                 dataBuffer.get(data, 0, dataBuffer.limit())
 
-                for (i in dataBuffer.limit()..<size) {
+                for (i in dataBuffer.limit()..<getSizeValue()) {
                     data[i] = ' '.code.toByte()
                 }
                 return data
             }
         } else {
             log.warn(
-                "There was a serious problem writing the following StringFixedlength Field:$value:using default value instead"
+                "There was a serious problem writing the following StringFixedlength Field:${getValue()}:using default value instead"
             )
-            data = ByteArray(size)
-            for (i in 0..<size) {
+            data = ByteArray(getSizeValue())
+            for (i in 0..<getSizeValue()) {
                 data[i] = ' '.code.toByte()
             }
             return data

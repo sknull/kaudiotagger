@@ -5,6 +5,7 @@ import de.visualdigits.kaudiotagger.model.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.datatype.PairedTextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.datatype.ValuePairs
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
 import java.io.ByteArrayOutputStream
@@ -31,14 +32,16 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
         setText(text)
     }
 
-    /**
-     * Creates a new AbstractFrameBodyPairs data type.
-     *
-     * @param byteBuffer
-     * @param frameSize
-     * @throws org.jaudiotagger.tag.InvalidTagException
-     */
-    constructor(byteBuffer: ByteBuffer, frameSize: Int): super(byteBuffer, frameSize)
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(byteBuffer, frameSize)
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     /**
      * Parse text as a null separated pairing of function and name
@@ -63,7 +66,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
     fun addPair(function: String, name: String) {
         val value = (getObject(
                 DataTypes.OBJ_TEXT
-            ) as PairedTextEncodedStringNullTerminated).value as? ValuePairs
+            ) as PairedTextEncodedStringNullTerminated).getValue() as? ValuePairs
         value?.add(function, name)
     }
 
@@ -74,7 +77,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
         val value =
             (getObject(
                 DataTypes.OBJ_TEXT
-            ) as PairedTextEncodedStringNullTerminated).value as? ValuePairs
+            ) as PairedTextEncodedStringNullTerminated).getValue() as? ValuePairs
         value?.mapping?.clear()
     }
 
@@ -82,14 +85,14 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
      * Because have a text encoding we need to check the data values do not contain characters that cannot be encoded in
      * current encoding before we write data. If they do change the encoding.
      */
-    fun write(tagBuffer: ByteArrayOutputStream?) {
+    override fun write(tagBuffer: ByteArrayOutputStream) {
         if (!(getObject(
                 DataTypes.OBJ_TEXT
             ) as PairedTextEncodedStringNullTerminated).canBeEncoded()
         ) {
             this.setTextEncoding(TextEncoding.UTF_16.id)
         }
-        super.write(tagBuffer!!)
+        super.write(tagBuffer)
     }
 
     /**
@@ -112,7 +115,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
     fun getPairing(): ValuePairs? {
         return getObject(
             DataTypes.OBJ_TEXT
-        )?.value as? ValuePairs
+        )?.getValue() as? ValuePairs
     }
 
     /**
@@ -124,7 +127,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
     fun getKeyAtIndex(index: Int): String {
         val text: PairedTextEncodedStringNullTerminated =
             getObject(DataTypes.OBJ_TEXT) as PairedTextEncodedStringNullTerminated
-        return (text.value as ValuePairs).mapping[index].first
+        return (text.getValue() as ValuePairs).mapping[index].first
     }
 
     /**
@@ -136,7 +139,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
     fun getValueAtIndex(index: Int): String {
         val text: PairedTextEncodedStringNullTerminated =
             getObject(DataTypes.OBJ_TEXT) as PairedTextEncodedStringNullTerminated
-        return (text.value as ValuePairs).mapping[index].second
+        return (text.getValue() as ValuePairs).mapping[index].second
     }
 
     override fun getUserFriendlyValue(): String {
@@ -148,7 +151,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
             getObject(DataTypes.OBJ_TEXT) as PairedTextEncodedStringNullTerminated
         val sb = StringBuilder()
         var count = 1
-        for (entry in (text.value as ValuePairs).mapping) {
+        for (entry in (text.getValue() as ValuePairs).mapping) {
             sb.append(entry.first + '\u0000' + entry.second)
             if (count != getNumberOfPairs()) {
                 sb.append('\u0000')
@@ -183,6 +186,6 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
     fun getNumberOfPairs(): Int {
         val text: PairedTextEncodedStringNullTerminated =
             getObject(DataTypes.OBJ_TEXT) as PairedTextEncodedStringNullTerminated
-        return (text.value as ValuePairs).getNumberOfPairs()
+        return (text.getValue() as ValuePairs).getNumberOfPairs()
     }
 }

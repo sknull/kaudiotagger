@@ -10,15 +10,7 @@ import java.nio.charset.CharsetEncoder
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
 
-open class TextEncodedStringSizeTerminated(
-    identifier: String,
-    frameBody: AbstractTagFrameBody? = null,
-    value: Any? = null
-) : AbstractString(
-    identifier,
-    frameBody,
-    value
-) {
+open class TextEncodedStringSizeTerminated : AbstractString {
 
     companion object {
 
@@ -39,6 +31,26 @@ open class TextEncodedStringSizeTerminated(
             return values;
         }
     }
+
+    /**
+     * Creates a new empty TextEncodedStringSizeTerminated datatype.
+     *
+     * @param identifier identifies the frame type
+     * @param frameBody
+     */
+    constructor(
+        identifier: String,
+        frameBody: AbstractTagFrameBody
+    ) : super(identifier, frameBody)
+
+    /**
+     * Copy constructor
+     *
+     * @param `object`
+     */
+    constructor(
+        copyObject: TextEncodedStringSizeTerminated
+    ) : super(copyObject)
 
     /**
      * Read a 'n' bytes from buffer into a String where n is the framesize - offset
@@ -71,14 +83,14 @@ open class TextEncodedStringSizeTerminated(
 
         //If using UTF16 with BOM we then search through the text removing any BOMs that could exist
         //for multiple values, BOM could be Big Endian or Little Endian
-        value = if (StandardCharsets.UTF_16 == getTextEncodingCharSet()) {
+        setValue(if (StandardCharsets.UTF_16 == getTextEncodingCharSet()) {
             outBuffer.toString().replace("\ufeff", "").replace("\ufffe", "")
         } else {
             outBuffer.toString()
-        }
+        })
         //SetSize, important this is correct for finding the next datatype
-        size = arr.size - offset
-        log.debug("Read SizeTerminatedString:{} size:{}", value, size)
+        size = (arr.size - offset)
+        log.debug("Read SizeTerminatedString:{} size:{}", getValue(), getSizeValue())
     }
 
     override fun getTextEncodingCharSet(): Charset? {
@@ -106,7 +118,7 @@ open class TextEncodedStringSizeTerminated(
             stripTrailingNull()
 
             //Special Handling because there is no UTF16 BOM LE charset
-            val stringValue = value as String
+            val stringValue = getValue() as String
             var actualCharSet: Charset? = null
             if (StandardCharsets.UTF_16 == charset) {
                 actualCharSet = if (TagOptionSingleton.isEncodeUTF16BomAsLittleEndian) {
@@ -144,9 +156,9 @@ open class TextEncodedStringSizeTerminated(
             data = ByteArray(outputBuffer.limit())
             outputBuffer.rewind()
             outputBuffer.get(data, 0, outputBuffer.limit())
-            size = data.size
+            setValue(data.size)
         } catch (ce: CharacterCodingException) { //https://bitbucket.org/ijabz/jaudiotagger/issue/1/encoding-metadata-to-utf-16-can-fail-if
-            log.error(ce.message + ":" + charset + ":" + value)
+            log.error("${ce.message}:$charset:${getValue()}")
             throw RuntimeException(ce)
         }
         return data
@@ -257,11 +269,11 @@ open class TextEncodedStringSizeTerminated(
      */
     fun stripTrailingNull() {
         if (TagOptionSingleton.removeTrailingTerminatorOnWrite) {
-            var stringValue = value as String
+            var stringValue = getValue() as String
             if (stringValue.isNotEmpty()) {
                 if (stringValue.get(stringValue.length - 1) == '\u0000') {
                     stringValue = stringValue.take(stringValue.length - 1)
-                    value = stringValue
+                    setValue(stringValue)
                 }
             }
         }
@@ -292,7 +304,7 @@ open class TextEncodedStringSizeTerminated(
      * @param value
      */
     open fun addValue(value: String) {
-        this.value = "${this.value}\u0000$value"
+        setValue("${value}\u0000$value")
     }
 
     /**
@@ -301,7 +313,7 @@ open class TextEncodedStringSizeTerminated(
      * @return number of values held, usually this will be one.
      */
     open fun getNumberOfValues(): Int {
-        return TextEncodedStringSizeTerminated.splitByNullSeperator((value as String)).size
+        return TextEncodedStringSizeTerminated.splitByNullSeperator((getValue() as String)).size
     }
 
     /**
@@ -313,7 +325,7 @@ open class TextEncodedStringSizeTerminated(
      */
     open fun getValueAtIndex(index: Int): String? {
         //Split String into separate components
-        val values: MutableList<*> = TextEncodedStringSizeTerminated.splitByNullSeperator(value as String)
+        val values: MutableList<*> = TextEncodedStringSizeTerminated.splitByNullSeperator(getValue() as String)
         return values[index] as String
     }
 
@@ -321,7 +333,7 @@ open class TextEncodedStringSizeTerminated(
      * @return list of all values
      */
     open fun getValues(): MutableList<String> {
-        return TextEncodedStringSizeTerminated.splitByNullSeperator(value as String)
+        return TextEncodedStringSizeTerminated.splitByNullSeperator(getValue() as String)
     }
 
     /**
@@ -330,7 +342,7 @@ open class TextEncodedStringSizeTerminated(
      * @return
      */
     open fun getValueWithoutTrailingNull(): String {
-        val values = TextEncodedStringSizeTerminated.splitByNullSeperator(value as String)
+        val values = TextEncodedStringSizeTerminated.splitByNullSeperator(getValue() as String)
         val sb = StringBuffer()
         for (i in values.indices) {
             if (i != 0) {

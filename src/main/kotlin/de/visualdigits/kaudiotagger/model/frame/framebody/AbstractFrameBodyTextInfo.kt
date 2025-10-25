@@ -4,17 +4,13 @@ import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 
 abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
-    
-    init {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, 0)
-        setObjectValue(DataTypes.OBJ_TEXT, "")
-    }
 
     /**
      * Creates a new FrameBodyTextInformation datatype. The super.super
@@ -40,22 +36,21 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      * text to file.
      * @param text         Specifies the text String.
      */
-    constructor(textEncoding: Byte, text: String) {
+    constructor(textEncoding: Byte, text: String?) {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding)
-        setObjectValue(DataTypes.OBJ_TEXT, text!!)
+        setObjectValue(DataTypes.OBJ_TEXT, text)
     }
 
-    /**
-     * Creates a new FrameBodyTextInformation data type from file.
-     *
-     *
-     * The super.super Constructor sets up the Object list for the frame.
-     *
-     * @param byteBuffer
-     * @param frameSize
-     * @throws InvalidTagException if unable to create framebody from buffer
-     */
-    constructor(byteBuffer: ByteBuffer, frameSize: Int): super(byteBuffer, frameSize)
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(byteBuffer, frameSize)
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     override fun getUserFriendlyValue(): String? {
         return getTextWithoutTrailingNulls()
@@ -173,7 +168,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
                 ID3TextEncodingConversion.getUnicodeTextEncoding(header)
             )
         }
-        super.write(tagBuffer!!)
+        super.write(tagBuffer)
     }
 
     /**

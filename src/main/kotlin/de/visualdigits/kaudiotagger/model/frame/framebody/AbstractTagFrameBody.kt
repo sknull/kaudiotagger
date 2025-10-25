@@ -5,8 +5,9 @@ import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.tag.AbstractTagItem
 import de.visualdigits.kaudiotagger.util.ID3Tags
+import java.nio.ByteBuffer
 
-abstract class AbstractTagFrameBody(): AbstractTagItem() {
+abstract class AbstractTagFrameBody : AbstractTagItem {
 
     /**
      * List of data types that make up this particular frame body.
@@ -21,6 +22,22 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
      */
     var header: AbstractTagFrame? = null
 
+    constructor() {
+        setupObjectList()
+    }
+
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ) : super(byteBuffer, frameSize)
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ) : super(identifier, byteBuffer, frameSize)
+
+    constructor(size: Int) : super(size)
 
     /**
      * Copy Constructor for fragment body. Copies all objects in the
@@ -28,7 +45,7 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
      *
      * @param copyObject
      */
-    constructor(copyObject: AbstractTagFrameBody): this() {
+    constructor(copyObject: AbstractTagFrameBody) : this() {
         var newObject: AbstractDataType
         for (i in copyObject.objectList.indices) {
             newObject = ID3Tags.copyObject(
@@ -47,8 +64,8 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
     fun getTextEncoding(): Byte {
         return getObject(DataTypes.OBJ_TEXT_ENCODING)
             ?.let { o ->
-                (o.value as Long).toByte()
-            } ?: 0.toByte()
+                (o.getValue() as Long).toByte()
+            } ?: 0
     }
 
     /**
@@ -56,7 +73,7 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
      *
      * @param textEncoding to use for this frame body
      */
-    open fun setTextEncoding(textEncoding: Byte) {
+    open fun setTextEncoding(textEncoding: Byte?) {
         //Number HashMap actually converts this byte to a long
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding)
     }
@@ -69,8 +86,8 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
      */
     fun setObjectValue(identifier: String, value: Any?) {
         objectList
-            .find { obj -> obj.identifier == identifier}
-            ?.also { obj -> obj.value = value }
+            .find { obj -> obj.identifier == identifier }
+            ?.also { obj -> obj.setValue(value) }
     }
 
     /**
@@ -132,7 +149,7 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
      * `identifier`
      */
     fun getObjectValue(identifier: String): Any? {
-        return getObject(identifier)?.value
+        return getObject(identifier)?.getValue()
     }
 
     /**
@@ -140,8 +157,8 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
      *
      * @return estimated size in bytes of this datatype
      */
-    override fun getSize(): Int {
-        return objectList.sumOf { obj -> obj.size }
+    override fun getSizeValue(): Int {
+        return size
     }
 
     /**
@@ -159,7 +176,7 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
         }
         val superset = obj.objectList
         objectList.forEach { anObjectList ->
-            if (anObjectList.value != null) {
+            if (anObjectList.getValue() != null) {
                 if (!superset.contains(anObjectList)) {
                     return false
                 }
@@ -173,4 +190,7 @@ abstract class AbstractTagFrameBody(): AbstractTagItem() {
      * expects in the correct order This method needs to be implemented by concrete subclasses
      */
     abstract fun setupObjectList()
+
+    open fun createStructure() {
+    }
 }

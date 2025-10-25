@@ -7,7 +7,9 @@ import de.visualdigits.kaudiotagger.model.datatype.TextEncodedStringSizeTerminat
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
-import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -142,14 +144,16 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
         this.setObjectValue(DataTypes.OBJ_TEXT, text)
     }
 
-    /**
-     * Creates a new FrameBodyTXXX datatype.
-     *
-     * @param byteBuffer
-     * @param frameSize
-     * @throws InvalidTagException
-     */
-    constructor(byteBuffer: ByteBuffer, frameSize: Int): super(byteBuffer, frameSize)
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(byteBuffer, frameSize)
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     /**
      * @return the description field
@@ -173,7 +177,7 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String? {
-        return ID3v24KFrame.USER_DEFINED_INFO.id
+        return ID3v24Frames.USER_DEFINED_INFO.id
     }
 
     /**

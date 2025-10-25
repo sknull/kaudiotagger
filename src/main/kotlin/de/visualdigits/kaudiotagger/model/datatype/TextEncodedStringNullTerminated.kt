@@ -9,15 +9,35 @@ import java.nio.charset.CharsetDecoder
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
 
-class TextEncodedStringNullTerminated(
-    identifier: String,
-    frameBody: AbstractTagFrameBody? = null,
-    value: Any? = null
-) : AbstractString(
-    identifier,
-    frameBody,
-    value
-) {
+open class TextEncodedStringNullTerminated : AbstractString {
+
+    /**
+     * Creates a new TextEncodedStringNullTerminated datatype.
+     *
+     * @param identifier identifies the frame type
+     * @param frameBody
+     */
+    constructor(
+        identifier: String,
+        frameBody: AbstractTagFrameBody?
+    ) : super(identifier, frameBody)
+
+    /**
+     * Creates a new TextEncodedStringNullTerminated datatype, with value
+     *
+     * @param identifier
+     * @param frameBody
+     * @param value
+     */
+    constructor(
+        identifier: String,
+        frameBody: AbstractTagFrameBody?,
+        value: String
+    ) : super(identifier, frameBody, value)
+
+    constructor(
+        copyObject: TextEncodedStringNullTerminated
+    ) : super(copyObject)
 
     /**
      * Read a string from buffer upto null character (if exists)
@@ -120,7 +140,7 @@ class TextEncodedStringNullTerminated(
         if (!nullIsOneByte) {
             size++
         }
-        this.size = size
+        setValue(size)
 
         //Decode buffer if runs into problems should throw exception which we
         //catch and then set value to empty string. (We don't read the null terminator
@@ -128,23 +148,23 @@ class TextEncodedStringNullTerminated(
         bufferSize = endPosition - offset
         log.debug("Text size is:$bufferSize")
         if (bufferSize == 0) {
-            value = ""
+            setValue("")
         } else {
             //Decode sliced inBuffer
             val inBuffer = ByteBuffer.wrap(arr, offset, bufferSize).slice()
             val outBuffer = CharBuffer.allocate(bufferSize)
 
-            val decoder: CharsetDecoder = getCorrectDecoder(inBuffer!!)!!
-            val coderResult = decoder.decode(inBuffer, outBuffer, true)
-            if (coderResult.isError) {
+            val decoder: CharsetDecoder? = getCorrectDecoder(inBuffer)
+            val coderResult = decoder?.decode(inBuffer, outBuffer, true)
+            if (coderResult?.isError == true) {
                 log.warn("Problem decoding text encoded null terminated string:$coderResult")
             }
-            decoder.flush(outBuffer)
+            decoder?.flush(outBuffer)
             outBuffer.flip()
-            value = outBuffer.toString()
+            setValue(outBuffer.toString())
         }
         //Set Size so offset is ready for next field (includes the null terminator)
-        log.debug("Read NullTerminatedString:{} size inc terminator:{}", value, size)
+        log.debug("Read NullTerminatedString:{} size inc terminator:{}", getValue(), size)
     }
 
     /**
@@ -153,7 +173,7 @@ class TextEncodedStringNullTerminated(
      * @return the data as a byte array in format to write to file
      */
     override fun writeByteArray(): ByteArray {
-        log.debug("Writing NullTerminatedString.{}", value)
+        log.debug("Writing NullTerminatedString.{}", getValue())
         val data: ByteArray?
         //Write to buffer using the CharSet defined by getTextEncodingCharSet()
         //Add a null terminator which will be encoded based on encoding.
@@ -167,7 +187,7 @@ class TextEncodedStringNullTerminated(
 
                     //Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
                     val bb = encoder.encode(
-                        CharBuffer.wrap('\ufeff'.toString() + value as String? + '\u0000')
+                        CharBuffer.wrap("\uFEFF${getValue() as String?}\u0000")
                     )
                     data = ByteArray(bb.limit())
                     bb.get(data, 0, bb.limit())
@@ -178,7 +198,7 @@ class TextEncodedStringNullTerminated(
 
                     //Note  BE BOM will leave as fe ff
                     val bb = encoder.encode(
-                        CharBuffer.wrap('\ufeff'.toString() + value as String? + '\u0000')
+                        CharBuffer.wrap("\uFEFF${getValue() as String?}\u0000")
                     )
                     data = ByteArray(bb.limit())
                     bb.get(data, 0, bb.limit())
@@ -189,16 +209,16 @@ class TextEncodedStringNullTerminated(
                 encoder.onUnmappableCharacter(CodingErrorAction.IGNORE)
 
                 val bb = encoder.encode(
-                    CharBuffer.wrap(value as String? + '\u0000')
+                    CharBuffer.wrap("${getValue() as String?}\u0000")
                 )
                 data = ByteArray(bb.limit())
                 bb.get(data, 0, bb.limit())
             }
         } catch (ce: CharacterCodingException) { //https://bitbucket.org/ijabz/jaudiotagger/issue/1/encoding-metadata-to-utf-16-can-fail-if
-            log.error(ce.message + ":" + charset.name() + ":" + value)
+            log.error("${ce.message}:${charset.name()}:${getValue()}")
             throw RuntimeException(ce)
         }
-        this.size = data.size
+        setValue(data.size)
 
         return data
     }

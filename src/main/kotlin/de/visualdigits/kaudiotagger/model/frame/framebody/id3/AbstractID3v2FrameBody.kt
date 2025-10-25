@@ -1,6 +1,7 @@
 package de.visualdigits.kaudiotagger.model.frame.framebody.id3
 
 import com.sun.jdi.InvalidStackFrameException
+import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import java.io.ByteArrayOutputStream
@@ -14,24 +15,23 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         const val TYPE_BODY: String = "body"
     }
 
-    var size: Int = 0
-
     constructor()
 
-    constructor(size: Int) {
-        this.size = size
-    }
+    constructor(size: Int): super(size)
 
-    /**
-     * Creates a new FrameBody dataType from file. The super
-     * Constructor sets up the Object list for the frame.
-     *
-     * @param byteBuffer from where to read the frame body from
-     * @param frameSize
-     */
-    constructor(byteBuffer: ByteBuffer, frameSize: Int): this(frameSize) {
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): this() {
+        size = frameSize
         read(byteBuffer)
     }
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     /**
      * Create Body based on another body
@@ -54,11 +54,15 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
     //TODO why don't we just slice byteBuffer, set limit to size and convert readByteArray to take a ByteBuffer
     //then we wouldn't have to temporary allocate space for the buffer, using lots of needless memory
     //and providing extra work for the garbage collector.
-    override fun read(byteBuffer: ByteBuffer) {
-        log.debug("Reading body for" + this.getIdentifier() + ":" + size)
+    override fun read(byteBuffer: ByteBuffer?) {
+        if (byteBuffer == null) {
+            return
+        }
+        val sizeValue = getSizeValue()
+        log.debug("Reading body for${this.getIdentifier()}:$sizeValue")
 
         //Allocate a buffer to the size of the Frame Body and read from file
-        val buffer = ByteArray(size)
+        val buffer = ByteArray(sizeValue)
         byteBuffer.get(buffer)
 
         //Offset into buffer, incremented by length of previous dataType
@@ -68,11 +72,11 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
 
         //Go through the ObjectList of the Frame reading the data into the
         for (`object` in objectList) { //correct dataType.
-            log.debug("offset:" + offset)
+            log.debug("offset:$offset")
 
             //The read has extended further than the defined frame size (ok to extend upto
             //size because the next datatype may be of length 0.)
-            if (offset > (size)) {
+            if (offset > sizeValue) {
                 log.warn("Invalid Size for FrameBody")
                 throw InvalidStackFrameException("Invalid size for Frame Body")
             }
@@ -83,12 +87,12 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
                 `object`.readByteArray(buffer, offset)
             } catch (e: InvalidDataTypeException) {
                 log.warn(
-                    "Problem reading datatype within Frame Body:" + e.message
+                    "Problem reading datatype within Frame Body:${e.message}"
                 )
                 throw e
             }
             //Increment Offset to start of next datatype.
-            offset += `object`.getSize()
+            offset += `object`.getSizeValue()
         }
     }
 
@@ -108,7 +112,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
      */
     open fun write(tagBuffer: ByteArrayOutputStream) {
         log.debug(
-            "Writing frame body for" + this.getIdentifier() + ":Est Size:" + size
+            "Writing frame body for${this.getIdentifier()}:Est Size:${getSizeValue()}"
         )
         //Write the various fields to file in order
         for (`object` in objectList) {
@@ -124,7 +128,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         }
         setDataSize()
         log.debug(
-            "Written frame body for" + this.getIdentifier() + ":Real Size:" + size
+            "Written frame body for${this.getIdentifier()}:Real Size:${getSizeValue()}"
         )
     }
 
@@ -134,7 +138,18 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
     fun setDataSize() {
         size = 0
         for (`object` in objectList) {
-            size += `object`.getSize()
+            size += `object`.getSizeValue()
         }
+    }
+
+    /**
+     * Return String Representation of Datatype     *
+     */
+    override fun createStructure() {
+        MP3File.tagFormatter?.openHeadingElement(TYPE_BODY, "")
+        for (nextObject in objectList) {
+            nextObject.createStructure()
+        }
+        MP3File.tagFormatter?.closeHeadingElement(TYPE_BODY)
     }
 }

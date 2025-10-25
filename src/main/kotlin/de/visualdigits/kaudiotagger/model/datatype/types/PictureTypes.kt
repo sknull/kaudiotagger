@@ -30,6 +30,14 @@ enum class PictureTypes(
 
     companion object {
 
+        const val PICTURE_TYPE_FIELD_SIZE: Int = 1
+        const val DEFAULT_VALUE: String = "Cover (front)"
+        const val DEFAULT_ID: Int = 3
+
+        fun getSize(): Int = entries.size
+
+        fun fromId(id: Int?): PictureTypes? = entries.find { e -> e.id == id }
+
         fun getValueToIdMap(): Map<String, Int> = entries.associate { e -> Pair(e.friendlyName, e.id) }
 
         fun getIdToValueMap(): Map<Int, String> = entries.associate { e -> Pair(e.id, e.friendlyName) }

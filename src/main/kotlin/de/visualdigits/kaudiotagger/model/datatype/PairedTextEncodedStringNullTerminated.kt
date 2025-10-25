@@ -3,28 +3,19 @@ package de.visualdigits.kaudiotagger.model.datatype
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import java.io.ByteArrayOutputStream
+import java.io.IOException
 
 class PairedTextEncodedStringNullTerminated: AbstractDataType {
 
     constructor(identifier: String, frameBody: AbstractTagFrameBody): super(identifier, frameBody) {
-        value = ValuePairs()
+        setValue(ValuePairs())
     }
 
     constructor(copyObject: TextEncodedStringSizeTerminated): super(copyObject) {
-        
-        value = ValuePairs()
+        setValue(ValuePairs())
     }
 
     constructor(copyObject: PairedTextEncodedStringNullTerminated): super(copyObject)
-
-    /**
-     * Returns the size in bytes of this dataType when written to file
-     *
-     * @return size of this dataType
-     */
-    override fun getSize(): Int {
-        return size
-    }
 
     /**
      * Check the value can be encoded with the specified encoding
@@ -32,11 +23,11 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
      * @return
      */
     fun canBeEncoded(): Boolean {
-        for (entry in (value as ValuePairs).mapping) {
+        for (entry in (getValue() as ValuePairs).mapping) {
             val next =
                 TextEncodedStringNullTerminated(
                     identifier,
-                    frameBody,
+                    frameBody?:error("No frame body"),
                     entry.second
                 )
             if (!next.canBeEncoded()) {
@@ -66,28 +57,28 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
             try {
                 //Read Key
                 val key =
-                    TextEncodedStringNullTerminated(identifier, frameBody)
+                    TextEncodedStringNullTerminated(identifier, frameBody?:error("No frame body"))
                 key.readByteArray(arr, offset)
-                size += key.getSize()
-                offset += key.getSize()
-                if (key.getSize() == 0) {
+                size += (key.getSizeValue())
+                offset += key.getSizeValue()
+                if (key.getSizeValue() == 0) {
                     break
                 }
 
                 try {
                     //Read Value
                     val result =
-                        TextEncodedStringNullTerminated(identifier, frameBody)
+                        TextEncodedStringNullTerminated(identifier, frameBody?:error("No frame body"))
                     result.readByteArray(arr, offset)
-                    size += result.getSize()
-                    offset += result.getSize()
-                    if (result.getSize() == 0) {
+                    size += (result.getSizeValue())
+                    offset += result.getSizeValue()
+                    if (result.getSizeValue() == 0) {
                         break
                     }
                     //Add to value
-                    (value as ValuePairs).add(
-                        (key.value as String?)!!,
-                        (result.value as String?)!!
+                    (getValue() as ValuePairs).add(
+                        (key.getValue() as? String)?:"",
+                        (result.getValue() as? String)?:""
                     )
                 } catch (idte: InvalidDataTypeException) {
                     //Value may not be null terminated if it is the last value
@@ -96,17 +87,17 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                         break
                     }
                     val result =
-                        TextEncodedStringSizeTerminated(identifier, frameBody)
+                        TextEncodedStringSizeTerminated(identifier, frameBody?:error("No frame body"))
                     result.readByteArray(arr, offset)
-                    size += result.getSize()
-                    offset += result.getSize()
-                    if (result.getSize() == 0) {
+                    size += (result.getSizeValue())
+                    offset += result.getSizeValue()
+                    if (result.getSizeValue() == 0) {
                         break
                     }
                     //Add to value
-                    (value as ValuePairs).add(
-                        (key.value as String?)!!,
-                        (result.value as String?)!!
+                    (getValue() as ValuePairs).add(
+                        (key.getValue() as? String)?:"",
+                        (result.getValue() as? String)?:""
                     )
                     break
                 }
@@ -114,13 +105,13 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                 break
             }
 
-            if (size == 0) {
+            if (getSizeValue() == 0) {
                 log.warn("No null terminated Strings found")
                 throw InvalidDataTypeException("No null terminated Strings found")
             }
         }
         log.debug(
-            "Read  PairTextEncodedStringNullTerminated:$value size:$size"
+            "Read  PairTextEncodedStringNullTerminated:${getValue()} size:${getSizeValue()}"
         )
     }
 
@@ -131,30 +122,39 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
      */
     override fun writeByteArray(): ByteArray {
         log.debug("Writing PairTextEncodedStringNullTerminated");
-        return ByteArrayOutputStream(). use { buffer ->
-            var localSize = 0;
-            (value as ValuePairs).mapping.forEach { pair ->
+
+        var localSize = 0;
+        var buffer = ByteArrayOutputStream();
+        try {
+            (getValue() as ValuePairs).mapping.forEach { pair ->
                 var next = TextEncodedStringNullTerminated(
                         identifier,
                         frameBody,
                         pair.first
                     );
                 buffer.write(next.writeByteArray());
-                localSize += next.getSize();
+                localSize += next.getSizeValue();
                 next = TextEncodedStringNullTerminated(
                         identifier,
-                        frameBody,
-                        pair.second
-                    );
+                frameBody,
+                pair.second
+                );
                 buffer.write(next.writeByteArray());
-                localSize += next.getSize();
+                localSize += next.getSizeValue();
             }
-
-            //Update size member variable
-            size = localSize;
-
-            log.debug("Written PairTextEncodedStringNullTerminated");
-            buffer.toByteArray()
+        } catch (ioe: IOException) {
+            //This should never happen because the write is internal with the JVM it is not to a file
+            log.error(
+                    "IOException in MultipleTextEncodedStringNullTerminated when writing byte array",
+                    ioe
+            );
+            throw RuntimeException(ioe);
         }
+
+        //Update size member variable
+        size = localSize;
+
+        log.debug("Written PairTextEncodedStringNullTerminated");
+        return buffer.toByteArray();
     }
 }

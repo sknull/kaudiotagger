@@ -3,8 +3,10 @@ package de.visualdigits.kaudiotagger.model.frame.framebody
 import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
-import de.visualdigits.kaudiotagger.model.kframe.ID3v23KFrame
-import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
+import java.nio.ByteBuffer
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -33,8 +35,18 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         const val PRECISION_MONTH: Int = 4
         const val PRECISION_YEAR: Int = 5
     }
-    
-    init {
+
+    /**
+     * Used when converting from v3 tags , these fields should ALWAYS hold the v23 value
+     */
+    var originalID: String? = null
+    var year: String = ""
+    var time = ""
+    var date = ""
+    var monthOnly = false
+    var hoursOnly = false
+
+    constructor() {
         //This is allowable v24 format , we use UK Locale not because we are restricting to UK
         //but because these formats are fixed in ID3 spec, and could possibly get unexpected results if library
         //used with a default locale that has Date Format Symbols that interfere with the pattern
@@ -58,22 +70,12 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         //These are formats used by v23 Frames
     }
 
-    /**
-     * Used when converting from v3 tags , these fields should ALWAYS hold the v23 value
-     */
-    var originalID: String? = null
-    var year: String = ""
-    var time = ""
-    var date = ""
-    var monthOnly = false
-    var hoursOnly = false
-
-    /**
-     * Creates a new FrameBodyTDRC datatype.
-     */
-    constructor()
-
     constructor(body: FrameBodyTDRC): super(body)
+
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(byteBuffer, frameSize)
 
     /**
      * When converting v3 TYER to v4 TDRC frame
@@ -81,7 +83,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTYER) {
-        originalID = ID3v23KFrame.TYER.id
+        originalID = ID3v23Frames.TYER.id
         year = body.getText()
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
@@ -93,7 +95,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTIME) {
-        originalID = ID3v23KFrame.TIME.id
+        originalID = ID3v23Frames.TIME.id
         time = body.getText()
         hoursOnly = body.hoursOnly
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
@@ -106,7 +108,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTDAT) {
-        originalID = ID3v23KFrame.TDAT.id
+        originalID = ID3v23Frames.TDAT.id
         date = body.getText()
         monthOnly = body.isMonthOnly
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
@@ -119,7 +121,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTRDA) {
-        originalID = ID3v23KFrame.TRDA.id
+        originalID = ID3v23Frames.TRDA.id
         date = body.getText()
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
@@ -178,7 +180,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String? {
-        return ID3v24KFrame.YEAR.id
+        return ID3v24Frames.YEAR.id
     }
 
     /**

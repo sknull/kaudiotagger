@@ -11,7 +11,8 @@ import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
-import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
@@ -62,7 +63,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         textEncoding: Byte,
         language: String,
         description: String,
-        text: String
+        text: String?
     ) {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding)
         setObjectValue(DataTypes.OBJ_LANGUAGE, language)
@@ -70,14 +71,16 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         setObjectValue(DataTypes.OBJ_TEXT, text)
     }
 
-    /**
-     * Construct a Comment frame body from the buffer
-     *
-     * @param byteBuffer
-     * @param frameSize
-     * @throws InvalidTagException if unable to create framebody from buffer
-     */
-    constructor(byteBuffer: ByteBuffer, frameSize: Int): super(byteBuffer, frameSize)
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(byteBuffer, frameSize)
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     fun isMediaMonkeyFrame(): Boolean {
         val desc = getDescription()
@@ -124,7 +127,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24KFrame.COMMENT.id
+        return ID3v24Frames.COMMENT.id
     }
 
     /**
@@ -227,7 +230,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
                 ID3TextEncodingConversion.getUnicodeTextEncoding(header)
             )
         }
-        super.write(tagBuffer!!)
+        super.write(tagBuffer)
     }
 
     /**

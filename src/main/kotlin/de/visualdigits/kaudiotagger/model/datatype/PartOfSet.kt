@@ -9,14 +9,9 @@ import java.nio.charset.Charset
 import java.nio.charset.CharsetEncoder
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
+import kotlin.Any
 
 class PartOfSet : AbstractString {
-
-    constructor(
-        identifier: String,
-        frameBody: AbstractTagFrameBody? = null,
-        value: Any? = null
-    ) : super(identifier, frameBody, value)
 
     /**
      * Copy constructor
@@ -24,6 +19,14 @@ class PartOfSet : AbstractString {
      * @param `object`
      */
     constructor(copyObject: PartOfSet): super(copyObject)
+
+    /**
+     * Creates a new empty  PartOfSet datatype.
+     *
+     * @param identifier identifies the frame type
+     * @param frameBody
+     */
+    constructor(identifier: String, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
     /**
      * Read a 'n' bytes from buffer into a String where n is the frameSize - offset
@@ -41,10 +44,10 @@ class PartOfSet : AbstractString {
      * @throws IndexOutOfBoundsException
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
-        log.debug("Reading from array from offset:" + offset)
+        log.debug("Reading from array from offset:$offset")
 
         //Get the Specified Decoder
-        val decoder = getTextEncodingCharSet()!!.newDecoder()
+        val decoder = getTextEncodingCharSet()?.newDecoder()
 
         //Decode sliced inBuffer
         val inBuffer = ByteBuffer.wrap(
@@ -53,21 +56,21 @@ class PartOfSet : AbstractString {
             arr.size - offset
         ).slice()
         val outBuffer = CharBuffer.allocate(arr.size - offset)
-        decoder.reset()
-        val coderResult = decoder.decode(inBuffer, outBuffer, true)
-        if (coderResult.isError()) {
-            log.warn("Decoding error:" + coderResult)
+        decoder?.reset()
+        val coderResult = decoder?.decode(inBuffer, outBuffer, true)
+        if (coderResult?.isError == true) {
+            log.warn("Decoding error:$coderResult")
         }
-        decoder.flush(outBuffer)
+        decoder?.flush(outBuffer)
         outBuffer.flip()
 
         //Store value
         val stringValue = outBuffer.toString()
-        value = PartOfSetValue(stringValue)
+        setValue(PartOfSetValue(stringValue))
 
         //SetSize, important this is correct for finding the next datatype
-        size = arr.size - offset
-        log.debug("Read SizeTerminatedString:" + value + " size:" + size)
+        setValue(arr.size - offset)
+        log.debug("Read SizeTerminatedString:${getValue()} size:${getSizeValue()}")
     }
 
     /**
@@ -97,7 +100,7 @@ class PartOfSet : AbstractString {
      * @return the data as a byte array in format to write to file
      */
     override fun writeByteArray(): ByteArray {
-        var value = this.value.toString()
+        var value = getValue().toString()
         val data: ByteArray?
         //Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
         try {
@@ -110,28 +113,28 @@ class PartOfSet : AbstractString {
                 }
             }
 
-            val charset: Charset = getTextEncodingCharSet()!!
+            val charset = getTextEncodingCharSet()
             val valueWithBOM: String
-            val encoder: CharsetEncoder
+            val encoder: CharsetEncoder?
             if (StandardCharsets.UTF_16 == charset) {
                 encoder = StandardCharsets.UTF_16LE.newEncoder()
                 //Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
                 valueWithBOM = '\ufeff'.toString() + value
             } else {
-                encoder = charset.newEncoder()
+                encoder = charset?.newEncoder()
                 valueWithBOM = value
             }
-            encoder.onMalformedInput(CodingErrorAction.IGNORE)
-            encoder.onUnmappableCharacter(CodingErrorAction.IGNORE)
+            encoder?.onMalformedInput(CodingErrorAction.IGNORE)
+            encoder?.onUnmappableCharacter(CodingErrorAction.IGNORE)
 
-            val bb = encoder.encode(CharBuffer.wrap(valueWithBOM))
-            data = ByteArray(bb.limit())
-            bb.get(data, 0, bb.limit())
+            val bb = encoder?.encode(CharBuffer.wrap(valueWithBOM))
+            data = ByteArray(bb?.limit()?:0)
+            bb?.get(data, 0, bb.limit())
         } catch (ce: CharacterCodingException) { //Should never happen so if does throw a RuntimeException
             log.error(ce.message)
             throw RuntimeException(ce)
         }
-        size = data.size
+        setValue(data.size)
         return data
     }
 }

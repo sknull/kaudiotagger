@@ -264,6 +264,6 @@ enum class ErrorMessage(
     FLAC_NO_BLOCKTYPE("Flac file has invalid block type {0}");
 
     fun getMsg(vararg args: Any?): String {
-        return MessageFormat.format(getMsg(), *args)
+        return MessageFormat.format(msg, *args)
     }
 }

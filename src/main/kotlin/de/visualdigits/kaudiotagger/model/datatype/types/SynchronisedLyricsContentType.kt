@@ -6,7 +6,7 @@ enum class SynchronisedLyricsContentType(
 ) {
 
     OTHER(0x00, "other"),
-    LYRICS(0x01, "lyrics"),
+    LYRICS(0x01, "lyrics3"),
     TEXT_TRANSCRIPTION(0x02, "text transcription"),
     MOVEMENT_PART_NAME(0x03, "movement/part name"),
     EVENTS(0x04, "events"),
@@ -17,6 +17,8 @@ enum class SynchronisedLyricsContentType(
     ;
 
     companion object {
+
+        const val CONTENT_KEY_FIELD_SIZE: Int = 1
 
         fun getValueToIdMap(): Map<String, Int> = entries.associate { e -> Pair(e.friendlyName, e.id) }
 

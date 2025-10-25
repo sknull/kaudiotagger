@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.frame.id3
 
+import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameException
@@ -29,16 +30,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
 
     }
     
-    init {
-        frameBody?.header = this
-    }
-
-    //Frame identifier
-    var identifier: String? = null
-
-    //Frame Size
-    var frameSize: Int = 0
-
     /**
      * This holds the Status flags (not supported in v2.20
      */
@@ -49,6 +40,10 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      */
     var encodingFlags: EncodingFlags? = null
 
+    constructor() {
+        frameBody?.header = this
+    }
+
     /**
      * Create a frame based on another frame
      *
@@ -56,7 +51,15 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      */
     constructor(frame: AbstractID3v2Frame): super(frame)
 
-    constructor(frameBody: AbstractID3v2FrameBody? = null): super(frameBody)
+    /**
+     * Create a frame based on a body
+     *
+     * @param body
+     */
+    constructor(body: AbstractID3v2FrameBody) {
+        this.frameBody = body
+        this.frameBody?.header = this
+    }
 
     /**
      * Create a new frame with empty body based on identifier
@@ -66,14 +69,13 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
     //TODO the identifier checks should be done in the relevent subclasses
     constructor(
         identifier: String
-    ): this() {
+    ): super(identifier) {
         log.debug("Creating empty frame of type$identifier")
-        this.identifier = identifier
 
         // Use reflection to map id to frame body, which makes things much easier
         // to keep things up to date.
         try {
-            val c = Class.forName("FrameBody$identifier") as Class<AbstractID3v2FrameBody>
+            val c = Class.forName("de.visualdigits.kaudiotagger.model.frame.framebody.FrameBody$identifier") as Class<AbstractID3v2FrameBody>
             frameBody = c.newInstance()
         } catch (cnfe: ClassNotFoundException) {
             log.error(cnfe.message)
@@ -89,37 +91,16 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         frameBody?.header = this
         
         if (this is ID3v24Frame) {
-            frameBody!!.setTextEncoding(
+            frameBody?.setTextEncoding(
                 TagOptionSingleton.id3v24DefaultTextEncoding.id
             )
         } else if (this is ID3v23Frame) {
-            frameBody!!.setTextEncoding(
+            frameBody?.setTextEncoding(
                 TagOptionSingleton.id3v23DefaultTextEncoding.id
             )
         }
 
         log.debug("Created empty frame of type$identifier")
-    }
-
-    /**
-     * Return the frame identifier, this only identifies the frame it does not provide a unique
-     * key, when using frames such as TXXX which are used by many fields     *
-     *
-     * @return the frame identifier (Tag Field Interface)
-     */
-    //TODO, this is confusing only returns the frameId, which does not neccessarily uniquely
-    //identify the frame
-    override fun getId(): String? {
-        return identifier
-    }
-
-    /**
-     * Return the frame identifier
-     *
-     * @return the frame identifier
-     */
-    override fun getIdentifier(): String? {
-        return identifier
     }
 
     //TODO:needs implementing but not sure if this method is required at all
@@ -153,10 +134,10 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
             )
         }
 
-        identifier = String(buffer)
-        log.debug("Identifier is" + identifier)
+        setIdentifier(String(buffer))
+        log.debug("Identifier is${this.getIdentifier()}")
 
-        return identifier
+        return this.getIdentifier()
     }
 
     /**
@@ -213,7 +194,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
          */
         val frameBody: AbstractID3v2FrameBody
         try {
-            val c = Class.forName("FrameBody" + identifier) as Class<AbstractID3v2FrameBody>
+            val c = Class.forName("de.visualdigits.kaudiotagger.model.frame.framebody.FrameBody$identifier") as Class<AbstractID3v2FrameBody>
             val constructorParameterTypes = arrayOf<Class<*>>(body.javaClass)
             val constructorParameterValues = arrayOf<Any?>(body)
             val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(
@@ -222,47 +203,42 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
             frameBody = (construct.newInstance(*constructorParameterValues))
         } catch (cex: ClassNotFoundException) {
             log.debug(
-                "Identifier not recognised:" +
-                        identifier +
-                        " unable to create framebody"
+                "Identifier not recognised:$identifier unable to create framebody"
             )
             throw InvalidFrameException(
-                "FrameBody" + identifier + " does not exist"
+                "FrameBody$identifier does not exist"
             )
         } catch (sme: NoSuchMethodException) { //If suitable constructor does not exist
             log.error("No such method:" + sme.message, sme)
             throw InvalidFrameException(
-                "FrameBody" +
-                        identifier +
-                        " does not have a constructor that takes:" +
-                        body.javaClass.getName()
+                "FrameBody$identifier does not have a constructor that takes:${body.javaClass.getName()}"
             )
         } catch (ite: InvocationTargetException) {
             log.error("An error occurred within abstractID3v2FrameBody")
             log.error(
-                "Invocation target exception:" + ite.cause!!.message,
+                "Invocation target exception:${ite.cause?.message}",
                 ite.cause
             )
-            throw InvalidFrameException(ite.cause!!.message)
+            throw InvalidFrameException(ite.cause?.message)
         } catch (ie: InstantiationException) { //Instantiate Interface/Abstract should not happen
-            log.error("Instantiation exception:" + ie.message, ie)
+            log.error("Instantiation exception:${ie.message}", ie)
             throw RuntimeException(ie.message)
         } catch (iae: IllegalAccessException) { //Private Constructor shouild not happen
-            log.error("Illegal access exception :" + iae.message, iae)
+            log.error("Illegal access exception :${iae.message}", iae)
             throw RuntimeException(iae.message)
         }
 
-        log.debug("frame Body created" + frameBody.getIdentifier())
+        log.debug("frame Body created${frameBody.getIdentifier()}")
         frameBody.header = this
 
         return frameBody
     }
 
+
     override fun getRawContent(): ByteArray? {
-        return ByteArrayOutputStream().use { baos ->
-            write(baos)
-            baos.toByteArray()
-        }
+        val baos = ByteArrayOutputStream()
+        write(baos)
+        return baos.toByteArray()
     }
 
     abstract fun write(tagBuffer: ByteArrayOutputStream)
@@ -360,7 +336,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         var frameBody: AbstractID3v2FrameBody
         try {
             val c = Class.forName(
-                "FrameBody$identifier"
+                "de.visualdigits.kaudiotagger.model.frame.framebody.FrameBody$identifier"
             ) as Class<AbstractID3v2FrameBody>
             val constructorParameterTypes = arrayOf<Class<*>>(
                 Class.forName("java.nio.ByteBuffer"),
@@ -370,7 +346,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
             val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(*constructorParameterTypes)
             frameBody = (construct.newInstance(*constructorParameterValues))
         } catch (cex: ClassNotFoundException) { //No class defined for this frame type,use FrameUnsupported
-            log.debug(
+            log.error(
                 "Identifier not recognised:$identifier using FrameBodyUnsupported"
             )
             try {
@@ -384,9 +360,9 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         } //propagate it up otherwise mark this frame as invalid //An error has occurred during frame instantiation, if underlying cause is an unchecked exception or error
         catch (ite: InvocationTargetException) {
             log.error(
-                "An error occurred within abstractID3v2FrameBody for identifier:$identifier:${ite.cause!!.message}"
+                "An error occurred within abstractID3v2FrameBody for identifier:$identifier:${ite.cause?.message}"
             )
-            throw InvalidFrameException(ite.cause!!.message)
+            throw InvalidFrameException(ite.cause?.message)
         } catch (sme: NoSuchMethodException) { //No Such Method should not happen
             log.error(
                 "No such method:${sme.message}",
@@ -411,5 +387,16 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         )
         frameBody.header = this
         return frameBody
+    }
+
+    /**
+     * Return String Representation of frame
+     */
+    open fun createStructure() {
+        MP3File.tagFormatter?.openHeadingElement(
+            TYPE_FRAME,
+            this@AbstractID3v2Frame.getIdentifier() ?:""
+        )
+        MP3File.tagFormatter?.closeHeadingElement(TYPE_FRAME)
     }
 }

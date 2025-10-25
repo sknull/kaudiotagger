@@ -1,15 +1,25 @@
 package de.visualdigits.kaudiotagger.model.tag.id3
 
+import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
+import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
+import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.MusicianCredits
+import de.visualdigits.kaudiotagger.model.datatype.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.StandardIPLSKey
 import de.visualdigits.kaudiotagger.model.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidTagException
+import de.visualdigits.kaudiotagger.model.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.exceptions.TagNotFoundException
+import de.visualdigits.kaudiotagger.model.field.TagField
+import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyCOMM
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyIPLS
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTALB
@@ -20,116 +30,110 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTMCL
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTRCK
-import de.visualdigits.kaudiotagger.model.frame.framebody.ID3v24PreferredFrameOrderComparator
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.frame.id3.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v23Frame
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v24Frame
-import de.visualdigits.kaudiotagger.model.kfield.Lyrics3v2Field
-import de.visualdigits.kaudiotagger.model.kframe.ID3v22KFrame
-import de.visualdigits.kaudiotagger.model.kframe.ID3v23KFrame
-import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
 import de.visualdigits.kaudiotagger.model.tag.AbstractTag
-import de.visualdigits.kaudiotagger.model.tag.lyrics.AbstractLyrics3
+import de.visualdigits.kaudiotagger.model.tag.images.Artwork
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.AbstractLyrics3
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.Lyrics3v2
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.FileConstants
 import de.visualdigits.kaudiotagger.util.ID3SyncSafeInteger
 import java.io.File
 import java.nio.ByteBuffer
-import kotlin.experimental.and
-import kotlin.experimental.or
+import java.nio.charset.StandardCharsets
 
-class ID3v24Tag(
-    buffer: ByteBuffer? = null
-) : AbstractID3v2Tag(buffer) {
+class ID3v24Tag : AbstractID3v2Tag {
 
     companion object {
 
         /**
          * ID3v2.4 Header bit mask
          */
-        val MASK_V24_UNSYNCHRONIZATION: Byte = FileConstants.BIT7
+        val MASK_V24_UNSYNCHRONIZATION: Int = FileConstants.BIT7
         /**
          * ID3v2.4 Header bit mask
          */
-        val MASK_V24_EXTENDED_HEADER: Byte = FileConstants.BIT6
+        val MASK_V24_EXTENDED_HEADER: Int = FileConstants.BIT6
         /**
          * ID3v2.4 Header bit mask
          */
-        val MASK_V24_EXPERIMENTAL: Byte = FileConstants.BIT5
+        val MASK_V24_EXPERIMENTAL: Int = FileConstants.BIT5
         /**
          * ID3v2.4 Header bit mask
          */
-        val MASK_V24_FOOTER_PRESENT: Byte = FileConstants.BIT4
+        val MASK_V24_FOOTER_PRESENT: Int = FileConstants.BIT4
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_TAG_UPDATE: Byte = FileConstants.BIT6
+        val MASK_V24_TAG_UPDATE: Int = FileConstants.BIT6
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_CRC_DATA_PRESENT: Byte = FileConstants.BIT5
+        val MASK_V24_CRC_DATA_PRESENT: Int = FileConstants.BIT5
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_TAG_RESTRICTIONS: Byte = FileConstants.BIT4
+        val MASK_V24_TAG_RESTRICTIONS: Int = FileConstants.BIT4
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_TAG_SIZE_RESTRICTIONS: Byte = FileConstants.BIT7.toByte() or FileConstants.BIT6
+        val MASK_V24_TAG_SIZE_RESTRICTIONS: Int = FileConstants.BIT7 or FileConstants.BIT6
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_TEXT_ENCODING_RESTRICTIONS: Byte = FileConstants.BIT5
+        val MASK_V24_TEXT_ENCODING_RESTRICTIONS: Int = FileConstants.BIT5
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_TEXT_FIELD_SIZE_RESTRICTIONS: Byte = FileConstants.BIT4 or FileConstants.BIT3
+        val MASK_V24_TEXT_FIELD_SIZE_RESTRICTIONS: Int = FileConstants.BIT4 or FileConstants.BIT3
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_IMAGE_ENCODING: Byte = FileConstants.BIT2
+        val MASK_V24_IMAGE_ENCODING: Int = FileConstants.BIT2
         /**
          * ID3v2.4 Extended header bit mask
          */
-        val MASK_V24_IMAGE_SIZE_RESTRICTIONS: Byte = FileConstants.BIT2 or FileConstants.BIT1
+        val MASK_V24_IMAGE_SIZE_RESTRICTIONS: Int = FileConstants.BIT2 or FileConstants.BIT1
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_TAG_ALTER_PRESERVATION: Byte = FileConstants.BIT6
+        val MASK_V24_TAG_ALTER_PRESERVATION: Int = FileConstants.BIT6
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_FILE_ALTER_PRESERVATION: Byte = FileConstants.BIT5
+        val MASK_V24_FILE_ALTER_PRESERVATION: Int = FileConstants.BIT5
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_READ_ONLY: Byte = FileConstants.BIT4
+        val MASK_V24_READ_ONLY: Int = FileConstants.BIT4
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_GROUPING_IDENTITY: Byte = FileConstants.BIT6
+        val MASK_V24_GROUPING_IDENTITY: Int = FileConstants.BIT6
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_COMPRESSION: Byte = FileConstants.BIT4
+        val MASK_V24_COMPRESSION: Int = FileConstants.BIT4
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_ENCRYPTION: Byte = FileConstants.BIT3
+        val MASK_V24_ENCRYPTION: Int = FileConstants.BIT3
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_FRAME_UNSYNCHRONIZATION: Byte = FileConstants.BIT2
+        val MASK_V24_FRAME_UNSYNCHRONIZATION: Int = FileConstants.BIT2
         /**
          * ID3v2.4 Header Footer bit mask
          */
-        val MASK_V24_DATA_LENGTH_INDICATOR: Byte = FileConstants.BIT1
+        val MASK_V24_DATA_LENGTH_INDICATOR: Int = FileConstants.BIT1
         
-        const val RELEASE: Byte = 2
-        const val MAJOR_VERSION: Byte = 4
-        const val REVISION: Byte = 0
+        const val RELEASE: Int = 2
+        const val MAJOR_VERSION: Int = 4
+        const val REVISION: Int = 0
         const val TYPE_FOOTER: String = "footer"
         const val TYPE_IMAGEENCODINGRESTRICTION: String = "imageEncodingRestriction"
         const val TYPE_IMAGESIZERESTRICTION: String = "imageSizeRestriction"
@@ -142,7 +146,7 @@ class ID3v24Tag(
         const val TYPE_EXPERIMENTAL: String = "experimental"
 
         /**
-         * ID3v2.4 Header Footer are the same as the header flags. WHY!! move the
+         * ID3v2.4 Header Footer are the same as the header flags. WHY move the
          * flags from thier position in 2.3
          */
         const val TYPE_EXTENDED: String = "extended"
@@ -161,22 +165,22 @@ class ID3v24Tag(
     /**
      * CRC Checksum calculated
      */
-    var crcDataFlag: Boolean = false
+    var isCrcDataFlag: Boolean = false
 
     /**
      * Experiemntal tag
      */
-    var experimental: Boolean = false
+    var isExperimental: Boolean = false
 
     /**
      * Contains extended header
      */
-    var extended: Boolean = false
+    var isExtended: Boolean = false
 
     /**
      * All frames in the tag uses unsynchronisation
      */
-    var unsynchronization: Boolean = false
+    var isUnsynchronization: Boolean = false
 
     /**
      * CRC Checksum
@@ -186,17 +190,17 @@ class ID3v24Tag(
     /**
      * Contains a footer
      */
-    var footer: Boolean = false
+    var isFooter: Boolean = false
 
     /**
      * Tag is an update
      */
-    var updateTag: Boolean = false
+    var isUpdateTag: Boolean = false
 
     /**
      * Tag has restrictions
      */
-    var tagRestriction: Boolean = false
+    var isTagRestriction: Boolean = false
 
     /**
      * If Set Image encoding restrictions
@@ -205,7 +209,7 @@ class ID3v24Tag(
      * 0   No restrictions
      * 1   Images are encoded only with PNG [PNG] or JPEG [JFIF].
      */
-    var imageEncodingRestriction: Byte = 0
+    var imageEncodingRestriction: Int = 0
 
     /**
      * If set Image size restrictions
@@ -217,7 +221,7 @@ class ID3v24Tag(
      * 11  All images are exactly 64x64 pixels, unless required
      * otherwise.
      */
-    var imageSizeRestriction: Byte = 0
+    var imageSizeRestriction: Int = 0
 
     /**
      * If set then Tag Size Restrictions
@@ -228,7 +232,7 @@ class ID3v24Tag(
      * 10   No more than 32 frames and 40 KB total tag size.
      * 11   No more than 32 frames and 4 KB total tag size.
      */
-    var tagSizeRestriction: Byte = 0
+    var tagSizeRestriction: Int = 0
 
     /**
      * If set Text encoding restrictions
@@ -238,7 +242,7 @@ class ID3v24Tag(
      * 1    Strings are only encoded with ISO-8859-1 [ISO-8859-1] or
      * UTF-8 [UTF-8].
      */
-    var textEncodingRestriction: Byte = 0
+    var textEncodingRestriction: Int = 0
 
     /**
      * Tag padding
@@ -260,14 +264,33 @@ class ID3v24Tag(
      * text frame consists of more than one string, the sum of the
      * strungs is restricted as stated.
      */
-    var textFieldSizeRestriction: Byte = 0
+    var textFieldSizeRestriction: Int = 0
+
+    /**
+     * Creates a new empty ID3v2_4 datatype.
+     */
+    constructor() {
+        frameMap = mutableMapOf()
+        encryptedFrameMap = mutableMapOf()
+    }
+
+    /**
+     * Copy Constructor, creates a new ID3v2_4 Tag based on another ID3v2_4 Tag
+     *
+     * @param copyObject
+     */
+    constructor(copyObject: ID3v24Tag) {
+        log.debug("Creating tag from another tag of same type")
+        copyPrimitives(copyObject)
+        copyFrames(copyObject)
+    }
 
     /**
      * Creates a new ID3v2_4 datatype based on another (non 2.4) tag
      *
      * @param mp3tag
      */
-    constructor(mp3tag: AbstractTag): this() {
+    constructor(mp3tag: AbstractTag?): this() {
         log.debug("Creating tag from a tag of a different version")
         frameMap = mutableMapOf()
         encryptedFrameMap = mutableMapOf()
@@ -285,52 +308,52 @@ class ID3v24Tag(
                 // convert id3v1 tags.
                 var newFrame: ID3v24Frame?
                 var newBody: AbstractID3v2FrameBody?
-                if ((mp3tag.title?.length ?: Int.MIN_VALUE) > 0) {
-                    newBody = FrameBodyTIT2(0.toByte(), mp3tag.title?:"")
-                    newFrame = ID3v24Frame(ID3v24KFrame.TITLE.id)
+                if ((mp3tag.getTitle()?.length ?: Int.MIN_VALUE) > 0) {
+                    newBody = FrameBodyTIT2(0, mp3tag.getTitle()?:"")
+                    newFrame = ID3v24Frame(ID3v24Frames.TITLE.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
-                if (mp3tag.artist.length > 0) {
-                    newBody = FrameBodyTPE1(0.toByte(), mp3tag.artist)
-                    newFrame = ID3v24Frame(ID3v24KFrame.ARTIST.id)
+                if (mp3tag.getArtist().length > 0) {
+                    newBody = FrameBodyTPE1(0, mp3tag.getArtist())
+                    newFrame = ID3v24Frame(ID3v24Frames.ARTIST.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
-                if (mp3tag.album.length > 0) {
-                    newBody = FrameBodyTALB(0.toByte(), mp3tag.album)
-                    newFrame = ID3v24Frame(ID3v24KFrame.ALBUM.id)
+                if (mp3tag.getAlbum().length > 0) {
+                    newBody = FrameBodyTALB(0, mp3tag.getAlbum())
+                    newFrame = ID3v24Frame(ID3v24Frames.ALBUM.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
-                if (mp3tag.year.length > 0) {
-                    newBody = FrameBodyTDRC(0.toByte(), mp3tag.year)
-                    newFrame = ID3v24Frame(ID3v24KFrame.YEAR.id)
+                if (mp3tag.getYear().length > 0) {
+                    newBody = FrameBodyTDRC(0, mp3tag.getYear())
+                    newFrame = ID3v24Frame(ID3v24Frames.YEAR.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
-                if (mp3tag.comment.length > 0) {
-                    newBody = FrameBodyCOMM(0.toByte(), "ENG", "", mp3tag.comment)
-                    newFrame = ID3v24Frame(ID3v24KFrame.COMMENT.id)
+                if (mp3tag.getComment().length > 0) {
+                    newBody = FrameBodyCOMM(0, "ENG", "", mp3tag.getComment())
+                    newFrame = ID3v24Frame(ID3v24Frames.COMMENT.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
-                if (((mp3tag.genre and ID3v1Tag.BYTE_TO_UNSIGNED) >= 0.toByte()) &&
-                    ((mp3tag.genre and ID3v1Tag.BYTE_TO_UNSIGNED) !=
+                if (((mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED) >= 0) &&
+                    ((mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED) !=
                             ID3v1Tag.BYTE_TO_UNSIGNED)
                 ) {
-                    val genreId: Int = (mp3tag.genre and ID3v1Tag.BYTE_TO_UNSIGNED).toInt()
+                    val genreId: Int = (mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED)
                     val genre = "($genreId) ${GenreTypes.fromId(genreId)}"
 
-                    newBody = FrameBodyTCON(0.toByte(), genre)
-                    newFrame = ID3v24Frame(ID3v24KFrame.GENRE.id)
+                    newBody = FrameBodyTCON(0, genre)
+                    newFrame = ID3v24Frame(ID3v24Frames.GENRE.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
                 if (mp3tag is ID3v11Tag) {
                     if (mp3tag.track > 0) {
-                        newBody = FrameBodyTRCK(0.toByte(), mp3tag.track.toString())
-                        newFrame = ID3v24Frame(ID3v24KFrame.TRACK.id)
+                        newBody = FrameBodyTRCK(0, mp3tag.track.toString())
+                        newFrame = ID3v24Frame(ID3v24Frames.TRACK.id)
                         newFrame.frameBody = newBody
                         frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                     }
@@ -343,14 +366,10 @@ class ID3v24Tag(
                 } else {
                     lyric = Lyrics3v2(mp3tag)
                 }
-                val iterator = lyric.iterator()
-                var field: Lyrics3v2Field
-                var newFrame: ID3v24Frame?
-                while (iterator.hasNext()) {
+                lyric.fieldMap.values.forEach { field ->
                     try {
-                        field = iterator.next()
-                        newFrame = ID3v24Frame(field)
-                        frameMap.put(newFrame.getIdentifier(), newFrame)
+                        val newFrame = ID3v24Frame(field)
+                        frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                     } catch (ex: InvalidTagException) {
                         log.warn(
                             "Unable to convert Lyrics3 to v24 Frame:Frame Identifier"
@@ -362,23 +381,36 @@ class ID3v24Tag(
     }
 
     /**
+     * Creates a new ID3v2_4 datatype.
+     *
+     * @param buffer
+     * @throws TagException
+     */
+    constructor(buffer: ByteBuffer) {
+        frameMap = mutableMapOf()
+        encryptedFrameMap = mutableMapOf()
+
+        this.read(buffer)
+    }
+
+    /**
      * Retrieve the Release
      */
-    override fun getRelease(): Byte {
+    override fun getRelease(): Int {
         return RELEASE
     }
 
     /**
      * Retrieve the Major Version
      */
-    override fun getMajorVersion(): Byte {
+    override fun getMajorVersion(): Int {
         return MAJOR_VERSION
     }
 
     /**
      * Retrieve the Revision
      */
-    override fun getRevision(): Byte {
+    override fun getRevision(): Int {
         return REVISION
     }
 
@@ -391,9 +423,9 @@ class ID3v24Tag(
         super.copyPrimitives(copyObj)
 
         if (copyObj is ID3v24Tag) {
-            this.footer = copyObj.footer
-            this.tagRestriction = copyObj.tagRestriction
-            this.updateTag = copyObj.updateTag
+            this.isFooter = copyObj.isFooter
+            this.isTagRestriction = copyObj.isTagRestriction
+            this.isUpdateTag = copyObj.isUpdateTag
             this.imageEncodingRestriction = copyObj.imageEncodingRestriction
             this.imageSizeRestriction = copyObj.imageSizeRestriction
             this.tagSizeRestriction = copyObj.tagSizeRestriction
@@ -409,7 +441,10 @@ class ID3v24Tag(
         return "ID3v2.40"
     }
 
-    override fun read(byteBuffer: ByteBuffer) {
+    override fun read(byteBuffer: ByteBuffer?) {
+        if (byteBuffer == null) {
+            return
+        }
         val size: Int
         var buffer: ByteArray
         if (!seek(byteBuffer)) {
@@ -427,7 +462,7 @@ class ID3v24Tag(
                     size
         )
 
-        if (extended) {
+        if (isExtended) {
             readExtendedHeader(byteBuffer, size)
         }
 
@@ -453,7 +488,7 @@ class ID3v24Tag(
         encryptedFrameMap = LinkedHashMap()
 
         //Read the size from the Tag Header
-        this.fileReadSize = size
+        this.fileReadBytes = size
         // Read the frames until got to upto the size as specified in header
         log.debug(
             "Start of frame body at:" +
@@ -534,20 +569,20 @@ class ID3v24Tag(
         byteBuffer.get()
 
         // Read the extended flag bytes
-        val extFlag = byteBuffer.get()
-        updateTag = (extFlag and MASK_V24_TAG_UPDATE) != 0.toByte()
-        crcDataFlag = (extFlag and MASK_V24_CRC_DATA_PRESENT) != 0.toByte()
-        tagRestriction = (extFlag and MASK_V24_TAG_RESTRICTIONS) != 0.toByte()
+        val extFlag = byteBuffer.get().toInt()
+        isUpdateTag = (extFlag and MASK_V24_TAG_UPDATE) != 0
+        isCrcDataFlag = (extFlag and MASK_V24_CRC_DATA_PRESENT) != 0
+        isTagRestriction = (extFlag and MASK_V24_TAG_RESTRICTIONS) != 0
 
         // read the length byte if the flag is set
         // this tag should always be zero but just in case
         // read this information.
-        if (updateTag) {
+        if (isUpdateTag) {
             byteBuffer.get()
         }
 
         //CRC-32
-        if (crcDataFlag) {
+        if (isCrcDataFlag) {
             // the CRC has a variable length
             byteBuffer.get()
             buffer = ByteArray(TAG_EXT_HEADER_CRC_DATA_LENGTH)
@@ -560,24 +595,24 @@ class ID3v24Tag(
         }
 
         //Tag Restriction
-        if (tagRestriction) {
+        if (isTagRestriction) {
             byteBuffer.get()
             buffer = ByteArray(1)
             byteBuffer.get(buffer, 0, 1)
-            tagSizeRestriction = ((buffer[0] and
-                    MASK_V24_TAG_SIZE_RESTRICTIONS).toInt() shr
-                    6).toByte()
-            textEncodingRestriction = ((buffer[0] and
-                    MASK_V24_TEXT_ENCODING_RESTRICTIONS).toInt() shr
-                    5).toByte()
-            textFieldSizeRestriction = ((buffer[0] and
-                    MASK_V24_TEXT_FIELD_SIZE_RESTRICTIONS).toInt() shr
-                    3).toByte()
-            imageEncodingRestriction = ((buffer[0] and
-                    MASK_V24_IMAGE_ENCODING).toInt() shr
-                    2).toByte()
-            imageSizeRestriction = (buffer[0] and
-                    MASK_V24_IMAGE_SIZE_RESTRICTIONS).toByte()
+            tagSizeRestriction = ((buffer[0].toInt() and
+                    MASK_V24_TAG_SIZE_RESTRICTIONS) shr
+                    6)
+            textEncodingRestriction = ((buffer[0].toInt() and
+                    MASK_V24_TEXT_ENCODING_RESTRICTIONS) shr
+                    5)
+            textFieldSizeRestriction = ((buffer[0].toInt() and
+                    MASK_V24_TEXT_FIELD_SIZE_RESTRICTIONS) shr
+                    3)
+            imageEncodingRestriction = ((buffer[0].toInt() and
+                    MASK_V24_IMAGE_ENCODING) shr
+                    2)
+            imageSizeRestriction = (buffer[0].toInt() and
+                    MASK_V24_IMAGE_SIZE_RESTRICTIONS)
         }
     }
 
@@ -591,14 +626,14 @@ class ID3v24Tag(
      */
     private fun readHeaderFlags(byteBuffer: ByteBuffer) {
         //Flags
-        val flags = byteBuffer.get()
-        unsynchronization = (flags and MASK_V24_UNSYNCHRONIZATION) != 0.toByte()
-        extended = (flags and MASK_V24_EXTENDED_HEADER) != 0.toByte()
-        experimental = (flags and MASK_V24_EXPERIMENTAL) != 0.toByte()
-        footer = (flags and MASK_V24_FOOTER_PRESENT) != 0.toByte()
+        val flags = byteBuffer.get().toInt()
+        isUnsynchronization = (flags and MASK_V24_UNSYNCHRONIZATION) != 0
+        isExtended = (flags and MASK_V24_EXTENDED_HEADER) != 0
+        isExperimental = (flags and MASK_V24_EXPERIMENTAL) != 0
+        isFooter = (flags and MASK_V24_FOOTER_PRESENT) != 0
 
         //Not allowable/Unknown Flags
-        if ((flags and FileConstants.BIT3) != 0.toByte()) {
+        if ((flags and FileConstants.BIT3) != 0) {
             log.warn(
                 ErrorMessage.ID3_INVALID_OR_UNKNOWN_FLAG_SET.getMsg(
                     FileConstants.BIT3
@@ -606,7 +641,7 @@ class ID3v24Tag(
             )
         }
 
-        if ((flags and FileConstants.BIT2) != 0.toByte()) {
+        if ((flags and FileConstants.BIT2) != 0) {
             log.warn(
                 ErrorMessage.ID3_INVALID_OR_UNKNOWN_FLAG_SET.getMsg(
                     FileConstants.BIT2
@@ -614,7 +649,7 @@ class ID3v24Tag(
             )
         }
 
-        if ((flags and FileConstants.BIT1) != 0.toByte()) {
+        if ((flags and FileConstants.BIT1) != 0) {
             log.warn(
                 ErrorMessage.ID3_INVALID_OR_UNKNOWN_FLAG_SET.getMsg(
                     FileConstants.BIT1
@@ -622,7 +657,7 @@ class ID3v24Tag(
             )
         }
 
-        if ((flags and FileConstants.BIT0) != 0.toByte()) {
+        if ((flags and FileConstants.BIT0) != 0) {
             log.warn(
                 ErrorMessage.ID3_INVALID_OR_UNKNOWN_FLAG_SET.getMsg(
                     FileConstants.BIT0
@@ -630,38 +665,25 @@ class ID3v24Tag(
             )
         }
 
-        if (isUnsynchronization()) {
+        if (isUnsynchronization) {
             log.debug(
                 ErrorMessage.ID3_TAG_UNSYNCHRONIZED.getMsg()
             )
         }
 
-        if (extended) {
+        if (isExtended) {
             log.debug(ErrorMessage.ID3_TAG_EXTENDED.getMsg())
         }
 
-        if (experimental) {
+        if (isExperimental) {
             log.debug(
                 ErrorMessage.ID3_TAG_EXPERIMENTAL.getMsg()
             )
         }
 
-        if (footer) {
+        if (isFooter) {
             log.warn(ErrorMessage.ID3_TAG_FOOTER.getMsg())
         }
-    }
-
-    /**
-     * Are all frame swithin this tag unsynchronized
-     *
-     *
-     * Because synchronization occurs at the frame level it is not normally desirable to unsynchronize all frames
-     * and hence this flag is not normally set.
-     *
-     * @return are all frames within the tag unsynchronized
-     */
-    fun isUnsynchronization(): Boolean {
-        return unsynchronization
     }
 
     /**
@@ -706,13 +728,13 @@ class ID3v24Tag(
     override fun convertFrame(frame: AbstractID3v2Frame): MutableList<AbstractID3v2Frame> {
         var frame = frame
         val frames: MutableList<AbstractID3v2Frame> = ArrayList<AbstractID3v2Frame>()
-        if (frame is ID3v22Frame && frame.getIdentifier() == ID3v22KFrame.IPLS.id) {
+        if (frame is ID3v22Frame && frame.getIdentifier() == ID3v22Frames.IPLS.id) {
             frame = ID3v23Frame(frame)
         }
 
         //This frame may need splitting and converting into two frames depending on its content
         if (frame is ID3v23Frame &&
-            frame.getIdentifier() == ID3v23KFrame.INVOLVED_PEOPLE.id
+            frame.getIdentifier() == ID3v23Frames.INVOLVED_PEOPLE.id
         ) {
             val pairs = (frame.frameBody as? FrameBodyIPLS)?.getPairing()?.mapping?:error("No mapping")
             val pairsTipl: MutableList<Pair<String, String>> = mutableListOf()
@@ -729,10 +751,10 @@ class ID3v24Tag(
             }
             val tipl = ID3v24Frame(
                 frame as ID3v23Frame,
-                ID3v24KFrame.INVOLVED_PEOPLE.id
+                ID3v24Frames.INVOLVED_PEOPLE.id
             )
             val tiplBody = FrameBodyTIPL(
-                frame.frameBody?.getTextEncoding()?:0.toByte(),
+                frame.frameBody?.getTextEncoding()?:0,
                 pairsTipl
             )
             tipl.frameBody = tiplBody
@@ -740,10 +762,10 @@ class ID3v24Tag(
 
             val tmcl: AbstractID3v2Frame = ID3v24Frame(
                 frame as ID3v23Frame,
-                ID3v24KFrame.MUSICIAN_CREDITS.id
+                ID3v24Frames.MUSICIAN_CREDITS.id
             )
             val tmclBody = FrameBodyTMCL(
-                frame.frameBody?.getTextEncoding()?:0.toByte(),
+                frame.frameBody?.getTextEncoding()?:0,
                 pairsTmcl
             )
             tmcl.frameBody = tmclBody
@@ -757,7 +779,7 @@ class ID3v24Tag(
     /**
      * {@inheritDoc}
      */
-    override fun write(file: File, audioStartLocation: Long): Long {
+    override fun write(file: File?, audioStartLocation: Long): Long {
         log.debug("Writing tag to file")
 
         //Write Body Buffer
@@ -777,7 +799,7 @@ class ID3v24Tag(
             bodyByteBuffer.size
         )
         writeBufferToFile(
-            file!!,
+            file,
             headerBuffer,
             bodyByteBuffer,
             padding,
@@ -801,14 +823,14 @@ class ID3v24Tag(
     private fun writeHeaderToBuffer(padding: Int, size: Int): ByteBuffer {
         //This would only be set if every frame in tag has been unsynchronized, I only unsychronize frames
         //that need it, in any case I have been advised not to set it even then.
-        unsynchronization = false
+        isUnsynchronization = false
 
         // Flags,currently we never calculate the CRC
         // and if we dont calculate them cant keep orig values. Tags are not
         // experimental and we never create extended header to keep things simple.
-        extended = false
-        experimental = false
-        footer = false
+        isExtended = false
+        isExperimental = false
+        isFooter = false
 
         // Create Header Buffer,allocate maximum possible size for the header
         val headerBuffer = ByteBuffer.allocate(TAG_HEADER_LENGTH)
@@ -816,39 +838,39 @@ class ID3v24Tag(
         headerBuffer.put(TAG_ID)
 
         //Major Version
-        headerBuffer.put(getMajorVersion())
+        headerBuffer.put(getMajorVersion().toByte())
 
         //Minor Version
-        headerBuffer.put(getRevision())
+        headerBuffer.put(getRevision().toByte())
 
         //Flags
-        var flagsByte: Byte = 0
-        if (isUnsynchronization()) {
+        var flagsByte: Int = 0
+        if (isUnsynchronization) {
             flagsByte = flagsByte or MASK_V24_UNSYNCHRONIZATION
         }
-        if (extended) {
+        if (isExtended) {
             flagsByte = flagsByte or MASK_V24_EXTENDED_HEADER
         }
-        if (experimental) {
+        if (isExperimental) {
             flagsByte = flagsByte or MASK_V24_EXPERIMENTAL
         }
-        if (footer) {
+        if (isFooter) {
             flagsByte = flagsByte or MASK_V24_FOOTER_PRESENT
         }
-        headerBuffer.put(flagsByte)
+        headerBuffer.put(flagsByte.toByte())
 
         //Size As Recorded in Header, don't include the main header length
         //Additional Header Size,(for completeness we never actually write the extended header, or footer)
         var additionalHeaderSize = 0
-        if (extended) {
+        if (isExtended) {
             additionalHeaderSize += TAG_EXT_HEADER_LENGTH
-            if (updateTag) {
+            if (isUpdateTag) {
                 additionalHeaderSize += TAG_EXT_HEADER_UPDATE_LENGTH
             }
-            if (crcDataFlag) {
+            if (isCrcDataFlag) {
                 additionalHeaderSize += TAG_EXT_HEADER_CRC_LENGTH
             }
-            if (tagRestriction) {
+            if (isTagRestriction) {
                 additionalHeaderSize += TAG_EXT_HEADER_RESTRICTION_LENGTH
             }
         }
@@ -860,49 +882,49 @@ class ID3v24Tag(
 
         //Write Extended Header
         var extHeaderBuffer: ByteBuffer? = null
-        if (extended) {
+        if (isExtended) {
             //Write Extended Header Size
             var extendedSize = TAG_EXT_HEADER_LENGTH
-            if (updateTag) {
+            if (isUpdateTag) {
                 extendedSize += TAG_EXT_HEADER_UPDATE_LENGTH
             }
-            if (crcDataFlag) {
+            if (isCrcDataFlag) {
                 extendedSize += TAG_EXT_HEADER_CRC_LENGTH
             }
-            if (tagRestriction) {
+            if (isTagRestriction) {
                 extendedSize += TAG_EXT_HEADER_RESTRICTION_LENGTH
             }
             extHeaderBuffer = ByteBuffer.allocate(extendedSize)
             extHeaderBuffer.putInt(extendedSize)
-            //Write Number of flags Byte
+            //Write Number of flags Int
             extHeaderBuffer.put(TAG_EXT_NUMBER_BYTES_DATA_LENGTH.toByte())
             //Write Extended Flags
-            var extFlag: Byte = 0
-            if (updateTag) {
+            var extFlag: Int = 0
+            if (isUpdateTag) {
                 extFlag = extFlag or MASK_V24_TAG_UPDATE
             }
-            if (crcDataFlag) {
+            if (isCrcDataFlag) {
                 extFlag = extFlag or MASK_V24_CRC_DATA_PRESENT
             }
-            if (tagRestriction) {
+            if (isTagRestriction) {
                 extFlag = extFlag or MASK_V24_TAG_RESTRICTIONS
             }
-            extHeaderBuffer.put(extFlag)
+            extHeaderBuffer.put(extFlag.toByte())
             //Write Update Data
-            if (updateTag) {
-                extHeaderBuffer.put(0.toByte())
+            if (isUpdateTag) {
+                extHeaderBuffer.put(0)
             }
             //Write CRC Data
-            if (crcDataFlag) {
+            if (isCrcDataFlag) {
                 extHeaderBuffer.put(TAG_EXT_HEADER_CRC_DATA_LENGTH.toByte())
-                extHeaderBuffer.put(0.toByte())
+                extHeaderBuffer.put(0)
                 extHeaderBuffer.putInt(crcData)
             }
             //Write Tag Restriction
-            if (tagRestriction) {
+            if (isTagRestriction) {
                 extHeaderBuffer.put(TAG_EXT_HEADER_RESTRICTION_DATA_LENGTH.toByte())
                 //todo not currently setting restrictions
-                extHeaderBuffer.put(0.toByte())
+                extHeaderBuffer.put(0)
             }
         }
 
@@ -914,5 +936,145 @@ class ID3v24Tag(
         headerBuffer.flip()
 
         return headerBuffer
+    }
+
+    /**
+     * Delete fields with this (frame) id
+     *
+     * @param id
+     */
+    override fun deleteField(id: String) {
+        super.doDeleteTagField(FrameAndSubId(null, id, null))
+    }
+
+    override fun createField(artwork: Artwork): TagField {
+        val frame = createFrame(
+            getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART).frameId
+        )
+        val body: FrameBodyAPIC = frame.frameBody as FrameBodyAPIC
+        if (!artwork.isLinked) {
+            body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, artwork.mimeType)
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            return frame
+        } else {
+            body.setObjectValue(
+                DataTypes.OBJ_PICTURE_DATA,
+                artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
+            )
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            return frame
+        }
+    }
+
+    /**
+     * Create Artwork
+     *
+     * @param data
+     * @param mimeType of the image
+     * @return
+     * @see PictureTypes
+     */
+    fun createArtworkField(data: ByteArray, mimeType: String): TagField {
+        val frame = createFrame(
+            getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART).frameId
+        )
+        val body = frame.frameBody as FrameBodyAPIC
+        body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, data)
+        body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, PictureTypes.DEFAULT_ID)
+        body.setObjectValue(DataTypes.OBJ_MIME_TYPE, mimeType)
+        body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+        return frame
+    }
+
+    /**
+     * Create a new frame with the specified frameid
+     *
+     * @param id
+     * @return
+     */
+    override fun createFrame(id: String): ID3v24Frame {
+        return ID3v24Frame(id)
+    }
+
+    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
+        if (genericKey == null) {
+            throw IllegalArgumentException(
+                ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg()
+            )
+        }
+        val id3v24FieldKey = ID3v24Frames.fromFieldKey(genericKey)
+        if (id3v24FieldKey == null) {
+            throw KeyNotFoundException(genericKey.name)
+        }
+        return FrameAndSubId(
+            genericKey,
+            id3v24FieldKey.id,
+            id3v24FieldKey.fieldKey?.subId
+        )
+    }
+
+    /**
+     * Display the tag in an XMLFormat
+     */
+    override fun createStructure() {
+        MP3File.tagFormatter?.openHeadingElement(
+            TYPE_TAG,
+            getIdentifier()?:""
+        )
+
+        super.createStructureHeader()
+
+        //Header
+        MP3File.tagFormatter?.openHeadingElement(TYPE_HEADER, "")
+        MP3File.tagFormatter?.addElement(
+            TYPE_UNSYNCHRONISATION,
+            this.isUnsynchronization
+        )
+        MP3File.tagFormatter?.addElement(TYPE_CRCDATA, this.crcData)
+        MP3File.tagFormatter?.addElement(
+            TYPE_EXPERIMENTAL,
+            this.isExperimental
+        )
+        MP3File.tagFormatter?.addElement(TYPE_EXTENDED, this.isExtended)
+        MP3File.tagFormatter?.addElement(
+            TYPE_PADDINGSIZE,
+            this.paddingSize
+        )
+        MP3File.tagFormatter?.addElement(TYPE_FOOTER, this.isFooter)
+        MP3File.tagFormatter?.addElement(
+            TYPE_IMAGEENCODINGRESTRICTION,
+            this.paddingSize
+        )
+        MP3File.tagFormatter?.addElement(
+            TYPE_IMAGESIZERESTRICTION,
+            this.imageSizeRestriction.toInt()
+        )
+        MP3File.tagFormatter?.addElement(
+            TYPE_TAGRESTRICTION,
+            this.isTagRestriction
+        )
+        MP3File.tagFormatter?.addElement(
+            TYPE_TAGSIZERESTRICTION,
+            this.tagSizeRestriction.toInt()
+        )
+        MP3File.tagFormatter?.addElement(
+            TYPE_TEXTFIELDSIZERESTRICTION,
+            this.textFieldSizeRestriction.toInt()
+        )
+        MP3File.tagFormatter?.addElement(
+            TYPE_TEXTENCODINGRESTRICTION,
+            this.textEncodingRestriction.toInt()
+        )
+        MP3File.tagFormatter?.addElement(TYPE_UPDATETAG, this.isUpdateTag)
+        MP3File.tagFormatter?.closeHeadingElement(TYPE_HEADER)
+
+        //Body
+        super.createStructureBody()
+
+        MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
     }
 }

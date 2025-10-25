@@ -1,17 +1,17 @@
 package de.visualdigits.kaudiotagger.model.frame
 
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTDAT
-import de.visualdigits.kaudiotagger.model.kframe.ID3v23KFrame
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
 
 class TyerTdatAggregatedFrame(): AggregatedFrame() {
 
     companion object {
-        val ID_TYER_TDAT: String = ID3v23KFrame.TYER.id + ID3v23KFrame.TDAT.id
+        val ID_TYER_TDAT: String = ID3v23Frames.TYER.id + ID3v23Frames.TDAT.id
     }
 
     override fun getContent(): String? {
         val sb = StringBuilder()
-        val i = frames.iterator()
+        val i = getFrames().iterator()
         val tyer = i.next()
         sb.append(tyer.getContent())
         val tdat = i.next()

@@ -1,13 +1,24 @@
 package de.visualdigits.kaudiotagger.model.datatype
 
+import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import org.slf4j.LoggerFactory
 
-abstract class AbstractDataType(
-    val identifier: String,
-    var frameBody: AbstractTagFrameBody? = null,
-    var value: Any? = null
-) {
+abstract class AbstractDataType {
+
+    val identifier: String
+    var frameBody: AbstractTagFrameBody? = null
+    private var value: Any? = null
+
+    constructor(
+        identifier: String = "",
+        frameBody: AbstractTagFrameBody? = null,
+        value: Any? = null
+    ) {
+        this.identifier = identifier
+        this.frameBody = frameBody
+        this.value = value
+    }
 
     val log = LoggerFactory.getLogger(javaClass)
 
@@ -29,7 +40,7 @@ abstract class AbstractDataType(
      *
      * @param copyObject
      */
-    constructor(copyObject: AbstractDataType): this(copyObject.identifier) {
+    constructor(copyObject: AbstractDataType): this(copyObject.identifier?:error("No identifier")) {
         // no copy constructor in super class
         this.value = when (val obj = copyObject.value) {
             is String -> obj
@@ -90,7 +101,13 @@ abstract class AbstractDataType(
      *
      * @return the size in bytes of the datatype
      */
-    abstract fun getSize(): Int
+    open fun getSizeValue(): Int = size
+
+    fun getValue(): Any? = value
+
+    fun setValue(value: Any?) {
+        this.value = value
+    }
 
     /**
      * Starting point write ID3 Datatype back to array of bytes.
@@ -99,4 +116,14 @@ abstract class AbstractDataType(
      * @return the array of bytes representing this datatype that should be written to file
      */
     abstract fun writeByteArray(): ByteArray
+
+    /**
+     * Return String Representation of Datatype     *
+     */
+    fun createStructure() {
+        MP3File.tagFormatter?.addElement(
+            identifier,
+            value.toString()
+        )
+    }
 }

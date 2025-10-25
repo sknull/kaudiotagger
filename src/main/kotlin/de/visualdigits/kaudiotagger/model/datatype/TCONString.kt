@@ -1,33 +1,47 @@
 package de.visualdigits.kaudiotagger.model.datatype
 
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
+import kotlin.Any
 
-class TCONString(
-    identifier: String,
-    frameBody: AbstractTagFrameBody? = null,
-    value: Any? = null
-): TextEncodedStringSizeTerminated(
-    identifier,
-    frameBody,
-    value
-) {
+class TCONString : TextEncodedStringSizeTerminated {
 
     var isNullSeperateMultipleValues = true
 
     companion object {
 
-    fun splitV23(value: String): List<String> {
-        val valuesarray = value
+        fun splitV23(value: String): List<String> {
+            val valuesarray = value
                 .replace("(\\(\\d+\\)|\\(RX\\)|\\(CR\\)\\w*)".toRegex(), "$1\u0000")
                 .split("\u0000")
-        var values = valuesarray.toList()
-        //Read only list so if empty have to create new list
-        if (values.isEmpty()) {
-            values = listOf("")
+            var values = valuesarray.toList()
+            //Read only list so if empty have to create new list
+            if (values.isEmpty()) {
+                values = listOf("")
+            }
+            return values
         }
-        return values
     }
 
+    /**
+     * Creates a new empty TextEncodedStringSizeTerminated datatype.
+     *
+     * @param identifier identifies the frame type
+     * @param frameBody
+     */
+    constructor(identifier: String, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
+
+    /**
+     * Copy constructor
+     *
+     * @param object
+     */
+    constructor(`object`: TCONString) : super(`object`)
+
+    override fun equals(obj: Any?): Boolean {
+        if (this === obj) {
+            return true
+        }
+        return obj is TCONString && super.equals(obj)
     }
 
     /**
@@ -38,14 +52,14 @@ class TCONString(
     override fun addValue(value: String) {
         //For ID3v24 we separate each value by a null
         if (isNullSeperateMultipleValues) {
-            this.value = this.value.toString() + "\u0000" + value
+            setValue("${value}\u0000$value")
         } else {
             //For ID3v23 if they pass a numeric value in brackets this indicates a mapping to an ID3v2 genre and
             //can be seen as a refinement and therefore do not need the non-standard (for ID3v23) null seperator
             if (value.startsWith("(")) {
-                this.value = this.value.toString() + value
+                setValue("${value}$value")
             } else {
-                this.value = this.value.toString() + "\u0000" + value
+                setValue("${value}\u0000$value")
             }
         }
     }
@@ -63,14 +77,14 @@ class TCONString(
      * @return list of all values
      */
     override fun getValues(): MutableList<String> {
-        return (value as? String)?.let { s ->
+        return (getValue() as? String)?.let { s ->
             if (isNullSeperateMultipleValues) {
                 splitByNullSeperator(s)
             } else {
                 splitV23(s)
             }
         }?.toMutableList()
-            ?:mutableListOf()
+            ?: mutableListOf()
     }
 
     /**

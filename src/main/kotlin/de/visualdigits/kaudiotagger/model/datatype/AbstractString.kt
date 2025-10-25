@@ -9,18 +9,33 @@ import java.nio.charset.StandardCharsets
 
 abstract class AbstractString: AbstractDataType {
 
+    /**
+     * Creates a new  datatype
+     *
+     * @param identifier
+     * @param frameBody
+     */
+    constructor(identifier: String, frameBody: AbstractTagFrameBody?) : super(identifier, frameBody)
+
+    /**
+     * Creates a new  datatype, with value
+     *
+     * @param identifier
+     * @param frameBody
+     * @param value
+     */
     constructor(
         identifier: String,
-        frameBody: AbstractTagFrameBody? = null,
-        value: Any? = null
-    ): super(identifier, frameBody, value)
+        frameBody: AbstractTagFrameBody?,
+        value: String
+    ) : super(identifier, frameBody, value)
 
     /**
      * Copy constructor
      *
      * @param `object`
      */
-    constructor(copyObject: AbstractString): super(copyObject)
+    constructor(copyObject: AbstractString) : super(copyObject)
 
     /**
      * Check the value can be encoded with the specified encoding
@@ -33,7 +48,7 @@ abstract class AbstractString: AbstractDataType {
                 .fromId(te)
                 ?.charSet
                 ?.newEncoder()
-                ?.canEncode(value as String) == true
+                ?.canEncode(getValue() as String) == true
         }?:false
     }
 
@@ -84,12 +99,11 @@ abstract class AbstractString: AbstractDataType {
     }
 
     /**
-     * Return the size in bytes of this datatype as it was/is held in file this
-     * will be effected by the encoding type.
+     * Return String representation of data type
      *
-     * @return the size
+     * @return a string representation of the value
      */
-    override fun getSize(): Int {
-        return size
+    override fun toString(): String {
+        return (getValue() as? String)?:""
     }
 }

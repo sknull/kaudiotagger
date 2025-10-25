@@ -7,7 +7,35 @@ abstract class AbstractTagItem {
 
     val log = LoggerFactory.getLogger(javaClass)
 
+    var size: Int = 0
+
+    private var identifier: String? = null
+    var byteBuffer: ByteBuffer? = null
+    var frameSize: Int = 0
+
     constructor()
+
+    constructor(size: Int) {
+        this.size = size
+    }
+
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ) {
+        this.byteBuffer = byteBuffer
+        this.frameSize = frameSize
+    }
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ) {
+        this.identifier = identifier
+        this.byteBuffer = byteBuffer
+        this.frameSize = frameSize
+    }
 
     constructor(copyObject: AbstractTagItem?) {
         // no copy constructor in super class
@@ -16,21 +44,29 @@ abstract class AbstractTagItem {
     /**
      * @param byteBuffer file to read from
      */
-    abstract fun read(byteBuffer: ByteBuffer)
+    abstract fun read(byteBuffer: ByteBuffer?)
 
     /**
      * Return the ID3v2 Frame Identifier, must be implemented by concrete subclasses
      *
      * @return the frame identifier
      */
-    abstract fun getIdentifier(): String?
+    open fun getIdentifier(): String? = identifier
+
+    fun setIdentifier(identifier: String?) {
+        this.identifier = identifier
+    }
 
     /**
      * Return size of this item
      *
      * @return size of this item
      */
-    abstract fun getSize(): Int
+    open fun getSizeValue(): Int = size
+
+    open fun setSizeValue(size: Int) {
+        this.size = size
+    }
 
     /**
      * Returns true if this datatype is a subset of the argument. This instance

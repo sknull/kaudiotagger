@@ -4,7 +4,6 @@ import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
-import java.util.Arrays
 import java.util.regex.Pattern
 
 abstract class AbstractID3v1Tag: AbstractID3Tag {
@@ -14,7 +13,7 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
         const val TAG: String = "TAG"
 
         //If field is less than maximum field length this is how it is terminated
-        val END_OF_FIELD: Byte = 0.toByte()
+        val END_OF_FIELD: Byte = 0
         val TAG_ID: ByteArray = byteArrayOf('T'.code.toByte(), 'A'.code.toByte(), 'G'.code.toByte())
 
         //Fields Lengths common to v1 and v1.1 tags
@@ -55,7 +54,7 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
      *
      * @return size of this tag in bytes
      */
-    override fun getSize(): Int {
+    override fun getSizeValue(): Int {
         return TAG_LENGTH
     }
 

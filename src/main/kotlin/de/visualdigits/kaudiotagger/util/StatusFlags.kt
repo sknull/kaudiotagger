@@ -3,8 +3,8 @@ package de.visualdigits.kaudiotagger.util
 import org.slf4j.LoggerFactory
 
 open class StatusFlags(
-    var originalFlags: Byte = 0,
-    var writeFlags: Byte = 0
+    var originalFlags: Int = 0,
+    var writeFlags: Int = 0
 ) {
 
     val log = LoggerFactory.getLogger(javaClass)
@@ -14,6 +14,8 @@ open class StatusFlags(
         const val TYPE_FLAGS: String = "statusFlags"
     }
 
+    open fun createStructure() {
+    }
 
     override fun equals(obj: Any?): Boolean {
         if (this == obj) {

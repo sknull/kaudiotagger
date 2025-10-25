@@ -1,6 +1,11 @@
 package de.visualdigits.kaudiotagger.model.tag.id3
 
+import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
+import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v1FieldKey
+import de.visualdigits.kaudiotagger.model.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.exceptions.TagException
+import de.visualdigits.kaudiotagger.model.field.TagField
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyCOMM
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTALB
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTCON
@@ -9,8 +14,11 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTRCK
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v24Frame
-import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.tag.images.Artwork
+import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.IOException
@@ -32,15 +40,15 @@ class ID3v11Tag: ID3v1Tag {
         const val FIELD_TRACK_INDICATOR_POS: Int = 125
         const val FIELD_TRACK_LENGTH: Int = 1
         const val FIELD_TRACK_POS: Int = 126
-        const val RELEASE: Byte = 1
-        const val MAJOR_VERSION: Byte = 1
-        const val REVISION: Byte = 0
+        const val RELEASE: Int = 1
+        const val MAJOR_VERSION: Int = 1
+        const val REVISION: Int = 0
     }
 
     /**
      * Track is held as a single byte in v1.1
      */
-    var track: Byte = TRACK_UNDEFINED.toByte()
+    var track: Int = TRACK_UNDEFINED
 
     /**
      * Creates a new ID3v11 datatype.
@@ -58,79 +66,76 @@ class ID3v11Tag: ID3v1Tag {
      * @param mp3tag
      * @throws UnsupportedOperationException
      */
-    constructor(mp3tag: AbstractTag) {
-        if (mp3tag != null) {
-            if (mp3tag is ID3v1Tag) {
-                if (mp3tag is ID3v11Tag) {
-                    throw UnsupportedOperationException(
-                        "Copy Constructor not called. Please type cast the argument"
-                    )
-                }
-                // id3v1_1 objects are also id3v1 objects
-                this.title = mp3tag.title
-                this.artist = mp3tag.artist
-                this.album = mp3tag.album
-                this.comment = mp3tag.comment
-                this.year = mp3tag.year
-                this.genre = mp3tag.genre
+    constructor(mp3tag: AbstractTag?) {
+        if (mp3tag is ID3v1Tag) {
+            if (mp3tag is ID3v11Tag) {
+                throw UnsupportedOperationException(
+                    "Copy Constructor not called. Please type cast the argument"
+                )
+            }
+            // id3v1_1 objects are also id3v1 objects
+            setTitle(mp3tag.getTitle())
+            setArtist(mp3tag.getArtist())
+            setAlbum(mp3tag.getAlbum())
+            setComment(mp3tag.getComment())
+            setYear(mp3tag.getYear())
+            setGenre(mp3tag.getGenre())
+        } else {
+            val id3tag: ID3v24Tag
+            // first change the tag to ID3v2_4 tag if not one already
+            if (mp3tag !is ID3v24Tag) {
+                id3tag = ID3v24Tag(mp3tag)
             } else {
-                val id3tag: ID3v24Tag
-                // first change the tag to ID3v2_4 tag if not one already
-                if (mp3tag !is ID3v24Tag) {
-                    id3tag = ID3v24Tag(mp3tag)
-                } else {
-                    id3tag = mp3tag
-                }
-                var frame: ID3v24Frame
-                var text: String
-                if (id3tag.hasFrame(ID3v24KFrame.TITLE.id)) {
-                    frame = id3tag.getFrame(ID3v24KFrame.TITLE.id) as ID3v24Frame
-                    text = (frame.frameBody as FrameBodyTIT2).getText()
-                    this.title = ID3Tags.truncate(text, FIELD_TITLE_LENGTH)
-                }
-                if (id3tag.hasFrame(ID3v24KFrame.ARTIST.id)) {
-                    frame = id3tag.getFrame(ID3v24KFrame.ARTIST.id) as ID3v24Frame
-                    text = (frame.frameBody as FrameBodyTPE1).getText()
-                    this.artist = ID3Tags.truncate(text, FIELD_ARTIST_LENGTH)
-                }
-                if (id3tag.hasFrame(ID3v24KFrame.ALBUM.id)) {
-                    frame = id3tag.getFrame(ID3v24KFrame.ALBUM.id) as ID3v24Frame
-                    text = (frame.frameBody as FrameBodyTALB).getText()
-                    this.album = ID3Tags.truncate(text, FIELD_ALBUM_LENGTH)
-                }
-                if (id3tag.hasFrame(ID3v24KFrame.YEAR.id)) {
-                    frame = id3tag.getFrame(ID3v24KFrame.YEAR.id) as ID3v24Frame
-                    text = (frame.frameBody as FrameBodyTDRC).getText()
-                    this.year = ID3Tags.truncate(text, FIELD_YEAR_LENGTH)
-                }
+                id3tag = mp3tag
+            }
+            var frame: ID3v24Frame
+            var text: String
+            if (id3tag.hasFrame(ID3v24Frames.TITLE.id)) {
+                frame = id3tag.getFrame(ID3v24Frames.TITLE.id) as ID3v24Frame
+                text = (frame.frameBody as FrameBodyTIT2).getText()
+                setTitle(ID3Tags.truncate(text, FIELD_TITLE_LENGTH))
+            }
+            if (id3tag.hasFrame(ID3v24Frames.ARTIST.id)) {
+                frame = id3tag.getFrame(ID3v24Frames.ARTIST.id) as ID3v24Frame
+                text = (frame.frameBody as FrameBodyTPE1).getText()
+                setArtist(ID3Tags.truncate(text, FIELD_ARTIST_LENGTH))
+            }
+            if (id3tag.hasFrame(ID3v24Frames.ALBUM.id)) {
+                frame = id3tag.getFrame(ID3v24Frames.ALBUM.id) as ID3v24Frame
+                text = (frame.frameBody as FrameBodyTALB).getText()
+                setAlbum(ID3Tags.truncate(text, FIELD_ALBUM_LENGTH))
+            }
+            if (id3tag.hasFrame(ID3v24Frames.YEAR.id)) {
+                frame = id3tag.getFrame(ID3v24Frames.YEAR.id) as ID3v24Frame
+                text = (frame.frameBody as FrameBodyTDRC).getText()
+                setYear(ID3Tags.truncate(text, FIELD_YEAR_LENGTH))
+            }
 
-                if (id3tag.hasFrame(ID3v24KFrame.COMMENT.id)) {
-                    text = ""
-                    id3tag.getFrameOfType(
-                        ID3v24KFrame.COMMENT.id
-                    ).forEach { frame ->
-                        text += (((frame as ID3v24Frame).frameBody as FrameBodyCOMM).getText() + " ")
-                    }
-                    this.comment = ID3Tags.truncate(text, FIELD_COMMENT_LENGTH)
+            if (id3tag.hasFrame(ID3v24Frames.COMMENT.id)) {
+                text = ""
+                id3tag.getFrameOfType(
+                    ID3v24Frames.COMMENT.id
+                ).forEach { frame ->
+                    text += (((frame as ID3v24Frame).frameBody as FrameBodyCOMM).getText() + " ")
                 }
-                if (id3tag.hasFrame(ID3v24KFrame.GENRE.id)) {
-                    frame = id3tag.getFrame(ID3v24KFrame.GENRE.id) as ID3v24Frame
-                    text = (frame.frameBody as FrameBodyTCON).getText()
-                    try {
-                        this.genre = ID3Tags.findNumber(text).toByte()
-                    } catch (ex: TagException) {
-                        log.warn(
-                            "Unable to convert TCON frame to format suitable for v11 tag",
-                            ex
-                        )
-                        this.genre = GENRE_UNDEFINED as Byte
-                    }
+                setComment(ID3Tags.truncate(text, FIELD_COMMENT_LENGTH))
+            }
+            if (id3tag.hasFrame(ID3v24Frames.GENRE.id)) {
+                frame = id3tag.getFrame(ID3v24Frames.GENRE.id) as ID3v24Frame
+                text = (frame.frameBody as FrameBodyTCON).getText()
+                try {
+                    setGenre(ID3Tags.findNumber(text).toInt())
+                } catch (ex: TagException) {
+                    log.warn(
+                        "Unable to convert TCON frame to format suitable for v11 tag",
+                        ex
+                    )
+                    setGenre(GENRE_UNDEFINED)
                 }
-                if (id3tag.hasFrame(ID3v24KFrame.TRACK.id)) {
-                    frame = id3tag.getFrame(ID3v24KFrame.TRACK.id) as ID3v24Frame
-                    this.track =
-                        (frame.frameBody as FrameBodyTRCK).getTrackNo().toByte()
-                }
+            }
+            if (id3tag.hasFrame(ID3v24Frames.TRACK.id)) {
+                frame = id3tag.getFrame(ID3v24Frames.TRACK.id) as ID3v24Frame
+                this.track = (frame.frameBody as FrameBodyTRCK).getTrackNo()
             }
         }
     }
@@ -157,21 +162,21 @@ class ID3v11Tag: ID3v1Tag {
     /**
      * Retrieve the Release
      */
-    override fun getRelease(): Byte {
+    override fun getRelease(): Int {
         return RELEASE
     }
 
     /**
      * Retrieve the Major Version
      */
-    override fun getMajorVersion(): Byte {
+    override fun getMajorVersion(): Int {
         return MAJOR_VERSION
     }
 
     /**
      * Retrieve the Revision
      */
-    override fun getRevision(): Byte {
+    override fun getRevision(): Int {
         return REVISION
     }
 
@@ -180,9 +185,9 @@ class ID3v11Tag: ID3v1Tag {
      *
      * @param byteBuffer from where to read in a tag
      */
-    override fun read(byteBuffer: ByteBuffer) {
+    override fun read(byteBuffer: ByteBuffer?) {
         super.read(byteBuffer)
-        track = dataBuffer[FIELD_TRACK_POS]
+        track = dataBuffer[FIELD_TRACK_POS].toInt()
     }
 
     /**
@@ -228,7 +233,7 @@ class ID3v11Tag: ID3v1Tag {
         )
         var offset = FIELD_TITLE_POS
         if (TagOptionSingleton.id3v1SaveTitle) {
-            str = ID3Tags.truncate(title, FIELD_TITLE_LENGTH)
+            str = ID3Tags.truncate(getTitle(), FIELD_TITLE_LENGTH)
             i = 0
             while (i < str.length) {
                 buffer[i + offset] = str.get(i).code.toByte()
@@ -237,7 +242,7 @@ class ID3v11Tag: ID3v1Tag {
         }
         offset = FIELD_ARTIST_POS
         if (TagOptionSingleton.id3v1SaveArtist) {
-            str = ID3Tags.truncate(artist, FIELD_ARTIST_LENGTH)
+            str = ID3Tags.truncate(getArtist(), FIELD_ARTIST_LENGTH)
             i = 0
             while (i < str.length) {
                 buffer[i + offset] = str.get(i).code.toByte()
@@ -246,7 +251,7 @@ class ID3v11Tag: ID3v1Tag {
         }
         offset = FIELD_ALBUM_POS
         if (TagOptionSingleton.id3v1SaveAlbum) {
-            str = ID3Tags.truncate(album, FIELD_ALBUM_LENGTH)
+            str = ID3Tags.truncate(getAlbum(), FIELD_ALBUM_LENGTH)
             i = 0
             while (i < str.length) {
                 buffer[i + offset] = str.get(i).code.toByte()
@@ -255,7 +260,7 @@ class ID3v11Tag: ID3v1Tag {
         }
         offset = FIELD_YEAR_POS
         if (TagOptionSingleton.id3v1SaveYear) {
-            str = ID3Tags.truncate(year, FIELD_YEAR_LENGTH)
+            str = ID3Tags.truncate(getYear(), FIELD_YEAR_LENGTH)
             i = 0
             while (i < str.length) {
                 buffer[i + offset] = str.get(i).code.toByte()
@@ -264,7 +269,7 @@ class ID3v11Tag: ID3v1Tag {
         }
         offset = FIELD_COMMENT_POS
         if (TagOptionSingleton.id3v1SaveComment) {
-            str = ID3Tags.truncate(comment, FIELD_COMMENT_LENGTH)
+            str = ID3Tags.truncate(getComment(), FIELD_COMMENT_LENGTH)
             i = 0
             while (i < str.length) {
                 buffer[i + offset] = str.get(i).code.toByte()
@@ -272,13 +277,231 @@ class ID3v11Tag: ID3v1Tag {
             }
         }
         offset = FIELD_TRACK_POS
-        buffer[offset] = track // skip one byte extra blank for 1.1 definition
+        buffer[offset] = track.toByte() // skip one byte extra blank for 1.1 definition
         offset = FIELD_GENRE_POS
         if (TagOptionSingleton.id3v1SaveGenre) {
-            buffer[offset] = genre
+            buffer[offset] = getGenre().toByte()
         }
         file.write(buffer)
 
         log.debug("Saved ID3v11 tag to file")
+    }
+
+    override fun addField(artwork: Artwork) {
+        throw java.lang.UnsupportedOperationException(
+            ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
+        )
+    }
+
+    override fun addField(genericKey: GenericFieldKey, vararg value: String) {
+        setField(genericKey, *value)
+    }
+
+    override fun setField(genericKey: GenericFieldKey, vararg value: String) {
+        val tagfield = createField(genericKey, *value)
+        setField(tagfield)
+    }
+
+    override fun setField(field: TagField) {
+        val genericKey: GenericFieldKey = GenericFieldKey.valueOf(field.getIdentifier()?:error("No id"))
+        when (genericKey) {
+            GenericFieldKey.ARTIST -> setArtist(field.toString())
+            GenericFieldKey.ALBUM -> setAlbum(field.toString())
+            GenericFieldKey.TITLE -> setTitle(field.toString())
+            GenericFieldKey.GENRE -> setGenreVal(field.toString())
+            GenericFieldKey.YEAR -> setYear(field.toString())
+            GenericFieldKey.COMMENT -> setComment(field.toString())
+            else -> {}
+        }
+    }
+
+    /**
+     * Create Tag Field using generic key
+     */
+    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
+        val value = values[0]
+        val idv1FieldKey = tagFieldToID3v1Field[genericKey] ?: throw KeyNotFoundException(
+            ErrorMessage.INVALID_FIELD_FOR_ID3V1TAG.getMsg(genericKey.name)
+        )
+        return ID3v1TagField(idv1FieldKey.name, value)
+    }
+
+    /**
+     * @return album within list or empty if does not exist
+     */
+    override fun getAlbumTag(): List<TagField> {
+        if (getAlbum().isNotEmpty()) {
+            val field = ID3v1TagField(
+                ID3v1FieldKey.ALBUM.name,
+                getAlbum()
+            )
+            return listOf(field)
+        } else {
+            return ArrayList<TagField>()
+        }
+    }
+
+    /**
+     * @return Artist within list or empty if does not exist
+     */
+    override fun getArtistTag(): List<TagField> {
+        if (getArtist().length > 0) {
+            val field: ID3v1TagField = ID3v1TagField(
+                ID3v1FieldKey.ARTIST.name,
+                getArtist()
+            )
+            return listOf(field)
+        } else {
+            return ArrayList<TagField>()
+        }
+    }
+
+    /**
+     * @return comment within list or empty if does not exist
+     */
+    override fun getCommentTag(): List<TagField> {
+        if (getComment().isNotEmpty()) {
+            val field: ID3v1TagField = ID3v1TagField(
+                ID3v1FieldKey.COMMENT.name,
+                getComment()
+            )
+            return listOf(field)
+        } else {
+            return ArrayList<TagField>()
+        }
+    }
+
+    /**
+     * Get Genre field
+     *
+     *
+     * Only a single genre is available in ID3v1
+     *
+     * @return
+     */
+    override fun getGenreTag(): List<TagField> {
+        if (getFirst(GenericFieldKey.GENRE).length > 0) {
+            val field: ID3v1TagField = ID3v1TagField(
+                ID3v1FieldKey.GENRE.name,
+                getFirst(GenericFieldKey.GENRE)
+            )
+            return listOf(field)
+        } else {
+            return ArrayList<TagField>()
+        }
+    }
+
+    /**
+     * Sets the genreID,
+     *
+     *
+     * ID3v1 only supports genres defined in a predefined list
+     * so if unable to find value in list set 255, which seems to be the value
+     * winamp uses for undefined.
+     *
+     * @param genreVal
+     */
+    override fun setGenreVal(genreVal: String) {
+        val genreID = GenreTypes.fromName(genreVal)?.id
+        if (genreID != null) {
+            setGenre(genreID)
+        } else {
+            setGenre(GENRE_UNDEFINED)
+        }
+    }
+
+    /**
+     * Get title field
+     *
+     *
+     * Only a single title is available in ID3v1
+     *
+     * @return
+     */
+    override fun getTitleTag(): List<TagField> {
+        if (getFirst(GenericFieldKey.TITLE).isNotEmpty()) {
+            val field: ID3v1TagField = ID3v1TagField(
+                ID3v1FieldKey.TITLE.name,
+                getFirst(GenericFieldKey.TITLE)
+            )
+            return listOf(field)
+        } else {
+            return ArrayList<TagField>()
+        }
+    }
+
+    /**
+     * Get year field
+     *
+     *
+     * Only a single year is available in ID3v1
+     *
+     * @return
+     */
+    override fun getYearTag(): List<TagField> {
+        if (getFirst(GenericFieldKey.YEAR).isNotEmpty()) {
+            val field: ID3v1TagField = ID3v1TagField(
+                ID3v1FieldKey.YEAR.name,
+                getFirst(GenericFieldKey.YEAR)
+            )
+            return listOf(field)
+        } else {
+            return ArrayList<TagField>()
+        }
+    }
+
+    override fun getFirst(genericKey: GenericFieldKey): String {
+        when (genericKey) {
+            GenericFieldKey.ARTIST -> return getArtist()
+            GenericFieldKey.ALBUM -> return getAlbum()
+            GenericFieldKey.TITLE -> return getTitle()
+            GenericFieldKey.GENRE -> return getFirstGenre()
+            GenericFieldKey.YEAR -> return getYear()
+            GenericFieldKey.TRACK -> return getFirstTrack()
+            GenericFieldKey.COMMENT -> return getComment()
+            else -> return ""
+        }
+    }
+
+    /**
+     * Return the track number as a String.
+     *
+     * @return track
+     */
+    fun getFirstTrack(): String {
+        return (track and BYTE_TO_UNSIGNED).toString()
+    }
+
+    /**
+     * Delete all instance of artwork Field
+     *
+     * @throws KeyNotFoundException
+     */
+    override fun deleteArtworkField() {
+        throw java.lang.UnsupportedOperationException(
+            ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
+        )
+    }
+
+    override fun createCompilationField(value: Boolean): TagField {
+        throw java.lang.UnsupportedOperationException(
+            ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
+        )
+    }
+
+    override fun createStructure() {
+        MP3File.tagFormatter?.openHeadingElement(
+            TYPE_TAG,
+            getIdentifier()?:""
+        )
+        //Header
+        MP3File.tagFormatter?.addElement(TYPE_TITLE, this.getTitle())
+        MP3File.tagFormatter?.addElement(TYPE_ARTIST, this.getArtist())
+        MP3File.tagFormatter?.addElement(TYPE_ALBUM, this.getAlbum())
+        MP3File.tagFormatter?.addElement(TYPE_YEAR, this.getYear())
+        MP3File.tagFormatter?.addElement(TYPE_COMMENT, this.getComment())
+        MP3File.tagFormatter?.addElement(TYPE_TRACK, this.track)
+        MP3File.tagFormatter?.addElement(TYPE_GENRE, this.getGenre())
+        MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
     }
 }

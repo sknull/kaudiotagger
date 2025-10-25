@@ -2,6 +2,7 @@ package de.visualdigits.kaudiotagger.model.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.datatype.ByteArraySizeTerminated
 import de.visualdigits.kaudiotagger.model.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v22FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
@@ -10,29 +11,16 @@ import java.nio.ByteBuffer
 
 class FrameBodyUnsupported: AbstractID3v2FrameBody, ID3v22FrameBody, ID3v23FrameBody, ID3v24FrameBody {
 
-    /**
-     * Because used by any unknown frame identifier varies
-     */
-    private var identifier: String? = null
-    private var byteBuffer: ByteBuffer? = null
-    private var frameSize: Int = 0
-
     constructor(
         byteBuffer: ByteBuffer? = null,
         frameSize: Int = 0
-    ) {
-        this.byteBuffer = byteBuffer
-        this.frameSize = frameSize
-    }
+    ): super(byteBuffer, frameSize)
 
-    /**
-     * Creates a new FrameBodyUnsupported
-     *
-     * @param identifier
-     */
-    constructor(identifier: String?): this() {
-        this.identifier = identifier
-    }
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     /**
      * Copy constructor
@@ -40,7 +28,7 @@ class FrameBodyUnsupported: AbstractID3v2FrameBody, ID3v22FrameBody, ID3v23Frame
      * @param copyObject a copy is made of this
      */
     constructor(copyObject: FrameBodyUnsupported): super(copyObject) {
-        this.identifier = copyObject.identifier
+        setIdentifier(copyObject.getIdentifier())
     }
 
     /**
@@ -49,17 +37,8 @@ class FrameBodyUnsupported: AbstractID3v2FrameBody, ID3v22FrameBody, ID3v23Frame
      * @param identifier
      * @param value
      */
-    constructor(identifier: String?, value: ByteArray): this(identifier) {
+    constructor(identifier: String?, value: ByteArray): super(identifier) {
         setObjectValue(DataTypes.OBJ_DATA, value)
-    }
-
-    /**
-     * Return the frame identifier
-     *
-     * @return the identifier
-     */
-    override fun getIdentifier(): String? {
-        return identifier
     }
 
     /**

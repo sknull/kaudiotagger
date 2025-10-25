@@ -1,6 +1,11 @@
 package de.visualdigits.kaudiotagger.util
 
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3V2Version
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.tag.id3.AbstractID3v2Tag
+import de.visualdigits.kaudiotagger.model.tag.id3.ID3v22Tag
+import de.visualdigits.kaudiotagger.model.tag.id3.ID3v23Tag
+import de.visualdigits.kaudiotagger.model.tag.id3.ID3v24Tag
 
 object TagOptionSingleton {
 
@@ -230,4 +235,23 @@ object TagOptionSingleton {
      * Preserve file identity if possible
      */
     var preserveFileIdentity = true
+
+    var id3v2Version = ID3V2Version.ID3_V23
+
+    /**
+     * Default based on user option
+     *
+     * @return
+     */
+    fun createDefaultID3Tag(): AbstractID3v2Tag {
+        if (id3v2Version == ID3V2Version.ID3_V24) {
+            return ID3v24Tag()
+        } else if (id3v2Version == ID3V2Version.ID3_V23) {
+            return ID3v23Tag()
+        } else if (id3v2Version == ID3V2Version.ID3_V22) {
+            return ID3v22Tag()
+        }
+        //Default in case not set somehow
+        return ID3v23Tag()
+    }
 }

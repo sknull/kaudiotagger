@@ -1,11 +1,24 @@
 package de.visualdigits.kaudiotagger.model.frame.lyrics
 
-import de.visualdigits.kaudiotagger.model.exceptions.FieldFrameBodyUnsupported
+import de.visualdigits.kaudiotagger.model.datatype.types.Lyrics3v2Fields
+import de.visualdigits.kaudiotagger.model.frame.framebody.FieldFrameBodyUnsupported
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractFrameBodyTextInfo
+import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyCOMM
+import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodySYLT
+import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.frame.id3.AbstractID3v2Frame
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.AbstractLyrics3v2FieldFrameBody
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyAUT
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyEAL
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyEAR
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyETT
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyIMG
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyIND
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyINF
+import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyLYR
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.IOException
 import java.io.RandomAccessFile
@@ -37,36 +50,35 @@ class Lyrics3v2Field: AbstractTagFrame {
      */
     constructor(frame: AbstractID3v2Frame) {
         val textFrame: AbstractFrameBodyTextInfo?
-        val text: String?
-        val frameIdentifier = frame.getIdentifier()
+        val frameIdentifier = frame.getIdentifier()?:error("No frame identifier")
         if (frameIdentifier?.startsWith("USLT") == true) {
             frameBody = FieldFrameBodyLYR("")
-            (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodyUSLT?)
+            (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodyUSLT)
         } else if (frameIdentifier.startsWith("SYLT")) {
             frameBody = FieldFrameBodyLYR("")
-            (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodySYLT?)
+            (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodySYLT)
         } else if (frameIdentifier.startsWith("COMM")) {
-            text = (frame.frameBody as FrameBodyCOMM).getText()
+            val text = (frame.frameBody as FrameBodyCOMM).getText()
             frameBody = FieldFrameBodyINF(text)
         } else if (frameIdentifier == "TCOM") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
             frameBody = FieldFrameBodyAUT("")
-            if ((textFrame != null) && (textFrame.getText().length > 0)) {
+            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
                 frameBody = FieldFrameBodyAUT(textFrame.getText())
             }
         } else if (frameIdentifier == "TALB") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText().length > 0)) {
+            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
                 frameBody = FieldFrameBodyEAL(textFrame.getText())
             }
         } else if (frameIdentifier == "TPE1") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText().length > 0)) {
+            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
                 frameBody = FieldFrameBodyEAR(textFrame.getText())
             }
         } else if (frameIdentifier == "TIT2") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText().length > 0)) {
+            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
                 frameBody = FieldFrameBodyETT(textFrame.getText())
             }
         } else {
@@ -91,14 +103,17 @@ class Lyrics3v2Field: AbstractTagFrame {
      * @throws InvalidTagException
      * @throws IOException
      */
-    override fun read(byteBuffer: ByteBuffer) {
+    override fun read(byteBuffer: ByteBuffer?) {
+        if (byteBuffer == null) {
+            return
+        }
         val buffer = ByteArray(6)
         // lets scan for a non-zero byte;
         val filePointer: Long
         var b: Byte;
         do {
             b = byteBuffer.get();
-        } while (b == 0);
+        } while (b.toInt() == 0);
         byteBuffer.position(byteBuffer.position() - 1);
         // read the 3 character ID
         byteBuffer.get(buffer, 0, 3);
@@ -122,26 +137,24 @@ class Lyrics3v2Field: AbstractTagFrame {
      */
     private fun readBody(
         identifier: String,
-        byteBuffer: ByteBuffer?
+        byteBuffer: ByteBuffer
     ): AbstractLyrics3v2FieldFrameBody {
         val newBody: AbstractLyrics3v2FieldFrameBody
-        if (identifier == Lyrics3v2Fields.FIELD_V2_AUTHOR) {
+        if (identifier == Lyrics3v2Fields.AUTHOR.id) {
             newBody = FieldFrameBodyAUT(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.FIELD_V2_ALBUM) {
+        } else if (identifier == Lyrics3v2Fields.ALBUM.id) {
             newBody = FieldFrameBodyEAL(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.FIELD_V2_ARTIST) {
+        } else if (identifier == Lyrics3v2Fields.ARTIST.id) {
             newBody = FieldFrameBodyEAR(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.FIELD_V2_TRACK) {
+        } else if (identifier == Lyrics3v2Fields.TRACK.id) {
             newBody = FieldFrameBodyETT(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.FIELD_V2_IMAGE) {
+        } else if (identifier == Lyrics3v2Fields.IMAGE.id) {
             newBody = FieldFrameBodyIMG(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.FIELD_V2_INDICATIONS) {
+        } else if (identifier == Lyrics3v2Fields.INDICATIONS.id) {
             newBody = FieldFrameBodyIND(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.FIELD_V2_ADDITIONAL_MULTI_LINE_TEXT
-        ) {
+        } else if (identifier == Lyrics3v2Fields.ADDITIONAL_MULTI_LINE_TEXT.id) {
             newBody = FieldFrameBodyINF(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.FIELD_V2_LYRICS_MULTI_LINE_TEXT
-        ) {
+        } else if (identifier == Lyrics3v2Fields.LYRICS_MULTI_LINE_TEXT.id) {
             newBody = FieldFrameBodyLYR(byteBuffer)
         } else {
             newBody = FieldFrameBodyUnsupported(byteBuffer)
@@ -152,18 +165,15 @@ class Lyrics3v2Field: AbstractTagFrame {
     /**
      * @return
      */
-    override fun getSize(): Int {
-        return frameBody!!.getSize() + 5 + getIdentifier().length
+    override fun getSizeValue(): Int {
+        return (frameBody?.getSizeValue()?:0) + 5 + (getIdentifier()?.length?:0)
     }
 
     /**
      * @return
      */
-    override fun getIdentifier(): String {
-        if (frameBody == null) {
-            return ""
-        }
-        return frameBody!!.getIdentifier()!!
+    override fun getIdentifier(): String? {
+        return frameBody?.getIdentifier()?:""
     }
 
     /**
@@ -171,15 +181,15 @@ class Lyrics3v2Field: AbstractTagFrame {
      * @throws IOException
      */
     fun write(file: RandomAccessFile) {
-        if ((frameBody!!.getSize() > 0) ||
+        if (((frameBody?.getSizeValue()?:0) > 0) ||
             TagOptionSingleton.lyrics3SaveEmptyField
         ) {
             val buffer = ByteArray(3)
             val str = getIdentifier()
-            for (i in 0..<str.length) {
-                buffer[i] = str.get(i).code.toByte()
+            for (i in 0..< (str?.length?:0)) {
+                str?.get(i)?.code?.toByte()?.also { b -> buffer[i] = b }
             }
-            file.write(buffer, 0, str.length)
+            file.write(buffer, 0, (str?.length?:0))
             //body.write(file);
         }
     }

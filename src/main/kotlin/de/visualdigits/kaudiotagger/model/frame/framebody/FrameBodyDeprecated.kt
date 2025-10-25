@@ -3,8 +3,9 @@ package de.visualdigits.kaudiotagger.model.frame.framebody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
+import java.nio.ByteBuffer
 
-class FrameBodyDeprecated() : AbstractID3v2FrameBody(), ID3v24FrameBody, ID3v23FrameBody {
+class FrameBodyDeprecated : AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
 
     /**
      * The original frameBody is held so can be retrieved
@@ -17,17 +18,14 @@ class FrameBodyDeprecated() : AbstractID3v2FrameBody(), ID3v24FrameBody, ID3v23F
      *
      * @param frameBody
      */
-    constructor(frameBody:AbstractID3v2FrameBody): this() {
+    constructor(frameBody:AbstractID3v2FrameBody) {
         this.originalFrameBody = frameBody
     }
 
-    /**
-     * Copy constructor
-     *
-     * @param copyObject a copy is made of this
-     */
-    constructor(copyObject: FrameBodyDeprecated): this() {
-    }
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(byteBuffer, frameSize)
 
     /**
      * Delgate size to size of original frameBody, if frameBody already exist will take this value from the frame header
@@ -35,8 +33,8 @@ class FrameBodyDeprecated() : AbstractID3v2FrameBody(), ID3v24FrameBody, ID3v23F
      *
      * @return size in bytes of this frame body
      */
-    override fun getSize(): Int {
-        return originalFrameBody!!.getSize()
+    override fun getSizeValue(): Int {
+        return originalFrameBody?.getSizeValue()?:0
     }
 
     /**
@@ -45,7 +43,7 @@ class FrameBodyDeprecated() : AbstractID3v2FrameBody(), ID3v24FrameBody, ID3v23F
      * @return the identifier
      */
     override fun getIdentifier(): String? {
-        return originalFrameBody!!.getIdentifier()
+        return originalFrameBody?.getIdentifier()
     }
 
     /**
@@ -68,10 +66,6 @@ class FrameBodyDeprecated() : AbstractID3v2FrameBody(), ID3v24FrameBody, ID3v23F
     }
 
     override fun getBriefDescription(): String {
-        //TODO When is this null, it seems it can be but Im not sure why
-        if (originalFrameBody != null) {
-            return originalFrameBody!!.getBriefDescription()
-        }
-        return ""
+        return originalFrameBody?.getBriefDescription()?:""
     }
 }

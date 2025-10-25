@@ -1,8 +1,9 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.kframe.ID3v22KFrame
-import de.visualdigits.kaudiotagger.model.kframe.ID3v23KFrame
-import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -12,15 +13,16 @@ class JAudioKotlinToolTest {
 
     @Test
     fun testMetadata() {
-        val file = File("M:/Electronic/Tangerine Dream/Alben/1973_Green Desert/01_Green Desert.mp3")
-        println(file.getArtworks())
+        val file = File("E:/temp/01_Green Desert.mp3")
+        val audioFile = MP3File(file)
+        println(audioFile)
     }
 
     @Test
     fun determineCommonFields() {
-        val v22Entries = ID3v22KFrame.entries.map { e -> e.name}
-        val v23Entries = ID3v23KFrame.entries.map { e -> e.name}
-        val v24Entries = ID3v24KFrame.entries.map { e -> e.name}
+        val v22Entries = ID3v22Frames.entries.map { e -> e.name}
+        val v23Entries = ID3v23Frames.entries.map { e -> e.name}
+        val v24Entries = ID3v24Frames.entries.map { e -> e.name}
 
         val common = v22Entries.intersect(v23Entries).intersect(v24Entries)
         common

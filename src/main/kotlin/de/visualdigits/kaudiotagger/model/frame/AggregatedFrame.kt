@@ -10,10 +10,10 @@ import java.nio.charset.Charset
 abstract class AggregatedFrame() : TagTextField {
 
     //TODO rather than just maintaining insertion order we want to define a preset order
-    var frames: MutableSet<AbstractID3v2Frame> = mutableSetOf()
+    private var frames: MutableSet<AbstractID3v2Frame> = mutableSetOf()
 
-    fun addFrame(frame: AbstractID3v2Frame?) {
-        frames.add(frame!!)
+    fun addFrame(frame: AbstractID3v2Frame) {
+        frames.add(frame)
     }
 
     fun getFrames(): MutableSet<AbstractID3v2Frame> {
@@ -67,10 +67,10 @@ abstract class AggregatedFrame() : TagTextField {
     override fun copyContent(field: TagField) {
     }
 
-    override fun getId(): String? {
+    override fun getIdentifier(): String? {
         val sb = StringBuilder()
         for (next in frames) {
-            sb.append(next.getId())
+            sb.append(next.getIdentifier())
         }
         return sb.toString()
     }

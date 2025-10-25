@@ -1,7 +1,9 @@
 package de.visualdigits.kaudiotagger.model.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
-import de.visualdigits.kaudiotagger.model.kframe.ID3v24KFrame
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import java.nio.ByteBuffer
 
 class FrameBodyTIT2: AbstractFrameBodyTextInfo, ID3v23FrameBody {
@@ -20,16 +22,18 @@ class FrameBodyTIT2: AbstractFrameBodyTextInfo, ID3v23FrameBody {
      * @param textEncoding
      * @param text
      */
-    constructor(textEncoding: Byte, text: String): super(textEncoding, text)
+    constructor(textEncoding: Byte, text: String?): super(textEncoding, text)
 
-    /**
-     * Creates a new FrameBodyTIT2 datatype.
-     *
-     * @param byteBuffer
-     * @param frameSize
-     * @throws InvalidTagException
-     */
-    constructor(byteBuffer: ByteBuffer, frameSize: Int): super(byteBuffer, frameSize)
+    constructor(
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(byteBuffer, frameSize)
+
+    constructor(
+        identifier: String? = null,
+        byteBuffer: ByteBuffer? = null,
+        frameSize: Int = 0
+    ): super(identifier, byteBuffer, frameSize)
 
     /**
      * The ID3v2 frame identifier
@@ -37,6 +41,6 @@ class FrameBodyTIT2: AbstractFrameBodyTextInfo, ID3v23FrameBody {
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24KFrame.TITLE.id
+        return ID3v24Frames.TITLE.id
     }
 }

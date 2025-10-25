@@ -33,16 +33,7 @@ open class NumberFixedLength(
     }
 
     constructor(copy: NumberFixedLength): this(copy.identifier) {
-        this.size = copy.size
-    }
-
-    /**
-     * Return size
-     *
-     * @return the size of this number
-     */
-    override fun getSize(): Int {
-        return size
+        setValue(copy.getSizeValue())
     }
 
     /**
@@ -58,19 +49,19 @@ open class NumberFixedLength(
             )
         }
 
-        if (offset + size > arr.size) {
+        if (offset + getSizeValue() > arr.size) {
             throw InvalidDataTypeException(
-                "Offset plus size to byte array is out of bounds: offset = $offset, size = $size + arr.length ${arr.size}"
+                "Offset plus size to byte array is out of bounds: offset = $offset, size = ${getSizeValue()}() + arr.length ${arr.size}"
             )
         }
 
         var lvalue: Long = 0
-        for (i in offset..<(offset + size)) {
+        for (i in offset..<(offset + getSizeValue())) {
             lvalue = lvalue shl 8
             lvalue += (arr[i].toInt() and 0xff).toLong()
         }
-        value = lvalue
-        log.debug("Read NumberFixedlength:$value")
+        setValue(lvalue)
+        log.debug("Read NumberFixedlength:${getValue()}")
     }
 
     /**
@@ -79,11 +70,11 @@ open class NumberFixedLength(
      * @return the datatype converted to a byte array
      */
     override fun writeByteArray(): ByteArray {
-        val arr = ByteArray(size)
-        if (value != null) {
+        val arr = ByteArray(getSizeValue())
+        if (getValue() != null) {
             //Convert value to long
-            val temp = ID3Tags.getWholeNumber(value!!)
-            (size - 1 downTo 0 ).forEach { i ->
+            val temp = ID3Tags.getWholeNumber(getValue())
+            (getSizeValue() - 1 downTo 0 ).forEach { i ->
                 arr[i] =  (temp and 0xFF).toByte()
                 temp shr 8
             }

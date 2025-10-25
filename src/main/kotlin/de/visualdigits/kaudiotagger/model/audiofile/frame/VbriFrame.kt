@@ -5,9 +5,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 
-class VbriFrame(
-    val header: ByteBuffer
-) {
+class VbriFrame {
 
     companion object {
 
@@ -39,8 +37,8 @@ class VbriFrame(
          *
          * @return
          */
-        fun parseVBRIFrame(header: ByteBuffer): VbriFrame {
-            return VbriFrame(header);
+        fun parseVBRIFrame(header: ByteBuffer?): VbriFrame? {
+            return header?.let { h -> VbriFrame(h) }
         }
 
         /**
@@ -51,8 +49,11 @@ class VbriFrame(
          * @return raw header if this is a VBRI frame
          */
         fun isVbriFrame(
-            bb: ByteBuffer
+            bb: ByteBuffer?
         ): ByteBuffer? {
+            if (bb == null) {
+                return null
+            }
             //We store this so can return here after scanning through buffer
             val startPosition = bb.position();
             log.debug("Checking VBRI Frame at$startPosition");
@@ -76,13 +77,16 @@ class VbriFrame(
         }
     }
 
-    var vbr = false
+    var isVbr = false
     var frameCount = -1
     var audioSize = -1
     var lameFrame: LameFrame? = null
     val encoder: String = "Fraunhofer"
 
-    init {
+    val header: ByteBuffer
+
+    constructor(header: ByteBuffer) {
+        this.header = header
         //Go to start of Buffer
         header.rewind()
         header.position(10)
@@ -116,5 +120,12 @@ class VbriFrame(
                     ((frameCountBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or
                     ((frameCountBuffer[BYTE_3].toInt() shl 8) and 0x0000FF00) or
                     (frameCountBuffer[BYTE_4].toInt() and 0x000000FF)
+    }
+
+    /**
+     * @return a string represntation
+     */
+    override fun toString(): String {
+        return ("VBRIheader vbr:$isVbr frameCount:$frameCount audioFileSize:$audioSize encoder:$encoder")
     }
 }
