@@ -120,7 +120,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             //So we have a tag
             val tagHeader = ByteArray(FIELD_TAG_SIZE_LENGTH)
             raf.seek(
-                raf.getFilePointer() +
+                raf.filePointer +
                         FIELD_TAGID_LENGTH +
                         FIELD_TAG_MAJOR_VERSION_LENGTH +
                         FIELD_TAG_MINOR_VERSION_LENGTH +
@@ -330,8 +330,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         newFrame: AbstractID3v2Frame
     ) {
         if (frameMap.containsKey(newFrame.getIdentifier())) {
-            val o = frameMap[newFrame.getIdentifier()]
-            when (o) {
+            when (val o = frameMap[newFrame.getIdentifier()]) {
                 is AbstractID3v2Frame -> {
                     processDuplicateFrame(newFrame, o)
                 }
@@ -380,9 +379,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         //Copy Frames that are a valid 2.4 type
         for (o1 in copyObject.frameMap.keys) {
             val id = o1
-            val o = copyObject.frameMap[id]
             //SingleFrames
-            when (o) {
+            when (val o = copyObject.frameMap[id]) {
                 is AbstractID3v2Frame -> {
                     addFrame(o)
                 }
@@ -635,7 +633,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
         try {
             fc = RandomAccessFile(file, "rw").getChannel()
-            fileLock = getFileLockForWriting(fc, file.getPath())
+            fileLock = getFileLockForWriting(fc, file.path)
             fc.write(headerBuffer)
             fc.write(ByteBuffer.wrap(bodyByteBuffer))
             fc.write(ByteBuffer.wrap(ByteArray(padding)))
@@ -646,23 +644,23 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             ) {
                 log.error(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getPath()
+                        file.path
                     )
                 )
                 throw UnableToModifyFileException(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getPath()
+                        file.path
                     )
                 )
             } else {
                 log.error(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getPath()
+                        file.path
                     )
                 )
                 throw UnableToCreateFileException(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getPath()
+                        file.path
                     )
                 )
             }
@@ -672,23 +670,23 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             ) {
                 log.error(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
                 throw UnableToModifyFileException(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
             } else {
                 log.error(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
                 throw UnableToCreateFileException(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
             }
@@ -785,26 +783,26 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 log.error(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
                         file.getName(),
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
                 throw UnableToCreateFileException(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
                         file.getName(),
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
             } else {
                 log.error(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
                         file.getName(),
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
                 throw UnableToCreateFileException(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
                         file.getName(),
-                        file.getParentFile().getPath()
+                        file.getParentFile().path
                     )
                 )
             }
@@ -817,13 +815,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             log.error(
                 ErrorMessage.GENERAL_WRITE_FAILED_TO_MODIFY_TEMPORARY_FILE_IN_FOLDER.getMsg(
                     file.getName(),
-                    file.getParentFile().getPath()
+                    file.getParentFile().path
                 )
             )
             throw UnableToModifyFileException(
                 ErrorMessage.GENERAL_WRITE_FAILED_TO_MODIFY_TEMPORARY_FILE_IN_FOLDER.getMsg(
                     file.getName(),
-                    file.getParentFile().getPath()
+                    file.getParentFile().path
                 )
             )
         }
@@ -886,13 +884,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
             //Close Channels and locks
             if (fcIn != null) {
-                if (fcIn.isOpen()) {
+                if (fcIn.isOpen) {
                     fcIn.close()
                 }
             }
 
             if (fcOut != null) {
-                if (fcOut.isOpen()) {
+                if (fcOut.isOpen) {
                     fcOut.close()
                 }
             }
@@ -910,13 +908,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             try {
                 //Whatever happens ensure all locks and channels are closed/released
                 if (fcIn != null) {
-                    if (fcIn.isOpen()) {
+                    if (fcIn.isOpen) {
                         fcIn.close()
                     }
                 }
 
                 if (fcOut != null) {
-                    if (fcOut.isOpen()) {
+                    if (fcOut.isOpen) {
                         fcOut.close()
                     }
                 }
@@ -940,14 +938,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         var renameOriginalResult: Boolean
         //Rename Original File to make a backup in case problem with new file
         var originalFileBackup = File(
-            originalFile.getAbsoluteFile().getParentFile().getPath(),
+            originalFile.getAbsoluteFile().getParentFile().path,
             originalFile.nameWithoutExtension + ".old"
         )
         //If already exists modify the suffix
         var count = 1
         while (originalFileBackup.exists()) {
             originalFileBackup = File(
-                originalFile.getAbsoluteFile().getParentFile().getPath(),
+                originalFile.getAbsoluteFile().getParentFile().path,
                 originalFile.nameWithoutExtension + ".old" + count
             )
             count++
@@ -957,14 +955,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         if (!renameOriginalResult) {
             log.warn(
                 ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(
-                    originalFile.getAbsolutePath(),
+                    originalFile.absolutePath,
                     originalFileBackup.getName()
                 )
             )
             newFile.delete()
             throw UnableToRenameFileException(
                 ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(
-                    originalFile.getAbsolutePath(),
+                    originalFile.absolutePath,
                     originalFileBackup.getName()
                 )
             )
@@ -978,7 +976,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             if (!newFile.exists()) {
                 log.warn(
                     ErrorMessage.GENERAL_WRITE_FAILED_NEW_FILE_DOESNT_EXIST.getMsg(
-                        newFile.getAbsolutePath()
+                        newFile.absolutePath
                     )
                 )
             }
@@ -989,7 +987,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 //TODO now if this happens we are left with testfile.old instead of testfile.mp3
                 log.warn(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_BACKUP_TO_ORIGINAL.getMsg(
-                        originalFileBackup.getAbsolutePath(),
+                        originalFileBackup.absolutePath,
                         originalFile.getName()
                     )
                 )
@@ -997,14 +995,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
             log.warn(
                 ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(
-                    originalFile.getAbsolutePath(),
+                    originalFile.absolutePath,
                     newFile.getName()
                 )
             )
             newFile.delete()
             throw UnableToRenameFileException(
                 ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(
-                    originalFile.getAbsolutePath(),
+                    originalFile.absolutePath,
                     newFile.getName()
                 )
             )
@@ -1015,7 +1013,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 //Not a disaster but can't deleteField the backup so make a warning
                 log.warn(
                     ErrorMessage.GENERAL_WRITE_WARNING_UNABLE_TO_DELETE_BACKUP_FILE.getMsg(
-                        originalFileBackup.getAbsolutePath()
+                        originalFileBackup.absolutePath
                     )
                 )
             }
@@ -1029,7 +1027,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return true if tag exists.
      */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
-        byteBuffer.rewind();
+        byteBuffer.rewind()
         log.debug(
                 "ByteBuffer pos:" +
                         byteBuffer.position() +
@@ -1037,21 +1035,21 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         byteBuffer.limit() +
                         ":cap" +
                         byteBuffer.capacity()
-        );
+        )
 
         val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
-        byteBuffer.get(tagIdentifier, 0, FIELD_TAGID_LENGTH);
+        byteBuffer.get(tagIdentifier, 0, FIELD_TAGID_LENGTH)
         if (!(tagIdentifier.contentEquals(TAG_ID))) {
-            return false;
+            return false
         }
         //Major Version
         val major = byteBuffer.get().toInt()
         if (major != getMajorVersion()) {
-            return false;
+            return false
         }
         //Minor Version
-        val minor = byteBuffer.get().toInt();
-        return minor == getRevision();
+        val minor = byteBuffer.get().toInt()
+        return minor == getRevision()
     }
 
     /**

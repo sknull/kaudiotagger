@@ -1,10 +1,10 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.exceptions.TagException
-import de.visualdigits.kaudiotagger.model.frame.id3.ID3Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.exceptions.TagException
+import de.visualdigits.kaudiotagger.model.frame.id3.ID3Frames
 import de.visualdigits.kaudiotagger.util.ID3Tags.copyObject
 
 object ID3Tags {

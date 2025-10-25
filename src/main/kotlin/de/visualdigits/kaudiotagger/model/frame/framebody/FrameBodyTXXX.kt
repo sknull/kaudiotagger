@@ -4,12 +4,10 @@ import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.datatype.TextEncodedStringSizeTerminated
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
-import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -170,7 +168,7 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      *
      * @return the ID3v2 frame identifier  for this frame type
      */
-    override fun getIdentifier(): String? {
+    override fun getIdentifier(): String {
         return ID3v24Frames.USER_DEFINED_INFO.id
     }
 

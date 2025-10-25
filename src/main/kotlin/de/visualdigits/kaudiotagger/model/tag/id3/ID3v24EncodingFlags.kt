@@ -4,9 +4,6 @@ import de.visualdigits.kaudiotagger.model.frame.id3.ID3v24Frame
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.FileConstants
-import kotlin.experimental.and
-import kotlin.experimental.inv
-import kotlin.experimental.or
 
 class ID3v24EncodingFlags(
     val id3v24Frame: ID3v24Frame? = null,

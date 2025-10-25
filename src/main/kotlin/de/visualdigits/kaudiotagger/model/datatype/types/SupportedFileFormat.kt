@@ -90,7 +90,7 @@ enum class SupportedFileFormat(filesuffix: String) {
 //        }
 //    },
     UNKNOWN("") {
-        override fun createDefaultTag(): Tag? {
+        override fun createDefaultTag(): Tag {
             throw RuntimeException(
                 "Unable to create default tag for this file format:" + name
             )
@@ -138,12 +138,12 @@ enum class SupportedFileFormat(filesuffix: String) {
          */
         fun fromExtension(fileExtension: String?): SupportedFileFormat {
             if (fileExtension == null) {
-                return SupportedFileFormat.UNKNOWN
+                return UNKNOWN
             }
             val format: SupportedFileFormat? = extensionMap.get(
                 fileExtension.lowercase()
             )
-            return if (format == null) SupportedFileFormat.UNKNOWN else format
+            return if (format == null) UNKNOWN else format
         }
     }
 }

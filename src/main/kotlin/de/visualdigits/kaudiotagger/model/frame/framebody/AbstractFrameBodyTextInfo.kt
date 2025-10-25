@@ -4,7 +4,6 @@ import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
@@ -85,7 +84,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      * @param text to set
      */
     fun setText(text: String) {
-        setObjectValue(DataTypes.OBJ_TEXT, text);
+        setObjectValue(DataTypes.OBJ_TEXT, text)
     }
 
     /**

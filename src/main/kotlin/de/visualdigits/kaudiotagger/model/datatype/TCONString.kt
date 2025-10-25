@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.datatype
 
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
-import kotlin.Any
 
 class TCONString : TextEncodedStringSizeTerminated {
 

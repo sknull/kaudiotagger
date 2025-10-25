@@ -12,7 +12,7 @@ class VbriFrame {
         val log: Logger = LoggerFactory.getLogger(VbriFrame::class.java)
 
         //The offset into frame
-        val VBRI_OFFSET: Int = MPEGFrameHeader.Companion.HEADER_SIZE + 32
+        val VBRI_OFFSET: Int = MPEGFrameHeader.HEADER_SIZE + 32
 
         const val VBRI_HEADER_BUFFER_SIZE: Int = 120 //TODO this is just a guess, not right
         val MAX_BUFFER_SIZE_NEEDED_TO_READ_VBRI: Int = VBRI_OFFSET + VBRI_HEADER_BUFFER_SIZE
@@ -55,25 +55,25 @@ class VbriFrame {
                 return null
             }
             //We store this so can return here after scanning through buffer
-            val startPosition = bb.position();
-            log.debug("Checking VBRI Frame at$startPosition");
+            val startPosition = bb.position()
+            log.debug("Checking VBRI Frame at$startPosition")
 
-            bb.position(startPosition + VBRI_OFFSET);
+            bb.position(startPosition + VBRI_OFFSET)
 
             //Create header from here
-            val header = bb.slice();
+            val header = bb.slice()
 
             // Return Buffer to start Point
-            bb.position(startPosition);
+            bb.position(startPosition)
 
             //Check Identifier
             val identifier = ByteArray(VBRI_IDENTIFIER_BUFFER_SIZE)
-            header.get(identifier);
+            header.get(identifier)
             if (!identifier.contentEquals(VBRI_VBR_ID)) {
-                return null;
+                return null
             }
-            log.debug("Found VBRI Frame");
-            return header;
+            log.debug("Found VBRI Frame")
+            return header
         }
     }
 
@@ -100,7 +100,6 @@ class VbriFrame {
     private fun setAudioSize() {
         val frameSizeBuffer = ByteArray(VBRI_AUDIOSIZE_BUFFER_SIZE)
         header.get(frameSizeBuffer)
-        val audioSizeEnabled = true
         audioSize =
             ((frameSizeBuffer[BYTE_1].toInt() shl 24) and -0x1000000) or
                     ((frameSizeBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or
@@ -114,7 +113,6 @@ class VbriFrame {
     private fun setFrameCount() {
         val frameCountBuffer = ByteArray(VBRI_FRAMECOUNT_BUFFER_SIZE)
         header.get(frameCountBuffer)
-        val frameCountEnabled = true
         frameCount =
             ((frameCountBuffer[BYTE_1].toInt() shl 24) and -0x1000000) or
                     ((frameCountBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or

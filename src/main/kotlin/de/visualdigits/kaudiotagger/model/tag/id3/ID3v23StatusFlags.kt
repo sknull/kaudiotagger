@@ -4,9 +4,6 @@ import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v23Frame
 import de.visualdigits.kaudiotagger.util.FileConstants
 import de.visualdigits.kaudiotagger.util.StatusFlags
-import kotlin.experimental.and
-import kotlin.experimental.inv
-import kotlin.experimental.or
 
 class ID3v23StatusFlags: StatusFlags {
 
@@ -55,7 +52,7 @@ class ID3v23StatusFlags: StatusFlags {
 
     fun modifyFlags() {
         val str = id3v23Frame?.getIdentifier()
-        if (ID3v23Frames.Companion.isDiscardedIfFileAltered(str)) {
+        if (ID3v23Frames.isDiscardedIfFileAltered(str)) {
             writeFlags = writeFlags or MASK_FILE_ALTER_PRESERVATION
             writeFlags = writeFlags and MASK_TAG_ALTER_PRESERVATION.inv()
         } else {

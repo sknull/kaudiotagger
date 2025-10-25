@@ -23,7 +23,7 @@ enum class Lyrics3v2Fields(
         /**
          * CRLF int set
          */
-        val CRLF = String(crlfByte);
+        val CRLF = String(crlfByte)
 
         fun fromId(id: String): Lyrics3v2Fields? = entries.find { e -> id == e.id }
 

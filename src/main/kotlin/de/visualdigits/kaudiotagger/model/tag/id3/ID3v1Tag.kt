@@ -132,24 +132,24 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             return
         }
         if (!seek(byteBuffer)) {
-            error("ID3v1 tag not found");
+            error("ID3v1 tag not found")
         }
-        log.debug("Reading v1.1 tag");
+        log.debug("Reading v1.1 tag")
 
         //Do single file read of data to cut down on file reads
         dataBuffer = ByteArray(TAG_LENGTH)
-        byteBuffer.position(0);
-        byteBuffer.get(dataBuffer, 0, TAG_LENGTH);
+        byteBuffer.position(0)
+        byteBuffer.get(dataBuffer, 0, TAG_LENGTH)
 
         title = String(
             dataBuffer,
             FIELD_TITLE_POS,
             FIELD_TITLE_LENGTH,
             StandardCharsets.ISO_8859_1
-        ).trim();
-        var m = endofStringPattern.matcher(title);
+        ).trim()
+        var m = endofStringPattern.matcher(title)
         if (m.find()) {
-            title = title.take(m.start());
+            title = title.take(m.start())
         }
 
         artist = String(
@@ -157,10 +157,10 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             FIELD_ARTIST_POS,
             FIELD_ARTIST_LENGTH,
             StandardCharsets.ISO_8859_1
-        ).trim();
-        m = endofStringPattern.matcher(artist);
+        ).trim()
+        m = endofStringPattern.matcher(artist)
         if (m.find()) {
-            artist = artist.take(m.start());
+            artist = artist.take(m.start())
         }
 
         var album = String(
@@ -168,10 +168,10 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             FIELD_ALBUM_POS,
             FIELD_ALBUM_LENGTH,
             StandardCharsets.ISO_8859_1
-        ).trim();
-        m = endofStringPattern.matcher(album);
+        ).trim()
+        m = endofStringPattern.matcher(album)
         if (m.find()) {
-            album = album.take(m.start());
+            album = album.take(m.start())
         }
 
         year = String(
@@ -179,21 +179,21 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             FIELD_YEAR_POS,
             FIELD_YEAR_LENGTH,
             StandardCharsets.ISO_8859_1
-        ).trim();
-        m = endofStringPattern.matcher(year);
+        ).trim()
+        m = endofStringPattern.matcher(year)
         if (m.find()) {
-            year = year.take(m.start());
+            year = year.take(m.start())
         }
 
         comment = String(
             dataBuffer,
-            ID3v11Tag.Companion.FIELD_COMMENT_POS,
-            ID3v11Tag.Companion.FIELD_COMMENT_LENGTH,
+            ID3v11Tag.FIELD_COMMENT_POS,
+            ID3v11Tag.FIELD_COMMENT_LENGTH,
             StandardCharsets.ISO_8859_1
-        ).trim();
-        m = endofStringPattern.matcher(comment);
+        ).trim()
+        m = endofStringPattern.matcher(comment)
         if (m.find()) {
-            comment = comment.take(m.start());
+            comment = comment.take(m.start())
         }
 
         genre = dataBuffer[FIELD_GENRE_POS].toInt()
@@ -205,10 +205,10 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return whether tag exists within the byteBuffer
      */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
-        val buffer = ByteArray(FIELD_TAGID_LENGTH);
+        val buffer = ByteArray(FIELD_TAGID_LENGTH)
         // read the TAG value
-        byteBuffer.get(buffer, 0, FIELD_TAGID_LENGTH);
-        return (buffer.contentEquals(TAG_ID));
+        byteBuffer.get(buffer, 0, FIELD_TAGID_LENGTH)
+        return (buffer.contentEquals(TAG_ID))
     }
 
     /**
@@ -603,10 +603,10 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
 
     override fun hasField(id: String): Boolean {
         try {
-            val key = GenericFieldKey.valueOf(id.uppercase());
-            return hasField(key);
+            val key = GenericFieldKey.valueOf(id.uppercase())
+            return hasField(key)
         } catch (_: IllegalArgumentException) {
-            return false;
+            return false
         }
     }
 

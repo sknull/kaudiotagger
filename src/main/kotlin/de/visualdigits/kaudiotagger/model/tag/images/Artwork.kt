@@ -96,8 +96,8 @@ class Artwork(
     fun setFromMetadataBlockDataPicture(
         coverArt: MetadataBlockDataPicture
     ) {
-        mimeType = coverArt.getMimeType()
-        description = coverArt.getDescription()
+        mimeType = coverArt.mimeType
+        description = coverArt.description
         pictureType = coverArt.pictureType
         if (coverArt.isImageUrl()) {
             isLinked = coverArt.isImageUrl()
@@ -117,8 +117,8 @@ class Artwork(
     fun setImageFromData(): Boolean {
         try {
             val image: BufferedImage = getImage()
-            width = image.getWidth()
-            height = image.getHeight()
+            width = image.width
+            height = image.height
         } catch (ioe: IOException) {
             return false
         }

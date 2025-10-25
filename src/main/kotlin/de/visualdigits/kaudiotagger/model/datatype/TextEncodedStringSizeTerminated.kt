@@ -21,14 +21,14 @@ open class TextEncodedStringSizeTerminated : AbstractString {
          * @return list of values, guaranteed to be at least one value
          */
         fun splitByNullSeperator(value: String): MutableList<String> {
-            val valuesarray = value.split("\\u0000");
-            var values = valuesarray.toMutableList();
+            val valuesarray = value.split("\\u0000")
+            var values = valuesarray.toMutableList()
             //Read only list so if empty have to create new list
             if (values.isEmpty()) {
                 values = mutableListOf("")
             }
 
-            return values;
+            return values
         }
     }
 
@@ -313,7 +313,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @return number of values held, usually this will be one.
      */
     open fun getNumberOfValues(): Int {
-        return TextEncodedStringSizeTerminated.splitByNullSeperator((getValue() as String)).size
+        return splitByNullSeperator((getValue() as String)).size
     }
 
     /**
@@ -325,7 +325,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      */
     open fun getValueAtIndex(index: Int): String? {
         //Split String into separate components
-        val values: MutableList<*> = TextEncodedStringSizeTerminated.splitByNullSeperator(getValue() as String)
+        val values: MutableList<*> = splitByNullSeperator(getValue() as String)
         return values[index] as String
     }
 
@@ -333,7 +333,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @return list of all values
      */
     open fun getValues(): MutableList<String> {
-        return TextEncodedStringSizeTerminated.splitByNullSeperator(getValue() as String)
+        return splitByNullSeperator(getValue() as String)
     }
 
     /**
@@ -342,7 +342,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @return
      */
     open fun getValueWithoutTrailingNull(): String {
-        val values = TextEncodedStringSizeTerminated.splitByNullSeperator(getValue() as String)
+        val values = splitByNullSeperator(getValue() as String)
         val sb = StringBuffer()
         for (i in values.indices) {
             if (i != 0) {

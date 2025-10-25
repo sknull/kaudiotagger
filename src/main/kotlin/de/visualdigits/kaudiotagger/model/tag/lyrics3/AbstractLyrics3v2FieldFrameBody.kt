@@ -23,18 +23,18 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
      * @throws IOException
      */
     fun readHeader(file: RandomAccessFile): Int {
-        val size: Int;
+        val size: Int
         val buffer = ByteArray(5)
 
         // read the 5 character size
-        file.read(buffer, 0, 5);
-        size = Integer.parseInt(String(buffer, 0, 5));
+        file.read(buffer, 0, 5)
+        size = Integer.parseInt(String(buffer, 0, 5))
 
         if ((size == 0) && (!TagOptionSingleton.lyrics3KeepEmptyFieldIfRead)) {
-            throw InvalidTagException("Lyircs3v2 Field has size of zero.");
+            throw InvalidTagException("Lyircs3v2 Field has size of zero.")
         }
 
-        return size;
+        return size
     }
 
     /**

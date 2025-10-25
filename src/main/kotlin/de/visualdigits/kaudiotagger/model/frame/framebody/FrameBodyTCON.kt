@@ -5,12 +5,10 @@ import de.visualdigits.kaudiotagger.model.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.datatype.TCONString
 import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3V2ExtendedGenreTypes
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
-import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import java.nio.ByteBuffer
 
 /**
@@ -74,11 +72,11 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
         fun convertGenericToID3v24Genre(value: String): String {
             try {
                 //If passed id and known value use it
-                val genreId = Integer.parseInt(value);
+                val genreId = Integer.parseInt(value)
                 if (genreId <= GenreTypes.MAX_GENRE_ID) {
-                    return genreId.toString();
+                    return genreId.toString()
                 } else {
-                    return value;
+                    return value
                 }
             } catch (nfe: NumberFormatException) {
                 // If passed String, use matching integral value if can
@@ -87,13 +85,13 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                 return if (genreId != null && genreId.id <= GenreTypes.MAX_GENRE_ID) {
                     genreId.id.toString()
                 } else if (value.equals(ID3V2ExtendedGenreTypes.RX.description, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.RX.name;
+                    ID3V2ExtendedGenreTypes.RX.name
                 } else if (value.equals(ID3V2ExtendedGenreTypes.CR.description, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.CR.name;
+                    ID3V2ExtendedGenreTypes.CR.name
                 } else if (value.equals(ID3V2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.RX.name;
+                    ID3V2ExtendedGenreTypes.RX.name
                 } else if (value.equals(ID3V2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.CR.name;
+                    ID3V2ExtendedGenreTypes.CR.name
                 } else {
                     ""
                 }
@@ -111,24 +109,24 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                 //If passed integer and in list use numeric form else use original value
                 val genreId = value.toInt()
                 if (genreId <= GenreTypes.MAX_GENRE_ID) {
-                    return bracketWrap(genreId.toString());
+                    return bracketWrap(genreId.toString())
                 } else {
-                    return value;
+                    return value
                 }
             } catch (nfe: NumberFormatException) {
                 //if passed text try and find integral value otherwise use text
-                val genreId = GenreTypes.fromName(value);
+                val genreId = GenreTypes.fromName(value)
                 // to preserve iTunes compatibility, don't write genre ids higher than getMaxStandardGenreId, rather use string
                 return if (genreId != null && genreId.id <= GenreTypes.MAX_GENRE_ID) {
-                    return bracketWrap(genreId.toString());
+                    return bracketWrap(genreId.toString())
                 } else if (value.equals(ID3V2ExtendedGenreTypes.RX.description, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.RX.name);
+                    bracketWrap(ID3V2ExtendedGenreTypes.RX.name)
                 } else if (value.equals(ID3V2ExtendedGenreTypes.CR.description, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.CR.name);
+                    bracketWrap(ID3V2ExtendedGenreTypes.CR.name)
                 } else if (value.equals(ID3V2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.RX.name);
+                    bracketWrap(ID3V2ExtendedGenreTypes.RX.name)
                 } else if (value.equals(ID3V2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.CR.name);
+                    bracketWrap(ID3V2ExtendedGenreTypes.CR.name)
                 } else {
                     ""
                 }
@@ -136,7 +134,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
         }
 
     fun convertID3v22GenreToGeneric(value: String): String? {
-        return convertID3v23GenreToGeneric(value);
+        return convertID3v23GenreToGeneric(value)
     }
 
     /**
@@ -161,22 +159,22 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                     checkBracketed(value.substring(0, value.lastIndexOf(')'))) +
                             ' ' +
                             value.substring(value.lastIndexOf(')') + 1)
-            );
+            )
         } else {
-            return checkBracketed(value);
+            return checkBracketed(value)
         }
     }
 
     private fun checkBracketed(value: String): String? {
         var value1 = value
             .replace("(", "")
-            .replace(")", "");
+            .replace(")", "")
         return try {
             val genreId = value1.toInt()
             if (genreId <= GenreTypes.MAX_GENRE_ID) {
                 GenreTypes.fromId(genreId)?.name
             } else {
-                value1;
+                value1
             }
         } catch (nfe: NumberFormatException) {
             if (value1.equals(ID3V2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
@@ -184,7 +182,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
             } else if (value1.equals(ID3V2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
                 ID3V2ExtendedGenreTypes.CR.description
             } else {
-                value1;
+                value1
             }
         }
     }

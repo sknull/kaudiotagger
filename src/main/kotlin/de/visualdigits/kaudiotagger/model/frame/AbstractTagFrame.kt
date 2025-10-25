@@ -3,7 +3,6 @@ package de.visualdigits.kaudiotagger.model.frame
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.tag.AbstractTagItem
 import de.visualdigits.kaudiotagger.util.ID3Tags
-import java.nio.ByteBuffer
 
 abstract class AbstractTagFrame: AbstractTagItem {
 

@@ -6,13 +6,12 @@ import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.datatype.StringFixedLength
 import de.visualdigits.kaudiotagger.model.datatype.StringNullTerminated
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.datatype.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v22FrameBody
-import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -243,7 +242,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
             NumberHashMap(
                 DataTypes.OBJ_TEXT_ENCODING,
                 this,
-                TextEncoding.Companion.TEXT_ENCODING_FIELD_SIZE
+                TextEncoding.TEXT_ENCODING_FIELD_SIZE
             )
         )
         objectList.add(StringFixedLength(DataTypes.OBJ_IMAGE_FORMAT, this, 3))

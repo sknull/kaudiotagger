@@ -72,8 +72,8 @@ class XingFrame {
             val startPosition = bb.position()
 
             //Get to Start of where Xing Frame Should be ( we dont know if it is one at this point)
-            if (mpegFrameHeader.version == MPEGFrameHeader.Companion.VERSION_1) {
-                if (mpegFrameHeader.channelMode == MPEGFrameHeader.Companion.MODE_MONO) {
+            if (mpegFrameHeader.version == MPEGFrameHeader.VERSION_1) {
+                if (mpegFrameHeader.channelMode == MPEGFrameHeader.MODE_MONO) {
                     bb.position(startPosition + MPEG_VERSION_1_MODE_MONO_OFFSET)
                 } else {
                     bb.position(startPosition + MPEG_VERSION_1_MODE_STEREO_OFFSET)
@@ -81,7 +81,7 @@ class XingFrame {
             }
             //MPEGVersion 2 and 2.5
             else {
-                if (mpegFrameHeader.channelMode == MPEGFrameHeader.Companion.MODE_MONO) {
+                if (mpegFrameHeader.channelMode == MPEGFrameHeader.MODE_MONO) {
                     bb.position(startPosition + MPEG_VERSION_2_MODE_MONO_OFFSET)
                 } else {
                     bb.position(startPosition + MPEG_VERSION_2_MODE_STEREO_OFFSET)
@@ -128,12 +128,12 @@ class XingFrame {
         header.get(flagBuffer)
 
         //Read FrameCount if flag set
-        if ((flagBuffer[XingFrame.BYTE_4].toInt() and (1).toByte().toInt()) != 0) {
+        if ((flagBuffer[BYTE_4].toInt() and (1).toByte().toInt()) != 0) {
             setFrameCount()
         }
 
         //Read Size if flag set
-        if ((flagBuffer[XingFrame.BYTE_4].toInt() and (1 shl 1).toByte().toInt()) != 0) {
+        if ((flagBuffer[BYTE_4].toInt() and (1 shl 1).toByte().toInt()) != 0) {
             setAudioSize()
         }
 
@@ -142,9 +142,9 @@ class XingFrame {
 
         //Look for LAME Header as long as we have enough bytes to do it properly
         if (header.limit() >=
-            XingFrame.XING_HEADER_BUFFER_SIZE + LameFrame.LAME_HEADER_BUFFER_SIZE
+            XING_HEADER_BUFFER_SIZE + LameFrame.LAME_HEADER_BUFFER_SIZE
         ) {
-            header.position(XingFrame.XING_HEADER_BUFFER_SIZE)
+            header.position(XING_HEADER_BUFFER_SIZE)
             lameFrame = LameFrame.parseLameFrame(header)
         }
     }

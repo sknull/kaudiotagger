@@ -95,7 +95,7 @@ class ID3v1TagField : TagTextField {
         }
     }
 
-    override fun getIdentifier(): String? {
+    override fun getIdentifier(): String {
         return id
     }
 

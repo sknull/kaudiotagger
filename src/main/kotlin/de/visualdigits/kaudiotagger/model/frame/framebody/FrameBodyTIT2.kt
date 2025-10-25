@@ -1,9 +1,7 @@
 package de.visualdigits.kaudiotagger.model.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import java.nio.ByteBuffer
 
 class FrameBodyTIT2: AbstractFrameBodyTextInfo, ID3v23FrameBody {
@@ -11,8 +9,7 @@ class FrameBodyTIT2: AbstractFrameBodyTextInfo, ID3v23FrameBody {
     /**
      * Creates a new FrameBodyTIT2 datatype.
      */
-    constructor() {
-    }
+    constructor()
 
     constructor(body: FrameBodyTIT2): super(body)
 

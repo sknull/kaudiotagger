@@ -121,40 +121,40 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
      * @return byteBuffer that should be written to file to persist this dataType.
      */
     override fun writeByteArray(): ByteArray {
-        log.debug("Writing PairTextEncodedStringNullTerminated");
+        log.debug("Writing PairTextEncodedStringNullTerminated")
 
-        var localSize = 0;
-        var buffer = ByteArrayOutputStream();
+        var localSize = 0
+        var buffer = ByteArrayOutputStream()
         try {
             (getValue() as ValuePairs).mapping.forEach { pair ->
                 var next = TextEncodedStringNullTerminated(
                         identifier,
                         frameBody,
                         pair.first
-                    );
-                buffer.write(next.writeByteArray());
-                localSize += next.getSize();
+                    )
+                buffer.write(next.writeByteArray())
+                localSize += next.getSize()
                 next = TextEncodedStringNullTerminated(
                         identifier,
                 frameBody,
                 pair.second
-                );
-                buffer.write(next.writeByteArray());
-                localSize += next.getSize();
+                )
+                buffer.write(next.writeByteArray())
+                localSize += next.getSize()
             }
         } catch (ioe: IOException) {
             //This should never happen because the write is internal with the JVM it is not to a file
             log.error(
                     "IOException in MultipleTextEncodedStringNullTerminated when writing byte array",
                     ioe
-            );
-            throw RuntimeException(ioe);
+            )
+            throw RuntimeException(ioe)
         }
 
         //Update size member variable
         setSize(localSize)
 
-        log.debug("Written PairTextEncodedStringNullTerminated");
-        return buffer.toByteArray();
+        log.debug("Written PairTextEncodedStringNullTerminated")
+        return buffer.toByteArray()
     }
 }

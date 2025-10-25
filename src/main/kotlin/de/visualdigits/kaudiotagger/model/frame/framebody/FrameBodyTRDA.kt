@@ -1,9 +1,7 @@
 package de.visualdigits.kaudiotagger.model.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import java.nio.ByteBuffer
 
 class FrameBodyTRDA: AbstractFrameBodyTextInfo, ID3v23FrameBody {

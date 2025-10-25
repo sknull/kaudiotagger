@@ -24,7 +24,7 @@ object ID3Unsynchronization {
                 ((abySource[i + 1].toInt() and MPEGFrameHeader.SYNC_BYTE2) ==
                         MPEGFrameHeader.SYNC_BYTE2)
             ) {
-                if (log.isDebugEnabled()) {
+                if (log.isDebugEnabled) {
                     log.debug("Unsynchronisation required found bit at:" + i)
                 }
                 return true
@@ -66,13 +66,13 @@ object ID3Unsynchronization {
                         MPEGFrameHeader.SYNC_BYTE2
                     ) {
                         // we need to unsynchronize here
-                        if (log.isDebugEnabled()) {
+                        if (log.isDebugEnabled) {
                             log.debug("Writing unsynchronisation bit at:" + count)
                         }
                         output.write(0)
                     } else if (secondByte == 0) {
                         // we need to unsynchronize here
-                        if (log.isDebugEnabled()) {
+                        if (log.isDebugEnabled) {
                             log.debug("Inserting zero unsynchronisation bit at:" + count)
                         }
                         output.write(0)

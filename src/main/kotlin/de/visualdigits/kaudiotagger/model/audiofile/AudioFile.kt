@@ -149,7 +149,7 @@ open class AudioFile {
      * TODO Maybe this can be changed ?
      */
     override fun toString(): String {
-        return ("AudioFile ${file?.getAbsolutePath()}  --------\n$audioHeader\n${if (tag == null) "" else tag.toString()}\n-------------------")
+        return ("AudioFile ${file?.absolutePath}  --------\n$audioHeader\n${if (tag == null) "" else tag.toString()}\n-------------------")
     }
 
     /**
@@ -202,14 +202,14 @@ open class AudioFile {
         log.debug(
             "Reading file:" +
                     "path" +
-                    file.getPath() +
+                    file.path +
                     ":abs:" +
-                    file.getAbsolutePath()
+                    file.absolutePath
         )
         if (!file.exists()) {
-            log.error("Unable to find:" + file.getPath())
+            log.error("Unable to find:" + file.path)
             throw FileNotFoundException(
-                ErrorMessage.UNABLE_TO_FIND_FILE.getMsg(file.getPath())
+                ErrorMessage.UNABLE_TO_FIND_FILE.getMsg(file.path)
             )
         }
     }

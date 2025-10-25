@@ -171,7 +171,7 @@ class ID3v23Tag : AbstractID3v2Tag {
     /**
      * @return textual tag identifier
      */
-    override fun getIdentifier(): String? {
+    override fun getIdentifier(): String {
         return "ID3v2.30"
     }
 

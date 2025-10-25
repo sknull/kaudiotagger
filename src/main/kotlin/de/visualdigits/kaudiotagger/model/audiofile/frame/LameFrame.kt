@@ -29,7 +29,7 @@ class LameFrame(
                 StandardCharsets.ISO_8859_1
             )
             lameHeader.rewind()
-            if (id == LameFrame.LAME_ID) {
+            if (id == LAME_ID) {
                 val lameFrame = LameFrame(lameHeader)
 
                 return lameFrame
@@ -41,7 +41,7 @@ class LameFrame(
     val encoder: String = Utils.getString(
         lameHeader,
         0,
-        LameFrame.ENCODER_SIZE,
+        ENCODER_SIZE,
         StandardCharsets.ISO_8859_1
     )
 }

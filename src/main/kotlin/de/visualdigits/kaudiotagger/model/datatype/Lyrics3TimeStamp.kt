@@ -2,7 +2,6 @@ package de.visualdigits.kaudiotagger.model.datatype
 
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import java.nio.charset.StandardCharsets
-import kotlin.Any
 
 class Lyrics3TimeStamp : AbstractDataType {
     /**

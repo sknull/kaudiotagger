@@ -14,7 +14,6 @@ abstract class AbstractLyrics3: AbstractTag {
      * @param file
      */
     override fun delete(file: RandomAccessFile) {
-        var filePointer: Long
-        val id3v1tag = ID3v1Tag()
+        ID3v1Tag()
     }
 }

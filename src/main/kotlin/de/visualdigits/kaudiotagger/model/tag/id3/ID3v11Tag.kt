@@ -1,8 +1,10 @@
 package de.visualdigits.kaudiotagger.model.tag.id3
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
+import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v1FieldKey
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.field.TagField
@@ -14,8 +16,6 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTRCK
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v24Frame
-import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.tag.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
@@ -53,8 +53,7 @@ class ID3v11Tag: ID3v1Tag {
     /**
      * Creates a new ID3v11 datatype.
      */
-    constructor() {
-    }
+    constructor()
 
     constructor(copyObject: ID3v11Tag): super(copyObject) {
         this.track = copyObject.track

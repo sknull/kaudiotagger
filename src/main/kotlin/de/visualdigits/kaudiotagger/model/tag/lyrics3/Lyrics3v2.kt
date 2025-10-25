@@ -190,7 +190,7 @@ class Lyrics3v2 : AbstractLyrics3 {
         lyricEnd = String(buffer, 0, 9)
 
         if (lyricEnd == "LYRICS200") {
-            filePointer = file.getFilePointer()
+            filePointer = file.filePointer
         } else {
             // check the end of the file for a lyrics tag incase an ID3
             // tag wasn't placed after it.
@@ -199,7 +199,7 @@ class Lyrics3v2 : AbstractLyrics3 {
             lyricEnd = String(buffer, 0, 9)
 
             if (lyricEnd == "LYRICS200") {
-                filePointer = file.getFilePointer()
+                filePointer = file.filePointer
             } else {
                 return false
             }
@@ -275,7 +275,7 @@ class Lyrics3v2 : AbstractLyrics3 {
         delete(file)
         file.seek(file.length())
 
-        val filePointer: Long = file.getFilePointer()
+        val filePointer: Long = file.filePointer
 
         var str = "LYRICSBEGIN"
 
@@ -303,7 +303,7 @@ class Lyrics3v2 : AbstractLyrics3 {
             }
         }
 
-        size = file.getFilePointer() - filePointer
+        size = file.filePointer - filePointer
 
         str = size.toString()
 

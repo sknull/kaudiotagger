@@ -118,23 +118,23 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         var buffer = ByteArray(5)
 
         // read the 5 character size
-        byteBuffer.get(buffer, 0, 5);
+        byteBuffer.get(buffer, 0, 5)
 
-        val size = Integer.parseInt(String(buffer, 0, 5));
+        val size = Integer.parseInt(String(buffer, 0, 5))
 
         if (
                 (size == 0) &&
                         (!TagOptionSingleton.lyrics3KeepEmptyFieldIfRead)
         ) {
-            throw InvalidTagException("Lyircs3v2 Field has size of zero.");
+            throw InvalidTagException("Lyircs3v2 Field has size of zero.")
         }
 
         buffer = ByteArray(size)
 
         // read the SIZE length description
-        byteBuffer.get(buffer);
-        lineString = String(buffer);
-        readString(lineString);
+        byteBuffer.get(buffer)
+        lineString = String(buffer)
+        readString(lineString)
     }
 
     /**

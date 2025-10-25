@@ -102,7 +102,7 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
     fun seekForV1OrV11Tag(byteBuffer: ByteBuffer): Boolean {
         val buffer = ByteArray(FIELD_TAGID_LENGTH)
         // read the TAG value
-        byteBuffer.get(buffer, 0, FIELD_TAGID_LENGTH);
-        return (buffer.contentEquals(TAG_ID));
+        byteBuffer.get(buffer, 0, FIELD_TAGID_LENGTH)
+        return (buffer.contentEquals(TAG_ID))
     }
 }

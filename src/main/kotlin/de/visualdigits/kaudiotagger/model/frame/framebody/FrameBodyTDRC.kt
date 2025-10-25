@@ -1,11 +1,10 @@
 package de.visualdigits.kaudiotagger.model.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
+import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
 import java.nio.ByteBuffer
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -149,28 +148,28 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      */
 
     fun getFormattedText(): String {
-        val sb = StringBuffer();
+        val sb = StringBuffer()
         if (originalID == null) {
             return this.getText()
         } else {
             if (year != null && !(year.trim().isEmpty())) {
-                sb.append(formatAndParse(formatYearOut, formatYearIn, year));
+                sb.append(formatAndParse(formatYearOut, formatYearIn, year))
             }
             if (!date.equals("")) {
                 if (monthOnly) {
-                    sb.append(formatAndParse(formatMonthOut, formatDateIn, date));
+                    sb.append(formatAndParse(formatMonthOut, formatDateIn, date))
                 } else {
-                    sb.append(formatAndParse(formatDateOut, formatDateIn, date));
+                    sb.append(formatAndParse(formatDateOut, formatDateIn, date))
                 }
             }
             if (!time.equals("")) {
                 if (hoursOnly) {
-                    sb.append(formatAndParse(formatHoursOut, formatTimeIn, time));
+                    sb.append(formatAndParse(formatHoursOut, formatTimeIn, time))
                 } else {
-                    sb.append(formatAndParse(formatTimeOut, formatTimeIn, time));
+                    sb.append(formatAndParse(formatTimeOut, formatTimeIn, time))
                 }
             }
-            return sb.toString();
+            return sb.toString()
         }
     }
 
@@ -179,7 +178,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      *
      * @return the ID3v2 frame identifier  for this frame type
      */
-    override fun getIdentifier(): String? {
+    override fun getIdentifier(): String {
         return ID3v24Frames.YEAR.id
     }
 

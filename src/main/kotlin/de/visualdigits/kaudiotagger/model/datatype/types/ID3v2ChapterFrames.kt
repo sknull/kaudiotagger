@@ -36,13 +36,13 @@ enum class ID3v2ChapterFrames(
 
         fun discardIfFileAltered(): List<ID3v2ChapterFrames> = entries.filter { e -> e.isDiscardedIfFileAltered }
 
-        fun isSupported(id: String?): Boolean = ID3v22Frames.Companion.supprtedFrames().any { e -> e.id == id }
+        fun isSupported(id: String?): Boolean = ID3v22Frames.supprtedFrames().any { e -> e.id == id }
 
-        fun isExtension(id: String?): Boolean = ID3v22Frames.Companion.extensionFrames().any { e -> e.id == id }
+        fun isExtension(id: String?): Boolean = ID3v22Frames.extensionFrames().any { e -> e.id == id }
 
-        fun isCommon(id: String?): Boolean = ID3v22Frames.Companion.commonFrames().any { e -> e.id == id }
+        fun isCommon(id: String?): Boolean = ID3v22Frames.commonFrames().any { e -> e.id == id }
 
-        fun isBinary(id: String?): Boolean = ID3v22Frames.Companion.binaryFrames().any { e -> e.id == id }
+        fun isBinary(id: String?): Boolean = ID3v22Frames.binaryFrames().any { e -> e.id == id }
 
         fun isMultipleAllowed(id: String?): Boolean = multipleFrames().any { e -> e.id == id }
     }

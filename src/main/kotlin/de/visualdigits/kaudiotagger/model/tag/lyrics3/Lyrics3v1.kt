@@ -16,8 +16,7 @@ class Lyrics3v1: AbstractLyrics3 {
     /**
      * Creates a Lyrics3v1 datatype.
      */
-    constructor() {
-    }
+    constructor()
 
     constructor(copyObject: Lyrics3v1): super(copyObject) {
         this.lyric = copyObject.lyric
@@ -62,16 +61,16 @@ class Lyrics3v1: AbstractLyrics3 {
         if (byteBuffer == null) {
             return
         }
-        val buffer = ByteArray(5100 + 9 + 11);
+        val buffer = ByteArray(5100 + 9 + 11)
 
         if (!seek(byteBuffer)) {
-            throw TagNotFoundException("ID3v1 tag not found");
+            throw TagNotFoundException("ID3v1 tag not found")
         }
 
-        byteBuffer.get(buffer);
-        val lyricBuffer: String = String(buffer);
+        byteBuffer.get(buffer)
+        val lyricBuffer: String = String(buffer)
 
-        lyric = lyricBuffer.substringBefore("LYRICSEND");
+        lyric = lyricBuffer.substringBefore("LYRICSEND")
     }
 
     /**
@@ -82,7 +81,7 @@ class Lyrics3v1: AbstractLyrics3 {
      * @throws IOException
      */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
-        return false;
+        return false
     }
 
     /**
@@ -94,44 +93,44 @@ class Lyrics3v1: AbstractLyrics3 {
         val buffer = ByteArray(5100 + 9 + 11)
         var lyricsEnd: String
         val lyricsStart: String
-        var offset: Long;
+        var offset: Long
 
         // check right before the ID3 1.0 tag for the lyrics3 tag
-        file.seek(file.length() - 128 - 9);
-        file.read(buffer, 0, 9);
-        lyricsEnd = String(buffer, 0, 9);
+        file.seek(file.length() - 128 - 9)
+        file.read(buffer, 0, 9)
+        lyricsEnd = String(buffer, 0, 9)
 
         if (lyricsEnd.equals("LYRICSEND")) {
-            offset = file.getFilePointer();
+            offset = file.filePointer
         } else {
             // check the end of the file for a lyrics3 tag incase an ID3
             // tag wasn't placed after it.
-            file.seek(file.length() - 9);
-            file.read(buffer, 0, 9);
-            lyricsEnd = String(buffer, 0, 9);
+            file.seek(file.length() - 9)
+            file.read(buffer, 0, 9)
+            lyricsEnd = String(buffer, 0, 9)
 
             if (lyricsEnd.equals("LYRICSEND")) {
-                offset = file.getFilePointer();
+                offset = file.filePointer
             } else {
-                return false;
+                return false
             }
         }
 
         // the tag can at most only be 5100 bytes
-        offset -= (5100 + 9 + 11);
-        file.seek(offset);
-        file.read(buffer);
-        lyricsStart = String(buffer);
+        offset -= (5100 + 9 + 11)
+        file.seek(offset)
+        file.read(buffer)
+        lyricsStart = String(buffer)
 
         // search for the tag
-        val i = lyricsStart.indexOf("LYRICSBEGIN");
+        val i = lyricsStart.indexOf("LYRICSBEGIN")
         if (i == -1) {
-            return false;
+            return false
         }
 
-        file.seek(offset + i + 11);
+        file.seek(offset + i + 11)
 
-        return true;
+        return true
     }
 
     /**

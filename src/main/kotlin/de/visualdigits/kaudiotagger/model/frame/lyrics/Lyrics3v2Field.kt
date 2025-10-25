@@ -1,11 +1,11 @@
 package de.visualdigits.kaudiotagger.model.frame.lyrics
 
 import de.visualdigits.kaudiotagger.model.datatype.types.Lyrics3v2Fields
-import de.visualdigits.kaudiotagger.model.frame.framebody.FieldFrameBodyUnsupported
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractFrameBodyTextInfo
+import de.visualdigits.kaudiotagger.model.frame.framebody.FieldFrameBodyUnsupported
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyCOMM
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodySYLT
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUSLT
@@ -109,22 +109,21 @@ class Lyrics3v2Field: AbstractTagFrame {
         }
         val buffer = ByteArray(6)
         // lets scan for a non-zero byte;
-        val filePointer: Long
-        var b: Byte;
+        var b: Byte
         do {
-            b = byteBuffer.get();
-        } while (b.toInt() == 0);
-        byteBuffer.position(byteBuffer.position() - 1);
+            b = byteBuffer.get()
+        } while (b.toInt() == 0)
+        byteBuffer.position(byteBuffer.position() - 1)
         // read the 3 character ID
-        byteBuffer.get(buffer, 0, 3);
-        val identifier = String(buffer, 0, 3);
+        byteBuffer.get(buffer, 0, 3)
+        val identifier = String(buffer, 0, 3)
         // is this a valid identifier?
         if (!Lyrics3v2Fields.isLyrics3v2FieldIdentifier(identifier)) {
             throw InvalidTagException(
                 "$identifier is not a valid ID3v2.4 frame"
-            );
+            )
         }
-        frameBody = readBody(identifier, byteBuffer);
+        frameBody = readBody(identifier, byteBuffer)
     }
 
     /**
@@ -172,7 +171,7 @@ class Lyrics3v2Field: AbstractTagFrame {
     /**
      * @return
      */
-    override fun getIdentifier(): String? {
+    override fun getIdentifier(): String {
         return frameBody?.getIdentifier()?:""
     }
 

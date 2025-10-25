@@ -1,10 +1,9 @@
 package de.visualdigits.kaudiotagger.model.tag.images
 
+import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.datatype.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.field.TagField
-import de.visualdigits.kaudiotagger.model.datatype.types.FieldKey
-import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.util.Utils
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
@@ -220,7 +219,7 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
         if (isImageUrl()) {
             return imageData?.let { id -> String(id, StandardCharsets.ISO_8859_1) }?:""
         } else {
-            return "";
+            return ""
         }
     }
 

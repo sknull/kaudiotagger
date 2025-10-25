@@ -79,6 +79,6 @@ open class NumberFixedLength(
                 temp shr 8
             }
         }
-        return arr;
+        return arr
     }
 }

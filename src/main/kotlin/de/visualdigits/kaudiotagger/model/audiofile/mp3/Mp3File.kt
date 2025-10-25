@@ -282,7 +282,7 @@ class MP3File : AudioFile {
             } finally {
                 //Workaround for 4724038 on Windows
                 bb.clear()
-                if (bb.isDirect()) {
+                if (bb.isDirect) {
                     // Reflection substitute for following code:
                     //    ((sun.nio.ch.DirectBuffer) bb).cleaner().clean();
                     // which causes exception on Android - Sun NIO classes are not available
@@ -335,7 +335,7 @@ class MP3File : AudioFile {
 
         log.warn(
             ErrorMessage.MP3_ID3TAG_LENGTH_INCORRECT.getMsg(
-                file?.getPath(),
+                file?.path,
                 startByte.toHexString(),
                 firstHeaderAfterTag.mp3StartByte.toHexString()
             )
@@ -353,7 +353,7 @@ class MP3File : AudioFile {
         if (firstHeaderAfterTag.mp3StartByte == headerOne.mp3StartByte) {
             log.debug(
                 ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(
-                    file?.getPath(),
+                    file?.path,
                     headerOne.mp3StartByte.toHexString()
                 )
             )
@@ -362,7 +362,7 @@ class MP3File : AudioFile {
             //We get a different value if read from start, can't guarantee 100% correct lets do some more checks
             log.debug(
                 (ErrorMessage.MP3_RECALCULATED_POSSIBLE_START_OF_MP3_AUDIO.getMsg(
-                    file?.getPath(),
+                    file?.path,
                     headerOne.mp3StartByte.toHexString()
                 ))
             )
@@ -372,7 +372,7 @@ class MP3File : AudioFile {
             ) {
                 log.warn(
                     (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                        file?.getPath(),
+                        file?.path,
                         headerOne.mp3StartByte.toHexString()
                     ))
                 )
@@ -401,7 +401,7 @@ class MP3File : AudioFile {
             if (headerTwo.mp3StartByte == firstHeaderAfterTag.mp3StartByte) {
                 log.warn(
                     (ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(
-                        file?.getPath(),
+                        file?.path,
                         firstHeaderAfterTag.mp3StartByte.toHexString()
                     ))
                 )
@@ -413,7 +413,7 @@ class MP3File : AudioFile {
             if (headerTwo.numberOfFrames == headerOne.numberOfFrames) {
                 log.warn(
                     (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                        file?.getPath(),
+                        file?.path,
                         headerOne.mp3StartByte.toHexString()
                     ))
                 )
@@ -421,7 +421,7 @@ class MP3File : AudioFile {
             } else {
                 log.warn(
                     (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                        file?.getPath(),
+                        file?.path,
                         firstHeaderAfterTag.mp3StartByte.toHexString()
                     ))
                 )
@@ -833,7 +833,7 @@ class MP3File : AudioFile {
         //Ensure we are dealing with absolute filepaths not relative ones
         val file = fileToSave.getAbsoluteFile()
 
-        log.debug("Saving  : " + file.getPath())
+        log.debug("Saving  : " + file.path)
 
         //Checks before starting write
         precheck(file)
@@ -958,9 +958,9 @@ class MP3File : AudioFile {
     /**
      * Displays MP3File Structure
      */
-    override fun displayStructureAsXML(): String? {
+    override fun displayStructureAsXML(): String {
         createXMLStructureFormatter()
-        tagFormatter?.openHeadingElement("file", this.file?.getAbsolutePath()?:"")
+        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?:"")
         if (this.id3v1tag != null) {
             this.id3v1tag?.createStructure()
         }
@@ -974,9 +974,9 @@ class MP3File : AudioFile {
     /**
      * Displays MP3File Structure
      */
-    override fun displayStructureAsPlainText(): String? {
+    override fun displayStructureAsPlainText(): String {
         createPlainTextStructureFormatter()
-        tagFormatter?.openHeadingElement("file", this.file?.getAbsolutePath()?:"")
+        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?:"")
         if (this.id3v1tag != null) {
             this.id3v1tag?.createStructure()
         }
@@ -1035,7 +1035,7 @@ class MP3File : AudioFile {
      *
      * @return
      */
-    override fun createDefaultTag(): Tag? {
+    override fun createDefaultTag(): Tag {
         return TagOptionSingleton.createDefaultID3Tag()
     }
 }

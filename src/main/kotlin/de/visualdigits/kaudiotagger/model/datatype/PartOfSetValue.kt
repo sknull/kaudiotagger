@@ -51,25 +51,25 @@ class PartOfSetValue {
      */
     private fun initFromValue(value: String) {
         try {
-            var m = trackNoPatternWithTotalCount.matcher(value);
+            var m = trackNoPatternWithTotalCount.matcher(value)
             if (m.matches()) {
-                this.extra = m.group(3);
-                this.count = Integer.parseInt(m.group(1));
-                this.rawCount = m.group(1);
-                this.total = Integer.parseInt(m.group(2));
-                this.rawTotal = m.group(2);
-                return;
+                this.extra = m.group(3)
+                this.count = Integer.parseInt(m.group(1))
+                this.rawCount = m.group(1)
+                this.total = Integer.parseInt(m.group(2))
+                this.rawTotal = m.group(2)
+                return
             }
 
-            m = trackNoPattern.matcher(value);
+            m = trackNoPattern.matcher(value)
             if (m.matches()) {
-                this.extra = m.group(2);
-                this.count = Integer.parseInt(m.group(1));
-                this.rawCount = m.group(1);
+                this.extra = m.group(2)
+                this.count = Integer.parseInt(m.group(1))
+                this.rawCount = m.group(1)
             }
         } catch (_: NumberFormatException) {
             //#JAUDIOTAGGER-366 Could occur if actually value is a long not an int
-            this.count = 0;
+            this.count = 0
         }
     }
 

@@ -2,8 +2,8 @@ package de.visualdigits.kaudiotagger.model.tag.id3
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
@@ -437,7 +437,7 @@ class ID3v24Tag : AbstractID3v2Tag {
     /**
      * @return identifier
      */
-    override fun getIdentifier(): String? {
+    override fun getIdentifier(): String {
         return "ID3v2.40"
     }
 
@@ -446,7 +446,6 @@ class ID3v24Tag : AbstractID3v2Tag {
             return
         }
         val size: Int
-        var buffer: ByteArray
         if (!seek(byteBuffer)) {
             throw TagNotFoundException(
                 getIdentifier() + " tag not found"
@@ -517,7 +516,7 @@ class ID3v24Tag : AbstractID3v2Tag {
                 log.warn(
                     "Empty Frame:" + ex.message
                 )
-                this.emptyFrameBytes += AbstractID3v2Tag.TAG_HEADER_LENGTH
+                this.emptyFrameBytes += TAG_HEADER_LENGTH
             } catch (ifie: InvalidFrameIdentifierException) {
                 log.debug(
                     "Invalid Frame Identifier:" +

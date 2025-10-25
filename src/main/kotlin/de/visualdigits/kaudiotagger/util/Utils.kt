@@ -381,9 +381,9 @@ object Utils {
     fun rename(fromFile: File, toFile: File): Boolean {
         log.debug(
             "Renaming From:" +
-                    fromFile.getAbsolutePath() +
+                    fromFile.absolutePath +
                     " to " +
-                    toFile.getAbsolutePath()
+                    toFile.absolutePath
         )
 
         if (toFile.exists()) {

@@ -1,6 +1,8 @@
 package de.visualdigits.kaudiotagger.model.frame.id3
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameIdentifierException
@@ -8,18 +10,15 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUnsupported
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
-import de.visualdigits.kaudiotagger.model.tag.id3.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
-import de.visualdigits.kaudiotagger.model.tag.id3.ID3v24StatusFlags
-import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.tag.id3.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.tag.id3.ID3v23StatusFlags
+import de.visualdigits.kaudiotagger.model.tag.id3.ID3v24StatusFlags
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.ID3Compression
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import de.visualdigits.kaudiotagger.util.StatusFlags
-
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -366,7 +365,7 @@ class ID3v23Frame: AbstractID3v2Frame {
             if (ID3Tags.isID3v23FrameIdentifier(identifier)) {
                 id = identifier
             } else {
-                id = AbstractID3v2Frame.UNSUPPORTED_ID
+                id = UNSUPPORTED_ID
             }
         }
         log.debug(

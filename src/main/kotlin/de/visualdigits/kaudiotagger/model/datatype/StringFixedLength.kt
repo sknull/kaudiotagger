@@ -25,7 +25,7 @@ open class StringFixedLength: AbstractString {
             size: Int
     ): super(identifier, frameBody) {
         if (size < 0) {
-            throw IllegalArgumentException("size is less than zero: " + size);
+            throw IllegalArgumentException("size is less than zero: " + size)
         }
         setValue(size)
     }

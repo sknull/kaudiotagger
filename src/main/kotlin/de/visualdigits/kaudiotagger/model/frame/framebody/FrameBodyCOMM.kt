@@ -6,13 +6,12 @@ import de.visualdigits.kaudiotagger.model.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.datatype.StringHashMap
 import de.visualdigits.kaudiotagger.model.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.datatype.TextEncodedStringSizeTerminated
+import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.Languages
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.ID3v24FrameBody
-import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream

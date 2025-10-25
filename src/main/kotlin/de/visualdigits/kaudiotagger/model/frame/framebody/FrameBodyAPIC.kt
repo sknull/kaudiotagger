@@ -291,9 +291,9 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
             return String(
                     (getObjectValue(DataTypes.OBJ_PICTURE_DATA) as ByteArray),
                     StandardCharsets.ISO_8859_1
-            );
+            )
         } else {
-            return "";
+            return ""
         }
     }
 

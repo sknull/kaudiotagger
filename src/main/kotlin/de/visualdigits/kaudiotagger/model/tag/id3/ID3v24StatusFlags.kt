@@ -1,13 +1,9 @@
 package de.visualdigits.kaudiotagger.model.tag.id3
 
-import de.visualdigits.kaudiotagger.model.tag.id3.ID3v23StatusFlags
-import de.visualdigits.kaudiotagger.model.frame.id3.ID3v24Frame
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.frame.id3.ID3v24Frame
 import de.visualdigits.kaudiotagger.util.FileConstants
 import de.visualdigits.kaudiotagger.util.StatusFlags
-import kotlin.experimental.and
-import kotlin.experimental.inv
-import kotlin.experimental.or
 
 class ID3v24StatusFlags: StatusFlags {
 

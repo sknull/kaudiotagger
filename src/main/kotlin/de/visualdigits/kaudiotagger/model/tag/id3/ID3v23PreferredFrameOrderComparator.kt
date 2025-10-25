@@ -108,13 +108,13 @@ class ID3v23PreferredFrameOrderComparator private constructor(): Comparator<Stri
     override fun compare(frameId1: String?, frameId2: String?): Int {
         var frameId1Index = frameIdsInPreferredOrder.indexOf(frameId1)
         if (frameId1Index == -1) {
-            frameId1Index = Int.Companion.MAX_VALUE
+            frameId1Index = Int.MAX_VALUE
         }
         var frameId2Index = frameIdsInPreferredOrder.indexOf(frameId2)
 
         //Because othwerwise returns -1 whihc would be tags in list went to top of list
         if (frameId2Index == -1) {
-            frameId2Index = Int.Companion.MAX_VALUE
+            frameId2Index = Int.MAX_VALUE
         }
 
         //To have determinable ordering AND because if returns equal Treese considers as equal
