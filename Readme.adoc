@@ -13,4 +13,10 @@ https://github.com/sknull/kaudiotagger/actions/workflows/build.yml[image:https:/
 
 == Introduction
 
-This is a thin wrapper around link:https://github.com/RouHim/jaudiotagger[jaudiotagger] to make usage in kotlin more convenient.
+This started as thin wrapper around link:https://github.com/RouHim/jaudiotagger[jaudiotagger] to make usage in kotlin more convenient.
+As an exercise in converting Java to Kotlin code using IntteliJ tools and partially hand crafting
+I now ported part of the jaudio project to kotlin (work in progress).
+After two weeks of work I only implemented what is needed to parse mp3 files.
+There is still a lot of java like code especially error handling and dealing with input streams
+needs improvement.
+
