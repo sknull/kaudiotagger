@@ -1092,7 +1092,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             (frame.frameBody as FrameBodyCOMM).setText(value)
         } else if (frame.frameBody is FrameBodyUSLT) {
             (frame.frameBody as FrameBodyUSLT).setDescription("")
-            (frame.frameBody as FrameBodyUSLT).lyric = value
+            (frame.frameBody as FrameBodyUSLT).setLyric(value)
         } else if (frame.frameBody is FrameBodyWOAR) {
             (frame.frameBody as FrameBodyWOAR).setUrlLink(value)
         } else if (frame.frameBody is AbstractFrameBodyTextInfo) {
@@ -1181,7 +1181,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             val fields = getFields(genericKey)
             if (fields.size > index) {
                 val frame = fields.get(index) as AbstractID3v2Frame
-                return (frame.frameBody as FrameBodyPOPM).rating.toString()
+                return (frame.frameBody as FrameBodyPOPM).getRating().toString()
             } else {
                 return ""
             }
@@ -1687,9 +1687,9 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             val isImageUrl = coverArt.isImageUrl()
             Artwork(
                 binaryData = if (!isImageUrl) coverArt.getImageData() else null,
-                mimeType = ImageFormats.mimeType(coverArt.formatType),
+                mimeType = ImageFormats.mimeType(coverArt.getFormatType()),
                 isLinked = isImageUrl,
-                imageUrl = if (isImageUrl) coverArt.imageUrl else null,
+                imageUrl = if (isImageUrl) coverArt.getImageUrl() else null,
                 pictureType = coverArt.getPictureType(),
             )
         }

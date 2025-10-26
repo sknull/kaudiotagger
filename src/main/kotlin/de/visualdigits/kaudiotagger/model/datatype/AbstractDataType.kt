@@ -113,8 +113,13 @@ abstract class AbstractDataType {
 
     fun getValue(): Any? = value
 
-    open fun setValue(value: Any?) {
+    fun setValue(value: Any?) {
         this.value = value
+        when (value) {
+            is String -> this.value = (value as? String)?.trimEnd { c -> c.code == 0 } // trim trailing null byte
+            else ->
+                this.value = value
+        }
     }
 
     /**

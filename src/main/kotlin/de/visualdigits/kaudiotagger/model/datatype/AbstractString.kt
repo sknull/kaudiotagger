@@ -98,10 +98,6 @@ abstract class AbstractString: AbstractDataType {
         return charSetName
     }
 
-    override fun setValue(value: Any?) {
-        super.setValue((value as? String)?.trimEnd { c -> c.code == 0 }) // trim trailing null byte
-    }
-
     /**
      * Return String representation of data type
      *
