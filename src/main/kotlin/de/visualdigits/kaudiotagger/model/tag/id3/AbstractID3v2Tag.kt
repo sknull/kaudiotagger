@@ -46,6 +46,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.RandomAccessFile
+import java.lang.Exception
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileLock
@@ -131,7 +132,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
             val size = ID3SyncSafeInteger.bufferToValue(bb)
             raf.seek((size + TAG_HEADER_LENGTH).toLong())
-            
+
             return true
         }
 
@@ -147,7 +148,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
             raf.read(tagIdentifier)
             raf.seek(start)
-            
+
             return tagIdentifier.contentEquals(TAG_ID)
         }
 
@@ -159,7 +160,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             )
             fc.position(start)
             val s = Utils.readThreeBytesAsChars(headerBuffer)
-            
+
             return s == TAGID
         }
 
@@ -176,28 +177,15 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             if (file == null) {
                 return 0
             }
-            var fis: FileInputStream? = null
-            var fc: FileChannel? = null
-            var bb: ByteBuffer? = null
-            try {
-                //Files
-                fis = FileInputStream(file)
-                fc = fis.getChannel()
-
-                //Read possible Tag header  Byte Buffer
-                bb = ByteBuffer.allocate(TAG_HEADER_LENGTH)
-                fc.read(bb)
-                bb.flip()
-                if (bb.limit() < (TAG_HEADER_LENGTH)) {
-                    return 0
-                }
-            } finally {
-                if (fc != null) {
-                    fc.close()
-                }
-
-                if (fis != null) {
-                    fis.close()
+            val bb = FileInputStream(file).use { fis ->
+                fis.getChannel().use { fc ->
+                    val bb = ByteBuffer.allocate(TAG_HEADER_LENGTH)
+                    fc.read(bb)
+                    bb.flip()
+                    if (bb.limit() < (TAG_HEADER_LENGTH)) {
+                        return 0
+                    }
+                    bb
                 }
             }
 
@@ -224,11 +212,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             bb.get()
 
             //Get size as recorded in frame header
-            var frameSize = ID3SyncSafeInteger.bufferToValue(bb)
-
-            //addField header size to frame size
-            frameSize += TAG_HEADER_LENGTH
-            return frameSize.toLong()
+            return (TAG_HEADER_LENGTH + ID3SyncSafeInteger.bufferToValue(bb)).toLong()
         }
     }
 
@@ -247,13 +231,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     var fileReadBytes: Int = 0
     var invalidFrames: Int = 0
 
-    //Start location of this chunk
-    //TODO currently only used by ID3 embedded into Wav/Aiff but shoudl be extended to mp3s
-    var startLocationInFile: Long = 0
-
-    //End location of this chunk
-    var endLocationInFile: Long = 0
-
     /**
      * Empty Constructor
      */
@@ -265,7 +242,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @param copyObject
      */
-    constructor(copyObject: AbstractID3v2Tag)
+    constructor(copyObject: AbstractID3v2Tag) : super(copyObject)
 
     /**
      * Return tag size based upon the sizes of the tags rather than the physical
@@ -334,18 +311,21 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 is AbstractID3v2Frame -> {
                     processDuplicateFrame(newFrame, o)
                 }
+
                 is AggregatedFrame -> {
                     log.error("Duplicated Aggregate Frame, ignoring:$id")
                 }
+
                 is MutableList<*> -> {
                     (o as? MutableList<Any>)?.add(newFrame)
                 }
+
                 else -> {
                     log.error("Unknown frame class:discarding:${o?.javaClass}")
                 }
             }
         } else {
-            frameMap[newFrame.getIdentifier()?:""] = newFrame
+            frameMap[newFrame.getIdentifier() ?: ""] = newFrame
         }
     }
 
@@ -363,7 +343,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         val list: MutableList<AbstractID3v2Frame> = mutableListOf()
         list.add(existingFrame)
         list.add(newFrame)
-        frameMap[newFrame.getIdentifier()?:""] = list
+        frameMap[newFrame.getIdentifier() ?: ""] = list
     }
 
     /**
@@ -384,11 +364,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 is AbstractID3v2Frame -> {
                     addFrame(o)
                 }
+
                 is TyerTdatAggregatedFrame -> {
                     for (next in o.getFrames()) {
                         addFrame(next)
                     }
                 }
+
                 is java.util.ArrayList<*> -> {
                     for (frame in o as java.util.ArrayList<AbstractID3v2Frame>) {
                         addFrame(frame)
@@ -622,8 +604,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         if (file == null) {
             return
         }
-        var fc: FileChannel? = null
-        var fileLock: FileLock? = null
 
         //We need to adjust location of audio file if true
         if (sizeIncPadding > audioStartLocation) {
@@ -632,70 +612,32 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         }
 
         try {
-            fc = RandomAccessFile(file, "rw").getChannel()
-            fileLock = getFileLockForWriting(fc, file.path)
-            fc.write(headerBuffer)
-            fc.write(ByteBuffer.wrap(bodyByteBuffer))
-            fc.write(ByteBuffer.wrap(ByteArray(padding)))
-        } catch (fe: FileNotFoundException) {
-            log.error(fe.message, fe)
-            if (fe.message?.contains(FileSystemMessage.ACCESS_IS_DENIED.message)?:false ||
-                fe.message?.contains(FileSystemMessage.PERMISSION_DENIED.message)?:false
-            ) {
-                log.error(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.path
-                    )
-                )
-                throw UnableToModifyFileException(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.path
-                    )
-                )
-            } else {
-                log.error(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.path
-                    )
-                )
-                throw UnableToCreateFileException(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.path
-                    )
-                )
-            }
-        } catch (ioe: IOException) {
-            log.error(ioe.message, ioe)
-            if (ioe.message == FileSystemMessage.ACCESS_IS_DENIED.message
-            ) {
-                log.error(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().path
-                    )
-                )
-                throw UnableToModifyFileException(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().path
-                    )
-                )
-            } else {
-                log.error(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().path
-                    )
-                )
-                throw UnableToCreateFileException(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(
-                        file.getParentFile().path
-                    )
-                )
-            }
-        } finally {
-            if (fc != null) {
-                if (fileLock != null) {
-                    fileLock.release()
+            RandomAccessFile(file, "rw").getChannel().use { fc ->
+                getFileLockForWriting(fc, file.path).use { fileLock ->
+                    fc.write(headerBuffer)
+                    fc.write(ByteBuffer.wrap(bodyByteBuffer))
+                    fc.write(ByteBuffer.wrap(ByteArray(padding)))
                 }
-                fc.close()
+            }
+        } catch (e: FileNotFoundException) {
+            log.error(e.message, e)
+            if (e.message?.contains(FileSystemMessage.ACCESS_IS_DENIED.message) ?: false || e.message?.contains(
+                    FileSystemMessage.PERMISSION_DENIED.message
+                ) ?: false) {
+                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
+                throw UnableToModifyFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
+            } else {
+                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
+                throw UnableToCreateFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
+            }
+        } catch (e: IOException) {
+            log.error(e.message, e)
+            if (e.message == FileSystemMessage.ACCESS_IS_DENIED.message) {
+                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
+                throw UnableToModifyFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
+            } else {
+                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
+                throw UnableToCreateFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
             }
         }
     }
@@ -713,28 +655,16 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @throws java.nio.channels.OverlappingFileLockException if already locked by another thread in the same VM, we dont catch this
      * because indicates a programming error
      */
-    @Throws(IOException::class)
     fun getFileLockForWriting(
         fileChannel: FileChannel,
         filePath: String?
     ): FileLock? {
-        log.debug("locking fileChannel for " + filePath)
-        val fileLock: FileLock
-        try {
-            fileLock = fileChannel.tryLock()
+        log.debug("locking fileChannel for $filePath")
+        return try {
+            fileChannel.tryLock()
         } catch (exception: IOException) { //Assumes locking is not supported on this platform so just returns null
-            return null
-        } catch (error: Error) { //#129 Workaround for https://bugs.openjdk.java.net/browse/JDK-8025619
-            return null
-        }
-
-        //Couldnt getFields lock because file is already locked by another application
-        if (fileLock == null) {
-            throw IOException(
-                ErrorMessage.GENERAL_WRITE_FAILED_FILE_LOCKED.getMsg(filePath)
-            )
-        }
-        return fileLock
+            null
+        } ?: throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_FILE_LOCKED.getMsg(filePath))
     }
 
     /**
@@ -765,162 +695,62 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         val paddingBuffer = ByteBuffer.wrap(ByteArray(paddingSize))
 
         //Create Temporary File and write channel, make sure it is locked
-        val paddedFile: File?
 
+        val paddedFile = File.createTempFile(Utils.getBaseFilenameForTempFile(file), ".new", file.getParentFile())
         try {
-            paddedFile = File.createTempFile(
-                Utils.getBaseFilenameForTempFile(file),
-                ".new",
-                file.getParentFile()
-            )
-            log.debug(
-                "Created temp file:" + paddedFile.getName() + " for " + file.getName()
-            )
-        } catch (ioe: IOException) { //Vista:Can occur if have Write permission on folder this file would be created in Denied
-            log.error(ioe.message, ioe)
-            if (ioe.message == FileSystemMessage.ACCESS_IS_DENIED.message
-            ) {
-                log.error(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
-                        file.getName(),
-                        file.getParentFile().path
-                    )
-                )
-                throw UnableToCreateFileException(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
-                        file.getName(),
-                        file.getParentFile().path
-                    )
-                )
-            } else {
-                log.error(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
-                        file.getName(),
-                        file.getParentFile().path
-                    )
-                )
-                throw UnableToCreateFileException(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_CREATE_TEMPORARY_FILE_IN_FOLDER.getMsg(
-                        file.getName(),
-                        file.getParentFile().path
-                    )
-                )
-            }
-        }
+            FileOutputStream(paddedFile).getChannel().use { fcOut ->
+                //Create read channel from original file
+                //TODO lock so cant be modified by anything else whilst reading from it ?
+                fcIn = FileInputStream(file).getChannel()
 
-        try {
-            fcOut = FileOutputStream(paddedFile).getChannel()
-        } catch (ioe: FileNotFoundException) { //Vista:Can occur if have special permission Create Folder/Append Data denied
-            log.error(ioe.message, ioe)
-            log.error(
-                ErrorMessage.GENERAL_WRITE_FAILED_TO_MODIFY_TEMPORARY_FILE_IN_FOLDER.getMsg(
-                    file.getName(),
-                    file.getParentFile().path
-                )
-            )
-            throw UnableToModifyFileException(
-                ErrorMessage.GENERAL_WRITE_FAILED_TO_MODIFY_TEMPORARY_FILE_IN_FOLDER.getMsg(
-                    file.getName(),
-                    file.getParentFile().path
-                )
-            )
-        }
+                //Write padding to new file (this is where the tag will be written to later)
+                val written = fcOut.write(paddingBuffer).toLong()
 
-        try {
-            //Create read channel from original file
-            //TODO lock so cant be modified by anything else whilst reading from it ?
-            fcIn = FileInputStream(file).getChannel()
+                //Write rest of file starting from audio
+                log.debug("Copying:" + (file.length() - audioStart) + "bytes")
 
-            //Write padding to new file (this is where the tag will be written to later)
-            val written = fcOut.write(paddingBuffer).toLong()
-
-            //Write rest of file starting from audio
-            log.debug("Copying:" + (file.length() - audioStart) + "bytes")
-
-            //If the amount to be copied is very large we split into 10MB lumps to try and avoid
-            //out of memory errors
-            val audiolength = file.length() - audioStart
-            if (audiolength <= MAXIMUM_WRITABLE_CHUNK_SIZE) {
-                fcIn.position(audioStart)
-                val written2 = fcOut.transferFrom(fcIn, paddingSize.toLong(), audiolength)
-                log.debug("Written padding:" + written + " Data:" + written2)
-                if (written2 != audiolength) {
-                    throw RuntimeException(
-                        ErrorMessage.MP3_UNABLE_TO_ADJUST_PADDING.getMsg(
-                            audiolength,
-                            written2
+                //If the amount to be copied is very large we split into 10MB lumps to try and avoid
+                //out of memory errors
+                val audiolength = file.length() - audioStart
+                if (audiolength <= MAXIMUM_WRITABLE_CHUNK_SIZE) {
+                    fcIn.position(audioStart)
+                    val written2 = fcOut.transferFrom(fcIn, paddingSize.toLong(), audiolength)
+                    log.debug("Written padding:$written Data:$written2")
+                    if (written2 != audiolength) {
+                        throw RuntimeException(ErrorMessage.MP3_UNABLE_TO_ADJUST_PADDING.getMsg(audiolength, written2))
+                    }
+                } else {
+                    val noOfChunks = audiolength / MAXIMUM_WRITABLE_CHUNK_SIZE
+                    val lastChunkSize = audiolength % MAXIMUM_WRITABLE_CHUNK_SIZE
+                    var written2: Long = 0
+                    for (i in 0..<noOfChunks) {
+                        written2 += fcIn.transferTo(
+                            audioStart + (i * MAXIMUM_WRITABLE_CHUNK_SIZE),
+                            MAXIMUM_WRITABLE_CHUNK_SIZE,
+                            fcOut
                         )
-                    )
-                }
-            } else {
-                val noOfChunks = audiolength / MAXIMUM_WRITABLE_CHUNK_SIZE
-                val lastChunkSize = audiolength % MAXIMUM_WRITABLE_CHUNK_SIZE
-                var written2: Long = 0
-                for (i in 0..<noOfChunks) {
+                    }
                     written2 += fcIn.transferTo(
-                        audioStart + (i * MAXIMUM_WRITABLE_CHUNK_SIZE),
-                        MAXIMUM_WRITABLE_CHUNK_SIZE,
+                        audioStart + (noOfChunks * MAXIMUM_WRITABLE_CHUNK_SIZE),
+                        lastChunkSize,
                         fcOut
                     )
-                }
-                written2 += fcIn.transferTo(
-                    audioStart + (noOfChunks * MAXIMUM_WRITABLE_CHUNK_SIZE),
-                    lastChunkSize,
-                    fcOut
-                )
-                log.debug("Written padding:" + written + " Data:" + written2)
-                if (written2 != audiolength) {
-                    throw RuntimeException(
-                        ErrorMessage.MP3_UNABLE_TO_ADJUST_PADDING.getMsg(
-                            audiolength,
-                            written2
-                        )
-                    )
+                    log.debug("Written padding:$written Data:$written2")
+                    if (written2 != audiolength) {
+                        throw RuntimeException(ErrorMessage.MP3_UNABLE_TO_ADJUST_PADDING.getMsg(audiolength, written2))
+                    }
                 }
             }
 
             //Store original modification time
             val lastModified = file.lastModified()
 
-            //Close Channels and locks
-            if (fcIn != null) {
-                if (fcIn.isOpen) {
-                    fcIn.close()
-                }
-            }
-
-            if (fcOut != null) {
-                if (fcOut.isOpen) {
-                    fcOut.close()
-                }
-            }
-
             //Replace file with paddedFile
             replaceFile(file, paddedFile)
-
-            //Update modification time
-            //TODO is this the right file ?
             paddedFile.setLastModified(lastModified)
-        } catch (ure: UnableToRenameFileException) {
+        } catch (e: IOException) {
             paddedFile.delete()
-            throw ure
-        } finally {
-            try {
-                //Whatever happens ensure all locks and channels are closed/released
-                if (fcIn != null) {
-                    if (fcIn.isOpen) {
-                        fcIn.close()
-                    }
-                }
-
-                if (fcOut != null) {
-                    if (fcOut.isOpen) {
-                        fcOut.close()
-                    }
-                }
-            } catch (e: Exception) {
-                log.warn("Problem closing channels and locks:" + e.message, e)
-            }
+            throw e
         }
     }
 
@@ -934,7 +764,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param originalFile
      * @throws IOException
      */
-    private fun replaceFile(originalFile: File, newFile: File) {
+    private fun replaceFile(originalFile: File?, newFile: File?) {
+        if (originalFile == null || newFile == null) {
+            return
+        }
         var renameOriginalResult: Boolean
         //Rename Original File to make a backup in case problem with new file
         var originalFileBackup = File(
@@ -974,11 +807,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             //Renamed failed so lets do some checks rename the backup back to the original file
             //New File doesnt exist
             if (!newFile.exists()) {
-                log.warn(
-                    ErrorMessage.GENERAL_WRITE_FAILED_NEW_FILE_DOESNT_EXIST.getMsg(
-                        newFile.absolutePath
-                    )
-                )
+                log.warn(ErrorMessage.GENERAL_WRITE_FAILED_NEW_FILE_DOESNT_EXIST.getMsg(newFile.absolutePath))
             }
 
             //Rename the backup back to the original
@@ -1011,11 +840,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             val deleteResult = originalFileBackup.delete()
             if (!deleteResult) {
                 //Not a disaster but can't deleteField the backup so make a warning
-                log.warn(
-                    ErrorMessage.GENERAL_WRITE_WARNING_UNABLE_TO_DELETE_BACKUP_FILE.getMsg(
-                        originalFileBackup.absolutePath
-                    )
-                )
+                log.warn(ErrorMessage.GENERAL_WRITE_WARNING_UNABLE_TO_DELETE_BACKUP_FILE.getMsg(originalFileBackup.absolutePath))
             }
         }
     }
@@ -1028,14 +853,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
         byteBuffer.rewind()
-        log.debug(
-                "ByteBuffer pos:" +
-                        byteBuffer.position() +
-                        ":limit" +
-                        byteBuffer.limit() +
-                        ":cap" +
-                        byteBuffer.capacity()
-        )
+        log.debug("ByteBuffer pos:${byteBuffer.position()}:limit${byteBuffer.limit()}:cap${byteBuffer.capacity()}")
 
         val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
         byteBuffer.get(tagIdentifier, 0, FIELD_TAGID_LENGTH)
@@ -1107,6 +925,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     override fun addField(artwork: Artwork) {
         this.addField(createField(artwork))
     }
+
     /**
      * Add new field
      *
@@ -1121,14 +940,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         if ((field !is AbstractID3v2Frame) &&
             (field !is AggregatedFrame)
         ) {
-            throw FieldDataInvalidException(
-                "Field " +
-                        field +
-                        " is not of type AbstractID3v2Frame or AggregatedFrame"
-            )
+            throw FieldDataInvalidException("Field $field is not of type AbstractID3v2Frame or AggregatedFrame")
         }
 
-        val fieldId = field.getIdentifier()?:error("No id")
+        val fieldId = field.getIdentifier() ?: error("No id")
         if (field is AbstractID3v2Frame) {
             val o = frameMap.get(fieldId)
 
@@ -1213,7 +1028,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyNumberTotal
 
             if (frameBody.getNumber() > 0) {
-                existingFrameBody?.setNumber(frameBody.getNumberAsText()?:"0")
+                existingFrameBody?.setNumber(frameBody.getNumberAsText() ?: "0")
             }
 
             if (frameBody.getTotal() > 0) {
@@ -1241,7 +1056,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         if (list.isEmpty()) {
             existingFrame?.also { ef -> list.add(ef) }
             list.add(frame)
-            frameMap[frame.getIdentifier()?:error("No id")] = list
+            frameMap[frame.getIdentifier() ?: error("No id")] = list
         } else {
             list.add(frame)
         }
@@ -1287,7 +1102,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 value.toByteArray(StandardCharsets.ISO_8859_1)
             )
         } else if (frame.frameBody is FrameBodyTXXX) {
-            (frame.frameBody as FrameBodyTXXX).setDescription(formatKey.subId?:"")
+            (frame.frameBody as FrameBodyTXXX).setDescription(formatKey.subId ?: "")
             (frame.frameBody as FrameBodyTXXX).setText(value)
         } else if (frame.frameBody is FrameBodyWXXX) {
             (frame.frameBody as FrameBodyWXXX).setDescription(formatKey.subId)
@@ -1327,7 +1142,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 }
             }
         } else if (frame.frameBody is FrameBodyTIPL) {
-            ((frame.frameBody) as FrameBodyTIPL).addPair(formatKey.subId?:"", value)
+            ((frame.frameBody) as FrameBodyTIPL).addPair(formatKey.subId ?: "", value)
         } else if (frame.frameBody is FrameBodyTMCL) {
             if (values.size >= 2) {
                 ((frame.frameBody) as FrameBodyTMCL).addPair(values[0], values[1])
@@ -1432,25 +1247,31 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 is FrameBodyTXXX if frameBody.getDescription() == subId -> {
                     listOf(tagField)
                 }
+
                 is FrameBodyWXXX if frameBody.getDescription() == subId -> {
                     listOf(tagField)
                 }
+
                 is FrameBodyCOMM if frameBody.getDescription() == subId -> {
                     listOf(tagField)
                 }
+
                 is FrameBodyUFID if frameBody.getOwner() == subId -> {
                     listOf(tagField)
                 }
+
                 is FrameBodyIPLS -> {
                     frameBody.getPairing()?.mapping?.mapNotNull { entry ->
                         if (entry.first == subId) tagField else null
                     }
                 }
+
                 is FrameBodyTIPL -> {
                     frameBody.getPairing()?.mapping?.mapNotNull { entry ->
                         if (entry.first == subId) tagField else null
                     }
                 }
+
                 else -> {
                     null
                 }
@@ -1526,7 +1347,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     if (next.getOwner() == formatKey.subId) {
                         if (next.getUniqueIdentifier() != null) {
                             values.add(
-                                String(next.getUniqueIdentifier()?:byteArrayOf())
+                                String(next.getUniqueIdentifier() ?: byteArrayOf())
                             )
                         }
                     }
@@ -1753,7 +1574,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     fun doDeleteTagField(formatKey: FrameAndSubId) {
         //Get list of frames that this uses
         val list = getFields(formatKey.frameId)
-        list.forEach {  field ->
+        list.forEach { field ->
             val next = (field as AbstractID3v2Frame).frameBody
             if (next is FrameBodyTXXX) {
                 if (next.getDescription() == formatKey.subId

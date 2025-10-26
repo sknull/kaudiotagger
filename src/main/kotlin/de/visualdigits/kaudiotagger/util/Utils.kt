@@ -461,12 +461,14 @@ object Utils {
         // context switch cost. Pretty soon it vanishes into the noise.
         FileInputStream(source).use { inStream ->
             FileOutputStream(destination).use { outStream ->
-                val inChannel = inStream.getChannel()
-                val outChannel = outStream.getChannel()
-                val size = inChannel.size()
-                var position: Long = 0
-                while (position < size) {
-                    position += inChannel.transferTo(position, 1024L * 1024L, outChannel)
+                inStream.getChannel().use { inChannel ->
+                    val size = inChannel.size()
+                    outStream.getChannel().use { outChannel ->
+                        var position: Long = 0
+                        while (position < size) {
+                            position += inChannel.transferTo(position, 1024L * 1024L, outChannel)
+                        }
+                    }
                 }
             }
         }
@@ -601,6 +603,7 @@ object Utils {
         val buf = ByteBuffer.allocate(size)
         readFromChannel(ch, buf)
         buf.flip()
+
         return buf
     }
 
@@ -610,6 +613,7 @@ object Utils {
     ): Int {
         val rem = buffer.position()
         while (channel.read(buffer) != -1 && buffer.hasRemaining());
+
         return buffer.position() - rem
     }
 

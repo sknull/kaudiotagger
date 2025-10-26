@@ -209,7 +209,6 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @return
      * @throws CharacterCodingException
      */
-    @Throws(CharacterCodingException::class)
     fun writeStringUTF16LEBOM(
         next: String,
         i: Int,
@@ -242,7 +241,6 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @return
      * @throws CharacterCodingException
      */
-    @Throws(CharacterCodingException::class)
     fun writeStringUTF16BEBOM(
         next: String,
         i: Int,

@@ -26,9 +26,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.io.RandomAccessFile
-import java.lang.reflect.InvocationTargetException
 import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
 import java.security.MessageDigest
 
 /**
@@ -232,34 +230,23 @@ class MP3File : AudioFile {
         //a buffer then we can read the IDv2 information without needing any more File I/O
         if (startByte >= AbstractID3v2Tag.TAG_HEADER_LENGTH) {
             log.debug("Attempting to read id3v2tags")
-            var fis: FileInputStream? = null
-            var fc: FileChannel? = null
-            var bb: ByteBuffer?
-            try {
-                fis = FileInputStream(file)
-                fc = fis.getChannel()
-                bb = ByteBuffer.allocate(startByte)
-                // XXX: don't change it to map
-                // https://stackoverflow.com/questions/28378713/bytebuffer-getbyte-int-int-failed-on-android-ics-and-jb
-                fc.read(bb, 0)
-            } finally {
-                if (fc != null) {
-                    fc.close()
-                }
-
-                if (fis != null) {
-                    fis.close()
+            val bb = FileInputStream(file).use { fis ->
+                fis.getChannel().use { fc ->
+                    val bb = ByteBuffer.allocate(startByte)
+                    // XXX: don't change it to map
+                    // https://stackoverflow.com/questions/28378713/bytebuffer-getbyte-int-int-failed-on-android-ics-and-jb
+                    fc.read(bb, 0)
+                    bb
                 }
             }
 
             try {
                 bb.rewind()
-
                 if ((loadOptions and LOAD_IDV2TAG) != 0) {
                     log.debug("Attempting to read id3v2tags")
                     try {
                         this.setid3v2tag(ID3v24Tag(bb))
-                    } catch (ex: TagNotFoundException) {
+                    } catch (_: TagNotFoundException) {
                         log.debug("No id3v24 tag found")
                     }
 
@@ -267,7 +254,7 @@ class MP3File : AudioFile {
                         if (id3v2tag == null) {
                             this.setid3v2tag(ID3v23Tag(bb))
                         }
-                    } catch (ex: TagNotFoundException) {
+                    } catch (_: TagNotFoundException) {
                         log.debug("No id3v23 tag found")
                     }
 
@@ -275,44 +262,15 @@ class MP3File : AudioFile {
                         if (id3v2tag == null) {
                             this.setid3v2tag(ID3v22Tag(bb))
                         }
-                    } catch (ex: TagNotFoundException) {
+                    } catch (_: TagNotFoundException) {
                         log.debug("No id3v22 tag found")
                     }
                 }
             } finally {
-                //Workaround for 4724038 on Windows
                 bb.clear()
-                if (bb.isDirect) {
-                    // Reflection substitute for following code:
-                    //    ((sun.nio.ch.DirectBuffer) bb).cleaner().clean();
-                    // which causes exception on Android - Sun NIO classes are not available
-                    try {
-                        val clazz = Class.forName("sun.nio.ch.DirectBuffer")
-                        val cleanerMethod = clazz.getMethod("cleaner")
-                        val cleaner = cleanerMethod.invoke(bb) // cleaner = bb.cleaner()
-                        if (cleaner != null) {
-                            val cleanMethod = cleaner.javaClass.getMethod("clean")
-                            cleanMethod.invoke(cleaner) // cleaner.clean()
-                        }
-                    } catch (e: ClassNotFoundException) {
-                        log.error("Could not load sun.nio.ch.DirectBuffer.")
-                    } catch (e: NoSuchMethodException) {
-                        log.error(
-                            "Could not invoke DirectBuffer method - " + e.message
-                        )
-                    } catch (e: InvocationTargetException) {
-                        log.error(
-                            "Could not invoke DirectBuffer method - target exception"
-                        )
-                    } catch (e: IllegalAccessException) {
-                        log.error(
-                            "Could not invoke DirectBuffer method - illegal access"
-                        )
-                    }
-                }
             }
         } else {
-            log.debug("Not enough room for valid id3v2 tag:" + startByte)
+            log.debug("Not enough room for valid id3v2 tag:$startByte")
         }
     }
 
@@ -393,7 +351,7 @@ class MP3File : AudioFile {
             //Skip to the next header (header 2, counting from start of file)
             headerTwo = MP3AudioHeader(
                 file,
-                headerOne.mp3StartByte + (headerOne.mp3FrameHeader?.getFrameLength()?:0)
+                headerOne.mp3StartByte + (headerOne.mp3FrameHeader?.getFrameLength() ?: 0)
             )
 
             //It matches the header we found when doing the original search from after the ID3Tag therefore it
@@ -439,71 +397,22 @@ class MP3File : AudioFile {
      * @throws Exception
      */
     private fun isFilePortionNull(startByte: Int, endByte: Int): Boolean {
-        log.debug(
-            "Checking file portion:$startByte:${endByte.toHexString()}"
-        )
-        var fis: FileInputStream? = null
-        var fc: FileChannel? = null
-        try {
-            fis = FileInputStream(file)
-            fc = fis.getChannel()
-            fc.position(startByte.toLong())
-            val bb = ByteBuffer.allocateDirect(endByte - startByte)
-            fc.read(bb)
-            while (bb.hasRemaining()) {
-                if (bb.get().toInt() != 0) {
-                    return false
+        log.debug("Checking file portion:$startByte:${endByte.toHexString()}")
+        FileInputStream(file).use { fis ->
+            fis.getChannel().use { fc ->
+                fc.position(startByte.toLong())
+                val bb = ByteBuffer.allocateDirect(endByte - startByte)
+                fc.read(bb)
+                while (bb.hasRemaining()) {
+                    if (bb.get().toInt() != 0) {
+                        return false
+                    }
                 }
-            }
-        } finally {
-            if (fc != null) {
-                fc.close()
-            }
-
-            if (fis != null) {
-                fis.close()
             }
         }
         return true
     }
 
-    /**
-     * Sets the `Lyrics3` tag for this dataType. A new
-     * `Lyrics3v2` dataType is created from the argument and then
-     *
-     * used here.
-     *
-     * @param mp3tag Any MP3Tag dataType can be used and will be converted into a
-     * new Lyrics3v2 dataType.
-     */
-    /*
-    void setLyrics3Tag(AbstractTag mp3tag)
-    {
-        lyrics3tag = new Lyrics3v2(mp3tag);
-    }
-    */
-    /**
-     *
-     *
-     * @param lyrics3tag
-     */
-    /*
-    void setLyrics3Tag(AbstractLyrics3 lyrics3tag)
-    {
-        this.lyrics3tag = lyrics3tag;
-    }
-    */
-    /**
-     * Returns the `ID3v1` tag for this datatype.
-     *
-     * @return the `ID3v1` tag for this datatype
-     */
-    /*
-    AbstractLyrics3 getLyrics3Tag()
-    {
-        return lyrics3tag;
-    }
-    */
     /**
      * @return a representation of tag as v24
      */
@@ -542,40 +451,8 @@ class MP3File : AudioFile {
         newFile: RandomAccessFile?,
         loadOptions: Int
     ) {
-        /*if ((loadOptions & LOAD_LYRICS3) != 0)
-        {
-            try
-            {
-                lyrics3tag = new Lyrics3v2(newFile);
-            }
-            catch (TagNotFoundException ex)
-            {
-            }
-            try
-            {
-                if (lyrics3tag == null)
-                {
-                    lyrics3tag = new Lyrics3v1(newFile);
-                }
-            }
-            catch (TagNotFoundException ex)
-            {
-            }
-        }
-        */
     }
 
-    /**
-     * Returns true if this datatype contains a `Lyrics3` tag
-     * TODO disabled until Lyrics3 fixed
-     * @return true if this datatype contains a `Lyrics3` tag
-     */
-    /*
-    boolean hasLyrics3Tag()
-    {
-        return (lyrics3tag != null);
-    }
-    */
     /**
      * Extracts the raw ID3v2 tag data into a file.
      *
@@ -593,17 +470,19 @@ class MP3File : AudioFile {
         val startByte = (audioHeader as MP3AudioHeader).mp3StartByte.toInt()
         if (startByte >= 0) {
             //Read byte into buffer
-            val fis = FileInputStream(file)
-            val fc = fis.getChannel()
-            val bb = ByteBuffer.allocate(startByte)
-            fc.read(bb)
+            file?.also { f ->
+                FileInputStream(f).use { fis ->
+                    fis.getChannel().use { fc ->
+                        val bb = ByteBuffer.allocate(startByte)
+                        fc.read(bb)
 
-            //Write bytes to outputFile
-            val out = FileOutputStream(outputFile)
-            out.write(bb.array())
-            out.close()
-            fc.close()
-            fis.close()
+                        //Write bytes to outputFile
+                        FileOutputStream(outputFile).use { out ->
+                            out.write(bb.array())
+                        }
+                    }
+                }
+            }
             return outputFile
         }
         throw TagNotFoundException("There is no id3v2tag data in this file")
@@ -655,7 +534,7 @@ class MP3File : AudioFile {
 
         var id3v1tagSize = 0
         if (hasid3v1tag()) {
-            id3v1tagSize = id3v1tag?.getSize()?:0
+            id3v1tagSize = id3v1tag?.getSize() ?: 0
         }
 
         val inStream: InputStream = FileInputStream(file)
@@ -667,7 +546,7 @@ class MP3File : AudioFile {
         inStream.skip(startByte)
 
         var read: Int
-        val totalSize = (file?.length()?:0) - startByte - id3v1tagSize
+        val totalSize = (file?.length() ?: 0) - startByte - id3v1tagSize
         var pointer = buffer.size
 
         while (pointer <= totalSize) {
@@ -853,11 +732,11 @@ class MP3File : AudioFile {
                     log.debug("Writing ID3v2 tag:" + file.getName())
                     val mp3AudioHeader =
                         this.audioHeader as? MP3AudioHeader
-                    val mp3StartByte = mp3AudioHeader?.mp3StartByte?:0
-                    val newMp3StartByte = id3v2tag?.write(file, mp3StartByte?:0)
+                    val mp3StartByte = mp3AudioHeader?.mp3StartByte ?: 0
+                    val newMp3StartByte = id3v2tag?.write(file, mp3StartByte ?: 0)
                     if (mp3StartByte != newMp3StartByte) {
                         log.debug("New mp3 start byte: $newMp3StartByte")
-                        mp3AudioHeader?.mp3StartByte = newMp3StartByte?:0
+                        mp3AudioHeader?.mp3StartByte = newMp3StartByte ?: 0
                     }
                 }
             }
@@ -960,7 +839,7 @@ class MP3File : AudioFile {
      */
     override fun displayStructureAsXML(): String {
         createXMLStructureFormatter()
-        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?:"")
+        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?: "")
         if (this.id3v1tag != null) {
             this.id3v1tag?.createStructure()
         }
@@ -976,7 +855,7 @@ class MP3File : AudioFile {
      */
     override fun displayStructureAsPlainText(): String {
         createPlainTextStructureFormatter()
-        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?:"")
+        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?: "")
         if (this.id3v1tag != null) {
             this.id3v1tag?.createStructure()
         }

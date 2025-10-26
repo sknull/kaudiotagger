@@ -93,11 +93,12 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @throws IOException
      */
     constructor(file: RandomAccessFile) {
-        val fc: FileChannel = file.getChannel()
+        val fc = file.getChannel()
         fc.position(file.length() - TAG_LENGTH)
         val byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
         fc.read(byteBuffer)
         byteBuffer.flip()
+
         read(byteBuffer)
     }
 

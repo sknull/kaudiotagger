@@ -147,14 +147,12 @@ class ID3v11Tag: ID3v1Tag {
      * @throws IOException
      */
     constructor(file: RandomAccessFile) {
-        val fc: FileChannel
         val byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
-
-        fc = file.getChannel()
+        val fc = file.getChannel()
         fc.position(file.length() - TAG_LENGTH)
-
         fc.read(byteBuffer)
         byteBuffer.flip()
+
         read(byteBuffer)
     }
 

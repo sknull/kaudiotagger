@@ -149,121 +149,109 @@ open class MP3AudioHeader : AudioHeader {
      * @throws IOException on any I/O error
      */
     fun seek(seekFile: File, startByte: Long): Boolean {
-        var header: ByteBuffer? = null
 
-        val fis = FileInputStream(seekFile)
-        val fc = fis.getChannel()
+        return FileInputStream(seekFile).use { fis ->
+            fis.getChannel().use { fc ->
+                //Read into Byte Buffer in Chunks
+                val bb = ByteBuffer.allocateDirect(FILE_BUFFER_SIZE)
 
-        //Read into Byte Buffer in Chunks
-        val bb = ByteBuffer.allocateDirect(FILE_BUFFER_SIZE)
+                //Move FileChannel to the starting position (skipping over tag if any)
+                fc.position(startByte)
 
-        //Move FileChannel to the starting position (skipping over tag if any)
-        fc.position(startByte)
+                //Update filePointerCount
 
-        //Update filePointerCount
+                //This is substantially faster than updating the filechannels position
+                var filePointerCount: Long = startByte
 
-        //This is substantially faster than updating the filechannels position
-        var filePointerCount: Long = startByte
+                //Read from here into the byte buffer , doesn't move location of filepointer
+                fc.read(bb, startByte)
+                bb.flip()
 
-        //Read from here into the byte buffer , doesn't move location of filepointer
-        fc.read(bb, startByte)
-        bb.flip()
-
-        var syncFound = false
-        try {
-            do {
-                //TODO remaining() is quite an expensive operation, isn't there a way we can work this out without
-                //interrogating the bytebuffer. Also this is rarely going to be true, and could be made less true
-                //by increasing FILE_BUFFER_SIZE
-                if (bb.remaining() <= MIN_BUFFER_REMAINING_REQUIRED) {
-                    bb.clear()
-                    fc.position(filePointerCount)
-                    fc.read(bb, fc.position())
-                    bb.flip()
-                    if (bb.limit() <= MIN_BUFFER_REMAINING_REQUIRED) {
-                        //No mp3 exists
-                        return false
-                    }
-                }
-                //log.debug("fc:"+fc.position() + "bb"+bb.position());
-                if (MPEGFrameHeader.isMPEGFrame(bb)) {
-                    try {
-                        log.debug("Found Possible header at:" + filePointerCount)
-
-                        mp3FrameHeader = MPEGFrameHeader.parseMPEGHeader(bb)
-                        syncFound = true
-
-                        //if(2==1) use this line when you want to test getting the next frame without using xing
-                        if ((XingFrame.isXingFrame(bb, mp3FrameHeader)?.also { header = it }) != null) {
-                            log.debug("Found Possible XingHeader")
-                            try {
-                                //Parses Xing frame without modifying position of main buffer
-                                mp3XingFrame = XingFrame.parseXingFrame(header)
-                            } catch (ex: InvalidAudioFrameException) {
-                                // We Ignore because even if Xing Header is corrupted
-                                //doesn't mean file is corrupted
-                            }
-                            break
-                        } else if ((VbriFrame.isVbriFrame(bb)?.also { header = it }) != null
-                        ) {
-                            log.debug("Found Possible VbriHeader")
-                            try {
-                                //Parses Vbri frame without modifying position of main buffer
-                                mp3VbriFrame = VbriFrame.parseVBRIFrame(header)
-                            } catch (ex: InvalidAudioFrameException) {
-                                // We Ignore because even if Vbri Header is corrupted
-                                //doesn't mean file is corrupted
-                            }
-                            break
-                        } else {
-                            syncFound = isNextFrameValid(seekFile, filePointerCount, bb, fc)
-                            if (syncFound) {
-                                break
+                var syncFound = false
+                try {
+                    do {
+                        //TODO remaining() is quite an expensive operation, isn't there a way we can work this out without
+                        //interrogating the bytebuffer. Also this is rarely going to be true, and could be made less true
+                        //by increasing FILE_BUFFER_SIZE
+                        if (bb.remaining() <= MIN_BUFFER_REMAINING_REQUIRED) {
+                            bb.clear()
+                            fc.position(filePointerCount)
+                            fc.read(bb, fc.position())
+                            bb.flip()
+                            if (bb.limit() <= MIN_BUFFER_REMAINING_REQUIRED) {
+                                //No mp3 exists
+                                syncFound = false
                             }
                         }
-                    } catch (ex: InvalidAudioFrameException) {
-                        // We Ignore because likely to be incorrect sync bits ,
-                        // will just continue in loop
-                    }
+                        //log.debug("fc:"+fc.position() + "bb"+bb.position());
+                        if (MPEGFrameHeader.isMPEGFrame(bb)) {
+                            try {
+                                log.debug("Found Possible header at:" + filePointerCount)
+
+                                mp3FrameHeader = MPEGFrameHeader.parseMPEGHeader(bb)
+                                syncFound = true
+
+                                //if(2==1) use this line when you want to test getting the next frame without using xing
+                                var header: ByteBuffer? = null
+                                if ((XingFrame.isXingFrame(bb, mp3FrameHeader)?.also { header = it }) != null) {
+                                    log.debug("Found Possible XingHeader")
+                                    try {
+                                        //Parses Xing frame without modifying position of main buffer
+                                        mp3XingFrame = XingFrame.parseXingFrame(header)
+                                    } catch (ex: InvalidAudioFrameException) {
+                                        // We Ignore because even if Xing Header is corrupted
+                                        //doesn't mean file is corrupted
+                                    }
+                                    break
+                                } else if ((VbriFrame.isVbriFrame(bb)?.also { header = it }) != null
+                                ) {
+                                    log.debug("Found Possible VbriHeader")
+                                    try {
+                                        //Parses Vbri frame without modifying position of main buffer
+                                        mp3VbriFrame = VbriFrame.parseVBRIFrame(header)
+                                    } catch (ex: InvalidAudioFrameException) {
+                                        // We Ignore because even if Vbri Header is corrupted
+                                        //doesn't mean file is corrupted
+                                    }
+                                    break
+                                } else {
+                                    syncFound = isNextFrameValid(seekFile, filePointerCount, bb, fc)
+                                    if (syncFound) {
+                                        break
+                                    }
+                                }
+                            } catch (ex: InvalidAudioFrameException) {
+                                // We Ignore because likely to be incorrect sync bits ,
+                                // will just continue in loop
+                            }
+                        }
+
+                        //TODO position() is quite an expensive operation, isn't there a way we can work this out without
+                        //interrogating the bytebuffer
+                        bb.position(bb.position() + 1)
+                        filePointerCount++
+                    } while (!syncFound)
+                } catch (e: EOFException) {
+                    log.warn("Reached end of file without finding sync match", e)
+                    syncFound = false
+                } catch (e: IOException) {
+                    log.error("IOException occurred whilst trying to find sync", e)
+                    throw e
                 }
 
-                //TODO position() is quite an expensive operation, isn't there a way we can work this out without
-                //interrogating the bytebuffer
-                bb.position(bb.position() + 1)
-                filePointerCount++
-            } while (!syncFound)
-        } catch (ex: EOFException) {
-            log.warn("Reached end of file without finding sync match", ex)
-            syncFound = false
-        } catch (iox: IOException) {
-            log.error("IOException occurred whilst trying to find sync", iox)
-            syncFound = false
-            throw iox
-        } finally {
-            if (fc != null) {
-                fc.close()
+                //Return to start of audio header
+                log.debug("Return found matching mp3 header starting at$filePointerCount")
+                fileSize = seekFile.length()
+                this.mp3StartByte = filePointerCount
+                setTimePerFrame()
+                setNumberOfFrames()
+                setTrackLength()
+                setBitRate()
+                setEncoder()
+
+                syncFound
             }
-
-            fis.close()
         }
-
-        //Return to start of audio header
-        log.debug(
-            "Return found matching mp3 header starting at$filePointerCount"
-        )
-        fileSize = seekFile.length()
-        this.mp3StartByte = filePointerCount
-        setTimePerFrame()
-        setNumberOfFrames()
-        setTrackLength()
-        setBitRate()
-        setEncoder()
-        /*if((filePointerCount - startByte )>0)
-        {
-            log.error(seekFile.getName()+"length:"+startByte+"Difference:"+(filePointerCount - startByte));
-        }
-        */
-        return syncFound
     }
 
     /**

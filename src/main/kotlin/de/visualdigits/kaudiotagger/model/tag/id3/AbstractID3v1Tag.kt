@@ -68,18 +68,14 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
     override fun delete(file: RandomAccessFile) {
         //Read into Byte Buffer
         log.debug("Deleting ID3v1 from file if exists")
-
-        val fc: FileChannel
-        val byteBuffer: ByteBuffer?
-        fc = file.getChannel()
-
+        val fc: FileChannel = file.getChannel()
         if (file.length() < TAG_LENGTH) {
             throw IOException(
                 "File not not appear large enough to contain a tag"
             )
         }
         fc.position(file.length() - TAG_LENGTH)
-        byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
+        val byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
         fc.read(byteBuffer)
         byteBuffer.rewind()
         if (seekForV1OrV11Tag(byteBuffer)) {
