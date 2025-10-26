@@ -28,6 +28,7 @@ import java.io.InputStream
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 /**
  * This class represents a physical MP3 File
@@ -617,30 +618,17 @@ class MP3File : AudioFile {
     }
 
     /**
-     * Calculates hash with given buffer size.
+     * Calculates hash with algorithm "MD5". Buffer size is 32768 byte.
      * Hash is calculated EXCLUDING meta-data, like id3v1 or id3v2
      *
-     * @param buffer
-     * @return byte[] hash value in byte
+     * @return byte[] hash value.
      * @throws IOException
      * @throws InvalidAudioFrameException
      * @throws NoSuchAlgorithmException
      */
-    fun getHash(buffer: Int): ByteArray? {
-        return getHash("MD5", buffer)
+    fun getHash(): ByteArray? {
+        return getHash("MD5", 32768)
     }
-
-    val hash: ByteArray?
-        /**
-         * Calculates hash with algorithm "MD5". Buffer size is 32768 byte.
-         * Hash is calculated EXCLUDING meta-data, like id3v1 or id3v2
-         *
-         * @return byte[] hash value.
-         * @throws IOException
-         * @throws InvalidAudioFrameException
-         * @throws NoSuchAlgorithmException
-         */
-        get() = getHash("MD5", 32768)
 
     /**
      * Set v2 tag ,don't need to set v24 tag because saving

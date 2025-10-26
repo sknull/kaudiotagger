@@ -199,40 +199,41 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
         super.write(tagBuffer)
     }
 
-    val mimeType: String?
-        /**
-         * Get mimetype
-         *
-         * @return a description of the image
-         */
-        get() = getObjectValue(DataTypes.OBJ_MIME_TYPE) as String?
-
-    val imageUrl: String
-        /**
-         * @return the image url if there is otherwise return an empty String
-         */
-        get() {
-            if (isImageUrl()) {
-                return String(
-                    ((getObjectValue(DataTypes.OBJ_PICTURE_DATA) as ByteArray)),
-                    StandardCharsets.ISO_8859_1
-                )
-            } else {
-                return ""
-            }
-        }
-
-    fun isImageUrl(): Boolean {
-        return this.formatType != null && this.formatType == IMAGE_IS_URL
+    /**
+     * Get mimetype
+     *
+     * @return a description of the image
+     */
+    fun getMimeType(): String? {
+        return getObjectValue(DataTypes.OBJ_MIME_TYPE) as String?
     }
 
-    val formatType: String?
-        /**
-         * Get a description of the image
-         *
-         * @return a description of the image
-         */
-        get() = getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as String?
+    /**
+     * @return the image url if there is otherwise return an empty String
+     */
+    fun getImageUrl(): String {
+        if (isImageUrl()) {
+            return String(
+                    (getObjectValue(DataTypes.OBJ_PICTURE_DATA) as? ByteArray)?:byteArrayOf(),
+                    StandardCharsets.ISO_8859_1
+            )
+        } else {
+            return "";
+        }
+    }
+
+    fun isImageUrl(): Boolean {
+        return this.getFormatType() != null && this.getFormatType() == IMAGE_IS_URL
+    }
+
+    /**
+     * Get a description of the image
+     *
+     * @return a description of the image
+     */
+    fun getFormatType(): String? {
+        return getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as String?
+    }
 
     /**
      *

@@ -135,21 +135,23 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         return ID3v24Frames.UNSYNC_LYRICS.id
     }
 
-    var language: String?
-        /**
-         * Get the language field
-         *
-         * @return language
-         */
-        get() = getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
-        /**
-         * Set the language field
-         *
-         * @param language
-         */
-        set(language) {
-            setObjectValue(DataTypes.OBJ_LANGUAGE, language)
-        }
+    /**
+     * Get the language field
+     *
+     * @return language
+     */
+    fun getLanguage(): String? {
+        return getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+    }
+
+    /**
+     * Set the language field
+     *
+     * @param language
+     */
+    fun setLanguage(language: String?) {
+        setObjectValue(DataTypes.OBJ_LANGUAGE, language)
+    }
 
     /**
      * Add additional lyric to the lyric field
@@ -157,30 +159,32 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @param text
      */
     fun addLyric(text: String?) {
-        this.lyric = this.lyric + text
+        this.setLyric(this.getLyric() + text)
     }
 
-    var lyric: String?
-        /**
-         * Get the lyric field
-         *
-         * @return lyrics3
-         */
-        get() = getObjectValue(DataTypes.OBJ_LYRICS) as String?
-        /**
-         * Set the lyric field
-         *
-         * @param lyric
-         */
-        set(lyric) {
-            setObjectValue(DataTypes.OBJ_LYRICS, lyric)
-        }
+    /**
+     * Get the lyric field
+     *
+     * @return lyrics
+     */
+    fun getLyric(): String? {
+        return getObjectValue(DataTypes.OBJ_LYRICS) as String?
+    }
+
+    /**
+     * Set the lyric field
+     *
+     * @param lyric
+     */
+    fun setLyric(lyric: String?) {
+        setObjectValue(DataTypes.OBJ_LYRICS, lyric)
+    }
 
     /**
      * @param line
      */
     fun addLyric(line: Lyrics3Line) {
-        this.lyric = this.lyric + line.writeString()
+        this.setLyric(this.getLyric() + line.writeString())
     }
 
     override fun write(tagBuffer: ByteArrayOutputStream) {

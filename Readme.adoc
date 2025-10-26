@@ -23,9 +23,26 @@ As it turned out I have underestimated how complex jaudio tagger is and how many
 
 This started as thin wrapper around link:https://github.com/RouHim/jaudiotagger[jaudiotagger] to make usage in kotlin more convenient.
 
-As an exercise in converting Java to Kotlin code using IntteliJ tools and partially hand crafting
+As an exercise in converting Java to Kotlin code using IntelliJ tools and partially handcrafting
 I now ported part of the jaudio project to kotlin (work in progress).
 
 After two weeks of intense work I only implemented what is needed to parse mp3 files.
 At least we now have a kotlin code base which can do at least a little bit.
 Still a lot of id3 tag frames are currently not implemented but this seems to be mass work which will be done soon to complete at least the mp3 part.
+
+== My Approach Of Migration
+
+When I started the project I was not aware of how much code I would have to migrate, so I decided to create a kotlin class in my project with the same name of the class I wanted to migrate - the copy and paste the body into Intellij. In a lot of cases this gave me quite good results.
+
+For some reason the conversion engine fails on certain methods and I never found out why that is. So I had start with the pasted java code and convert that by hand.
+
+Of course this is cumbersome and very slow progress...
+
+After some days I found out that it is possible to configure kotlin for all modules of a java project and convert whole classes to kotlin code.
+
+This is of course a much faster approach as you only have to copy and paste the class body to your project.
+But it turned out that in case of methods which look like accessors (so starting the name with get or set) the conversion engine will convert that to a member property with the get() or set() advice respectively.
+In cases the method is no simple accessor for a property this is NOT what you want and I would like to be able to configure such features but you have to take it as it is provided.
+So you end up with fixing those by pasting in the original java code.
+But still the combination of converting complete classses, copy them over and fix any accessors which have been accidently converted is for me the fastest and best approach.
+Nowadays, it would also be a try to clean up afterward using an AI model, but I currently have none available.

@@ -84,54 +84,60 @@ class FrameBodyPOPM: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     override fun getUserFriendlyValue(): String {
-        return this.emailToUser + ":" + this.rating + ":" + this.counter
+        return "${this.getEmailToUser()}:${this.getRating()}:${this.getCounter()}"
     }
 
-    var emailToUser: String?
-        /**
-         * @return the memail of the user who rated this
-         */
-        get() = getObjectValue(DataTypes.OBJ_EMAIL) as String?
-        /**
-         * @param description
-         */
-        set(description) {
-            setObjectValue(DataTypes.OBJ_EMAIL, description)
-        }
+    /**
+     * @return the memail of the user who rated this
+     */
+    fun getEmailToUser(): String? {
+        return getObjectValue(DataTypes.OBJ_EMAIL) as String?
+    }
 
-    var rating: Long
-        /**
-         * @return the rating given to this file
-         */
-        get() = (getObjectValue(DataTypes.OBJ_RATING) as Number).toLong()
-        /**
-         * Set the rating given to this file
-         *
-         * @param rating
-         */
-        set(rating) {
-            setObjectValue(DataTypes.OBJ_RATING, rating)
-        }
+    /**
+     * @param description
+     */
+    fun setEmailToUser(description: String?) {
+        setObjectValue(DataTypes.OBJ_EMAIL, description)
+    }
 
-    var counter: Long
-        /**
-         * @return the play count of this file
-         */
-        get() = (getObjectValue(DataTypes.OBJ_COUNTER) as Number).toLong()
-        /**
-         * Set the play counter of this file
-         *
-         * @param counter
-         */
-        set(counter) {
-            setObjectValue(DataTypes.OBJ_COUNTER, counter)
-        }
+    /**
+     * @return the rating given to this file
+     */
+    fun getRating(): Long {
+        return (getObjectValue(DataTypes.OBJ_RATING) as Number).toLong()
+    }
+
+    /**
+     * Set the rating given to this file
+     *
+     * @param rating
+     */
+    fun setRating(rating: Long) {
+        setObjectValue(DataTypes.OBJ_RATING, rating)
+    }
+
+    /**
+     * @return the play count of this file
+     */
+    fun getCounter(): Long {
+        return (getObjectValue(DataTypes.OBJ_COUNTER) as Number).toLong()
+    }
+
+    /**
+     * Set the play counter of this file
+     *
+     * @param counter
+     */
+    fun setCounter(counter: Long) {
+        setObjectValue(DataTypes.OBJ_COUNTER, counter)
+    }
 
     fun parseString(data: String) {
         try {
             val value = data.toInt()
-            this.rating = value.toLong()
-            this.emailToUser = MEDIA_MONKEY_NO_EMAIL
+            this.setRating(value.toLong())
+            this.setEmailToUser(MEDIA_MONKEY_NO_EMAIL)
         } catch (nfe: NumberFormatException) {
         }
     }

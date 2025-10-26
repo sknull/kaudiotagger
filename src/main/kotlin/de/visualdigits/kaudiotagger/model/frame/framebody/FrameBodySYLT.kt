@@ -166,30 +166,34 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
 
-    val language: String?
-        /**
-         * @return language code
-         */
-        get() = getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+    /**
+     * @return language code
+     */
+    fun getLanguage(): String? {
+        return getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+    }
 
-    val timeStampFormat: Int
-        /**
-         * @return timestamp format key
-         */
-        get() = (getObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT) as Number
+    /**
+     * @return timestamp format key
+     */
+    fun getTimeStampFormat(): Int {
+        return (getObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT) as Number
                 ).toInt()
+    }
 
-    val contentType: Int
-        /**
-         * @return content type key
-         */
-        get() = (getObjectValue(DataTypes.OBJ_CONTENT_TYPE) as Number).toInt()
+    /**
+     * @return content type key
+     */
+    fun getContentType(): Int {
+        return (getObjectValue(DataTypes.OBJ_CONTENT_TYPE) as Number).toInt()
+    }
 
-    val description: String?
-        /**
-         * @return description
-         */
-        get() = getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+    /**
+     * @return description
+     */
+    fun getDescription(): String? {
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+    }
 
     /**
      * @return frame identifier
@@ -198,27 +202,29 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24Frames.SYNC_LYRIC.id
     }
 
-    var lyrics: ByteArray?
-        /**
-         * Get lyrics3
-         *
-         *
-         * TODO:better format
-         *
-         * @return lyrics3
-         */
-        get() = this.getObjectValue(DataTypes.OBJ_DATA) as ByteArray?
-        /**
-         * Set lyrics3
-         *
-         *
-         * TODO:provide a more user friendly way of adding lyrics3
-         *
-         * @param data
-         */
-        set(data) {
-            this.setObjectValue(DataTypes.OBJ_DATA, data)
-        }
+    /**
+     * Get lyrics
+     *
+     *
+     * TODO:better format
+     *
+     * @return lyrics
+     */
+    fun getLyrics(): ByteArray? {
+        return this.getObjectValue(DataTypes.OBJ_DATA) as ByteArray?
+    }
+
+    /**
+     * Set lyrics
+     *
+     *
+     * TODO:provide a more user friendly way of adding lyrics
+     *
+     * @param data
+     */
+    fun setLyrics(data: ByteArray?) {
+        this.setObjectValue(DataTypes.OBJ_DATA, data)
+    }
 
     /**
      * Setup Object List

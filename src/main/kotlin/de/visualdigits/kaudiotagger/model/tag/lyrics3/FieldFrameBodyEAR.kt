@@ -32,17 +32,19 @@ class FieldFrameBodyEAR : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    var artist: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue("Artist") as String?
-        /**
-         * @param artist
-         */
-        set(artist) {
-            setObjectValue("Artist", artist)
-        }
+    /**
+     * @return
+     */
+    fun getArtist(): String? {
+        return getObjectValue("Artist") as String?
+    }
+
+    /**
+     * @param artist
+     */
+    fun setArtist(artist: String?) {
+        setObjectValue("Artist", artist)
+    }
 
     /**
      * @return

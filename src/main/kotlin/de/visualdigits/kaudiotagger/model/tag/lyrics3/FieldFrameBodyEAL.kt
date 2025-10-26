@@ -32,17 +32,19 @@ class FieldFrameBodyEAL : AbstractLyrics3v2FieldFrameBody {
         read(byteBuffer)
     }
 
-    var album: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue("Album") as String?
-        /**
-         * @param album
-         */
-        set(album) {
-            setObjectValue("Album", album)
-        }
+    /**
+     * @return
+     */
+    fun getAlbum(): String? {
+        return getObjectValue("Album") as String?
+    }
+
+    /**
+     * @param album
+     */
+    fun setAlbum(album: String?) {
+        setObjectValue("Album", album)
+    }
 
     /**
      * @return

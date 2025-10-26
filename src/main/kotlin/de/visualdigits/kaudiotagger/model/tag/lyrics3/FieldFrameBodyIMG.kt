@@ -131,17 +131,19 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return super.isSubsetOf(obj)
     }
 
-    var value: String
-        /**
-         * @return
-         */
-        get() = writeString()
-        /**
-         * @param value
-         */
-        set(value) {
-            readString(value)
-        }
+    /**
+     * @return
+     */
+    fun getValue(): String {
+        return writeString()
+    }
+
+    /**
+     * @param value
+     */
+    fun setValue(value: String) {
+        readString(value)
+    }
 
     /**
      * @return

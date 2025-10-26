@@ -92,11 +92,10 @@ class MetadataBlockHeader {
                 )
     }
 
-    val bytesWithoutIsLastBlockFlag: ByteArray
-        get() {
-            bytes[0] = (bytes[0].toInt() and 0x7F).toByte()
-            return bytes
-        }
+    fun getBytesWithoutIsLastBlockFlag(): ByteArray {
+        bytes[0] = (bytes[0].toInt() and 0x7F).toByte()
+        return bytes
+    }
 
     companion object {
         const val BLOCK_TYPE_LENGTH: Int = 1

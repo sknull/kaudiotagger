@@ -141,11 +141,12 @@ class Lyrics3v2 : AbstractLyrics3 {
         return fieldMap.get(identifier)
     }
 
-    val fieldCount: Int
-        /**
-         * @return
-         */
-        get() = fieldMap.size
+    /**
+     * @return
+     */
+    fun getFieldCount(): Int {
+        return fieldMap.size
+    }
 
     /**
      * @param obj

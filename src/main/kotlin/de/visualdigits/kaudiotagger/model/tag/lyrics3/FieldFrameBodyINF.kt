@@ -32,17 +32,19 @@ class FieldFrameBodyINF : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    var additionalInformation: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue("Additional Information") as String?
-        /**
-         * @param additionalInformation
-         */
-        set(additionalInformation) {
-            setObjectValue("Additional Information", additionalInformation)
-        }
+    /**
+     * @return
+     */
+    fun getAdditionalInformation(): String? {
+        return getObjectValue("Additional Information") as String?
+    }
+
+    /**
+     * @param additionalInformation
+     */
+    fun setAdditionalInformation(additionalInformation: String?) {
+        setObjectValue("Additional Information", additionalInformation)
+    }
 
     /**
      * @return

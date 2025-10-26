@@ -39,17 +39,19 @@ class FieldFrameBodyETT : AbstractLyrics3v2FieldFrameBody {
         return "ETT"
     }
 
-    var title: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue("Title") as String?
-        /**
-         * @param title
-         */
-        set(title) {
-            setObjectValue("Title", title)
-        }
+    /**
+     * @return
+     */
+    fun getTitle(): String? {
+        return getObjectValue("Title") as String?
+    }
+
+    /**
+     * @param title
+     */
+    fun setTitle(title: String?) {
+        setObjectValue("Title", title)
+    }
 
     /**
      *

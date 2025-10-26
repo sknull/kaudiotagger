@@ -32,17 +32,19 @@ class FieldFrameBodyAUT : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    var author: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue("Author") as String?
-        /**
-         * @param author
-         */
-        set(author) {
-            setObjectValue("Author", author)
-        }
+    /**
+     * @return
+     */
+    fun getAuthor(): String? {
+        return getObjectValue("Author") as String?
+    }
+
+    /**
+     * @param author
+     */
+    fun setAuthor(author: String?) {
+        setObjectValue("Author", author)
+    }
 
     /**
      * @return
