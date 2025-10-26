@@ -113,7 +113,7 @@ abstract class AbstractDataType {
 
     fun getValue(): Any? = value
 
-    fun setValue(value: Any?) {
+    open fun setValue(value: Any?) {
         this.value = value
     }
 
