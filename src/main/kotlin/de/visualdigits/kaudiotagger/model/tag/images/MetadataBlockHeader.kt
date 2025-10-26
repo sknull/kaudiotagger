@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.tag.images
 
-import de.visualdigits.kaudiotagger.model.exceptions.CannotReadException
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -39,9 +38,7 @@ class MetadataBlockHeader {
                 bytes[i] = rawdata.get(i)
             }
         } else {
-            throw CannotReadException(
-                ErrorMessage.FLAC_NO_BLOCKTYPE.getMsg(type)
-            )
+            error(ErrorMessage.FLAC_NO_BLOCKTYPE.getMsg(type))
         }
     }
 

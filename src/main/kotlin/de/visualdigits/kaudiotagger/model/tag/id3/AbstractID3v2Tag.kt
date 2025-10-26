@@ -9,11 +9,7 @@ import de.visualdigits.kaudiotagger.model.datatype.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.datatype.types.Languages
 import de.visualdigits.kaudiotagger.model.datatype.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.StandardIPLSKey
-import de.visualdigits.kaudiotagger.model.exceptions.FieldDataInvalidException
 import de.visualdigits.kaudiotagger.model.exceptions.KeyNotFoundException
-import de.visualdigits.kaudiotagger.model.exceptions.UnableToCreateFileException
-import de.visualdigits.kaudiotagger.model.exceptions.UnableToModifyFileException
-import de.visualdigits.kaudiotagger.model.exceptions.UnableToRenameFileException
 import de.visualdigits.kaudiotagger.model.field.TagField
 import de.visualdigits.kaudiotagger.model.frame.AggregatedFrame
 import de.visualdigits.kaudiotagger.model.frame.TyerTdatAggregatedFrame
@@ -46,7 +42,6 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.RandomAccessFile
-import java.lang.Exception
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileLock
@@ -621,24 +616,20 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
         } catch (e: FileNotFoundException) {
             log.error(e.message, e)
-            if (e.message?.contains(FileSystemMessage.ACCESS_IS_DENIED.message) ?: false || e.message?.contains(
-                    FileSystemMessage.PERMISSION_DENIED.message
-                ) ?: false) {
+            if (e.message?.contains(FileSystemMessage.ACCESS_IS_DENIED.message) ?: false || e.message?.contains(FileSystemMessage.PERMISSION_DENIED.message) ?: false) {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
-                throw UnableToModifyFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
             } else {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
-                throw UnableToCreateFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
             }
+            throw e
         } catch (e: IOException) {
             log.error(e.message, e)
             if (e.message == FileSystemMessage.ACCESS_IS_DENIED.message) {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
-                throw UnableToModifyFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
             } else {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
-                throw UnableToCreateFileException(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
             }
+            throw e
         }
     }
 
@@ -786,19 +777,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
         renameOriginalResult = originalFile.renameTo(originalFileBackup)
         if (!renameOriginalResult) {
-            log.warn(
-                ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(
+            log.warn(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(
                     originalFile.absolutePath,
                     originalFileBackup.getName()
-                )
-            )
+                ))
             newFile.delete()
-            throw UnableToRenameFileException(
-                ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(
-                    originalFile.absolutePath,
-                    originalFileBackup.getName()
-                )
-            )
+            error(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(originalFile.absolutePath, originalFileBackup.getName()))
         }
 
         //Rename new Temporary file to the final file
@@ -822,19 +806,9 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 )
             }
 
-            log.warn(
-                ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(
-                    originalFile.absolutePath,
-                    newFile.getName()
-                )
-            )
+            log.warn(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(originalFile.absolutePath, newFile.getName()))
             newFile.delete()
-            throw UnableToRenameFileException(
-                ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(
-                    originalFile.absolutePath,
-                    newFile.getName()
-                )
-            )
+            error(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(originalFile.absolutePath, newFile.getName()))
         } else {
             //Rename was okay so we can now deleteField the backup of the original
             val deleteResult = originalFileBackup.delete()
@@ -920,7 +894,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * Create field and then set within tag itself
      *
      * @param artwork
-     * @throws FieldDataInvalidException
      */
     override fun addField(artwork: Artwork) {
         this.addField(createField(artwork))
@@ -934,13 +907,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * be appended to the existing field, separated by the null character.
      *
      * @param field
-     * @throws FieldDataInvalidException
      */
     override fun addField(field: TagField) {
         if ((field !is AbstractID3v2Frame) &&
             (field !is AggregatedFrame)
         ) {
-            throw FieldDataInvalidException("Field $field is not of type AbstractID3v2Frame or AggregatedFrame")
+            error("Field $field is not of type AbstractID3v2Frame or AggregatedFrame")
         }
 
         val fieldId = field.getIdentifier() ?: error("No id")
@@ -1090,7 +1062,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param values
      * @return
      * @throws KeyNotFoundException
-     * @throws FieldDataInvalidException
      */
     fun doCreateTagField(formatKey: FrameAndSubId, vararg values: String): TagField {
         val value: String = values[0]
@@ -1156,12 +1127,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 ErrorMessage.ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD.getMsg()
             )
         } else {
-            throw FieldDataInvalidException(
-                "Field with key of:" +
-                        formatKey.frameId +
-                        ":does not accept cannot parse data:" +
-                        value
-            )
+            error("Field with key of:${formatKey.frameId}:does not accept cannot parse data:$value")
         }
         return frame
     }
@@ -1677,7 +1643,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param values
      * @return
      * @throws KeyNotFoundException
-     * @throws FieldDataInvalidException
      */
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
         if (genericKey == null) {

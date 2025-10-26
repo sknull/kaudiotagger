@@ -11,12 +11,21 @@
 
 https://github.com/sknull/kaudiotagger/actions/workflows/build.yml[image:https://github.com/sknull/kaudiotagger/actions/workflows/build.yml/badge.svg[Klanglicht Kt]]
 
+== Disclaimer
+
+Over the last decade a lot of people including many forks have worked on this project and have put in their effort and knowledge. I wish to thank them all for their work. It is not my goal to hijack or replace any of that.
+
+The aim of this project was to serve as a fun project to train migrating a more complex java code base to kotlin.
+
+As it turned out I have underestimated how complex jaudio tagger is and how many code had to be ported to just be able to parse an mp3 file.
+
 == Introduction
 
 This started as thin wrapper around link:https://github.com/RouHim/jaudiotagger[jaudiotagger] to make usage in kotlin more convenient.
+
 As an exercise in converting Java to Kotlin code using IntteliJ tools and partially hand crafting
 I now ported part of the jaudio project to kotlin (work in progress).
-After two weeks of work I only implemented what is needed to parse mp3 files.
-There is still a lot of java like code especially error handling and dealing with input streams
-needs improvement.
 
+After two weeks of intense work I only implemented what is needed to parse mp3 files.
+At least we now have a kotlin code base which can do at least a little bit.
+Still a lot of id3 tag frames are currently not implemented but this seems to be mass work which will be done soon to complete at least the mp3 part.

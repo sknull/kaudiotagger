@@ -3,8 +3,6 @@ package de.visualdigits.kaudiotagger.model.audiofile
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3V2Version
 import de.visualdigits.kaudiotagger.model.datatype.types.SupportedFileFormat
-import de.visualdigits.kaudiotagger.model.exceptions.NoReadPermissionsException
-import de.visualdigits.kaudiotagger.model.exceptions.ReadOnlyFileException
 import de.visualdigits.kaudiotagger.model.tag.Tag
 import de.visualdigits.kaudiotagger.model.tag.id3.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.tag.id3.ID3v22Tag
@@ -158,7 +156,6 @@ open class AudioFile {
      * @param file
      * @param readOnly
      * @return
-     * @throws ReadOnlyFileException
      * @throws FileNotFoundException
      */
     protected fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
@@ -169,23 +166,15 @@ open class AudioFile {
         checkFileExists(file)
         if (readOnly) {
             if (!file.canRead()) {
-                log.error("Unable to read file:" + file)
-                //                    log.error(Permissions.displayPermissions(path));
-                throw NoReadPermissionsException(
-                    ErrorMessage.GENERAL_READ_FAILED_DO_NOT_HAVE_PERMISSION_TO_READ_FILE.getMsg(
-                        file
-                    )
-                )
+                log.error("Unable to read file:$file")
+                error(ErrorMessage.GENERAL_READ_FAILED_DO_NOT_HAVE_PERMISSION_TO_READ_FILE.getMsg(file))
             }
             newFile = RandomAccessFile(file, "r")
         } else {
             if (TagOptionSingleton.checkIsWritable && file.canWrite()
             ) {
-                log.error("Unable to write file:" + file)
-                //                    log.error(Permissions.displayPermissions(path));
-                throw ReadOnlyFileException(
-                    ErrorMessage.NO_PERMISSIONS_TO_WRITE_TO_FILE.getMsg(file)
-                )
+                log.error("Unable to write file:$file")
+                error(ErrorMessage.NO_PERMISSIONS_TO_WRITE_TO_FILE.getMsg(file))
             }
             newFile = RandomAccessFile(file, "rw")
         }
@@ -199,13 +188,7 @@ open class AudioFile {
      * @throws FileNotFoundException if file not found
      */
     fun checkFileExists(file: File) {
-        log.debug(
-            "Reading file:" +
-                    "path" +
-                    file.path +
-                    ":abs:" +
-                    file.absolutePath
-        )
+        log.debug("Reading file:path${file.path}:abs:${file.absolutePath}")
         if (!file.exists()) {
             log.error("Unable to find:" + file.path)
             throw FileNotFoundException(
