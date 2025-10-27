@@ -69,7 +69,8 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         var offset = 0
 
         //Go through the ObjectList of the Frame reading the data into the
-        for (`object` in objectList) { //correct dataType.
+        objectList.forEach { o ->
+            //correct dataType.
             log.debug("offset:$offset")
 
             //The read has extended further than the defined frame size (ok to extend upto
@@ -82,7 +83,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
             //Try and load it with data from the Buffer
             //if it fails frame is invalid
             try {
-                `object`.readByteArray(buffer, offset)
+                o.readByteArray(buffer, offset)
             } catch (e: InvalidDataTypeException) {
                 log.warn(
                     "Problem reading datatype within Frame Body:${e.message}"
@@ -90,7 +91,8 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
                 throw e
             }
             //Increment Offset to start of next datatype.
-            offset += `object`.getSize()
+            val size = o.getSize()
+            offset += size
         }
     }
 

@@ -96,6 +96,17 @@ interface Tag {
     fun isEmpty(): Boolean
 
     /**
+     * Retrieve all String values that exist for this generic key
+     *
+     * @param id
+     * @return
+     * @throws KeyNotFoundException
+     */
+    fun getAll(id: GenericFieldKey): List<String>
+
+    fun getFirst(genericKey: GenericFieldKey): String?
+
+    /**
      * Delete any instance of tag fields used to store artwork
      *
      *

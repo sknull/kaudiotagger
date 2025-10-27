@@ -15,7 +15,6 @@ import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 
 open class ID3v1Tag: AbstractID3v1Tag, Tag {
@@ -444,15 +443,9 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return
      */
     open fun getGenreTag(): List<TagField> {
-        if (getFirst(GenericFieldKey.GENRE).isNotEmpty()) {
-            val field = ID3v1TagField(
-                ID3v1FieldKey.GENRE.name,
-                getFirst(GenericFieldKey.GENRE)
-            )
-            return mutableListOf(field)
-        } else {
-            return mutableListOf()
-        }
+        return getFirst(GenericFieldKey.GENRE)
+            ?.let { f -> listOf(ID3v1TagField(ID3v1FieldKey.GENRE.name, f)) }
+            ?:listOf()
     }
 
     fun setGenre(genre: Int) {
@@ -489,15 +482,9 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return
      */
     open fun getTitleTag(): List<TagField> {
-        if (getFirst(GenericFieldKey.TITLE).isNotEmpty()) {
-            val field = ID3v1TagField(
-                ID3v1FieldKey.TITLE.name,
-                getFirst(GenericFieldKey.TITLE)
-            )
-            return mutableListOf(field)
-        } else {
-            return mutableListOf()
-        }
+        return getFirst(GenericFieldKey.TITLE)
+            ?.let { f -> listOf(ID3v1TagField(ID3v1FieldKey.TITLE.name, f)) }
+            ?:listOf()
     }
 
     /**
@@ -520,15 +507,9 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return
      */
     open fun getYearTag(): List<TagField> {
-        if (getFirst(GenericFieldKey.YEAR).length > 0) {
-            val field = ID3v1TagField(
-                ID3v1FieldKey.YEAR.name,
-                getFirst(GenericFieldKey.YEAR)
-            )
-            return mutableListOf(field)
-        } else {
-            return mutableListOf()
-        }
+        return getFirst(GenericFieldKey.YEAR)
+            ?.let { f -> listOf(ID3v1TagField(ID3v1FieldKey.YEAR.name, f)) }
+            ?:listOf()
     }
 
     /**
@@ -541,20 +522,31 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     /**
+     * Maps the generic key to the ogg key and return the list of values for this field as strings
+     *
+     * @param id
+     * @return
+     * @throws KeyNotFoundException
+     */
+    override fun getAll(id: GenericFieldKey): List<String> {
+        return getFirst(id)?.let { f -> listOf(f) }?:listOf()
+    }
+
+    /**
      * Retrieve the first value that exists for this generic key
      *
      * @param genericKey
      * @return
      */
-    open fun getFirst(genericKey: GenericFieldKey): String {
-        when (genericKey) {
-            GenericFieldKey.ARTIST -> return artist
-            GenericFieldKey.ALBUM -> return album
-            GenericFieldKey.TITLE -> return title
-            GenericFieldKey.GENRE -> return getFirstGenre()
-            GenericFieldKey.YEAR -> return year
-            GenericFieldKey.COMMENT -> return comment
-            else -> return ""
+    override fun getFirst(genericKey: GenericFieldKey): String? {
+        return when (genericKey) {
+            GenericFieldKey.ARTIST -> artist
+            GenericFieldKey.ALBUM -> album
+            GenericFieldKey.TITLE -> title
+            GenericFieldKey.GENRE -> getFirstGenre()
+            GenericFieldKey.YEAR -> year
+            GenericFieldKey.COMMENT -> comment
+            else -> ""
         }
     }
 
@@ -612,15 +604,15 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     override fun hasField(genericKey: GenericFieldKey): Boolean {
-        return getFirst(genericKey).isNotEmpty()
+        return getFirst(genericKey)?.isNotEmpty() == true
     }
 
     override fun isEmpty(): Boolean {
-        return !(getFirst(GenericFieldKey.TITLE).isNotEmpty()
+        return !(getFirst(GenericFieldKey.TITLE)?.isNotEmpty() == true
                 || artist.isNotEmpty()
                 || album.isNotEmpty()
-                || getFirst(GenericFieldKey.GENRE).isNotEmpty()
-                || getFirst(GenericFieldKey.YEAR).isNotEmpty()
+                || getFirst(GenericFieldKey.GENRE)?.isNotEmpty() == true
+                || getFirst(GenericFieldKey.YEAR)?.isNotEmpty() == true
                 || comment.isNotEmpty()
                 )
     }

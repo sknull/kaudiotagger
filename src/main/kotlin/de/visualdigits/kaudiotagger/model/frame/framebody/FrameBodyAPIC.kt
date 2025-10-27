@@ -238,6 +238,15 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     /**
+     * Get a description of the image
+     *
+     * @return a description of the image
+     */
+    fun getFormatType(): String? {
+        return getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as String?
+    }
+
+    /**
      * If the description cannot be encoded using current encoder, change the encoder
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {

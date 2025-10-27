@@ -20,8 +20,10 @@ class Artwork(
     var isLinked: Boolean = false,
     var imageUrl: String? = null,
     var pictureType: Int = -1,
-    var width: Int = 0,
-    var height: Int = 0
+    var extension: String? = mimeType?.split("/")?.lastOrNull()?.let { t -> if(t == "jpeg") "jpg" else t },
+    var image: BufferedImage? = binaryData?.let { bd -> ImageIO.read(ImageIO.createImageInputStream(ByteArrayInputStream(bd))) },
+    var width: Int = image?.width?:0,
+    var height: Int = image?.height?:0
 ) {
 
     companion object {
@@ -109,26 +111,7 @@ class Artwork(
         height = coverArt.height
     }
 
-    /**
-     * Should be called when you wish to prime the artwork for saving
-     *
-     * @return
-     */
-    fun setImageFromData(): Boolean {
-        try {
-            val image: BufferedImage = getImage()
-            width = image.width
-            height = image.height
-        } catch (ioe: IOException) {
-            return false
-        }
-        return true
-    }
-
-    fun getImage(): BufferedImage {
-        val iis = ImageIO.createImageInputStream(
-            ByteArrayInputStream(binaryData)
-        )
-        return ImageIO.read(iis)
+    override fun toString(): String {
+        return "Artwork(mimeType=$mimeType, description=$description, imageUrl=$imageUrl, pictureType=$pictureType, extension=$extension, width=$width, height=$height)"
     }
 }

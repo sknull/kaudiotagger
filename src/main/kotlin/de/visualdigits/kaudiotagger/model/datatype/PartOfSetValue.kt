@@ -122,13 +122,13 @@ class PartOfSetValue {
         padNumberLength: PadNumberOption
     ) {
         if (count != null) {
-            if (padNumberLength === PadNumberOption.PAD_ONE_ZERO) {
+            if (padNumberLength == PadNumberOption.PAD_ONE_ZERO) {
                 if (count in 1..<10) {
                     sb.append("0").append(count)
                 } else {
                     sb.append(count)
                 }
-            } else if (padNumberLength === PadNumberOption.PAD_TWO_ZERO) {
+            } else if (padNumberLength == PadNumberOption.PAD_TWO_ZERO) {
                 if (count in 1..<10) {
                     sb.append("00").append(count)
                 } else if (count in 10..<100) {
@@ -136,7 +136,7 @@ class PartOfSetValue {
                 } else {
                     sb.append(count)
                 }
-            } else if (padNumberLength === PadNumberOption.PAD_THREE_ZERO) {
+            } else if (padNumberLength == PadNumberOption.PAD_THREE_ZERO) {
                 if (count in 1..<10) {
                     sb.append("000").append(count)
                 } else if (count in 10..<100) {

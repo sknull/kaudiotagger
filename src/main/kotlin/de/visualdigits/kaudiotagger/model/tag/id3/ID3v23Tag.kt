@@ -14,8 +14,10 @@ import de.visualdigits.kaudiotagger.model.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.field.TagField
+import de.visualdigits.kaudiotagger.model.field.TagTextField
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyIPLS
+import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTCON
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTDAT
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTDRC
 import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTIME
@@ -772,12 +774,32 @@ class ID3v23Tag : AbstractID3v2Tag {
         return ID3v23Frame(id)
     }
 
-    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
-        val id3v23FieldKey =
-            ID3v23Frames.fromFieldKey(genericKey)
-        if (id3v23FieldKey == null) {
-            throw KeyNotFoundException(genericKey.name)
+    /**
+     * Overridden because GENRE can need converting of data to ID3v23 format and
+     * YEAR key is specially processed by getFields() for ID3
+     *
+     * @param id
+     * @return
+     * @throws KeyNotFoundException
+     */
+    override fun getAll(id: GenericFieldKey): List<String> {
+        return if (id === GenericFieldKey.GENRE) {
+            getFields(id).firstOrNull()?.let { f ->
+                ((f as AbstractID3v2Frame).frameBody as FrameBodyTCON)
+                    .getValues()
+                    .mapNotNull { next -> FrameBodyTCON.convertID3v22GenreToGeneric(next) }
+            }?:listOf()
+        } else if (id === GenericFieldKey.YEAR) {
+            getFields(id).mapNotNull { next ->
+                (next as? TagTextField)?.getContent()
+            }
+        } else {
+            super.getAll(id)
         }
+    }
+
+    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
+        val id3v23FieldKey = ID3v23Frames.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
         return FrameAndSubId(
             genericKey,
             id3v23FieldKey.id,

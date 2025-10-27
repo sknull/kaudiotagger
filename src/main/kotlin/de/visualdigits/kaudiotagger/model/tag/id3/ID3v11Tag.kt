@@ -2,7 +2,6 @@ package de.visualdigits.kaudiotagger.model.tag.id3
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.exceptions.KeyNotFoundException
@@ -24,7 +23,6 @@ import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
-import java.nio.channels.FileChannel
 
 class ID3v11Tag: ID3v1Tag {
     
@@ -365,98 +363,6 @@ class ID3v11Tag: ID3v1Tag {
             return listOf(field)
         } else {
             return ArrayList<TagField>()
-        }
-    }
-
-    /**
-     * Get Genre field
-     *
-     *
-     * Only a single genre is available in ID3v1
-     *
-     * @return
-     */
-    override fun getGenreTag(): List<TagField> {
-        if (getFirst(GenericFieldKey.GENRE).length > 0) {
-            val field: ID3v1TagField = ID3v1TagField(
-                ID3v1FieldKey.GENRE.name,
-                getFirst(GenericFieldKey.GENRE)
-            )
-            return listOf(field)
-        } else {
-            return ArrayList<TagField>()
-        }
-    }
-
-    /**
-     * Sets the genreID,
-     *
-     *
-     * ID3v1 only supports genres defined in a predefined list
-     * so if unable to find value in list set 255, which seems to be the value
-     * winamp uses for undefined.
-     *
-     * @param genreVal
-     */
-    override fun setGenreVal(genreVal: String) {
-        val genreID = GenreTypes.fromName(genreVal)?.id
-        if (genreID != null) {
-            setGenre(genreID)
-        } else {
-            setGenre(GENRE_UNDEFINED)
-        }
-    }
-
-    /**
-     * Get title field
-     *
-     *
-     * Only a single title is available in ID3v1
-     *
-     * @return
-     */
-    override fun getTitleTag(): List<TagField> {
-        if (getFirst(GenericFieldKey.TITLE).isNotEmpty()) {
-            val field: ID3v1TagField = ID3v1TagField(
-                ID3v1FieldKey.TITLE.name,
-                getFirst(GenericFieldKey.TITLE)
-            )
-            return listOf(field)
-        } else {
-            return ArrayList<TagField>()
-        }
-    }
-
-    /**
-     * Get year field
-     *
-     *
-     * Only a single year is available in ID3v1
-     *
-     * @return
-     */
-    override fun getYearTag(): List<TagField> {
-        if (getFirst(GenericFieldKey.YEAR).isNotEmpty()) {
-            val field: ID3v1TagField = ID3v1TagField(
-                ID3v1FieldKey.YEAR.name,
-                getFirst(GenericFieldKey.YEAR)
-            )
-            return listOf(field)
-        } else {
-            return ArrayList<TagField>()
-        }
-    }
-
-    override fun getFirst(genericKey: GenericFieldKey): String {
-        when (genericKey) {
-            GenericFieldKey.ARTIST -> return getArtist()
-            GenericFieldKey.ALBUM -> return getAlbum()
-            GenericFieldKey.TITLE -> return getTitle()
-            GenericFieldKey.GENRE -> return getFirstGenre()
-            GenericFieldKey.YEAR -> return getYear()
-            GenericFieldKey.TRACK -> return getFirstTrack()
-            GenericFieldKey.COMMENT -> return getComment()
-            else -> return ""
         }
     }
 

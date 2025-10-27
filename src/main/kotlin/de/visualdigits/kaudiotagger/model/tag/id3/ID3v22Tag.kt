@@ -521,6 +521,24 @@ class ID3v22Tag : AbstractID3v2Tag {
 
         return headerBuffer
     }
+    /**
+     * Maps the generic key to the id3 key and return the list of values for this field as strings
+     *
+     * @param id
+     * @return
+     * @throws KeyNotFoundException
+     */
+    override fun getAll(id: GenericFieldKey): List<String> {
+        return if (id === GenericFieldKey.GENRE) {
+            getFields(id).firstOrNull()?.let { f ->
+                ((f as AbstractID3v2Frame).frameBody as FrameBodyTCON)
+                    .getValues()
+                    .mapNotNull { next -> FrameBodyTCON.convertID3v22GenreToGeneric(next) }
+            }?:listOf()
+        } else {
+            super.getAll(id)
+        }
+    }
 
     override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
         val id3v22FieldKey = ID3v22Frames.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
@@ -554,6 +572,7 @@ class ID3v22Tag : AbstractID3v2Tag {
             return super.createField(genericKey, *values)
         }
     }
+
 
     /**
      * {@inheritDoc}

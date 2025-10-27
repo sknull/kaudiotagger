@@ -5,7 +5,6 @@ import de.visualdigits.kaudiotagger.model.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.FileSystemMessage
 import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.datatype.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.datatype.types.Languages
 import de.visualdigits.kaudiotagger.model.datatype.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.StandardIPLSKey
@@ -1136,13 +1135,55 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         genericKey: GenericFieldKey
     ): FrameAndSubId
 
+    //TODO
+    /**
+     * Maps the generic key to the id3 key and return the list of values for this field as strings
+     *
+     * @param id
+     * @return
+     * @throws KeyNotFoundException
+     */
+    override fun getAll(id: GenericFieldKey): List<String> {
+        //Special case here because the generic key to frameid/subid mapping is identical for trackno versus tracktotal
+        //and discno versus disctotal so we have to handle here, also want to ignore index parameter.
+        val fields = getFields(id)
+        val values = mutableListOf<String>()
+        if (ID3NumberTotalFields.isNumber(id)) {
+            if (fields.isNotEmpty()) {
+                val frame = fields.get(0) as AbstractID3v2Frame
+                values.add(
+                    (frame.frameBody as AbstractFrameBodyNumberTotal).getNumberAsText()!!
+                )
+            }
+            return values
+        } else if (ID3NumberTotalFields.isTotal(id)) {
+            if (fields.isNotEmpty()) {
+                val frame = fields.get(0) as AbstractID3v2Frame
+                values.add(
+                    (frame.frameBody as AbstractFrameBodyNumberTotal).getTotalAsText()
+                )
+            }
+            return values
+        } else if (id === GenericFieldKey.RATING) {
+            if (fields.isNotEmpty()) {
+                val frame = fields.get(0) as AbstractID3v2Frame
+                values.add(
+                    java.lang.String.valueOf((frame.frameBody as FrameBodyPOPM).getRating())
+                )
+            }
+            return values
+        } else {
+            return this.doGetValues(getFrameAndSubIdFromGenericKey(id))
+        }
+    }
+
     /**
      * Retrieve the first value that exists for this generic key
      *
      * @param genericKey
      * @return
      */
-    open fun getFirst(genericKey: GenericFieldKey): String? {
+    override fun getFirst(genericKey: GenericFieldKey): String? {
         return getValue(genericKey, 0)
     }
 
@@ -1200,70 +1241,23 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * confusing because getValues() would return two values.
      *
      * @param genericKey
-     * @return
-     * @throws KeyNotFoundException
+     *
+     * @return List<TagField>
      */
     open fun getFields(genericKey: GenericFieldKey): List<TagField> {
-        val formatKey = getFrameAndSubIdFromGenericKey(genericKey)
-        //Get list of frames that this uses, as we are going to remove entries we don't want take a copy
-        val filteredList = getFields(formatKey.frameId).mapNotNull { tagField ->
-            val frameBody = (tagField as AbstractID3v2Frame).frameBody
-            val subId = formatKey.subId
-            when (frameBody) {
-                is FrameBodyTXXX if frameBody.getDescription() == subId -> {
-                    listOf(tagField)
-                }
-
-                is FrameBodyWXXX if frameBody.getDescription() == subId -> {
-                    listOf(tagField)
-                }
-
-                is FrameBodyCOMM if frameBody.getDescription() == subId -> {
-                    listOf(tagField)
-                }
-
-                is FrameBodyUFID if frameBody.getOwner() == subId -> {
-                    listOf(tagField)
-                }
-
-                is FrameBodyIPLS -> {
-                    frameBody.getPairing()?.mapping?.mapNotNull { entry ->
-                        if (entry.first == subId) tagField else null
-                    }
-                }
-
-                is FrameBodyTIPL -> {
-                    frameBody.getPairing()?.mapping?.mapNotNull { entry ->
-                        if (entry.first == subId) tagField else null
-                    }
-                }
-
-                else -> {
-                    null
-                }
-            }
-        }.flatten()
-        return filteredList
+        return getFields(getFrameAndSubIdFromGenericKey(genericKey).frameId)
     }
 
     /**
      * Retrieve the values that exists for this id3 frame id
      */
-    open fun getFields(id: String): MutableList<TagField> {
-        val o = getFrame(id)
-        if (o == null) {
-            return ArrayList<TagField>()
-        } else if (o is MutableList<*>) {
-            //TODO should return copy
-            return o as MutableList<TagField>
-        } else if (o is AbstractID3v2Frame) {
-            val list: MutableList<TagField> = ArrayList<TagField>()
-            list.add(o as TagField)
-            return list
-        } else {
-            throw RuntimeException(
-                "Found entry in frameMap that was not a frame or a list:" + o
-            )
+    @Suppress("UNCHECKED_CAST")
+    open fun getFields(id: String): List<TagField> {
+        return when (val o = getFrame(id)) {
+            null -> listOf()
+            is List<*> -> (o as List<TagField>).toList()
+            is AbstractID3v2Frame -> listOf(o as TagField)
+            else -> throw RuntimeException("Found entry in frameMap that was not a frame or a list:$o")
         }
     }
 
@@ -1286,13 +1280,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return
      * @throws KeyNotFoundException
      */
-    fun doGetValues(formatKey: FrameAndSubId): MutableList<String?> {
-        val values: MutableList<String?> = ArrayList<String?>()
-
+    fun doGetValues(formatKey: FrameAndSubId): List<String> {
+        val values = mutableListOf<String>()
         if (formatKey.subId != null) {
             //Get list of frames that this uses
-            val list = getFields(formatKey.frameId)
-            list.forEach { field ->
+            getFields(formatKey.frameId).forEach { field ->
                 val next = (field as AbstractID3v2Frame).frameBody
                 if (next is FrameBodyTXXX) {
                     if (next.getDescription() == formatKey.subId
@@ -1312,9 +1304,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 } else if (next is FrameBodyUFID) {
                     if (next.getOwner() == formatKey.subId) {
                         if (next.getUniqueIdentifier() != null) {
-                            values.add(
-                                String(next.getUniqueIdentifier() ?: byteArrayOf())
-                            )
+                            values.add(String(next.getUniqueIdentifier() ?: byteArrayOf()))
                         }
                     }
                 } else if (next is AbstractFrameBodyPairs) {
@@ -1324,17 +1314,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         }
                     }
                 } else {
-                    throw RuntimeException(
-                        "Need to implement getFields(GenericFieldKey genericKey) for:" +
-                                next?.javaClass
-                    )
+                    error("Need to implement getFields(GenericFieldKey genericKey) for:${next?.javaClass}")
                 }
             }
         } else if ((formatKey.genericKey == GenericFieldKey.PERFORMER) ||
             (formatKey.genericKey == GenericFieldKey.INVOLVED_PERSON)
         ) {
-            val list = getFields(formatKey.frameId)
-            list.forEach { field ->
+            getFields(formatKey.frameId).forEach { field ->
                 val next = (field as AbstractID3v2Frame).frameBody
                 if (next is AbstractFrameBodyPairs) {
                     next.getPairing()?.mapping?.forEach { entry ->
@@ -1351,15 +1337,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 }
             }
         } else {
-            val list = getFields(formatKey.frameId)
-            list.forEach { next ->
+            getFields(formatKey.frameId).forEach { next ->
                 val frame = next as AbstractID3v2Frame?
                 if (frame != null) {
                     val fb = frame.frameBody
                     if (fb is AbstractFrameBodyTextInfo) {
                         values.addAll(fb.getValues())
                     } else {
-                        values.add(getTextValueForFrame(frame))
+                        getTextValueForFrame(frame)?.also { v -> values.add(v) }
                     }
                 }
             }
@@ -1682,16 +1667,25 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     }
 
     override fun getArtworkList(): List<Artwork> {
-        return getFields(GenericFieldKey.COVER_ART).map { next ->
-            val coverArt = (next as AbstractID3v2Frame).frameBody as FrameBodyPIC
-            val isImageUrl = coverArt.isImageUrl()
-            Artwork(
-                binaryData = if (!isImageUrl) coverArt.getImageData() else null,
-                mimeType = ImageFormats.mimeType(coverArt.getFormatType()),
-                isLinked = isImageUrl,
-                imageUrl = if (isImageUrl) coverArt.getImageUrl() else null,
-                pictureType = coverArt.getPictureType(),
-            )
+        return getFields(GenericFieldKey.COVER_ART).mapNotNull { next ->
+            when (val coverArt = (next as AbstractID3v2Frame).frameBody) {
+                is FrameBodyPIC -> Artwork(
+                    binaryData = coverArt.getImageData(),
+                    mimeType = coverArt.getMimeType(),
+                    isLinked = coverArt.isImageUrl(),
+                    imageUrl = coverArt.getImageUrl(),
+                    pictureType = coverArt.getPictureType(),
+                )
+                is FrameBodyAPIC -> Artwork(
+                    binaryData = coverArt.getImageData(),
+                    mimeType = coverArt.getMimeType(),
+                    isLinked = coverArt.isImageUrl(),
+                    imageUrl = coverArt.getImageUrl(),
+                    pictureType = coverArt.getPictureType(),
+                )
+                else -> null
+            }
+
         }
     }
 

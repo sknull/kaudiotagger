@@ -5,6 +5,7 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
+import java.nio.charset.Charset
 import java.nio.charset.CharsetDecoder
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
@@ -52,9 +53,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         if (offset >= arr.size) {
-            throw InvalidDataTypeException(
-                "Unable to find null terminated string"
-            )
+            throw InvalidDataTypeException("Unable to find null terminated string")
         }
         val bufferSize: Int
 
@@ -62,7 +61,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
         var size: Int
 
         //Get the Specified Decoder
-        val charset = getTextEncodingCharSet()?:error("No charset found")
+        val charset: Charset = getTextEncodingCharSet()!!
 
         //We only want to load up to null terminator, data after this is part of different
         //field and it may not be possible to decode it so do the check before we do
@@ -72,10 +71,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
 
         //Latin-1 and UTF-8 strings are terminated by a single-byte null,
         //while UTF-16 and its variants need two bytes for the null terminator.
-        val nullIsOneByte =
-            StandardCharsets.ISO_8859_1 == charset ||
-                    StandardCharsets.UTF_8 == charset
-
+        val nullIsOneByte = StandardCharsets.ISO_8859_1 == charset || StandardCharsets.UTF_8 == charset
         var isNullTerminatorFound = false
         while (buffer.hasRemaining()) {
             var nextByte = buffer.get()
@@ -85,7 +81,6 @@ open class TextEncodedStringNullTerminated : AbstractString {
                     buffer.reset()
                     endPosition = buffer.position() - 1
                     log.debug("Null terminator found starting at:$endPosition")
-
                     isNullTerminatorFound = true
                     break
                 } else {
@@ -107,11 +102,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
                         buffer.mark()
                         buffer.reset()
                         endPosition = buffer.position() - 1
-                        log.warn(
-                            "UTF16:Should be two null terminator marks but only found one starting at:" +
-                                    endPosition
-                        )
-
+                        log.warn("UTF16:Should be two null terminator marks but only found one starting at:$endPosition")
                         isNullTerminatorFound = true
                         break
                     }
@@ -127,12 +118,10 @@ open class TextEncodedStringNullTerminated : AbstractString {
         }
 
         if (!isNullTerminatorFound) {
-            throw InvalidDataTypeException(
-                "Unable to find null terminated string"
-            )
+            throw InvalidDataTypeException("Unable to find null terminated string")
         }
 
-        log.debug("End Position is:" + endPosition + "Offset:" + offset)
+        log.debug("End Position is:${endPosition}Offset:$offset")
 
         //Set Size so offset is ready for next field (includes the null terminator)
         size = endPosition - offset
@@ -140,7 +129,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
         if (!nullIsOneByte) {
             size++
         }
-        setValue(size)
+        setSize(size)
 
         //Decode buffer if runs into problems should throw exception which we
         //catch and then set value to empty string. (We don't read the null terminator
@@ -154,12 +143,12 @@ open class TextEncodedStringNullTerminated : AbstractString {
             val inBuffer = ByteBuffer.wrap(arr, offset, bufferSize).slice()
             val outBuffer = CharBuffer.allocate(bufferSize)
 
-            val decoder: CharsetDecoder? = getCorrectDecoder(inBuffer)
-            val coderResult = decoder?.decode(inBuffer, outBuffer, true)
-            if (coderResult?.isError == true) {
+            val decoder: CharsetDecoder = getCorrectDecoder(inBuffer!!)!!
+            val coderResult = decoder.decode(inBuffer, outBuffer, true)
+            if (coderResult.isError) {
                 log.warn("Problem decoding text encoded null terminated string:$coderResult")
             }
-            decoder?.flush(outBuffer)
+            decoder.flush(outBuffer)
             outBuffer.flip()
             setValue(outBuffer.toString())
         }
