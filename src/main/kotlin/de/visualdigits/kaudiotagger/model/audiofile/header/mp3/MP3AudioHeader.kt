@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.model.audiofile.header.mp3
 import de.visualdigits.kaudiotagger.model.audiofile.frame.VbriFrame
 import de.visualdigits.kaudiotagger.model.audiofile.frame.XingFrame
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
-import de.visualdigits.kaudiotagger.model.exceptions.InvalidAudioFrameException
+import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import org.slf4j.LoggerFactory
 import java.io.EOFException

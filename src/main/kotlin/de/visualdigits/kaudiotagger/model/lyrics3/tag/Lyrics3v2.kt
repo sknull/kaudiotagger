@@ -1,0 +1,360 @@
+package de.visualdigits.kaudiotagger.model.lyrics3.tag
+
+import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
+import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
+import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
+import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
+import de.visualdigits.kaudiotagger.model.lyrics3.Lyrics3v2Field
+import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
+import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyIND
+import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyLYR
+import de.visualdigits.kaudiotagger.util.TagOptionSingleton
+import java.io.RandomAccessFile
+import java.nio.ByteBuffer
+
+class Lyrics3v2 : AbstractLyrics3 {
+
+    var fieldMap = HashMap<String?, Lyrics3v2Field>()
+
+    /**
+     * Creates a new Lyrics3v2 datatype.
+     */
+    constructor()
+
+    constructor(copyObject: Lyrics3v2) : super(copyObject) {
+        copyObject.fieldMap.keys.forEach { key ->
+            val newObject = Lyrics3v2Field(copyObject.fieldMap.get(key)?:error("No field with id '$key'"))
+            fieldMap[key] = newObject
+        }
+    }
+
+    /**
+     * Creates a new Lyrics3v2 datatype.
+     *
+     * @param mp3tag
+     * @throws UnsupportedOperationException
+     */
+    constructor(mp3tag: AbstractTag) {
+        if (mp3tag is Lyrics3v2) {
+            throw UnsupportedOperationException(
+                "Copy Constructor not called. Please type cast the argument"
+            )
+        } else if (mp3tag is Lyrics3v1) {
+            val newField = Lyrics3v2Field(
+                FieldFrameBodyLYR(mp3tag.lyric)
+            )
+            fieldMap[newField.getIdentifier()] = newField
+        } else {
+            var newField: Lyrics3v2Field?
+
+            ID3v24Tag(mp3tag).frameMap.values.forEach { frame ->
+                try {
+                    newField = Lyrics3v2Field(frame as AbstractID3v2Frame)
+                    fieldMap[newField.getIdentifier()] = newField
+                } catch (ex: TagException) {
+                    //invalid frame to createField lyrics3 field. ignore and keep going
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a new Lyrics3v2 datatype.
+     *
+     * @param byteBuffer
+     */
+    constructor(byteBuffer: ByteBuffer) {
+        try {
+            this.read(byteBuffer)
+        } catch (e: TagException) {
+            log.error("Something went wrong", e)
+        }
+    }
+
+    override fun read(byteBuffer: ByteBuffer?) {
+        if (byteBuffer == null) {
+            return
+        }
+        val filePointer: Long
+        val lyricSize: Int
+
+        if (seek(byteBuffer)) {
+            lyricSize = seekSize(byteBuffer)
+        } else {
+            throw TagNotFoundException("Lyrics3v2.00 Tag Not Found")
+        }
+
+        // reset file pointer to the beginning of the tag;
+        seek(byteBuffer)
+        filePointer = byteBuffer.position().toLong()
+
+        fieldMap = HashMap<String?, Lyrics3v2Field>()
+
+        var lyric: Lyrics3v2Field?
+
+        // read each of the fields
+        while ((byteBuffer.position()) < (lyricSize - 11)) {
+            try {
+                lyric = Lyrics3v2Field(byteBuffer)
+                setField(lyric)
+            } catch (ex: InvalidTagException) {
+                // keep reading until we're done
+            }
+        }
+    }
+
+    /**
+     * @param field
+     */
+    fun setField(field: Lyrics3v2Field) {
+        fieldMap[field.getIdentifier()] = field
+    }
+
+    /**
+     * TODO implement
+     *
+     * @param byteBuffer
+     * @return
+     * @throws IOException
+     */
+    override fun seek(byteBuffer: ByteBuffer): Boolean {
+        return false
+    }
+
+    /**
+     * TODO
+     *
+     * @param byteBuffer
+     * @return
+     */
+    private fun seekSize(byteBuffer: ByteBuffer): Int {
+        return -1
+    }
+
+    /**
+     * Gets the value of the frame identified by identifier
+     *
+     * @param identifier The three letter code
+     * @return The value associated with the identifier
+     */
+    fun getField(identifier: String?): Lyrics3v2Field? {
+        return fieldMap.get(identifier)
+    }
+
+    /**
+     * @return
+     */
+    fun getFieldCount(): Int {
+        return fieldMap.size
+    }
+
+    /**
+     * @param obj
+     * @return
+     */
+    override fun equals(obj: Any?): Boolean {
+        if (obj !is Lyrics3v2) {
+            return false
+        }
+
+        return this.fieldMap == obj.fieldMap && super.equals(obj)
+    }
+
+    /**
+     * @param identifier
+     * @return
+     */
+    fun hasField(identifier: String?): Boolean {
+        return fieldMap.containsKey(identifier)
+    }
+
+    /**
+     * @param identifier
+     */
+    fun removeField(identifier: String?) {
+        fieldMap.remove(identifier)
+    }
+
+    /**
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    fun seek(file: RandomAccessFile): Boolean {
+        val buffer = ByteArray(11)
+        var lyricEnd: String?
+        var filePointer: Long
+
+        // check right before the ID3 1.0 tag for the lyrics tag
+        file.seek(file.length() - 128 - 9)
+        file.read(buffer, 0, 9)
+        lyricEnd = String(buffer, 0, 9)
+
+        if (lyricEnd == "LYRICS200") {
+            filePointer = file.filePointer
+        } else {
+            // check the end of the file for a lyrics tag incase an ID3
+            // tag wasn't placed after it.
+            file.seek(file.length() - 9)
+            file.read(buffer, 0, 9)
+            lyricEnd = String(buffer, 0, 9)
+
+            if (lyricEnd == "LYRICS200") {
+                filePointer = file.filePointer
+            } else {
+                return false
+            }
+        }
+
+        // read the 6 bytes for the length of the tag
+        filePointer -= (9 + 6).toLong()
+        file.seek(filePointer)
+        file.read(buffer, 0, 6)
+
+        val lyricSize: Long = String(buffer, 0, 6).toInt().toLong()
+
+        // read the lyrics begin tag if it exists.
+        file.seek(filePointer - lyricSize)
+        file.read(buffer, 0, 11)
+        val lyricStart = String(buffer, 0, 11)
+
+        return lyricStart == "LYRICSBEGIN"
+    }
+
+    /**
+     * @return
+     */
+    override fun toString(): String {
+        val iterator = fieldMap.values.iterator()
+        var field: Lyrics3v2Field
+        var str = getIdentifier() + " " + this.getSize() + "\n"
+
+        while (iterator.hasNext()) {
+            field = iterator.next()
+            str += (field.toString() + "\n")
+        }
+
+        return str
+    }
+
+    /**
+     * @return
+     */
+    override fun getIdentifier(): String {
+        return "Lyrics3v2.00"
+    }
+
+    /**
+     * @return
+     */
+    override fun getSize(): Int {
+        var size = 0
+        val iterator = fieldMap.values.iterator()
+        var field: Lyrics3v2Field
+
+        while (iterator.hasNext()) {
+            field = iterator.next()
+            size += field.getSize()
+        }
+
+        // include LYRICSBEGIN, but not 6 char size or LYRICSEND
+        return 11 + size
+    }
+
+    /**
+     * @param file
+     * @throws IOException
+     */
+    override fun write(file: RandomAccessFile) {
+        var offset = 0
+
+        val size: Long
+        val buffer = ByteArray(6 + 9)
+        var field: Lyrics3v2Field?
+        ID3v1Tag()
+
+        delete(file)
+        file.seek(file.length())
+
+        val filePointer: Long = file.filePointer
+
+        var str = "LYRICSBEGIN"
+
+        for (i in 0..<str.length) {
+            buffer[i] = str.get(i).code.toByte()
+        }
+
+        file.write(buffer, 0, str.length)
+
+        // IND needs to go first. lets createField/update it and write it first.
+        updateField("IND")
+        field = fieldMap.get("IND")
+        field?.write(file)
+
+        val iterator = fieldMap.values.iterator()
+
+        while (iterator.hasNext()) {
+            field = iterator.next()
+
+            val id = field.getIdentifier()
+            val save = TagOptionSingleton.lyrics3SaveFieldMap[id]?:false
+
+            if ((id != "IND") && save) {
+                field.write(file)
+            }
+        }
+
+        size = file.filePointer - filePointer
+
+        str = size.toString()
+
+        for (i in 0..<(6 - str.length)) {
+            buffer[i] = '0'.code.toByte()
+        }
+
+        offset += (6 - str.length)
+
+        for (i in 0..<str.length) {
+            buffer[i + offset] = str.get(i).code.toByte()
+        }
+
+        offset += str.length
+
+        str = "LYRICS200"
+
+        for (i in 0..<str.length) {
+            buffer[i + offset] = str.get(i).code.toByte()
+        }
+
+        offset += str.length
+
+        file.write(buffer, 0, offset)
+
+    }
+
+    /**
+     * @param identifier
+     */
+    fun updateField(identifier: String) {
+        var lyrField: Lyrics3v2Field?
+
+        if (identifier == "IND") {
+            val lyricsPresent = fieldMap.containsKey("LYR")
+            var timeStampPresent = false
+
+            if (lyricsPresent) {
+                lyrField = fieldMap.get("LYR")
+
+                val lyrBody = lyrField?.frameBody as? FieldFrameBodyLYR
+                timeStampPresent = lyrBody?.hasTimeStamp() == true
+            }
+
+            lyrField = Lyrics3v2Field(
+                FieldFrameBodyIND(lyricsPresent, timeStampPresent)
+            )
+            setField(lyrField)
+        }
+    }
+}

@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.audiofile.header.mp3
 
-import de.visualdigits.kaudiotagger.model.exceptions.InvalidAudioFrameException
+import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
 import de.visualdigits.kaudiotagger.util.AbstractTagDisplayFormatter
 import de.visualdigits.kaudiotagger.util.FileConstants
 import java.nio.ByteBuffer

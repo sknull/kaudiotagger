@@ -1,11 +1,11 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.datatype.types.ID3V2Version
-import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.tag.id3.AbstractID3v2Tag
-import de.visualdigits.kaudiotagger.model.tag.id3.ID3v22Tag
-import de.visualdigits.kaudiotagger.model.tag.id3.ID3v23Tag
-import de.visualdigits.kaudiotagger.model.tag.id3.ID3v24Tag
+import de.visualdigits.kaudiotagger.model.common.types.ID3V2Version
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 
 object TagOptionSingleton {
 

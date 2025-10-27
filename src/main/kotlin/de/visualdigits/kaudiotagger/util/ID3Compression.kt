@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameException
+import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
