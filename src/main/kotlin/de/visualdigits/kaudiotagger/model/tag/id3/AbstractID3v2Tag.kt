@@ -15,19 +15,19 @@ import de.visualdigits.kaudiotagger.model.frame.TyerTdatAggregatedFrame
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractFrameBodyNumberTotal
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractFrameBodyPairs
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractFrameBodyTextInfo
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyAPIC
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyCOMM
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyEncrypted
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyIPLS
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyPIC
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyPOPM
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTIPL
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTMCL
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTXXX
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUFID
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUSLT
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyWOAR
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyWXXX
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyAPIC
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyCOMM
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyEncrypted
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyIPLS
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyPIC
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyPOPM
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTIPL
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTMCL
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTXXX
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyUFID
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyUSLT
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyWOAR
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyWXXX
 import de.visualdigits.kaudiotagger.model.frame.id3.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.tag.Tag
 import de.visualdigits.kaudiotagger.model.tag.images.Artwork
@@ -1151,9 +1151,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         if (ID3NumberTotalFields.isNumber(id)) {
             if (fields.isNotEmpty()) {
                 val frame = fields.get(0) as AbstractID3v2Frame
-                values.add(
-                    (frame.frameBody as AbstractFrameBodyNumberTotal).getNumberAsText()!!
-                )
+                (frame.frameBody as AbstractFrameBodyNumberTotal).getNumberAsText()?.also { v -> values.add(v) }
             }
             return values
         } else if (ID3NumberTotalFields.isTotal(id)) {

@@ -25,7 +25,7 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
      * @throws IllegalArgumentException
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody,
         size: Int
     ): super(identifier, frameBody, size) {

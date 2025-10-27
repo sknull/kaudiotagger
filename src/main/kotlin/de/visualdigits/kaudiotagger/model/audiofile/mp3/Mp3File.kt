@@ -861,14 +861,14 @@ class MP3File : AudioFile {
      *
      * @return
      */
-    override fun getTagAndConvertOrCreateAndSetDefault(): Tag {
+    override fun getTagAndConvertOrCreateAndSetDefault(): Tag? {
         setTag(
             convertID3Tag(
                 getTagOrCreateDefault() as AbstractID3v2Tag?,
                 TagOptionSingleton.id3v2Version
             )
         )
-        return getTag()!!
+        return getTag()
     }
 
     /**

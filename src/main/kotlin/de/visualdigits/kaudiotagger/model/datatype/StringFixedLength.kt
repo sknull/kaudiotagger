@@ -20,7 +20,7 @@ open class StringFixedLength: AbstractString {
      * @throws IllegalArgumentException
      */
     constructor(
-             identifier: String,
+             identifier: String?,
             frameBody: AbstractTagFrameBody,
             size: Int
     ): super(identifier, frameBody) {
@@ -74,7 +74,7 @@ open class StringFixedLength: AbstractString {
      * @return the encoding of the frame body this datatype belongs to
      */
     override fun getTextEncodingCharSet(): Charset? {
-        val textEncoding = this.frameBody?.getTextEncoding()
+        val textEncoding = this.getBody()?.getTextEncoding()
         val charset = TextEncoding.fromId(textEncoding)?.charSet
         log.debug(
             "text encoding:$textEncoding charset:${charset?.name()}"

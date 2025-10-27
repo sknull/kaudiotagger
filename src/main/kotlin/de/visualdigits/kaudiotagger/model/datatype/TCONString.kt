@@ -27,7 +27,7 @@ class TCONString : TextEncodedStringSizeTerminated {
      * @param identifier identifies the frame type
      * @param frameBody
      */
-    constructor(identifier: String, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
     /**
      * Copy constructor

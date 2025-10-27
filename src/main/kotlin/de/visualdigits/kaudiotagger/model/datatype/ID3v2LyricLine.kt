@@ -18,7 +18,7 @@ class ID3v2LyricLine : AbstractDataType {
      */
     var timeStamp: Long = 0
 
-    constructor(identifier: String, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
     constructor(copy: ID3v2LyricLine) : super(copy) {
         this.text = copy.text

@@ -4,13 +4,14 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.datatype.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameException
+import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidTagException
-import de.visualdigits.kaudiotagger.model.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.field.TagField
 import de.visualdigits.kaudiotagger.model.field.TagTextField
 import de.visualdigits.kaudiotagger.model.frame.AbstractTagFrame
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyEncrypted
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUnsupported
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyEncrypted
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyUnsupported
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.StatusFlags
@@ -81,7 +82,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         // Use reflection to map id to frame body, which makes things much easier
         // to keep things up to date.
         try {
-            val c = Class.forName("de.visualdigits.kaudiotagger.model.frame.framebody.FrameBody$identifier") as Class<AbstractID3v2FrameBody>
+            val c = Class.forName("${AbstractID3v2FrameBody.FRAME_BODY_PACKAGE}.FrameBody$identifier") as Class<AbstractID3v2FrameBody>
             frameBody = c.newInstance()
         } catch (cnfe: ClassNotFoundException) {
             log.error(cnfe.message)
@@ -128,7 +129,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         }
 
         if (isPadding(buffer)) {
-            throw PaddingException("only padding found")
+            throw InvalidFrameIdentifierException("only padding found")
         }
 
         if ((getFrameHeaderSize() - getFrameIdSize()) > byteBuffer.remaining()) {
@@ -213,37 +214,26 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
          */
         val frameBody: AbstractID3v2FrameBody
         try {
-            val c = Class.forName("de.visualdigits.kaudiotagger.model.frame.framebody.FrameBody$identifier") as Class<AbstractID3v2FrameBody>
+            val c = Class.forName("${AbstractID3v2FrameBody.FRAME_BODY_PACKAGE}.FrameBody$identifier") as Class<AbstractID3v2FrameBody>
             val constructorParameterTypes = arrayOf<Class<*>>(body.javaClass)
             val constructorParameterValues = arrayOf<Any?>(body)
-            val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(
-                *constructorParameterTypes
-            )
+            val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(*constructorParameterTypes)
             frameBody = (construct.newInstance(*constructorParameterValues))
         } catch (cex: ClassNotFoundException) {
-            log.debug(
-                "Identifier not recognised:$identifier unable to create framebody"
-            )
-            throw InvalidFrameException(
-                "FrameBody$identifier does not exist"
-            )
+            log.debug("Identifier not recognised:$identifier unable to create framebody")
+            throw InvalidFrameException("FrameBody$identifier does not exist")
         } catch (sme: NoSuchMethodException) { //If suitable constructor does not exist
             log.error("No such method:" + sme.message, sme)
-            throw InvalidFrameException(
-                "FrameBody$identifier does not have a constructor that takes:${body.javaClass.getName()}"
-            )
+            throw InvalidFrameException("FrameBody$identifier does not have a constructor that takes:${body.javaClass.getName()}")
         } catch (ite: InvocationTargetException) {
             log.error("An error occurred within abstractID3v2FrameBody")
-            log.error(
-                "Invocation target exception:${ite.cause?.message}",
-                ite.cause
-            )
+            log.error("Invocation target exception", ite.cause)
             throw InvalidFrameException(ite.cause?.message)
         } catch (ie: InstantiationException) { //Instantiate Interface/Abstract should not happen
-            log.error("Instantiation exception:${ie.message}", ie)
+            log.error("Instantiation exception", ie)
             throw RuntimeException(ie.message)
         } catch (iae: IllegalAccessException) { //Private Constructor shouild not happen
-            log.error("Illegal access exception :${iae.message}", iae)
+            log.error("Illegal access exception ", iae)
             throw RuntimeException(iae.message)
         }
 
@@ -327,7 +317,8 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
     abstract fun getFrameHeaderSize(): Int
 
     open fun isPadding(buffer: ByteArray): Boolean {
-        return ((buffer[0] == '\u0000'.code.toByte()) &&
+        return (buffer.size >= 4 &&
+                (buffer[0] == '\u0000'.code.toByte()) &&
                 (buffer[1] == '\u0000'.code.toByte()) &&
                 (buffer[2] == '\u0000'.code.toByte()) &&
                 (buffer[3] == '\u0000'.code.toByte())
@@ -354,20 +345,19 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
 
         var frameBody: AbstractID3v2FrameBody
         try {
-            val c = Class.forName(
-                "de.visualdigits.kaudiotagger.model.frame.framebody.FrameBody$identifier"
+            val c = Class.forName("${AbstractID3v2FrameBody.FRAME_BODY_PACKAGE}.FrameBody$identifier"
             ) as Class<AbstractID3v2FrameBody>
             val constructorParameterTypes = arrayOf<Class<*>>(
                 Class.forName("java.nio.ByteBuffer"),
                 Integer.TYPE,
             )
             val constructorParameterValues = arrayOf<Any>(byteBuffer, frameSize)
+            log.debug("constructorParameterTypes: ${constructorParameterTypes.toList()}")
+            log.debug("constructorParameterValues: ${constructorParameterValues.toList()}")
             val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(*constructorParameterTypes)
             frameBody = (construct.newInstance(*constructorParameterValues))
         } catch (cex: ClassNotFoundException) { //No class defined for this frame type,use FrameUnsupported
-            log.error(
-                "Identifier not recognised:$identifier using FrameBodyUnsupported"
-            )
+            log.error("Identifier not recognised:$identifier using FrameBodyUnsupported")
             try {
                 frameBody = FrameBodyUnsupported(byteBuffer, frameSize)
             } //read method to declare it can throw InvalidtagException //Should only throw InvalidFrameException but unfortunately legacy hierachy forces
@@ -378,32 +368,20 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
             }
         } //propagate it up otherwise mark this frame as invalid //An error has occurred during frame instantiation, if underlying cause is an unchecked exception or error
         catch (ite: InvocationTargetException) {
-            log.error(
-                "An error occurred within abstractID3v2FrameBody for identifier:$identifier:${ite.cause?.message}"
-            )
+// todo
+//            log.error("An error occurred within abstractID3v2FrameBody for identifier:$identifier")
             throw InvalidFrameException(ite.cause?.message)
         } catch (sme: NoSuchMethodException) { //No Such Method should not happen
-            log.error(
-                "No such method:${sme.message}",
-                sme
-            )
+            log.error("No such method", sme)
             throw RuntimeException(sme.message)
         } catch (ie: InstantiationException) { //Instantiate Interface/Abstract should not happen
-            log.error(
-                "Instantiation exception:${ie.message}",
-                ie
-            )
+            log.error("Instantiation exception", ie)
             throw RuntimeException(ie.message)
         } catch (iae: IllegalAccessException) { //Private Constructor shouild not happen
-            log.error(
-                "Illegal access exception :${iae.message}",
-                iae
-            )
+            log.error("Illegal access exception ", iae)
             throw RuntimeException(iae.message)
         }
-        log.debug(
-            "Created framebody:end${frameBody.getIdentifier()}"
-        )
+        log.debug("Created framebody:end${frameBody.getIdentifier()}")
         frameBody.header = this
         return frameBody
     }

@@ -1,30 +1,47 @@
 package de.visualdigits.kaudiotagger.util
 
+import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v22Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import java.io.File
-import javax.imageio.ImageIO
 
 @Disabled("only for local testing")
 class JAudioKotlinToolTest {
 
     @Test
     fun testMetadata() {
-        val file = File("E:/temp/01_Green Desert.mp3")
-        val audioFile = MP3File(file)
-        audioFile.getTag()?.also { tag ->
-            tag.getArtworkList().firstOrNull()?.also { artwork ->
-                val album = tag.getFirst(GenericFieldKey.ALBUM)
-                println(album)
-                ImageIO.write(artwork.image, artwork.extension, File("e:/temp/$album.${artwork.extension}"))
+        val metaData = scanDirectory(File("m:"))
+
+//        val file = File("E:/temp/01_Green Desert.mp3")
+//        val audioFile = MP3File(file)
+//        audioFile.getTag()?.also { tag ->
+//            tag.getArtworkList().firstOrNull()?.also { artwork ->
+//                val album = tag.getFirst(GenericFieldKey.ALBUM)
+//                println(album)
+//                ImageIO.write(artwork.image, artwork.extension, File("e:/temp/$album.${artwork.extension}"))
+//            }
+//        }
+//        println(audioFile)
+    }
+
+    fun scanDirectory(directory: File, metaData: MutableMap<File, MP3File> = LinkedHashMap(), indent: String = ""): Map<File, AudioFile> {
+        println("## $indent${directory.canonicalPath}")
+        metaData.putAll(directory.listFiles { f -> f.isFile && f.name.endsWith(".mp3", ignoreCase = true) }
+            ?.associate { f ->
+//                println("## $indent - ${f.name}")
+                Pair(f, MP3File(f))
             }
-        }
-        println(audioFile)
+            ?:mapOf()
+        )
+        directory.listFiles { f -> f.isDirectory }
+            ?.forEach { d -> scanDirectory(d, metaData, "$indent  ") }
+
+        return metaData
     }
 
     @Test

@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory
 
 abstract class AbstractDataType {
 
-    val identifier: String
-    var frameBody: AbstractTagFrameBody? = null
+    val identifier: String?
+    private var frameBody: AbstractTagFrameBody? = null
     private var value: Any? = null
 
     constructor(
-        identifier: String = "",
+        identifier: String? = null,
         frameBody: AbstractTagFrameBody? = null,
         value: Any? = null
     ) {
@@ -111,9 +111,27 @@ abstract class AbstractDataType {
         this.size += amount
     }
 
-    fun getValue(): Any? = value
+    /**
+     * Get the framebody associated with this datatype
+     *
+     * @return the framebody that this datatype is associated with
+     */
+    fun getBody(): AbstractTagFrameBody? {
+        return frameBody
+    }
 
-    fun setValue(value: Any?) {
+    /**
+     * Set the framebody that this datatype is associated with
+     *
+     * @param frameBody
+     */
+    open fun setBody(frameBody: AbstractTagFrameBody?) {
+        this.frameBody = frameBody
+    }
+
+    open fun getValue(): Any? = value
+
+    open fun setValue(value: Any?) {
         this.value = value
         when (value) {
             is String -> this.value = (value as? String)?.trimEnd { c -> c.code == 0 } // trim trailing null byte
@@ -135,7 +153,7 @@ abstract class AbstractDataType {
      */
     fun createStructure() {
         MP3File.tagFormatter?.addElement(
-            identifier,
+            identifier?:error("No identifier"),
             value.toString()
         )
     }

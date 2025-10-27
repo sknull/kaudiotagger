@@ -25,7 +25,7 @@ class PartOfSet : AbstractString {
      * @param identifier identifies the frame type
      * @param frameBody
      */
-    constructor(identifier: String, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
     /**
      * Read a 'n' bytes from buffer into a String where n is the frameSize - offset
@@ -81,7 +81,7 @@ class PartOfSet : AbstractString {
      * @return the text encoding charset
      */
     override fun getTextEncodingCharSet(): Charset? {
-        val textEncoding = frameBody?.getTextEncoding()
+        val textEncoding = getBody()?.getTextEncoding()
         val charset = TextEncoding.fromId(textEncoding)?.charSet
         log.debug(
             "text encoding:$textEncoding charset:${charset?.name()}"

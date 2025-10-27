@@ -34,7 +34,7 @@ class NumberVariableLength : AbstractDataType {
      * @param minimumSize
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody,
         minimumSize: Int
     ) : super(identifier, frameBody) {

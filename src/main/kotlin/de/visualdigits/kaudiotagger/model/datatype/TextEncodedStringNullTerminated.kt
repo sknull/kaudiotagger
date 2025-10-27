@@ -5,8 +5,6 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
-import java.nio.charset.Charset
-import java.nio.charset.CharsetDecoder
 import java.nio.charset.CodingErrorAction
 import java.nio.charset.StandardCharsets
 
@@ -19,7 +17,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
      * @param frameBody
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody?
     ) : super(identifier, frameBody)
 
@@ -31,7 +29,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
      * @param value
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody?,
         value: String
     ) : super(identifier, frameBody, value)
@@ -61,7 +59,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
         var size: Int
 
         //Get the Specified Decoder
-        val charset: Charset = getTextEncodingCharSet()!!
+        val charset = getTextEncodingCharSet()
 
         //We only want to load up to null terminator, data after this is part of different
         //field and it may not be possible to decode it so do the check before we do
@@ -143,12 +141,12 @@ open class TextEncodedStringNullTerminated : AbstractString {
             val inBuffer = ByteBuffer.wrap(arr, offset, bufferSize).slice()
             val outBuffer = CharBuffer.allocate(bufferSize)
 
-            val decoder: CharsetDecoder = getCorrectDecoder(inBuffer!!)!!
-            val coderResult = decoder.decode(inBuffer, outBuffer, true)
-            if (coderResult.isError) {
+            val decoder = getCorrectDecoder(inBuffer)
+            val coderResult = decoder?.decode(inBuffer, outBuffer, true)
+            if (coderResult?.isError == true) {
                 log.warn("Problem decoding text encoded null terminated string:$coderResult")
             }
-            decoder.flush(outBuffer)
+            decoder?.flush(outBuffer)
             outBuffer.flip()
             setValue(outBuffer.toString())
         }

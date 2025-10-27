@@ -7,8 +7,9 @@ import de.visualdigits.kaudiotagger.model.datatype.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidFrameIdentifierException
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyDeprecated
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUnsupported
+import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyDeprecated
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyUnsupported
 import de.visualdigits.kaudiotagger.model.frame.framebody.id3.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import java.io.ByteArrayOutputStream
@@ -74,7 +75,7 @@ class ID3v22Frame: AbstractID3v2Frame {
         // Use reflection to map id to frame body, which makes things much easier
         // to keep things up to date.
         try {
-            val c = Class.forName("de.visualdigits.kaudiotagger.model.frame.framebody.FrameBody$bodyIdentifier") as Class<AbstractID3v2FrameBody>
+            val c = Class.forName("${AbstractID3v2FrameBody.FRAME_BODY_PACKAGE}.FrameBody$bodyIdentifier") as Class<AbstractID3v2FrameBody>
             frameBody = c.newInstance()
         } catch (cnfe: ClassNotFoundException) {
             log.error(cnfe.message, cnfe)

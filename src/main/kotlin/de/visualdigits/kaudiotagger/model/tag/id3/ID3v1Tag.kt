@@ -5,6 +5,7 @@ import de.visualdigits.kaudiotagger.model.datatype.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.datatype.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.exceptions.KeyNotFoundException
+import de.visualdigits.kaudiotagger.model.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.field.TagField
 import de.visualdigits.kaudiotagger.model.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.tag.Tag
@@ -132,7 +133,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             return
         }
         if (!seek(byteBuffer)) {
-            error("ID3v1 tag not found")
+            throw TagNotFoundException("ID3v1 tag not found")
         }
         log.debug("Reading v1.1 tag")
 

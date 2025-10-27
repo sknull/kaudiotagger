@@ -19,7 +19,7 @@ class StringNullTerminated : TextEncodedStringNullTerminated {
      * @param frameBody
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody
     ) : super(identifier, frameBody)
 

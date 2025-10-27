@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.datatype.types
 
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyCOMM
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTXXX
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUFID
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyWXXX
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyCOMM
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTXXX
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyUFID
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyWXXX
 
 enum class ID3v24FieldKey(
     val frameId: ID3v24Frames,

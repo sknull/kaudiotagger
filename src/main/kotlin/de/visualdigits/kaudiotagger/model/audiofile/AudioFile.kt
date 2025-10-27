@@ -268,16 +268,7 @@ open class AudioFile {
      * @return
      */
     open fun createDefaultTag(): Tag? {
-        val fileName = this.file!!.getName()
-        val dotIndex = fileName.lastIndexOf('.')
-        if (dotIndex > 0 && dotIndex < fileName.length - 1) {
-            return SupportedFileFormat.fromExtension(
-                fileName.substring(dotIndex + 1)
-            ).createDefaultTag()
-        }
-        throw RuntimeException(
-            "Unable to create default tag for this file format. No File extension found."
-        )
+        return file?.let { f -> SupportedFileFormat.fromExtension(f.extension).createDefaultTag()}
     }
 
     /**

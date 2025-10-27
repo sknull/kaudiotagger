@@ -5,8 +5,8 @@ import de.visualdigits.kaudiotagger.model.datatype.Lyrics3Line
 import de.visualdigits.kaudiotagger.model.datatype.Lyrics3TimeStamp
 import de.visualdigits.kaudiotagger.model.datatype.types.Lyrics3v2Fields
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidTagException
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodySYLT
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUSLT
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodySYLT
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.nio.ByteBuffer
 

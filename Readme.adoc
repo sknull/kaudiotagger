@@ -28,7 +28,6 @@ I now ported part of the jaudio project to kotlin (work in progress).
 
 After two weeks of intense work I only implemented what is needed to parse mp3 files.
 At least we now have a kotlin code base which can do at least a little bit.
-Still a lot of id3 tag frames are currently not implemented but this seems to be mass work which will be done soon to complete at least the mp3 part.
 
 == My Approach Of Migration
 

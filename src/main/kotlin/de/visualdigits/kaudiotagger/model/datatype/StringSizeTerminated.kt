@@ -21,7 +21,7 @@ open class StringSizeTerminated : TextEncodedStringSizeTerminated {
      * @param frameBody
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody
     ) : super(identifier, frameBody)
 

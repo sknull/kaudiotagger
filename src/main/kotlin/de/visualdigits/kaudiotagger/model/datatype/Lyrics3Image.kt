@@ -18,7 +18,7 @@ class Lyrics3Image : AbstractDataType {
      * @param identifier
      * @param frameBody
      */
-    constructor(identifier: String, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
     constructor(copy: Lyrics3Image) : super(copy) {
         this.timeStamp = copy.timeStamp?.let { ts -> Lyrics3TimeStamp(ts) }

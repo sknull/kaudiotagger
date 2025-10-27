@@ -37,7 +37,7 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
             newObject = ID3Tags.copyObject(
                 copyObject.objectList.get(i)
             ) as AbstractDataType
-            newObject.frameBody = this
+            newObject.setBody(this)
             this.objectList.add(newObject)
         }
     }
@@ -70,7 +70,7 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      * @param identifier `MP3Object` identifier
      * @param value      new datatype value
      */
-    fun setObjectValue(identifier: String, value: Any?) {
+    fun setObjectValue(identifier: String?, value: Any?) {
         objectList
             .find { obj -> obj.identifier == identifier }
             ?.also { obj -> obj.setValue(value) }

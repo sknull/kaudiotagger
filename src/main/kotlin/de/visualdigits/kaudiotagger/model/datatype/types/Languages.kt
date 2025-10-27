@@ -482,6 +482,8 @@ enum class Languages(
         //The number of bytes used to hold the language field size
         const val LANGUAGE_FIELD_SIZE: Int = 3
 
+        fun fromDescription(description: String?): Languages? = entries.find { e -> e.description == description }
+
         fun getValueToIdMap(): Map<String, String> = entries.associate { e -> Pair(e.description, e.name) }
 
         fun getIdToValueMap(): Map<String, String> = entries.associate { e -> Pair(e.name, e.description) }

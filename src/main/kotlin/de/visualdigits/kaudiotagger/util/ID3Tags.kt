@@ -318,4 +318,26 @@ object ID3Tags {
             else -> null
         }?:error("Value of class '${value?.javaClass}' not supported")
     }
+
+    /**
+     * Remove all occurances of the given character from the string argument.
+     *
+     * @param str String to search
+     * @param ch  character to remove
+     * @return new String without the given charcter
+     */
+    fun stripChar(str: String?, ch: Char): String? {
+        if (str != null) {
+            val buffer = CharArray(str.length)
+            var next = 0
+            for (i in 0..<str.length) {
+                if (str.get(i) != ch) {
+                    buffer[next++] = str.get(i)
+                }
+            }
+            return String(buffer, 0, next)
+        } else {
+            return null
+        }
+    }
 }

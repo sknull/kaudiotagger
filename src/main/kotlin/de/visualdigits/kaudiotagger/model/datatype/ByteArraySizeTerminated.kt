@@ -5,7 +5,7 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
 
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody
     ) : super(identifier, frameBody)
 

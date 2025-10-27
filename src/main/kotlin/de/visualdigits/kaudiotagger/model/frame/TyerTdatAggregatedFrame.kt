@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.frame
 
 import de.visualdigits.kaudiotagger.model.datatype.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTDAT
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTDAT
 
 class TyerTdatAggregatedFrame(): AggregatedFrame() {
 

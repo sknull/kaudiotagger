@@ -121,5 +121,9 @@ enum class ID3v22Frames(
         fun isMultipleAllowed(id: String?): Boolean = multipleFrames().any { e -> e.id == id }
 
         fun isDiscardedIfFileAltered(id: String?): Boolean = discardIfFileAltered().any { e -> e.id == id }
+
+        fun getValueToIdMap(): Map<String, String> = entries.associate { e -> Pair(e.friendlyName, e.id) }
+
+        fun getIdToValueMap(): Map<String, String> = entries.associate { e -> Pair(e.id, e.friendlyName) }
     }
 }

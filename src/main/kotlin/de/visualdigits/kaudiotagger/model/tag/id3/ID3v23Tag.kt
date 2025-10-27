@@ -15,15 +15,15 @@ import de.visualdigits.kaudiotagger.model.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.field.TagField
 import de.visualdigits.kaudiotagger.model.field.TagTextField
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyAPIC
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyIPLS
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTCON
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTDAT
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTDRC
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTIME
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTIPL
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTMCL
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTYER
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyAPIC
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyIPLS
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTCON
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTDAT
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTDRC
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTIME
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTIPL
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTMCL
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTYER
 import de.visualdigits.kaudiotagger.model.frame.id3.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v23Frame
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v24Frame
@@ -660,46 +660,31 @@ class ID3v23Tag : AbstractID3v2Tag {
             try {
                 //Read Frame
                 val posBeforeRead = byteBuffer.position()
-                log.debug(
-                    "Looking for next frame at:$posBeforeRead"
-                )
+                log.debug("Looking for next frame at:$posBeforeRead")
                 next = ID3v23Frame(byteBuffer)
                 id = next.getIdentifier()
-                log.debug(
-                    "Found " +
-                            id +
-                            " at frame at:" +
-                            posBeforeRead
-                )
+                log.debug("Found $id at frame at:$posBeforeRead")
                 loadFrameIntoMap(id, next)
-            } catch (ex: PaddingException) { //Found Padding, no more frames
-                log.debug(
-                    "Found padding starting at:${byteBuffer.position()}"
-                )
+            } catch (_: PaddingException) { //Found Padding, no more frames
+                log.debug("Found padding starting at:${byteBuffer.position()}")
                 break
             } catch (ex: EmptyFrameException) { //Found Empty Frame, log it - empty frames should not exist
                 log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += ID3v23Frame.FRAME_HEADER_SIZE
             } catch (ifie: InvalidFrameIdentifierException) {
-                log.warn(
-                    "Invalid Frame Identifier:${ifie.message}"
-                )
+                log.warn("Invalid Frame Identifier:${ifie.message}")
                 this.invalidFrames++
                 //Don't try and find any more frames
                 break
             } //and we have reached padding //Problem trying to find frame, often just occurs because frameHeader includes padding
             catch (ife: InvalidFrameException) {
-                log.warn(
-                    "Invalid Frame:${ife.message}"
-                )
+                log.warn("Invalid Frame:${ife.message}")
                 this.invalidFrames++
                 //Don't try and find any more frames
                 break
             } //in case we can read the next frame //Failed reading frame but may just have invalid data but correct length so lets carry on
             catch (idete: InvalidDataTypeException) {
-                log.warn(
-                    "Corrupt Frame:${idete.message}"
-                )
+                log.warn("Corrupt Frame:${idete.message}")
                 this.invalidFrames++
                 continue
             }

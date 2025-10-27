@@ -7,7 +7,7 @@ import java.io.IOException
 
 class PairedTextEncodedStringNullTerminated: AbstractDataType {
 
-    constructor(identifier: String, frameBody: AbstractTagFrameBody): super(identifier, frameBody) {
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody): super(identifier, frameBody) {
         setValue(ValuePairs())
     }
 
@@ -27,7 +27,7 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
             val next =
                 TextEncodedStringNullTerminated(
                     identifier,
-                    frameBody?:error("No frame body"),
+                    getBody()?:error("No frame body"),
                     entry.second
                 )
             if (!next.canBeEncoded()) {
@@ -57,7 +57,7 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
             try {
                 //Read Key
                 val key =
-                    TextEncodedStringNullTerminated(identifier, frameBody?:error("No frame body"))
+                    TextEncodedStringNullTerminated(identifier, getBody()?:error("No frame body"))
                 key.readByteArray(arr, offset)
                 addSize(key.getSize())
                 offset += key.getSize()
@@ -68,7 +68,7 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                 try {
                     //Read Value
                     val result =
-                        TextEncodedStringNullTerminated(identifier, frameBody?:error("No frame body"))
+                        TextEncodedStringNullTerminated(identifier, getBody()?:error("No frame body"))
                     result.readByteArray(arr, offset)
                     addSize(result.getSize())
                     offset += result.getSize()
@@ -87,7 +87,7 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
                         break
                     }
                     val result =
-                        TextEncodedStringSizeTerminated(identifier, frameBody?:error("No frame body"))
+                        TextEncodedStringSizeTerminated(identifier, getBody()?:error("No frame body"))
                     result.readByteArray(arr, offset)
                     addSize(result.getSize())
                     offset += result.getSize()
@@ -129,14 +129,14 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
             (getValue() as ValuePairs).mapping.forEach { pair ->
                 var next = TextEncodedStringNullTerminated(
                         identifier,
-                        frameBody,
+                    getBody(),
                         pair.first
                     )
                 buffer.write(next.writeByteArray())
                 localSize += next.getSize()
                 next = TextEncodedStringNullTerminated(
                         identifier,
-                frameBody,
+                    getBody(),
                 pair.second
                 )
                 buffer.write(next.writeByteArray())

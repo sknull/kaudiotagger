@@ -56,6 +56,8 @@ enum class EventTimingTypes(
 
     companion object {
 
+        fun fromId(id: Int): EventTimingTypes? = entries.find { e -> id == e.id }
+
         fun getValueToIdMap(): Map<String, Int> = entries.associate { e -> Pair(e.friendlyName, e.id) }
 
         fun getIdToValueMap(): Map<Int, String> = entries.associate { e -> Pair(e.id, e.friendlyName) }

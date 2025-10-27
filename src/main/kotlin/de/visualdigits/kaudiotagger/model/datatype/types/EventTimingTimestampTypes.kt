@@ -13,6 +13,8 @@ enum class EventTimingTimestampTypes(
 
         const val TIMESTAMP_KEY_FIELD_SIZE: Int = 1
 
+        fun fromId(id: Int): EventTimingTimestampTypes? = entries.find { e -> id == e.id }
+
         fun getValueToIdMap(): Map<String, Int> = entries.associate { e -> Pair(e.friendlyName, e.id) }
 
         fun getIdToValueMap(): Map<Int, String> = entries.associate { e -> Pair(e.id, e.friendlyName) }

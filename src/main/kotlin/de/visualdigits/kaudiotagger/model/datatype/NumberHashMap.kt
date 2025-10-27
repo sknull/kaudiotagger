@@ -31,7 +31,7 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Int, String>  {
     var hasEmptyValue = false
 
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody? = null,
         value: Any? = null
     ): super(identifier, frameBody, value)
@@ -45,7 +45,7 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Int, String>  {
      * @throws IllegalArgumentException
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody? = null,
         size: Int
     ): super(identifier, frameBody, size) {

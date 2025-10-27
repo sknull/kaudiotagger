@@ -26,7 +26,7 @@ class Lyrics3TimeStamp : AbstractDataType {
      * @param identifier
      * @param frameBody
      */
-    constructor(identifier: String, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
     constructor(identifier: String) : super(identifier, null)
 

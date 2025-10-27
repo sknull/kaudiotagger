@@ -15,7 +15,7 @@ abstract class AbstractString: AbstractDataType {
      * @param identifier
      * @param frameBody
      */
-    constructor(identifier: String, frameBody: AbstractTagFrameBody?) : super(identifier, frameBody)
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody?) : super(identifier, frameBody)
 
     /**
      * Creates a new  datatype, with value
@@ -25,7 +25,7 @@ abstract class AbstractString: AbstractDataType {
      * @param value
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody?,
         value: String
     ) : super(identifier, frameBody, value)
@@ -43,7 +43,7 @@ abstract class AbstractString: AbstractDataType {
      * @return
      */
     fun canBeEncoded(): Boolean {
-        return frameBody?.getTextEncoding()?.let { te ->
+        return getBody()?.getTextEncoding()?.let { te ->
             TextEncoding
                 .fromId(te)
                 ?.charSet
@@ -91,7 +91,7 @@ abstract class AbstractString: AbstractDataType {
      * @return the text encoding charset
      */
     open fun getTextEncodingCharSet(): Charset? {
-        val textEncoding = frameBody?.getTextEncoding()
+        val textEncoding = getBody()?.getTextEncoding()
         val charSetName = textEncoding?.let { te -> TextEncoding.fromId(te) }?.charSet
         log.debug("text encoding:$textEncoding charset:${charSetName?.name()}")
 

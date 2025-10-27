@@ -39,7 +39,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @param frameBody
      */
     constructor(
-        identifier: String,
+        identifier: String?,
         frameBody: AbstractTagFrameBody
     ) : super(identifier, frameBody)
 
@@ -70,9 +70,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
 
         //Decode sliced inBuffer
         val inBuffer = ByteBuffer.wrap(arr, offset, arr.size - offset).slice()
-
         val outBuffer = CharBuffer.allocate(arr.size - offset)
-
         val decoder = getCorrectDecoder(inBuffer)
         val coderResult = decoder?.decode(inBuffer, outBuffer, true)
         if (coderResult?.isError == true) {
@@ -94,7 +92,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
     }
 
     override fun getTextEncodingCharSet(): Charset? {
-        val textEncoding = frameBody?.getTextEncoding()?:error("No text encoding found")
+        val textEncoding = getBody()?.getTextEncoding()?:error("No text encoding found")
         val charset = TextEncoding.fromId(textEncoding)?.charSet
         log.debug("text encoding:$textEncoding charset:${charset?.name()}")
 

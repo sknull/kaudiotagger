@@ -16,10 +16,10 @@ import de.visualdigits.kaudiotagger.model.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.field.TagField
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractFrameBodyTextInfo
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyAPIC
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyPIC
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTCON
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyTDRC
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyAPIC
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyPIC
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTCON
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyTDRC
 import de.visualdigits.kaudiotagger.model.frame.id3.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.frame.id3.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.tag.AbstractTag
@@ -189,7 +189,6 @@ class ID3v22Tag : AbstractID3v2Tag {
         if (byteBuffer == null) {
             return
         }
-        val size: Int
         if (!seek(byteBuffer)) {
             throw TagNotFoundException("ID3v2.20 tag not found")
         }
@@ -199,7 +198,7 @@ class ID3v22Tag : AbstractID3v2Tag {
         readHeaderFlags(byteBuffer)
 
         // Read the size
-        size = ID3SyncSafeInteger.bufferToValue(byteBuffer)
+        val size: Int = ID3SyncSafeInteger.bufferToValue(byteBuffer)
 
         //Slice Buffer, so position markers tally with size (i.e do not include tagheader)
         var bufferWithoutHeader = byteBuffer.slice()

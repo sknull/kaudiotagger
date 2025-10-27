@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.frame.framebody.id3
 
-import com.sun.jdi.InvalidStackFrameException
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
@@ -11,6 +10,8 @@ import java.nio.ByteBuffer
 abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
 
     companion object {
+
+        val FRAME_BODY_PACKAGE = "de.visualdigits.kaudiotagger.model.frame.framebody.id3"
 
         const val TYPE_BODY: String = "body"
     }
@@ -77,7 +78,6 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
             //size because the next datatype may be of length 0.)
             if (offset > sizeValue) {
                 log.warn("Invalid Size for FrameBody")
-                throw InvalidStackFrameException("Invalid size for Frame Body")
             }
 
             //Try and load it with data from the Buffer

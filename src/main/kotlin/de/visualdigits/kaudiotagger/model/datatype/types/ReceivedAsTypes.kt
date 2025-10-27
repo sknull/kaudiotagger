@@ -18,6 +18,9 @@ enum class ReceivedAsTypes(
 
     companion object {
 
+        //The number of bytes used to hold the text encoding field size
+        const val RECEIVED_AS_FIELD_SIZE: Int = 1
+
         fun getValueToIdMap(): Map<String, Int> = entries.associate { e -> Pair(e.friendlyName, e.id) }
 
         fun getIdToValueMap(): Map<Int, String> = entries.associate { e -> Pair(e.id, e.friendlyName) }

@@ -5,7 +5,7 @@ import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.ID3Tags
 
 open class NumberFixedLength(
-    identifier: String,
+    identifier: String?,
     frameBody: AbstractTagFrameBody? = null,
     value: Any? = null
 ): AbstractDataType(
@@ -22,7 +22,7 @@ open class NumberFixedLength(
      * @throws IllegalArgumentException
      */
     constructor(
-            identifier: String,
+            identifier: String?,
             frameBody: AbstractTagFrameBody? = null,
             size: Int
     ): this(identifier, frameBody) {

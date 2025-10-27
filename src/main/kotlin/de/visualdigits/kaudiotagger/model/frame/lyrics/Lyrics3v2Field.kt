@@ -6,9 +6,9 @@ import de.visualdigits.kaudiotagger.model.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.frame.framebody.AbstractFrameBodyTextInfo
 import de.visualdigits.kaudiotagger.model.frame.framebody.FieldFrameBodyUnsupported
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyCOMM
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodySYLT
-import de.visualdigits.kaudiotagger.model.frame.framebody.FrameBodyUSLT
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyCOMM
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodySYLT
+import de.visualdigits.kaudiotagger.model.frame.framebody.id3.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.frame.id3.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.tag.lyrics3.AbstractLyrics3v2FieldFrameBody
 import de.visualdigits.kaudiotagger.model.tag.lyrics3.FieldFrameBodyAUT
@@ -135,7 +135,7 @@ class Lyrics3v2Field: AbstractTagFrame {
      * @throws InvalidTagException
      */
     private fun readBody(
-        identifier: String,
+        identifier: String?,
         byteBuffer: ByteBuffer
     ): AbstractLyrics3v2FieldFrameBody {
         val newBody: AbstractLyrics3v2FieldFrameBody
