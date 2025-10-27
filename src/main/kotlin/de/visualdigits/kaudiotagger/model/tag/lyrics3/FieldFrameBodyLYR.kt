@@ -80,7 +80,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
             timeStamp = Lyrics3TimeStamp("Time Stamp", this)
             timeStamp.setTimeStamp(
                 currentLine.timeStamp,
-                sync.timeStampFormat as Byte
+                sync.getTimeStampFormat() as Byte
             )
 
             if (lineMap.containsKey(currentLine.text)) {
@@ -102,7 +102,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
     fun addLyric(unsync: FrameBodyUSLT) {
         // USLT frames are just long text string;
         val line = Lyrics3Line("Lyric Line", this)
-        line.lyric = unsync.lyric
+        line.lyric = unsync.getLyric()
         lines.add(line)
     }
 

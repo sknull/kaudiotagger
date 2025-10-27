@@ -205,23 +205,23 @@ class ID3v24Frame: AbstractID3v2Frame {
                 frameBody?.header = this
             }
         } else if (id == "INF") {
-            value = (field.frameBody as FieldFrameBodyINF).additionalInformation
+            value = (field.frameBody as FieldFrameBodyINF).getAdditionalInformation()
             this.frameBody = FrameBodyCOMM(0, "ENG", "", value)
             frameBody?.header = this
         } else if (id == "AUT") {
-            value = (field.frameBody as FieldFrameBodyAUT).author
+            value = (field.frameBody as FieldFrameBodyAUT).getAuthor()
             this.frameBody = FrameBodyTCOM(0, value)
             frameBody?.header = this
         } else if (id == "EAL") {
-            value = (field.frameBody as FieldFrameBodyEAL).album
+            value = (field.frameBody as FieldFrameBodyEAL).getAlbum()
             this.frameBody = FrameBodyTALB(0, value)
             frameBody?.header = this
         } else if (id == "EAR") {
-            value = (field.frameBody as FieldFrameBodyEAR).artist
+            value = (field.frameBody as FieldFrameBodyEAR).getArtist()
             this.frameBody = FrameBodyTPE1(0, value)
             frameBody?.header = this
         } else if (id == "ETT") {
-            value = (field.frameBody as FieldFrameBodyETT).title
+            value = (field.frameBody as FieldFrameBodyETT).getTitle()
             this.frameBody = FrameBodyTIT2(0, value)
             frameBody?.header = this
         } else if (id == "IMG") {
