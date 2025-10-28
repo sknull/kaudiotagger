@@ -4,7 +4,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCode
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.common.types.SynchronisedTempoCode
 import de.visualdigits.kaudiotagger.model.common.types.SynchronisedTempoCodeList
 import java.nio.ByteBuffer
@@ -207,7 +207,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     override fun getIdentifier(): String {
-        return ID3v24Frames.SYNC_TEMPO.id
+        return ID3V24Frame.SYNC_TEMPO.id
     }
 
     override fun read(byteBuffer: ByteBuffer?): Boolean {

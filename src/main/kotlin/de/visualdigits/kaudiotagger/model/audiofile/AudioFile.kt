@@ -37,7 +37,7 @@ import java.util.Locale
  */
 open class AudioFile {
     
-    protected val log = LoggerFactory.getLogger(javaClass)
+    val log = LoggerFactory.getLogger(javaClass)
 
     /**
      * The physical file that this instance represents.
@@ -104,7 +104,7 @@ open class AudioFile {
      * @return
      * @throws FileNotFoundException
      */
-    protected fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
+    fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
         val newFile: RandomAccessFile
 
         // These exists(), can read, can write checks are sprinkled around the code. Are these necessary? Why not just treat them as

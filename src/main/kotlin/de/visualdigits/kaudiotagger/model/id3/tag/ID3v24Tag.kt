@@ -30,9 +30,9 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTMCL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTRCK
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V23Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.id3.types.MusicianCredits
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -275,10 +275,7 @@ class ID3v24Tag : AbstractID3v2Tag {
     /**
      * Creates a new empty ID3v2_4 datatype.
      */
-    constructor() {
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
-    }
+    constructor()
 
     /**
      * Copy Constructor, creates a new ID3v2_4 Tag based on another ID3v2_4 Tag
@@ -298,9 +295,6 @@ class ID3v24Tag : AbstractID3v2Tag {
      */
     constructor(mp3tag: AbstractTag?): this() {
         log.debug("Creating tag from a tag of a different version")
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
-
         if (mp3tag != null) {
             //Should use simpler copy constructor
             if ((mp3tag is ID3v24Tag)) {
@@ -316,31 +310,31 @@ class ID3v24Tag : AbstractID3v2Tag {
                 var newBody: AbstractID3v2FrameBody?
                 if ((mp3tag.getTitle()?.length ?: Int.MIN_VALUE) > 0) {
                     newBody = FrameBodyTIT2(0, mp3tag.getTitle()?:"")
-                    newFrame = ID3v24Frame(ID3v24Frames.TITLE.id)
+                    newFrame = ID3v24Frame(ID3V24Frame.TITLE.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
                 if (mp3tag.getArtist().length > 0) {
                     newBody = FrameBodyTPE1(0, mp3tag.getArtist())
-                    newFrame = ID3v24Frame(ID3v24Frames.ARTIST.id)
+                    newFrame = ID3v24Frame(ID3V24Frame.ARTIST.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
                 if (mp3tag.getAlbum().length > 0) {
                     newBody = FrameBodyTALB(0, mp3tag.getAlbum())
-                    newFrame = ID3v24Frame(ID3v24Frames.ALBUM.id)
+                    newFrame = ID3v24Frame(ID3V24Frame.ALBUM.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
                 if (mp3tag.getYear().length > 0) {
                     newBody = FrameBodyTDRC(0, mp3tag.getYear())
-                    newFrame = ID3v24Frame(ID3v24Frames.YEAR.id)
+                    newFrame = ID3v24Frame(ID3V24Frame.YEAR.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
                 if (mp3tag.getComment().length > 0) {
                     newBody = FrameBodyCOMM(0, "ENG", "", mp3tag.getComment())
-                    newFrame = ID3v24Frame(ID3v24Frames.COMMENT.id)
+                    newFrame = ID3v24Frame(ID3V24Frame.COMMENT.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
@@ -352,14 +346,14 @@ class ID3v24Tag : AbstractID3v2Tag {
                     val genre = "($genreId) ${GenreTypes.fromId(genreId)}"
 
                     newBody = FrameBodyTCON(0, genre)
-                    newFrame = ID3v24Frame(ID3v24Frames.GENRE.id)
+                    newFrame = ID3v24Frame(ID3V24Frame.GENRE.id)
                     newFrame.frameBody = newBody
                     frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                 }
                 if (mp3tag is ID3v11Tag) {
                     if (mp3tag.track > 0) {
                         newBody = FrameBodyTRCK(0, mp3tag.track.toString())
-                        newFrame = ID3v24Frame(ID3v24Frames.TRACK.id)
+                        newFrame = ID3v24Frame(ID3V24Frame.TRACK.id)
                         newFrame.frameBody = newBody
                         frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
                     }
@@ -439,8 +433,8 @@ class ID3v24Tag : AbstractID3v2Tag {
             return false
         }
         log.debug("Reading ID3v24 tag")
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
+        frameMap.clear()
+        encryptedFrameMap.clear()
 
         readHeaderFlags(byteBuffer)
 
@@ -475,8 +469,8 @@ class ID3v24Tag : AbstractID3v2Tag {
         )
         //Now start looking for frames
         var next: ID3v24Frame
-        frameMap = LinkedHashMap()
-        encryptedFrameMap = LinkedHashMap()
+        frameMap.clear()
+        encryptedFrameMap.clear()
 
         //Read the size from the Tag Header
         this.fileReadBytes = size
@@ -719,13 +713,13 @@ class ID3v24Tag : AbstractID3v2Tag {
     override fun convertFrame(frame: AbstractID3v2Frame): MutableList<AbstractID3v2Frame> {
         var frame = frame
         val frames: MutableList<AbstractID3v2Frame> = ArrayList<AbstractID3v2Frame>()
-        if (frame is ID3v22Frame && frame.getIdentifier() == ID3v22Frames.IPLS.id) {
+        if (frame is ID3v22Frame && frame.getIdentifier() == ID3V22Frame.IPLS.id) {
             frame = ID3v23Frame(frame)
         }
 
         //This frame may need splitting and converting into two frames depending on its content
         if (frame is ID3v23Frame &&
-            frame.getIdentifier() == ID3v23Frames.INVOLVED_PEOPLE.id
+            frame.getIdentifier() == ID3V23Frame.INVOLVED_PEOPLE.id
         ) {
             val pairs = (frame.frameBody as? FrameBodyIPLS)?.getPairing()?.mapping?:error("No mapping")
             val pairsTipl: MutableList<Pair<String, String>> = mutableListOf()
@@ -742,7 +736,7 @@ class ID3v24Tag : AbstractID3v2Tag {
             }
             val tipl = ID3v24Frame(
                 frame as ID3v23Frame,
-                ID3v24Frames.INVOLVED_PEOPLE.id
+                ID3V24Frame.INVOLVED_PEOPLE.id
             )
             val tiplBody = FrameBodyTIPL(
                 frame.frameBody?.getTextEncoding()?:0,
@@ -753,7 +747,7 @@ class ID3v24Tag : AbstractID3v2Tag {
 
             val tmcl: AbstractID3v2Frame = ID3v24Frame(
                 frame as ID3v23Frame,
-                ID3v24Frames.MUSICIAN_CREDITS.id
+                ID3V24Frame.MUSICIAN_CREDITS.id
             )
             val tmclBody = FrameBodyTMCL(
                 frame.frameBody?.getTextEncoding()?:0,
@@ -1016,7 +1010,7 @@ class ID3v24Tag : AbstractID3v2Tag {
                 ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg()
             )
         }
-        val id3v24FieldKey = ID3v24Frames.fromFieldKey(genericKey)
+        val id3v24FieldKey = ID3V24Frame.fromFieldKey(genericKey)
         if (id3v24FieldKey == null) {
             throw KeyNotFoundException(genericKey.name)
         }

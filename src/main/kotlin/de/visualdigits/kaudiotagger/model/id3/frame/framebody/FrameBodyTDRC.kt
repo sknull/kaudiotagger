@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V23Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 import java.text.ParseException
@@ -81,7 +81,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTYER) {
-        originalID = ID3v23Frames.TYER.id
+        originalID = ID3V23Frame.TYER.id
         year = body.getText()
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
@@ -93,7 +93,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTIME) {
-        originalID = ID3v23Frames.TIME.id
+        originalID = ID3V23Frame.TIME.id
         time = body.getText()
         hoursOnly = body.hoursOnly
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
@@ -106,7 +106,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTDAT) {
-        originalID = ID3v23Frames.TDAT.id
+        originalID = ID3V23Frame.TDAT.id
         date = body.getText()
         monthOnly = body.isMonthOnly
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
@@ -119,7 +119,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTRDA) {
-        originalID = ID3v23Frames.TRDA.id
+        originalID = ID3V23Frame.TRDA.id
         date = body.getText()
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
@@ -178,7 +178,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24Frames.YEAR.id
+        return ID3V24Frame.YEAR.id
     }
 
     /**

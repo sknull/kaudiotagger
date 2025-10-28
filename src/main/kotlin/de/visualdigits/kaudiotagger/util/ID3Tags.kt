@@ -2,9 +2,9 @@ package de.visualdigits.kaudiotagger.util
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V23Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.util.ID3Tags.copyObject
 
 object ID3Tags {
@@ -20,7 +20,7 @@ object ID3Tags {
         if ((identifier?.length?:0) < 3) {
             return false
         } else {
-            return ((identifier?.length?:0) == 3 && ID3v22Frames.contains(identifier))
+            return ((identifier?.length?:0) == 3 && ID3V22Frame.contains(identifier))
         }
     }
 
@@ -31,7 +31,7 @@ object ID3Tags {
      * @return true if the identifier is a valid ID3v2.3 frame identifier
      */
     fun isID3v23FrameIdentifier(identifier: String?): Boolean {
-        return ((identifier?.length?:0) >= 4 && ID3v23Frames.contains(identifier?.take(4)))
+        return ((identifier?.length?:0) >= 4 && ID3V23Frame.contains(identifier?.take(4)))
     }
 
     /**
@@ -41,7 +41,7 @@ object ID3Tags {
      * @return true if the identifier is a valid ID3v2.4 frame identifier
      */
     fun isID3v24FrameIdentifier(identifier: String?): Boolean {
-        return ((identifier?.length?:0) >= 4 && ID3v24Frames.contains(identifier?.take(4)))
+        return ((identifier?.length?:0) >= 4 && ID3V24Frame.contains(identifier?.take(4)))
     }
 
     /**
@@ -50,11 +50,11 @@ object ID3Tags {
      * @param identifier
      * @return
      */
-    fun convertFrameID22To23(identifier: String?): ID3v23Frames? {
+    fun convertFrameID22To23(identifier: String?): ID3V23Frame? {
         if ((identifier?.length?:0) < 3) {
             return null
         }
-        return ID3Frames.convertv22Tov23[ID3v22Frames.fromId(identifier?.take( 3))]
+        return ID3Frames.convertv22Tov23[ID3V22Frame.fromId(identifier?.take( 3))]
     }
 
     /**
@@ -63,21 +63,21 @@ object ID3Tags {
      * @param identifier
      * @return
      */
-    fun convertFrameID22To24(identifier: String?): ID3v24Frames? {
+    fun convertFrameID22To24(identifier: String?): ID3V24Frame? {
         //Idv22 identifiers are only of length 3 times
         if ((identifier?.length?:0) < 3) {
             return null
         }
         //Has idv22 been mapped to v23
-        val v23id = ID3Frames.convertv22Tov23[ID3v22Frames.fromId(identifier?.take(3))]
+        val v23id = ID3Frames.convertv22Tov23[ID3V22Frame.fromId(identifier?.take(3))]
         if (v23id != null) {
             //has v2.3 been mapped to v2.4
             val v24id = ID3Frames.convertv23Tov24[v23id]
             if (v24id == null) {
                 //if not it may be because v2.3 and and v2.4 are same so wont be
                 //in mapping
-                if (ID3v24Frames.contains(v23id.id)) {
-                    return ID3v24Frames.fromId(v23id.id)
+                if (ID3V24Frame.contains(v23id.id)) {
+                    return ID3V24Frame.fromId(v23id.id)
                 } else {
                     return null
                 }
@@ -101,9 +101,9 @@ object ID3Tags {
         }
 
         //If it is a v23 identifier
-        if (ID3v23Frames.contains(identifier)) {
+        if (ID3V23Frame.contains(identifier)) {
             //If only name has changed  v22 and modified in v23 return result of.
-            return ID3Frames.convertv23Tov22[ID3v23Frames.fromId(identifier?.take(4))]?.id
+            return ID3Frames.convertv23Tov22[ID3V23Frame.fromId(identifier?.take(4))]?.id
         }
         return null
     }
@@ -120,12 +120,12 @@ object ID3Tags {
         }
 
         //If it is a ID3v23 identifier
-        if (ID3v23Frames.contains(identifier)) {
+        if (ID3V23Frame.contains(identifier)) {
             //If no change between ID3v23 and ID3v24 should be in ID3v24 list.
-            if (ID3v24Frames.contains(identifier)) {
-                return ID3v24Frames.fromId(identifier)?.id
+            if (ID3V24Frame.contains(identifier)) {
+                return ID3V24Frame.fromId(identifier)?.id
             } else {
-                return ID3Frames.convertv23Tov24[ID3v23Frames.fromId(identifier?.take(4))]?.id
+                return ID3Frames.convertv23Tov24[ID3V23Frame.fromId(identifier?.take(4))]?.id
             }
         }
         return null
@@ -139,7 +139,7 @@ object ID3Tags {
      * @return
      */
     fun forceFrameID22To23(identifier: String?): String? {
-        return ID3Frames.forcev22Tov23[ID3v22Frames.fromId(identifier)]?.id
+        return ID3Frames.forcev22Tov23[ID3V22Frame.fromId(identifier)]?.id
     }
 
     /**
@@ -150,7 +150,7 @@ object ID3Tags {
      * @return
      */
     fun forceFrameID23To22(identifier: String?): String? {
-        return ID3Frames.forcev23Tov22[ID3v23Frames.fromId(identifier)]?.id
+        return ID3Frames.forcev23Tov22[ID3V23Frame.fromId(identifier)]?.id
     }
 
     /**
@@ -161,7 +161,7 @@ object ID3Tags {
      * @return
      */
     fun forceFrameID23To24(identifier: String?): String? {
-        return ID3Frames.forcev23Tov24[ID3v23Frames.fromId(identifier)]?.id
+        return ID3Frames.forcev23Tov24[ID3V23Frame.fromId(identifier)]?.id
     }
 
     /**
@@ -172,7 +172,7 @@ object ID3Tags {
      * @return
      */
     fun forceFrameID24To23(identifier: String?): String? {
-        return ID3Frames.forcev24Tov23[ID3v24Frames.fromId(identifier)]?.id
+        return ID3Frames.forcev24Tov23[ID3V24Frame.fromId(identifier)]?.id
     }
 
     /**
@@ -185,10 +185,10 @@ object ID3Tags {
         if ((identifier?.length?:0) < 4) {
             return null
         }
-        var v23id = ID3Frames.convertv24Tov23[ID3v24Frames.fromId(identifier)]
+        var v23id = ID3Frames.convertv24Tov23[ID3V24Frame.fromId(identifier)]
         if (v23id == null) {
-            if (ID3v23Frames.contains(identifier)) {
-                v23id = ID3v23Frames.fromId(identifier)
+            if (ID3V23Frame.contains(identifier)) {
+                v23id = ID3V23Frame.fromId(identifier)
             }
         }
         return v23id?.id

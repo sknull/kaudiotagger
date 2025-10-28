@@ -15,7 +15,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTRCK
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3Tags
@@ -101,38 +101,38 @@ class ID3v11Tag: ID3v1Tag {
             }
             var frame: ID3v24Frame
             var text: String
-            if (id3tag.hasFrame(ID3v24Frames.TITLE.id)) {
-                frame = id3tag.getFrame(ID3v24Frames.TITLE.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24Frame.TITLE.id)) {
+                frame = id3tag.getFrame(ID3V24Frame.TITLE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTIT2).getText()
                 setTitle(ID3Tags.truncate(text, FIELD_TITLE_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24Frames.ARTIST.id)) {
-                frame = id3tag.getFrame(ID3v24Frames.ARTIST.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24Frame.ARTIST.id)) {
+                frame = id3tag.getFrame(ID3V24Frame.ARTIST.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTPE1).getText()
                 setArtist(ID3Tags.truncate(text, FIELD_ARTIST_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24Frames.ALBUM.id)) {
-                frame = id3tag.getFrame(ID3v24Frames.ALBUM.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24Frame.ALBUM.id)) {
+                frame = id3tag.getFrame(ID3V24Frame.ALBUM.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTALB).getText()
                 setAlbum(ID3Tags.truncate(text, FIELD_ALBUM_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24Frames.YEAR.id)) {
-                frame = id3tag.getFrame(ID3v24Frames.YEAR.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24Frame.YEAR.id)) {
+                frame = id3tag.getFrame(ID3V24Frame.YEAR.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTDRC).getText()
                 setYear(ID3Tags.truncate(text, FIELD_YEAR_LENGTH))
             }
 
-            if (id3tag.hasFrame(ID3v24Frames.COMMENT.id)) {
+            if (id3tag.hasFrame(ID3V24Frame.COMMENT.id)) {
                 text = ""
                 id3tag.getFrameOfType(
-                    ID3v24Frames.COMMENT.id
+                    ID3V24Frame.COMMENT.id
                 ).forEach { frame ->
                     text += (((frame as ID3v24Frame).frameBody as FrameBodyCOMM).getText() + " ")
                 }
                 setComment(ID3Tags.truncate(text, FIELD_COMMENT_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24Frames.GENRE.id)) {
-                frame = id3tag.getFrame(ID3v24Frames.GENRE.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24Frame.GENRE.id)) {
+                frame = id3tag.getFrame(ID3V24Frame.GENRE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTCON).getText()
                 try {
                     setGenre(ID3Tags.findNumber(text).toInt())
@@ -144,8 +144,8 @@ class ID3v11Tag: ID3v1Tag {
                     setGenre(GENRE_UNDEFINED)
                 }
             }
-            if (id3tag.hasFrame(ID3v24Frames.TRACK.id)) {
-                frame = id3tag.getFrame(ID3v24Frames.TRACK.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24Frame.TRACK.id)) {
+                frame = id3tag.getFrame(ID3V24Frame.TRACK.id) as ID3v24Frame
                 this.track = (frame.frameBody as FrameBodyTRCK).getTrackNo()
             }
         }

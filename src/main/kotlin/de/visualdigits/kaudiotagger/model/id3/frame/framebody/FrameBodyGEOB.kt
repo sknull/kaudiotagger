@@ -6,7 +6,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringNullTerminated
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -108,7 +108,7 @@ class FrameBodyGEOB: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return
      */
     override fun getIdentifier(): String {
-        return ID3v24Frames.GENERAL_ENCAPS_OBJECT.id
+        return ID3V24Frame.GENERAL_ENCAPS_OBJECT.id
     }
 
     /**

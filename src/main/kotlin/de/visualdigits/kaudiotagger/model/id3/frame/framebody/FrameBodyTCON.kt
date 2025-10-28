@@ -5,7 +5,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.TCONString
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3V2ExtendedGenreTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 
@@ -216,7 +216,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24Frames.GENRE.id
+        return ID3V24Frame.GENRE.id
     }
 
     fun setV23Format() {

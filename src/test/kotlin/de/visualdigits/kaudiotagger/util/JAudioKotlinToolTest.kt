@@ -2,9 +2,9 @@ package de.visualdigits.kaudiotagger.util
 
 import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V23Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -69,9 +69,9 @@ Tag content:
 
     @Test
     fun determineCommonFields() {
-        val v22Entries = ID3v22Frames.entries.map { e -> e.name}
-        val v23Entries = ID3v23Frames.entries.map { e -> e.name}
-        val v24Entries = ID3v24Frames.entries.map { e -> e.name}
+        val v22Entries = ID3V22Frame.entries.map { e -> e.name}
+        val v23Entries = ID3V23Frame.entries.map { e -> e.name}
+        val v24Entries = ID3V24Frame.entries.map { e -> e.name}
 
         val common = v22Entries.intersect(v23Entries).intersect(v24Entries)
         common

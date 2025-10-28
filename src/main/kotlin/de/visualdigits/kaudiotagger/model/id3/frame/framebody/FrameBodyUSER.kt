@@ -5,7 +5,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringSizeTerminated
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.io.ByteArrayOutputStream
@@ -75,7 +75,7 @@ class FrameBodyUSER: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24Frames.TERMS_OF_USE.id
+        return ID3V24Frame.TERMS_OF_USE.id
     }
 
     val language: String?

@@ -4,7 +4,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.StringFixedLength
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.common.datatype.StringSizeTerminated
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import java.nio.ByteBuffer
 
 /**
@@ -128,7 +128,7 @@ class FrameBodyLINK
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24Frames.LINKED_INFO.id
+        return ID3V24Frame.LINKED_INFO.id
     }
 
     /**

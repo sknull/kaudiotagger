@@ -18,8 +18,8 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTDRC
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -63,10 +63,7 @@ class ID3v22Tag : AbstractID3v2Tag {
     /**
      * Creates a new empty ID3v2_2 tag.
      */
-    constructor() {
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
-    }
+    constructor()
 
     /**
      * Copy Constructor, creates a new ID3v2_2 Tag based on another ID3v2_2 Tag
@@ -86,8 +83,6 @@ class ID3v22Tag : AbstractID3v2Tag {
      * @param mp3tag
      */
     constructor(mp3tag: AbstractTag) {
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
         log.debug("Creating tag from a tag of a different version")
         //Default Superclass constructor does nothing
         if (mp3tag != null) {
@@ -312,11 +307,11 @@ class ID3v22Tag : AbstractID3v2Tag {
      * @param byteBuffer
      * @param size
      */
-    protected fun readFrames(byteBuffer: ByteBuffer, size: Int) {
+    fun readFrames(byteBuffer: ByteBuffer, size: Int) {
         //Now start looking for frames
         var next: ID3v22Frame?
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
+        frameMap.clear()
+        encryptedFrameMap.clear()
 
         //Read the size from the Tag Header
         this.fileReadBytes = size
@@ -401,17 +396,17 @@ class ID3v22Tag : AbstractID3v2Tag {
     override fun convertFrame(frame: AbstractID3v2Frame): MutableList<AbstractID3v2Frame> {
         val frames = mutableListOf<AbstractID3v2Frame>()
         val tmpBody = frame.frameBody
-        if ((frame.getIdentifier() == ID3v24Frames.YEAR.id) && (tmpBody is FrameBodyTDRC)) {
+        if ((frame.getIdentifier() == ID3V24Frame.YEAR.id) && (tmpBody is FrameBodyTDRC)) {
             var newFrame: ID3v22Frame
             if (tmpBody.year.isNotEmpty()) {
                 //Create Year frame (v2.2 id,but uses v2.3 body)
-                newFrame = ID3v22Frame(ID3v22Frames.TYER.id)
+                newFrame = ID3v22Frame(ID3V22Frame.TYER.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.year)
                 frames.add(newFrame)
             }
             if (tmpBody.time.isNotEmpty()) {
                 //Create Time frame (v2.2 id,but uses v2.3 body)
-                newFrame = ID3v22Frame(ID3v22Frames.TIME.id)
+                newFrame = ID3v22Frame(ID3V22Frame.TIME.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.time)
                 frames.add(newFrame)
             }
@@ -535,7 +530,7 @@ class ID3v22Tag : AbstractID3v2Tag {
     }
 
     override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
-        val id3v22FieldKey = ID3v22Frames.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
+        val id3v22FieldKey = ID3V22Frame.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
         return FrameAndSubId(
             genericKey,
             id3v22FieldKey.id,

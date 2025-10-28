@@ -4,7 +4,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.ByteArraySizeTerminate
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberFixedLength
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import java.nio.ByteBuffer
 
 /**
@@ -87,7 +87,7 @@ class FrameBodyENCR
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24Frames.ENCRYPTION.id
+        return ID3V24Frame.ENCRYPTION.id
     }
 
     /**

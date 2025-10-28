@@ -26,7 +26,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUFID
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWOAR
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWXXX
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -212,12 +212,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * Map of all frames for this tag
      */
-    var frameMap: MutableMap<String, Any> = mutableMapOf()
+    val frameMap: MutableMap<String, Any> = mutableMapOf()
 
     /**
      * Map of all encrypted frames, these cannot be unencrypted by jaudiotagger
      */
-    var encryptedFrameMap: MutableMap<String, Any> = mutableMapOf()
+    val encryptedFrameMap: MutableMap<String, Any> = mutableMapOf()
     var duplicateFrameId: String = ""
     var duplicateBytes: Int = 0
     var emptyFrameBytes: Int = 0
@@ -346,8 +346,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     //TODO Copy Encrypted frames needs implementing
     fun copyFrames(copyObject: AbstractID3v2Tag) {
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
+        frameMap.clear()
+        encryptedFrameMap.clear()
 
         //Copy Frames that are a valid 2.4 type
         for (o1 in copyObject.frameMap.keys) {
@@ -449,9 +449,9 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         frameId: String?,
         next: AbstractID3v2Frame
     ) {
-        if ((ID3v22Frames.isMultipleAllowed(frameId)) ||
-            (ID3v22Frames.isMultipleAllowed(frameId)) ||
-            (ID3v22Frames.isMultipleAllowed(frameId))
+        if ((ID3V22Frame.isMultipleAllowed(frameId)) ||
+            (ID3V22Frame.isMultipleAllowed(frameId)) ||
+            (ID3V22Frame.isMultipleAllowed(frameId))
         ) {
             //If a frame already exists of this type
             if (map.containsKey(frameId)) {

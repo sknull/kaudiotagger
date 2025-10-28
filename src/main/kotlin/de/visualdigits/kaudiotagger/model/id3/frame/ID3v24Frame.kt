@@ -22,8 +22,8 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupport
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.ID3v24FrameBody
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V23Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.lyrics3.Lyrics3v2Field
 import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyAUT
@@ -256,7 +256,7 @@ class ID3v24Frame: AbstractID3v2Frame {
             )
         } else if (this@ID3v24Frame.getIdentifier() != null) {
             //Special Case
-            if ((frame.getIdentifier() == ID3v23Frames.USER_DEFINED_INFO.id) &&
+            if ((frame.getIdentifier() == ID3V23Frame.USER_DEFINED_INFO.id) &&
                 ((frame.frameBody as FrameBodyTXXX).getDescription() == FrameBodyTXXX.MOOD)
             ) {
                 this.frameBody = FrameBodyTMOO(frame.frameBody as FrameBodyTXXX)
@@ -714,14 +714,14 @@ class ID3v24Frame: AbstractID3v2Frame {
      * @return true if considered a common frame
      */
     override fun isCommon(): Boolean {
-        return ID3v24Frames.isCommon(getIdentifier())
+        return ID3V24Frame.isCommon(getIdentifier())
     }
 
     /**
      * @return true if considered a common frame
      */
     override fun isBinary(): Boolean {
-        return ID3v24Frames.isBinary(getIdentifier())
+        return ID3V24Frame.isBinary(getIdentifier())
     }
 
     /**

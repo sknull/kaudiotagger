@@ -24,8 +24,8 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIME
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIPL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTMCL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTYER
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V23Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
@@ -211,7 +211,7 @@ class ID3v23Tag : AbstractID3v2Tag {
 
     override fun convertFrame(frame: AbstractID3v2Frame): MutableList<AbstractID3v2Frame> {
         val frames = mutableListOf<AbstractID3v2Frame>()
-        if ((frame.getIdentifier() == ID3v24Frames.YEAR.id) &&
+        if ((frame.getIdentifier() == ID3V24Frame.YEAR.id) &&
             (frame.frameBody is FrameBodyTDRC)
         ) {
             val tmpBody = frame.frameBody as FrameBodyTDRC
@@ -219,29 +219,29 @@ class ID3v23Tag : AbstractID3v2Tag {
             tmpBody.findMatchingMaskAndExtractV3Values()
             var newFrame: ID3v23Frame
             if (tmpBody.year != "") {
-                newFrame = ID3v23Frame(ID3v23Frames.TYER.id)
+                newFrame = ID3v23Frame(ID3V23Frame.TYER.id)
                 (newFrame.frameBody as FrameBodyTYER).setText(tmpBody.year)
                 frames.add(newFrame)
             }
             if (tmpBody.date != "") {
-                newFrame = ID3v23Frame(ID3v23Frames.TDAT.id)
+                newFrame = ID3v23Frame(ID3V23Frame.TDAT.id)
                 (newFrame.frameBody as FrameBodyTDAT).setText(tmpBody.date)
                 (newFrame.frameBody as FrameBodyTDAT).isMonthOnly = tmpBody.monthOnly
                 frames.add(newFrame)
             }
             if (!tmpBody.time.equals("")) {
-                newFrame = ID3v23Frame(ID3v23Frames.TIME.id)
+                newFrame = ID3v23Frame(ID3V23Frame.TIME.id)
                 (newFrame.frameBody as FrameBodyTIME).setText(tmpBody.time)
                 (newFrame.frameBody as FrameBodyTIME).hoursOnly = tmpBody.hoursOnly
                 frames.add(newFrame)
             }
-        } else if ((frame.getIdentifier() == ID3v24Frames.INVOLVED_PEOPLE.id) &&
+        } else if ((frame.getIdentifier() == ID3V24Frame.INVOLVED_PEOPLE.id) &&
             (frame.frameBody is FrameBodyTIPL)
         ) {
             val pairs = (frame.frameBody as FrameBodyTIPL).getPairing()?.mapping
             val ipls: AbstractID3v2Frame = ID3v23Frame(
                 frame as ID3v24Frame,
-                ID3v23Frames.INVOLVED_PEOPLE.id
+                ID3V23Frame.INVOLVED_PEOPLE.id
             )
             val iplsBody = FrameBodyIPLS(
                 frame.frameBody?.getTextEncoding() ?: 0,
@@ -249,13 +249,13 @@ class ID3v23Tag : AbstractID3v2Tag {
             )
             ipls.frameBody = iplsBody
             frames.add(ipls)
-        } else if ((frame.getIdentifier() == ID3v24Frames.MUSICIAN_CREDITS.id) &&
+        } else if ((frame.getIdentifier() == ID3V24Frame.MUSICIAN_CREDITS.id) &&
             (frame.frameBody is FrameBodyTMCL)
         ) {
             val pairs = (frame.frameBody as FrameBodyTMCL).getPairing()?.mapping
             val ipls: AbstractID3v2Frame = ID3v23Frame(
                 frame as ID3v24Frame,
-                ID3v23Frames.INVOLVED_PEOPLE.id
+                ID3V23Frame.INVOLVED_PEOPLE.id
             )
             val iplsBody = FrameBodyIPLS(
                 frame.frameBody?.getTextEncoding() ?: 0,
@@ -638,8 +638,8 @@ class ID3v23Tag : AbstractID3v2Tag {
     fun readFrames(byteBuffer: ByteBuffer, size: Int) {
         //Now start looking for frames
         var next: ID3v23Frame?
-        frameMap = mutableMapOf()
-        encryptedFrameMap = mutableMapOf()
+        frameMap.clear()
+        encryptedFrameMap.clear()
 
         //Read the size from the Tag Header
         this.fileReadBytes = size
@@ -778,7 +778,7 @@ class ID3v23Tag : AbstractID3v2Tag {
     }
 
     override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
-        val id3v23FieldKey = ID3v23Frames.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
+        val id3v23FieldKey = ID3V23Frame.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
         return FrameAndSubId(
             genericKey,
             id3v23FieldKey.id,

@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import java.nio.ByteBuffer
 
 /**
@@ -51,6 +51,6 @@ class FrameBodyTIT1: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3v24Frames.CONTENT_GROUP_DESC.id
+        return ID3V24Frame.CONTENT_GROUP_DESC.id
     }
 }

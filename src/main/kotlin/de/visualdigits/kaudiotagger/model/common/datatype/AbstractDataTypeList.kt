@@ -25,7 +25,7 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
      *
      * @param copy instance
      */
-    protected constructor(copy: AbstractDataTypeList<T>) : super(copy)
+    constructor(copy: AbstractDataTypeList<T>) : super(copy)
 
     /**
      * Reads list of [EventTimingCode]s from buffer starting at the given offset.
@@ -74,7 +74,7 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
      *
      * @return new list element
      */
-    protected abstract fun createListElement(): T?
+    abstract fun createListElement(): T?
 
     /**
      * Write contents to a byte array.

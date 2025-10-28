@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.datatype
 
+import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyETCO
 
 /**
@@ -17,9 +18,9 @@ class EventTimingCodeList : de.visualdigits.kaudiotagger.model.common.datatype.A
      */
     constructor(copy: EventTimingCodeList) : super(copy)
 
-    constructor(body: FrameBodyETCO) : super(_root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.DataTypes.OBJ_TIMED_EVENT_LIST, body)
+    constructor(body: FrameBodyETCO) : super(DataTypes.OBJ_TIMED_EVENT_LIST, body)
 
-    protected override fun createListElement(): EventTimingCode? {
-        return EventTimingCode(_root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.DataTypes.OBJ_TIMED_EVENT, getBody())
+    override fun createListElement(): EventTimingCode? {
+        return EventTimingCode(DataTypes.OBJ_TIMED_EVENT, getBody())
     }
 }
