@@ -81,12 +81,6 @@ class FrameBodyCRM
         return ID3V22Frame.ENCRYPTED_FRAME.id
     }
 
-    val owner: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue(DataTypes.OBJ_OWNER) as String?
-
     /**
      * @param description
      */

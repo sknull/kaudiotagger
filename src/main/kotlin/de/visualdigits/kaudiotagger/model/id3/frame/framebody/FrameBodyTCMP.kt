@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import java.nio.ByteBuffer
 
 /**
@@ -46,8 +46,9 @@ class FrameBodyTCMP: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    val isCompilation: Boolean
-        get() = this.getText().equals(IS_COMPILATION)
+    fun isCompilation(): Boolean {
+        return this.getText().equals(IS_COMPILATION)
+    }
 
     /**
      * The ID3v2 frame identifier

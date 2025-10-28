@@ -5,9 +5,9 @@ import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringSizeTerminated
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 
@@ -78,11 +78,12 @@ class FrameBodyUSER: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3V24Frame.TERMS_OF_USE.id
     }
 
-    val language: String?
-        /**
-         * @return lanaguage
-         */
-        get() = getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+    /**
+     * @return lanaguage
+     */
+    fun getLanguage(): String? {
+        return getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+    }
 
     /**
      * @param language

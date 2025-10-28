@@ -6,8 +6,8 @@ import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringNullTerminated
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 
@@ -92,17 +92,19 @@ class FrameBodyGEOB: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    var description: String?
-        /**
-         * @return the description field
-         */
-        get() = getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
-        /**
-         * @param description
-         */
-        set(description) {
-            setObjectValue(DataTypes.OBJ_DESCRIPTION, description)
-        }
+    /**
+     * @return the description field
+     */
+    fun getDescription(): String? {
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+    }
+
+    /**
+     * @param description
+     */
+    fun setDescription(description: String?) {
+        setObjectValue(DataTypes.OBJ_DESCRIPTION, description)
+    }
 
     /**
      * @return

@@ -78,23 +78,23 @@ class FrameBodyGRID
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    var groupSymbol: Byte
-        /**
-         * @return
-         */
-        get() {
-            if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
-                return (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as Long).toByte()
-            } else {
-                return 0.toByte()
-            }
+    /**
+     * @return
+     */
+    fun getGroupSymbol(): Byte {
+        if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
+            return (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as Long).toByte()
+        } else {
+            return 0.toByte()
         }
-        /**
-         * @param textEncoding
-         */
-        set(textEncoding) {
-            setObjectValue(DataTypes.OBJ_GROUP_SYMBOL, textEncoding)
-        }
+    }
+
+    /**
+     * @param textEncoding
+     */
+    fun setGroupSymbol(textEncoding: Byte) {
+        setObjectValue(DataTypes.OBJ_GROUP_SYMBOL, textEncoding)
+    }
 
     /**
      * The ID3v2 frame identifier
@@ -105,17 +105,19 @@ class FrameBodyGRID
         return ID3V24Frame.GROUP_ID_REG.id
     }
 
-    var owner: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue(DataTypes.OBJ_OWNER) as String?
-        /**
-         * @param owner
-         */
-        set(owner) {
-            setObjectValue(DataTypes.OBJ_OWNER, owner)
-        }
+    /**
+     * @return
+     */
+    fun getOwner(): String? {
+        return getObjectValue(DataTypes.OBJ_OWNER) as String?
+    }
+
+    /**
+     * @param owner
+     */
+    fun setOwner(owner: String?) {
+        setObjectValue(DataTypes.OBJ_OWNER, owner)
+    }
 
     /**
      *

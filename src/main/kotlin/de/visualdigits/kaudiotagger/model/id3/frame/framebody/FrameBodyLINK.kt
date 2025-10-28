@@ -96,11 +96,12 @@ class FrameBodyLINK
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    val additionalData: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue(DataTypes.OBJ_ID) as String?
+    /**
+     * @return
+     */
+    fun getAdditionalData(): String? {
+        return getObjectValue(DataTypes.OBJ_ID) as String?
+    }
 
     /**
      * @param additionalData
@@ -109,11 +110,12 @@ class FrameBodyLINK
         setObjectValue(DataTypes.OBJ_ID, additionalData)
     }
 
-    val frameIdentifier: String?
-        /**
-         * @return
-         */
-        get() = getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+    /**
+     * @return
+     */
+    fun getFrameIdentifier(): String? {
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+    }
 
     /**
      * @param frameIdentifier
