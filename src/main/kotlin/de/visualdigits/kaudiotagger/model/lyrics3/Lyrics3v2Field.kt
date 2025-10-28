@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.lyrics3
 
-import de.visualdigits.kaudiotagger.model.lyrics3.types.Lyrics3v2Fields
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
@@ -19,6 +18,7 @@ import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBody
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyIND
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyINF
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyLYR
+import de.visualdigits.kaudiotagger.model.lyrics3.types.Lyrics3v2Fields
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
@@ -102,9 +102,9 @@ class Lyrics3v2Field: AbstractTagFrame {
      * @throws InvalidTagException
      * @throws java.io.IOException
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val buffer = ByteArray(6)
         // lets scan for a non-zero byte;
@@ -117,12 +117,12 @@ class Lyrics3v2Field: AbstractTagFrame {
         byteBuffer.get(buffer, 0, 3)
         val identifier = String(buffer, 0, 3)
         // is this a valid identifier?
-        if (!Lyrics3v2Fields.Companion.isLyrics3v2FieldIdentifier(identifier)) {
-            throw InvalidTagException(
-                "$identifier is not a valid ID3v2.4 frame"
-            )
+        if (!Lyrics3v2Fields.isLyrics3v2FieldIdentifier(identifier)) {
+            throw InvalidTagException("$identifier is not a valid ID3v2.4 frame")
         }
         frameBody = readBody(identifier, byteBuffer)
+
+        return true
     }
 
     /**

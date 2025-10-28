@@ -4,7 +4,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MP3AudioHeader
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
@@ -174,8 +173,8 @@ class MP3File : AudioFile {
 
             //If we have a v2 tag use that, if we do not but have v1 tag use that
             //otherwise use nothing
-            //TODO:if have both should we merge
-            //rather than just returning specific ID3v22 tag, would it be better to return v24 version ?
+            //TODO if have both should we merge
+            //     rather than just returning specific ID3v22 tag, would it be better to return v24 version ?
             if (this.id3v2tag != null) {
                 setTag(this.id3v2tag)
             } else if (id3v1tag != null) {
@@ -199,18 +198,9 @@ class MP3File : AudioFile {
     private fun readV1Tag(file: File?, newFile: RandomAccessFile, loadOptions: Int) {
         if ((loadOptions and LOAD_IDV1TAG) != 0) {
             log.debug("Attempting to read id3v1tags")
-            try {
-                id3v1tag = ID3v11Tag(newFile)
-            } catch (ex: TagNotFoundException) {
-                log.debug("No ids3v11 tag found")
-            }
-
-            try {
-                if (id3v1tag == null) {
-                    id3v1tag = ID3v1Tag(newFile)
-                }
-            } catch (ex: TagNotFoundException) {
-                log.debug("No id3v1 tag found")
+            id3v1tag = ID3v11Tag.read(newFile)
+            if (id3v1tag == null) {
+                id3v1tag = ID3v1Tag.read(newFile)
             }
         }
     }
@@ -245,26 +235,12 @@ class MP3File : AudioFile {
                 bb.rewind()
                 if ((loadOptions and LOAD_IDV2TAG) != 0) {
                     log.debug("Attempting to read id3v2tags")
-                    try {
-                        this.setid3v2tag(ID3v24Tag(bb))
-                    } catch (_: TagNotFoundException) {
-                        log.debug("No id3v24 tag found")
+                    this.setid3v2tag(ID3v24Tag.read(bb))
+                    if (id3v2tag == null) {
+                        ID3v23Tag.read(bb)?.also { tag -> this.setid3v2tag(tag) }
                     }
-
-                    try {
-                        if (id3v2tag == null) {
-                            this.setid3v2tag(ID3v23Tag(bb))
-                        }
-                    } catch (_: TagNotFoundException) {
-                        log.debug("No id3v23 tag found")
-                    }
-
-                    try {
-                        if (id3v2tag == null) {
-                            this.setid3v2tag(ID3v22Tag(bb))
-                        }
-                    } catch (_: TagNotFoundException) {
-                        log.debug("No id3v22 tag found")
+                    if (id3v2tag == null) {
+                        ID3v22Tag.read(bb)?.also { tag -> this.setid3v2tag(tag) }
                     }
                 }
             } finally {
@@ -438,23 +414,6 @@ class MP3File : AudioFile {
     }
 
     /**
-     * Read lyrics3 Tag
-     *
-     *
-     * TODO:not working
-     *
-     * @param file
-     * @param newFile
-     * @param loadOptions
-     */
-    private fun readLyrics3Tag(
-        file: File?,
-        newFile: RandomAccessFile?,
-        loadOptions: Int
-    ) {
-    }
-
-    /**
      * Extracts the raw ID3v2 tag data into a file.
      *
      *
@@ -464,12 +423,11 @@ class MP3File : AudioFile {
      *
      * @param outputFile to write the data to
      * @return
-     * @throws TagNotFoundException
      * @throws IOException
      */
-    fun extractid3v2tagDataIntoFile(outputFile: File): File {
+    fun extractid3v2tagDataIntoFile(outputFile: File): File? {
         val startByte = (audioHeader as MP3AudioHeader).mp3StartByte.toInt()
-        if (startByte >= 0) {
+        return if (startByte >= 0) {
             //Read byte into buffer
             file?.also { f ->
                 FileInputStream(f).use { fis ->
@@ -484,9 +442,10 @@ class MP3File : AudioFile {
                     }
                 }
             }
-            return outputFile
+            outputFile
+        } else {
+            null
         }
-        throw TagNotFoundException("There is no id3v2tag data in this file")
     }
 
     /**

@@ -210,7 +210,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24Frames.SYNC_TEMPO.id
     }
 
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         super.read(byteBuffer)
 
         // validate input
@@ -229,6 +229,8 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
             }
             lastTimestamp = code.getTimestamp()
         }
+
+        return false
     }
 
     override fun setupObjectList() {

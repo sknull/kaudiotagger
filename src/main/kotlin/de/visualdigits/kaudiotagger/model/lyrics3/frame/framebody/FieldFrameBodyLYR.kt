@@ -109,9 +109,9 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
     /**
      *
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val lineString: String
 
@@ -135,6 +135,8 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         byteBuffer.get(buffer)
         lineString = String(buffer)
         readString(lineString)
+
+        return false
     }
 
     /**

@@ -2,27 +2,26 @@ package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
-import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.exceptions.PaddingException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
+import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyTextInfo
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTDRC
-import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
-import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.FileConstants
@@ -52,6 +51,13 @@ class ID3v22Tag : AbstractID3v2Tag {
         const val REVISION: Int = 0
         const val TYPE_COMPRESSION: String = "compression"
         const val TYPE_UNSYNCHRONISATION: String = "unsyncronisation"
+
+
+        fun read(byteBuffer: ByteBuffer?): ID3v22Tag? {
+            val tag = ID3v22Tag()
+
+            return if (tag.read(byteBuffer)) tag else null
+        }
     }
 
     /**
@@ -72,16 +78,6 @@ class ID3v22Tag : AbstractID3v2Tag {
         log.debug("Creating tag from another tag of same type")
         copyPrimitives(copyObject)
         copyFrames(copyObject)
-    }
-
-    /**
-     * Creates a new ID3v2_2 datatype.
-     *
-     * @param buffer
-     * @throws TagException
-     */
-    constructor(buffer: ByteBuffer) {
-        this.read(buffer)
     }
 
     /**
@@ -185,12 +181,9 @@ class ID3v22Tag : AbstractID3v2Tag {
     /**
      * {@inheritDoc}
      */
-    override fun read(byteBuffer: ByteBuffer?) {
-        if (byteBuffer == null) {
-            return
-        }
-        if (!seek(byteBuffer)) {
-            throw TagNotFoundException("ID3v2.20 tag not found")
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
+        if (byteBuffer == null || !seek(byteBuffer)) {
+            return false
         }
         log.debug("Reading tag from file")
 
@@ -214,6 +207,8 @@ class ID3v22Tag : AbstractID3v2Tag {
             "Loaded Frames,there are:" +
                     frameMap.size
         )
+
+        return true
     }
 
     /**

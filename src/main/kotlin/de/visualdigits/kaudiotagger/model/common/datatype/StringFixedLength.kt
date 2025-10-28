@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.common.datatype
 
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset

@@ -149,7 +149,6 @@ open class MP3AudioHeader : AudioHeader {
      * @throws IOException on any I/O error
      */
     fun seek(seekFile: File, startByte: Long): Boolean {
-
         return FileInputStream(seekFile).use { fis ->
             fis.getChannel().use { fc ->
                 //Read into Byte Buffer in Chunks
@@ -170,9 +169,6 @@ open class MP3AudioHeader : AudioHeader {
                 var syncFound = false
                 try {
                     do {
-                        //TODO remaining() is quite an expensive operation, isn't there a way we can work this out without
-                        //interrogating the bytebuffer. Also this is rarely going to be true, and could be made less true
-                        //by increasing FILE_BUFFER_SIZE
                         if (bb.remaining() <= MIN_BUFFER_REMAINING_REQUIRED) {
                             bb.clear()
                             fc.position(filePointerCount)
@@ -226,8 +222,6 @@ open class MP3AudioHeader : AudioHeader {
                             }
                         }
 
-                        //TODO position() is quite an expensive operation, isn't there a way we can work this out without
-                        //interrogating the bytebuffer
                         bb.position(bb.position() + 1)
                         filePointerCount++
                     } while (!syncFound)
@@ -472,14 +466,6 @@ open class MP3AudioHeader : AudioHeader {
     }
 
     /**
-     * @return the number of bits per sample
-     */
-    override fun getBitsPerSample(): Int {
-        //TODO: can it really be different in such an MP3 ? I think not.
-        return 16
-    }
-
-    /**
      * @return the sampling rate as string
      */
     override fun getSampleRate(): String? {
@@ -603,24 +589,6 @@ open class MP3AudioHeader : AudioHeader {
      */
     override fun getPreciseTrackLength(): Double {
         return trackLength
-    }
-
-    /**
-     * TODO (Was originally added for Wavs)
-     *
-     * @return
-     */
-    override fun getByteRate(): Int? {
-        return null
-    }
-
-    /**
-     * TODO (Was origjnally added for Wavs)
-     *
-     * @return
-     */
-    override fun getAudioDataLength(): Long? {
-        return 0
     }
 
     companion object {

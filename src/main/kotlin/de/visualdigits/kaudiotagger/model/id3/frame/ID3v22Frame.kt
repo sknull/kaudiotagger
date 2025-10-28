@@ -1,15 +1,16 @@
 package de.visualdigits.kaudiotagger.model.id3.frame
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.types.Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
+import de.visualdigits.kaudiotagger.model.common.types.Frames
+import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
-import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -25,6 +26,8 @@ class ID3v22Frame: AbstractID3v2Frame {
         const val FRAME_SIZE_SIZE: Int = 3
         val FRAME_HEADER_SIZE: Int = FRAME_ID_SIZE + FRAME_SIZE_SIZE
         val validFrameIdentifier: Pattern = Pattern.compile("[A-Z][0-9A-Z]{2}")
+
+
     }
 
     constructor()
@@ -193,9 +196,9 @@ class ID3v22Frame: AbstractID3v2Frame {
      *
      * @param byteBuffer
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val identifier = readIdentifier(byteBuffer)?:error("No ioentifier")
 
@@ -255,6 +258,8 @@ class ID3v22Frame: AbstractID3v2Frame {
                 byteBuffer.position(byteBuffer.position() + frameSize)
             }
         }
+
+        return true
     }
 
     /**

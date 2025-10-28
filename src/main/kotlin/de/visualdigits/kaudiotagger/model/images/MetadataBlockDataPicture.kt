@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.images
 
-import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.util.Utils
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream

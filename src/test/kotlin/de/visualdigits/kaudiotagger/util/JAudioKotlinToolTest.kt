@@ -14,6 +14,13 @@ class JAudioKotlinToolTest {
 
     @Test
     fun testMetadata() {
+        val file = File("E:/temp/01_Green Desert.mp3")
+        val audioFile = MP3File(file)
+        println(audioFile)
+    }
+
+    @Test
+    fun scanDirectory() {
         val metaData = scanDirectory(File("m:"))
 
 //        val file = File("E:/temp/01_Green Desert.mp3")

@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
@@ -9,9 +8,10 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyEncrypted
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
-import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.StatusFlags
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton

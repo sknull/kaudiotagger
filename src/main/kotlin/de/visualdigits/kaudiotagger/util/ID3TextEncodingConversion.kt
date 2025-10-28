@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

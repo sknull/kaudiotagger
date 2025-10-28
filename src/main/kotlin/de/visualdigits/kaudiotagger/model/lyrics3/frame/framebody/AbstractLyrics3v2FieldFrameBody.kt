@@ -47,9 +47,9 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
      * @throws IOException         on any I/O error
      * @throws InvalidTagException if there is any error in the data format.
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val size = getSize()
         //Allocate a buffer to the size of the Frame Body and read from file
@@ -74,6 +74,8 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
             //Increment Offset to start of next datatype.
             offset += `object`.getSize()
         }
+
+        return false
     }
 
     /**

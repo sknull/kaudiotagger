@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.common.tag
 
-import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.field.TagField
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.images.Artwork
 
 /**

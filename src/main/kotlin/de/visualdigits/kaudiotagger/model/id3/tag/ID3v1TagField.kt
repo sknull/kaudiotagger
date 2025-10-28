@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.Locale

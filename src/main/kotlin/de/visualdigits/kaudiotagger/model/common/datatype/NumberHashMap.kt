@@ -1,18 +1,17 @@
 package de.visualdigits.kaudiotagger.model.common.datatype
 
+import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
+import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.common.types.ChannelTypes
-import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
-import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.common.types.InterpolationTypes
-import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.types.ReceivedAsTypes
 import de.visualdigits.kaudiotagger.model.common.types.SynchronisedLyricsContentType
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
-import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
+import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.util.ErrorMessage
-import kotlin.collections.get
 
 class NumberHashMap: NumberFixedLength, HashMapInterface<Int, String>  {
 

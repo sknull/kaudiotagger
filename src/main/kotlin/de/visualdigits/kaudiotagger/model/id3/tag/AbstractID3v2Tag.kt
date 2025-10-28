@@ -2,16 +2,15 @@ package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.types.FileSystemMessage
-import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.id3.types.Languages
-import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
-import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.frame.AggregatedFrame
 import de.visualdigits.kaudiotagger.model.common.frame.TyerTdatAggregatedFrame
+import de.visualdigits.kaudiotagger.model.common.tag.Tag
+import de.visualdigits.kaudiotagger.model.common.types.FileSystemMessage
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
+import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyNumberTotal
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyPairs
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyTextInfo
@@ -28,8 +27,9 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUFID
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWOAR
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWXXX
-import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
-import de.visualdigits.kaudiotagger.model.common.tag.Tag
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.Languages
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3SyncSafeInteger
@@ -46,7 +46,6 @@ import java.nio.channels.FileChannel
 import java.nio.channels.FileLock
 import java.nio.charset.StandardCharsets
 import java.util.TreeSet
-import kotlin.collections.get
 
 abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 

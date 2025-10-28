@@ -1,14 +1,13 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3Tags
@@ -40,6 +39,19 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             GenericFieldKey.GENRE to ID3v1FieldKey.GENRE,
             GenericFieldKey.COMMENT to ID3v1FieldKey.COMMENT
         )
+
+
+        fun read(file: RandomAccessFile): ID3v1Tag? {
+            val fc = file.getChannel()
+            fc.position(file.length() - TAG_LENGTH)
+            val byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
+            fc.read(byteBuffer)
+            byteBuffer.flip()
+
+            val tag = ID3v1Tag()
+
+            return if (tag.read(byteBuffer)) tag else null
+        }
     }
 
     private var album: String = ""
@@ -86,23 +98,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     /**
-     * Creates a new ID3v1 datatype.
-     *
-     * @param file
-     * @throws TagNotFoundException
-     * @throws IOException
-     */
-    constructor(file: RandomAccessFile) {
-        val fc = file.getChannel()
-        fc.position(file.length() - TAG_LENGTH)
-        val byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
-        fc.read(byteBuffer)
-        byteBuffer.flip()
-
-        read(byteBuffer)
-    }
-
-    /**
      * Retrieve the Release
      */
     override fun getRelease(): Int {
@@ -128,12 +123,9 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @param byteBuffer from where to read in a tag
      */
-    override fun read(byteBuffer: ByteBuffer?) {
-        if (byteBuffer == null) {
-            return
-        }
-        if (!seek(byteBuffer)) {
-            throw TagNotFoundException("ID3v1 tag not found")
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
+        if (byteBuffer == null || !seek(byteBuffer)) {
+            return false
         }
         log.debug("Reading v1.1 tag")
 
@@ -198,6 +190,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         }
 
         genre = dataBuffer[FIELD_GENRE_POS].toInt()
+
+        return true
     }
 
     /**

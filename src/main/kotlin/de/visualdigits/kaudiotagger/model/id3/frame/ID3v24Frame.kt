@@ -1,15 +1,13 @@
 package de.visualdigits.kaudiotagger.model.id3.frame
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyCOMM
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodySYLT
@@ -21,11 +19,13 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTXXX
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
-import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.ID3v24FrameBody
-import de.visualdigits.kaudiotagger.model.lyrics3.Lyrics3v2Field
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.lyrics3.Lyrics3v2Field
+import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyAUT
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyEAL
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyEAR
@@ -57,6 +57,8 @@ class ID3v24Frame: AbstractID3v2Frame {
         const val FRAME_HEADER_SIZE: Int = FRAME_ID_SIZE + FRAME_SIZE_SIZE + FRAME_FLAGS_SIZE
 
         val validFrameIdentifier: Pattern = Pattern.compile("[A-Z][0-9A-Z]{3}")
+
+
     }
 
     /**
@@ -308,9 +310,9 @@ class ID3v24Frame: AbstractID3v2Frame {
      *
      * @param byteBuffer to read the frame from
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val identifier = readIdentifier(byteBuffer)
 
@@ -416,6 +418,8 @@ class ID3v24Frame: AbstractID3v2Frame {
             //Update position of main buffer, so no attempt is made to reread these bytes
             byteBuffer.position(byteBuffer.position() + realFrameSize)
         }
+
+        return true
     }
 
     override fun getFrameIdSize(): Int {

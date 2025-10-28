@@ -1,12 +1,12 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
+import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyCOMM
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTALB
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
@@ -14,8 +14,8 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTDRC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTRCK
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
-import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3Tags
@@ -41,6 +41,19 @@ class ID3v11Tag: ID3v1Tag {
         const val RELEASE: Int = 1
         const val MAJOR_VERSION: Int = 1
         const val REVISION: Int = 0
+
+
+        fun read(file: RandomAccessFile): ID3v11Tag? {
+            val fc = file.getChannel()
+            fc.position(file.length() - TAG_LENGTH)
+            val byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
+            fc.read(byteBuffer)
+            byteBuffer.flip()
+
+            val tag = ID3v11Tag()
+
+            return if (tag.read(byteBuffer)) tag else null
+        }
     }
 
     /**
@@ -138,23 +151,6 @@ class ID3v11Tag: ID3v1Tag {
     }
 
     /**
-     * Creates a new ID3v11 datatype.
-     *
-     * @param file
-     * @throws TagNotFoundException
-     * @throws IOException
-     */
-    constructor(file: RandomAccessFile) {
-        val byteBuffer = ByteBuffer.allocate(TAG_LENGTH)
-        val fc = file.getChannel()
-        fc.position(file.length() - TAG_LENGTH)
-        fc.read(byteBuffer)
-        byteBuffer.flip()
-
-        read(byteBuffer)
-    }
-
-    /**
      * Retrieve the Release
      */
     override fun getRelease(): Int {
@@ -180,9 +176,11 @@ class ID3v11Tag: ID3v1Tag {
      *
      * @param byteBuffer from where to read in a tag
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         super.read(byteBuffer)
         track = dataBuffer[FIELD_TRACK_POS].toInt()
+
+        return true
     }
 
     /**

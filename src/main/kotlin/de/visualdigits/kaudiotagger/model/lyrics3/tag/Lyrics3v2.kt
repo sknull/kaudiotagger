@@ -2,12 +2,11 @@ package de.visualdigits.kaudiotagger.model.lyrics3.tag
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
-import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
-import de.visualdigits.kaudiotagger.model.lyrics3.Lyrics3v2Field
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
+import de.visualdigits.kaudiotagger.model.lyrics3.Lyrics3v2Field
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyIND
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyLYR
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
@@ -73,22 +72,15 @@ class Lyrics3v2 : AbstractLyrics3 {
         }
     }
 
-    override fun read(byteBuffer: ByteBuffer?) {
-        if (byteBuffer == null) {
-            return
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
+        if (byteBuffer == null || !seek(byteBuffer)) {
+            return false
         }
-        val filePointer: Long
-        val lyricSize: Int
 
-        if (seek(byteBuffer)) {
-            lyricSize = seekSize(byteBuffer)
-        } else {
-            throw TagNotFoundException("Lyrics3v2.00 Tag Not Found")
-        }
+        val lyricSize: Int = seekSize(byteBuffer)
 
         // reset file pointer to the beginning of the tag;
         seek(byteBuffer)
-        filePointer = byteBuffer.position().toLong()
 
         fieldMap = HashMap<String?, Lyrics3v2Field>()
 
@@ -103,6 +95,8 @@ class Lyrics3v2 : AbstractLyrics3 {
                 // keep reading until we're done
             }
         }
+
+        return true
     }
 
     /**

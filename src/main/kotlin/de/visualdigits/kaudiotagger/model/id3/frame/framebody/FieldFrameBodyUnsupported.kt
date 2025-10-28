@@ -42,9 +42,9 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
      * @param byteBuffer
      * @throws IOException
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val size: Int
         val buffer = ByteArray(5)
@@ -57,6 +57,8 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
 
         // read the SIZE length description
         byteBuffer.get(value)
+
+        return false
     }
 
     /**

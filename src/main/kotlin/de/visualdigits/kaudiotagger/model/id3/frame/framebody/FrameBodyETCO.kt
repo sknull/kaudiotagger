@@ -234,7 +234,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         ) as MutableList<EventTimingCode?>).clear()
     }
 
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         super.read(byteBuffer)
 
         // validate input
@@ -259,6 +259,8 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
             }
             lastTimestamp = translatedTimestamp
         }
+
+        return false
     }
 
     /**

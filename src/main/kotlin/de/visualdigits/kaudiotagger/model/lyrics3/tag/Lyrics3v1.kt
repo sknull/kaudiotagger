@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.tag
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyLYR
@@ -55,23 +54,20 @@ class Lyrics3v1: AbstractLyrics3 {
 
     /**
      * @param byteBuffer
-     * @throws TagNotFoundException
      * @throws IOException
      */
-    override fun read(byteBuffer: ByteBuffer?) {
-        if (byteBuffer == null) {
-            return
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
+        if (byteBuffer == null || !seek(byteBuffer)) {
+            return false
         }
+
         val buffer = ByteArray(5100 + 9 + 11)
-
-        if (!seek(byteBuffer)) {
-            throw TagNotFoundException("ID3v1 tag not found")
-        }
-
         byteBuffer.get(buffer)
         val lyricBuffer: String = String(buffer)
 
         lyric = lyricBuffer.substringBefore("LYRICSEND")
+
+        return true
     }
 
     /**

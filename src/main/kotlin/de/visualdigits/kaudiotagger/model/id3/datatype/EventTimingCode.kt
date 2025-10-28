@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.id3.datatype
 
-import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
 
 /**
  * A single event timing code. Part of a list of timing codes ([EventTimingCodeList]), that are contained in

@@ -8,11 +8,6 @@ interface AudioHeader {
     fun getEncodingType(): String?
 
     /**
-     * @return the ByteRate of the Audio, this is the total average amount of bytes of data sampled per second
-     */
-    fun getByteRate(): Int?
-
-    /**
      * @return the BitRate of the Audio, this is the amount of kilobits of data sampled per second
      */
     fun getBitRate(): String?
@@ -21,14 +16,6 @@ interface AudioHeader {
      * @return bitRate as a number, this is the amount of kilobits of data sampled per second
      */
     fun getBitRateAsNumber(): Long
-
-    /**
-     * @return length of the audio data in bytes, exactly what this means depends on the audio format
-     *
-     *
-     * TODO currently only used by Wav/Aiff/Flac/Mp4
-     */
-    fun getAudioDataLength(): Long?
 
     /**
      * @return the Sampling rate, the number of samples taken per second
@@ -64,11 +51,6 @@ interface AudioHeader {
      * @return track length as float
      */
     fun getPreciseTrackLength(): Double
-
-    /**
-     * @return the number of bits in each sample
-     */
-    fun getBitsPerSample(): Int
 
     /**
      * @return if the audio codec is lossless or lossy

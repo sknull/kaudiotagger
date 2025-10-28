@@ -84,9 +84,9 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val imageString: String?
 
@@ -109,6 +109,8 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         byteBuffer.get(buffer)
         imageString = String(buffer)
         readString(imageString)
+
+        return false
     }
 
     /**

@@ -1,19 +1,19 @@
 package de.visualdigits.kaudiotagger.model.id3.frame
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
-import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23StatusFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.ID3Compression
 import de.visualdigits.kaudiotagger.util.ID3Tags
@@ -38,6 +38,8 @@ class ID3v23Frame: AbstractID3v2Frame {
         val FRAME_HEADER_SIZE: Int = FRAME_ID_SIZE + FRAME_SIZE_SIZE + FRAME_FLAGS_SIZE
 
         val validFrameIdentifier: Pattern = Pattern.compile("[A-Z][0-9A-Z]{3}")
+
+
     }
 
     /**
@@ -269,9 +271,9 @@ class ID3v23Frame: AbstractID3v2Frame {
      *
      * @param byteBuffer buffer to read from
      */
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val identifier = readIdentifier(byteBuffer)
         if (!isValidID3v2FrameIdentifier(identifier)) {
@@ -403,6 +405,8 @@ class ID3v23Frame: AbstractID3v2Frame {
             //Update position of main buffer, so no attempt is made to reread these bytes
             byteBuffer.position(byteBuffer.position() + realFrameSize)
         }
+
+        return true
     }
 
     override fun getFrameIdSize(): Int {

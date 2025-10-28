@@ -2,19 +2,19 @@ package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.exceptions.PaddingException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
+import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyIPLS
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
@@ -24,10 +24,9 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIME
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIPL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTMCL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTYER
-import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
-import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.FileConstants
@@ -80,6 +79,13 @@ class ID3v23Tag : AbstractID3v2Tag {
         var TAG_EXT_HEADER_CRC_LENGTH: Int = 4
         var FIELD_TAG_EXT_SIZE_LENGTH: Int = 4
         var TAG_EXT_HEADER_DATA_LENGTH: Int = TAG_EXT_HEADER_LENGTH - FIELD_TAG_EXT_SIZE_LENGTH
+
+
+        fun read(byteBuffer: ByteBuffer?): ID3v23Tag? {
+            val tag = ID3v23Tag()
+
+            return if (tag.read(byteBuffer)) tag else null
+        }
     }
 
     /**
@@ -158,16 +164,6 @@ class ID3v23Tag : AbstractID3v2Tag {
         //Copy Frames
         copyFrames(convertedTag)
         log.debug("Created tag from a tag of a different version")
-    }
-
-    /**
-     * Creates a new ID3v2_3 datatype.
-     *
-     * @param buffer
-     * @throws TagException
-     */
-    constructor(buffer: ByteBuffer) {
-        this.read(buffer)
     }
 
     /**
@@ -444,20 +440,16 @@ class ID3v23Tag : AbstractID3v2Tag {
     /**
      * {@inheritDoc}
      */
-    override fun read(buffer: ByteBuffer?) {
-        if (buffer == null) {
-            return
-        }
-        val size: Int
-        if (!seek(buffer)) {
-            throw TagNotFoundException(getIdentifier() + " tag not found")
+    override fun read(buffer: ByteBuffer?): Boolean {
+        if (buffer == null || !seek(buffer)) {
+            return false
         }
         log.debug("Reading ID3v23 tag")
 
         readHeaderFlags(buffer)
 
         // Read the size, this is size of tag not including the tag header
-        size = ID3SyncSafeInteger.bufferToValue(buffer)
+        val size = ID3SyncSafeInteger.bufferToValue(buffer)
         log.debug(ErrorMessage.ID_TAG_SIZE.getMsg(size))
 
         //Extended Header
@@ -479,6 +471,8 @@ class ID3v23Tag : AbstractID3v2Tag {
             "Loaded Frames,there are:" +
                     frameMap.size
         )
+
+        return true
     }
 
     /**

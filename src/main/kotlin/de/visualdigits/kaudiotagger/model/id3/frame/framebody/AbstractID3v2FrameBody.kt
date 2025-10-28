@@ -54,9 +54,9 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
     //TODO why don't we just slice byteBuffer, set limit to size and convert readByteArray to take a ByteBuffer
     //then we wouldn't have to temporary allocate space for the buffer, using lots of needless memory
     //and providing extra work for the garbage collector.
-    override fun read(byteBuffer: ByteBuffer?) {
+    override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
-            return
+            return false
         }
         val sizeValue = getSize()
         log.debug("Reading body for${this.getIdentifier()}:$sizeValue")
@@ -95,6 +95,8 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
             val size = o.getSize()
             offset += size
         }
+
+        return false
     }
 
     /**

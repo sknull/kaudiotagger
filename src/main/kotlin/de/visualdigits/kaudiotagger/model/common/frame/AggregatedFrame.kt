@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.common.frame
 
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import java.io.UnsupportedEncodingException
 import java.nio.charset.Charset

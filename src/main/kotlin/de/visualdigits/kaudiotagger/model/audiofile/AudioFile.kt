@@ -1,13 +1,13 @@
 package de.visualdigits.kaudiotagger.model.audiofile
 
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V2Version
-import de.visualdigits.kaudiotagger.model.common.types.SupportedFileFormat
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
+import de.visualdigits.kaudiotagger.model.common.types.SupportedFileFormat
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V2Version
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import org.slf4j.LoggerFactory
