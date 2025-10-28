@@ -102,9 +102,7 @@ open class MP3AudioHeader : AudioHeader {
      */
     constructor(seekFile: File?) {
         if (seekFile == null || !seek(seekFile, 0)) {
-            throw InvalidAudioFrameException(
-                "No audio header found within${seekFile?.getName()?:"No file given"}" 
-            )
+            throw InvalidAudioFrameException("No audio header found within${seekFile?.getName() ?: "No file given"}")
         }
     }
 
@@ -127,9 +125,7 @@ open class MP3AudioHeader : AudioHeader {
      */
     constructor(seekFile: File?, startByte: Long) {
         if (seekFile == null || !seek(seekFile, startByte)) {
-            throw InvalidAudioFrameException(
-                ErrorMessage.NO_AUDIO_HEADER_FOUND.getMsg(seekFile?.getName()?:"No file given")
-            )
+            throw InvalidAudioFrameException(ErrorMessage.NO_AUDIO_HEADER_FOUND.getMsg(seekFile?.getName() ?: "No file given"))
         }
     }
 
@@ -317,9 +313,7 @@ open class MP3AudioHeader : AudioHeader {
                 log.debug("Check next frame confirms is an audio header ")
                 result = true
             } catch (ex: InvalidAudioFrameException) {
-                log.debug(
-                    "Check next frame has identified this is not an audio header"
-                )
+                log.debug("Check next frame has identified this is not an audio header")
                 result = false
             }
         } else {
