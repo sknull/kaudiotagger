@@ -6,6 +6,10 @@ import java.io.RandomAccessFile
 
 abstract class AbstractLyrics3: AbstractTag {
 
+    companion object {
+
+    }
+
     constructor()
 
     constructor(copyObject: AbstractLyrics3): super(copyObject)

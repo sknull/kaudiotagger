@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.common.types
 
-enum class ChannelTypes(
+enum class ChannelType(
     val id: Int,
     val friendlyName: String
 ) {

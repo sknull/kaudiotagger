@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.common.types
 
-enum class ReceivedAsTypes(
+enum class ReceivedAsType(
     val id: Int,
     val friendlyName: String
 ) {

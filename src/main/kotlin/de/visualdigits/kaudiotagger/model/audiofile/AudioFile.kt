@@ -3,6 +3,7 @@ package de.visualdigits.kaudiotagger.model.audiofile
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.SupportedFileFormat
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
@@ -65,7 +66,7 @@ open class AudioFile {
     /**
      * The tag
      */
-    private var tag: Tag? = null
+    val tags: MutableMap<SupportedTag, Tag> = mutableMapOf()
 
     /**
      * Retrieve the file extension
@@ -86,68 +87,13 @@ open class AudioFile {
 
     /**
      *
-     * These constructors are used by the different readers, users should not use them, but use the `AudioFileIO.read(File)` method instead !.
-     *
-     * Create the AudioFile representing file f, the encoding audio headers and containing the tag
-     *
-     * @param f           The file of the audio file
-     * @param audioHeader the encoding audioHeaders over this file
-     * @param tag         the tag contained in this file or null if no tag exists
-     */
-    constructor(f: File, audioHeader: AudioHeader, tag: Tag?) {
-        this.file = f
-        this.audioHeader = audioHeader
-        this.tag = tag
-    }
-
-    /**
-     *
-     * These constructors are used by the different readers, users should not use them, but use the `AudioFileIO.read(File)` method instead !.
-     *
-     * Create the AudioFile representing file denoted by pathnames, the encoding audio Headers and containing the tag
-     *
-     * @param s           The pathname of the audio file
-     * @param audioHeader the encoding audioHeaders over this file
-     * @param tag         the tag contained in this file
-     */
-    constructor(s: String, audioHeader: AudioHeader, tag: Tag?) {
-        this.file = File(s)
-        this.audioHeader = audioHeader
-        this.tag = tag
-    }
-
-//    /**
-//     *
-//     * Write the tag contained in this AudioFile in the actual file on the disk, this is the same as calling the `AudioFileIO.write(this)` method.
-//     *
-//     * @throws NoWritePermissionsException if the file could not be written to due to file permissions
-//     * @throws CannotWriteException        If the file could not be written/accessed, the extension wasn't recognized, or other IO error occured.
-//     * @see AudioFileIO
-//     */
-//    open fun commit() {
-//        AudioFileIO.write(this)
-//    }
-//
-//    /**
-//     *
-//     * Delete any tags that exist in the fie , this is the same as calling the `AudioFileIO.delete(this)` method.
-//     *
-//     * @throws CannotWriteException If the file could not be written/accessed, the extension wasn't recognized, or other IO error occured.
-//     * @see AudioFileIO
-//     */
-//    fun delete() {
-//        AudioFileIO.delete(this)
-//    }
-
-    /**
-     *
      * Returns a multi-line string with the file path, the encoding audioHeader, and the tag contents.
      *
      * @return A multi-line string with the file path, the encoding audioHeader, and the tag contents.
      * TODO Maybe this can be changed ?
      */
     override fun toString(): String {
-        return ("AudioFile ${file?.absolutePath}  --------\n$audioHeader\n${if (tag == null) "" else tag.toString()}\n-------------------")
+        return ("AudioFile ${file?.name}  --------\n$audioHeader\n${tags.map { (k, v) -> "${k.name}:\n$v\n-------------------"}}\n===================")
     }
 
     /**
@@ -213,91 +159,6 @@ open class AudioFile {
      */
     open fun displayStructureAsPlainText(): String? {
         return ""
-    }
-
-    /**
-     * Get the tag or if the file doesn't have one at all, create a default tag and set it
-     * as the tag of this file
-     *
-     * @return
-     */
-    fun getTagOrCreateAndSetDefault(): Tag? {
-        val tag = getTagOrCreateDefault()
-        setTag(tag)
-        return tag
-    }
-
-    /**
-     * Get the tag or if the file doesn't have one at all, create a default tag  and return
-     *
-     * @return
-     */
-    open fun getTagOrCreateDefault(): Tag? {
-        val tag: Tag? = getTag()
-        if (tag == null) {
-            return createDefaultTag()
-        }
-        return tag
-    }
-
-    /**
-     *
-     * Returns the tag contained in this AudioFile, the `Tag` contains any useful meta-data, like
-     * artist, album, title, etc. If the file does not contain any tag the null is returned. Some audio formats do
-     * not allow there to be no tag so in this case the reader would return an empty tag whereas for others such
-     * as mp3 it is purely optional.
-     *
-     * @return Returns the tag contained in this AudioFile, or null if no tag exists.
-     */
-    fun getTag(): Tag? {
-        return tag
-    }
-
-    /**
-     * Assign a tag to this audio file
-     *
-     * @param tag Tag to be assigned
-     */
-    open fun setTag(tag: Tag?) {
-        this.tag = tag
-    }
-
-    /**
-     * Create Default Tag
-     *
-     * @return
-     */
-    open fun createDefaultTag(): Tag? {
-        return file?.let { f -> SupportedFileFormat.fromExtension(f.extension).createDefaultTag()}
-    }
-
-    /**
-     * Get the tag and convert to the default tag version or if the file doesn't have one at all, create a default tag
-     * set as tag for this file
-     *
-     *
-     * Conversions are currently only necessary/available for formats that support ID3
-     *
-     * @return
-     */
-    open fun getTagAndConvertOrCreateAndSetDefault(): Tag? {
-        /* TODO Currently only works for Dsf We need additional check here for Wav and Aif because they wrap the ID3 tag so never return
-         * null for getTag() and the wrapper stores the location of the existing tag, would that be broken if tag set to something else
-         * // TODO: 1/7/17 this comment may be outdated
-         */
-        val tag: Tag? = getTagOrCreateDefault()
-
-        if (tag is AbstractID3v2Tag) {
-            setTag(
-                convertID3Tag(
-                    tag as AbstractID3v2Tag?,
-                    TagOptionSingleton.id3v2Version
-                )
-            )
-        } else {
-            setTag(tag)
-        }
-        return getTag()
     }
 
     /**

@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.types
 
 import de.visualdigits.kaudiotagger.model.common.types.FieldKey
-import de.visualdigits.kaudiotagger.model.common.types.Frames
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 
 enum class ID3v2ChapterFrames(

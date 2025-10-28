@@ -23,6 +23,7 @@ import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
+import java.nio.charset.StandardCharsets
 
 class ID3v11Tag: ID3v1Tag {
     
@@ -175,11 +176,71 @@ class ID3v11Tag: ID3v1Tag {
      * Read in a tag from the ByteBuffer
      *
      * @param byteBuffer from where to read in a tag
+     * @throws TagNotFoundException if unable to read a tag in the byteBuffer
      */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
-        super.read(byteBuffer)
-        track = dataBuffer[FIELD_TRACK_POS].toInt()
+        if (byteBuffer == null || !seek(byteBuffer)) {
+            return false
+        }
+        log.debug("Reading v1.1 tag")
 
+        //Do single file read of data to cut down on file reads
+        val dataBuffer = ByteArray(TAG_LENGTH)
+        byteBuffer.position(0)
+        byteBuffer.get(dataBuffer, 0, TAG_LENGTH)
+        setTitle(String(
+            dataBuffer,
+            FIELD_TITLE_POS,
+            FIELD_TITLE_LENGTH,
+            StandardCharsets.ISO_8859_1
+        ).trim { it <= ' ' })
+        var m = endofStringPattern.matcher(getTitle())
+        if (m.find()) {
+            setTitle(getTitle().substring(0, m.start()))
+        }
+        setArtist(String(
+            dataBuffer,
+            FIELD_ARTIST_POS,
+            FIELD_ARTIST_LENGTH,
+            StandardCharsets.ISO_8859_1
+        ).trim { it <= ' ' })
+        m = endofStringPattern.matcher(getArtist())
+        if (m.find()) {
+            setArtist(getArtist().substring(0, m.start()))
+        }
+        setAlbum(String(
+            dataBuffer,
+            FIELD_ALBUM_POS,
+            FIELD_ALBUM_LENGTH,
+            StandardCharsets.ISO_8859_1
+        ).trim { it <= ' ' })
+        m = endofStringPattern.matcher(getAlbum())
+        if (m.find()) {
+            setAlbum(getAlbum().substring(0, m.start()))
+        }
+        setYear(String(
+            dataBuffer,
+            FIELD_YEAR_POS,
+            FIELD_YEAR_LENGTH,
+            StandardCharsets.ISO_8859_1
+        ).trim { it <= ' ' })
+        m = endofStringPattern.matcher(getYear())
+        if (m.find()) {
+            setYear(getYear().substring(0, m.start()))
+        }
+        setComment(String(
+            dataBuffer,
+            FIELD_COMMENT_POS,
+            FIELD_COMMENT_LENGTH,
+            StandardCharsets.ISO_8859_1
+        ).trim { it <= ' ' })
+        m = endofStringPattern.matcher(getComment())
+        if (m.find()) {
+            setComment(getComment().substring(0, m.start()))
+        }
+        track = dataBuffer[FIELD_TRACK_POS].toInt()
+        setGenre(dataBuffer[FIELD_GENRE_POS].toInt())
+        
         return true
     }
 

@@ -9,93 +9,23 @@ import de.visualdigits.kaudiotagger.util.TagOptionSingleton
  */
 enum class SupportedFileFormat(filesuffix: String) {
 
-//    OGG("ogg") {
-//        override fun createDefaultTag(): Tag {
-//            return VorbisCommentTag.createNewTag()
-//        }
-//    },
-    MP3("mp3") {
-        override fun createDefaultTag(): Tag {
-            return TagOptionSingleton.createDefaultID3Tag()
-        }
-    },
-//    FLAC("flac") {
-//        override fun createDefaultTag(): Tag {
-//            return FlacTag(VorbisCommentTag.createNewTag(), ArrayList<MetadataBlockDataPicture?>())
-//        }
-//    },
-//    MP4("mp4") {
-//        override fun createDefaultTag(): Tag {
-//            return Mp4Tag()
-//        }
-//    },
-//    M4A("m4a") {
-//        override fun createDefaultTag(): Tag {
-//            return Mp4Tag()
-//        }
-//    },
-//    M4P("m4p") {
-//        override fun createDefaultTag(): Tag {
-//            return Mp4Tag()
-//        }
-//    },
-//    WMA("wma") {
-//        override fun createDefaultTag(): Tag {
-//            return AsfTag()
-//        }
-//    },
-//    WAV("wav") {
-//        override fun createDefaultTag(): Tag {
-//            return WavTag(TagOptionSingleton.getInstance().getWavOptions())
-//        }
-//    },
-//    RA("ra") {
-//        override fun createDefaultTag(): Tag {
-//            return RealTag()
-//        }
-//    },
-//    RM("rm") {
-//        override fun createDefaultTag(): Tag {
-//            return RealTag()
-//        }
-//    },
-//    M4B("m4b") {
-//        override fun createDefaultTag(): Tag {
-//            return Mp4Tag()
-//        }
-//    },
-//    AIF("aif") {
-//        override fun createDefaultTag(): Tag {
-//            return AiffTag()
-//        }
-//    },
-//    AIFF("aiff") {
-//        override fun createDefaultTag(): Tag {
-//            return AiffTag()
-//        }
-//    },
-//    AIFC("aifc") {
-//        override fun createDefaultTag(): Tag {
-//            return AiffTag()
-//        }
-//    },
-//    DSF("dsf") {
-//        override fun createDefaultTag(): Tag {
-//            return Dsf.createDefaultTag()
-//        }
-//    },
-//    OPUS("opus") {
-//        override fun createDefaultTag(): Tag {
-//            return VorbisCommentTag.createNewTag()
-//        }
-//    },
-    UNKNOWN("") {
-        override fun createDefaultTag(): Tag {
-            throw RuntimeException(
-                "Unable to create default tag for this file format:" + name
-            )
-        }
-    };
+//    OGG("ogg"),
+    MP3("mp3"),
+//    FLAC("flac"),
+//    MP4("mp4"),
+//    M4A("m4a"),
+//    M4P("m4p"),
+//    WMA("wma"),
+//    WAV("wav"),
+//    RA("ra"),
+//    RM("rm"),
+//    M4B("m4b"),
+//    AIF("aif"),
+//    AIFF("aiff"),
+//    AIFC("aifc"),
+//    DSF("dsf"),
+//    OPUS("opus"),
+    UNKNOWN("unknown");
 
     /**
      * Returns the file suffix (lower case without initial .) associated with the format.
@@ -108,15 +38,6 @@ enum class SupportedFileFormat(filesuffix: String) {
     init {
         this.filesuffix = filesuffix.lowercase() // ensure lowercase
     }
-
-    /**
-     * Create for this format
-     *
-     * @return the default tag for the given type
-     * @throws RuntimeException if can't create the default tag
-     */
-    // TODO: 1/7/17 should we have a more specific type of runtime exception? RuntimeException is copied from legacy
-    abstract fun createDefaultTag(): Tag?
 
     companion object {
         val extensionMap: MutableMap<String?, SupportedFileFormat?>

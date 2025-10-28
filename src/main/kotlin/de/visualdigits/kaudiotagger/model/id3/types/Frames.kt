@@ -1,4 +1,6 @@
-package de.visualdigits.kaudiotagger.model.common.types
+package de.visualdigits.kaudiotagger.model.id3.types
+
+import de.visualdigits.kaudiotagger.model.common.types.FieldKey
 
 interface Frames {
 

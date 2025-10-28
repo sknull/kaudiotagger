@@ -8,7 +8,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.StringDate
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.common.types.ReceivedAsTypes
+import de.visualdigits.kaudiotagger.model.common.types.ReceivedAsType
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -190,7 +190,7 @@ class FrameBodyCOMR: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
             NumberHashMap(
                 DataTypes.OBJ_RECIEVED_AS,
                 this,
-                ReceivedAsTypes.RECEIVED_AS_FIELD_SIZE
+                ReceivedAsType.RECEIVED_AS_FIELD_SIZE
             )
         )
         objectList.add(

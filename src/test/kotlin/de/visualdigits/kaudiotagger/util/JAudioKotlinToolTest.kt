@@ -14,9 +14,15 @@ import java.io.File
 class JAudioKotlinToolTest {
 
     @Test
+    fun testRead() {
+        val file = File("M:/_Free Music/freemusicarchive.org/BODYSURFER/2018_Digital Prints/02_Wants To Know.mp3")
+        println(MP3File.read(file))
+    }
+
+    @Test
     fun testMetadata() {
-        val file = File("E:/temp/01_Green Desert.mp3")
-        val audioFile = MP3File(file)
+        val file = File("E:/temp/decisions-by-kevin-macleod.mp3")
+        val audioFile = MP3File.read(file)
 
         val expected = """AudioFile E:\temp\01_Green Desert.mp3  --------
 fileSize:46813950 encoder:LAME3.99r startByte:000000000000b386 numberOfFrames:44757 numberOfFramesEst:44796 timePerFrame:0.026122448979591838 bitrate:320 trackLength:19:29 mpeg frameheader: frame length:1044 version:MPEG-1 layer:Layer 3 channelMode:Joint Stereo noOfSamples:1152 samplingRate:44100 isPadding:false isProtected:false isPrivate:false isCopyrighted:false isOriginal:false isVariableBitRatefalse header as binary:11111111 11111011 11100000 01100100xingheader vbr:false frameCountEnabled:true frameCount:44757 audioSizeEnabled:true audioFileSize:46767542 mp3VbriFrame:false
@@ -42,18 +48,7 @@ Tag content:
 
     @Test
     fun scanDirectory() {
-        val metaData = scanDirectory(File("m:"))
-
-//        val file = File("E:/temp/01_Green Desert.mp3")
-//        val audioFile = MP3File(file)
-//        audioFile.getTag()?.also { tag ->
-//            tag.getArtworkList().firstOrNull()?.also { artwork ->
-//                val album = tag.getFirst(GenericFieldKey.ALBUM)
-//                println(album)
-//                ImageIO.write(artwork.image, artwork.extension, File("e:/temp/$album.${artwork.extension}"))
-//            }
-//        }
-//        println(audioFile)
+        scanDirectory(File("m:"))
     }
 
     fun scanDirectory(directory: File, metaData: MutableMap<File, MP3File> = LinkedHashMap(), indent: String = ""): Map<File, AudioFile> {
@@ -61,7 +56,8 @@ Tag content:
         metaData.putAll(directory.listFiles { f -> f.isFile && f.name.endsWith(".mp3", ignoreCase = true) }
             ?.associate { f ->
 //                println("## $indent - ${f.name}")
-                Pair(f, MP3File(f))
+                val mP3File = MP3File.read(f)
+                Pair(f, mP3File)
             }
             ?:mapOf()
         )

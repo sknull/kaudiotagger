@@ -237,21 +237,4 @@ object TagOptionSingleton {
     var preserveFileIdentity = true
 
     var id3v2Version = ID3V2Version.ID3_V23
-
-    /**
-     * Default based on user option
-     *
-     * @return
-     */
-    fun createDefaultID3Tag(): AbstractID3v2Tag {
-        if (id3v2Version == ID3V2Version.ID3_V24) {
-            return ID3v24Tag()
-        } else if (id3v2Version == ID3V2Version.ID3_V23) {
-            return ID3v23Tag()
-        } else if (id3v2Version == ID3V2Version.ID3_V22) {
-            return ID3v22Tag()
-        }
-        //Default in case not set somehow
-        return ID3v23Tag()
-    }
 }

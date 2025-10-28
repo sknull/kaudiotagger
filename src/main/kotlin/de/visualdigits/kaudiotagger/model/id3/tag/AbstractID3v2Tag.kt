@@ -7,7 +7,6 @@ import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.frame.AggregatedFrame
 import de.visualdigits.kaudiotagger.model.common.frame.TyerTdatAggregatedFrame
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
-import de.visualdigits.kaudiotagger.model.common.types.FileSystemMessage
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
@@ -615,7 +614,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
         } catch (e: FileNotFoundException) {
             log.error(e.message, e)
-            if (e.message?.contains(FileSystemMessage.ACCESS_IS_DENIED.message) ?: false || e.message?.contains(FileSystemMessage.PERMISSION_DENIED.message) ?: false) {
+            if (e.message?.contains("Access is denied") ?: false || e.message?.contains("Permission denied") ?: false) {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
             } else {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
@@ -623,7 +622,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             throw e
         } catch (e: IOException) {
             log.error(e.message, e)
-            if (e.message == FileSystemMessage.ACCESS_IS_DENIED.message) {
+            if (e.message == "Access is denied") {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
             } else {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
@@ -1824,7 +1823,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
     override fun toString(): String {
         val out = StringBuilder()
-        out.append("Tag content:\n")
+        out.append("Tag content [${this::class.simpleName}]:\n")
         val it = getFields()
         while (it.hasNext()) {
             val field = it.next()
