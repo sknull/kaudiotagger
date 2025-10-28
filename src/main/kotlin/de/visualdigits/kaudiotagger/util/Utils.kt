@@ -240,7 +240,6 @@ object Utils {
      *
      * @param bb
      * @return
-     * @throws IOException
      */
     fun readPascalString(bb: ByteBuffer): String {
         val len = u(bb.get()) //Read as unsigned value
@@ -449,7 +448,6 @@ object Utils {
      *
      * @param source      source File
      * @param destination destination File which will be created or truncated, before copying, if it already exists
-     * @throws IOException if any error occurS
      */
     fun copyThrowsOnException(
         source: File,
@@ -529,7 +527,6 @@ object Utils {
      *
      * @param bytes
      * @return
-     * @throws IOException
      */
     fun readFourBytesAsChars(bytes: ByteBuffer): String? {
         if (bytes.remaining() < 4) {
@@ -648,7 +645,6 @@ object Utils {
      * @param fc
      * @param size
      * @return
-     * @throws IOException
      */
     fun readFileDataIntoBufferLE(
         fc: FileChannel,
@@ -665,7 +661,6 @@ object Utils {
      * @param fc
      * @param size
      * @return
-     * @throws IOException
      */
     fun readFileDataIntoBufferBE(
         fc: FileChannel,

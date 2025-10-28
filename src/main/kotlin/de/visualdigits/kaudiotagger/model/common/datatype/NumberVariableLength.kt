@@ -63,8 +63,6 @@ class NumberVariableLength : AbstractDataType {
      *
      * @param arr
      * @param offset
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         //Coding error, should never happen

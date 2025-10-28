@@ -42,7 +42,6 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
      * @param identifier
      * @param frameBody
      * @param size
-     * @throws IllegalArgumentException
      */
     constructor(
         identifier: String?,
@@ -104,7 +103,6 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
      *
      * @param arr
      * @param offset
-     * @throws InvalidDataTypeException if emptyValues are not allowed and the eky was invalid.
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         super.readByteArray(arr, offset)

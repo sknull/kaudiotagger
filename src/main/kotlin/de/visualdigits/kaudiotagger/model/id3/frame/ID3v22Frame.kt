@@ -37,7 +37,6 @@ class ID3v22Frame: AbstractID3v2Frame {
      * Creates a new ID3v22Frame datatype by reading from byteBuffer.
      *
      * @param byteBuffer      to read from
-     * @throws InvalidFrameException
      */
     constructor(byteBuffer: ByteBuffer): this() {
         read(byteBuffer)

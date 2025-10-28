@@ -90,8 +90,6 @@ class Lyrics3Image : AbstractDataType {
     /**
      * @param imageString
      * @param offset
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     fun readString(imageString: String, offset: Int) {
         var offset = offset

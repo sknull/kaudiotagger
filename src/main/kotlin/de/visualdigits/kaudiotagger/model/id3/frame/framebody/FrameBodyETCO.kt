@@ -110,7 +110,6 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      *
      * @param byteBuffer buffer to read from
      * @param frameSize  size of the frame
-     * @throws InvalidTagException if unable to create framebody from buffer
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

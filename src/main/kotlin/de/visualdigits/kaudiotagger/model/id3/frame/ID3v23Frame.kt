@@ -105,7 +105,6 @@ class ID3v23Frame: AbstractID3v2Frame {
      * Creates a new ID3v23Frame  based on another frame of a different version.
      *
      * @param frame
-     * @throws InvalidFrameException
      */
     constructor(frame: AbstractID3v2Frame) {
         log.debug("Creating frame from a frame of a different version")
@@ -260,7 +259,6 @@ class ID3v23Frame: AbstractID3v2Frame {
      * Creates a new ID3v23Frame dataType by reading from byteBuffer.
      *
      * @param byteBuffer      to read from
-     * @throws org.jaudiotagger.tag.InvalidFrameException
      */
     constructor(byteBuffer: ByteBuffer) {
         read(byteBuffer)

@@ -65,7 +65,6 @@ class FrameBodyUSER: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
@@ -96,7 +95,6 @@ class FrameBodyUSER: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * If the text cannot be encoded using current encoder, change the encoder
      *
      * @param tagBuffer
-     * @throws java.io.IOException
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {
         if (!(getObject(DataTypes.OBJ_TEXT) as AbstractString).canBeEncoded()) {

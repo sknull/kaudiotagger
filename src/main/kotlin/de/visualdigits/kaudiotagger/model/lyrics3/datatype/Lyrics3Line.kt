@@ -111,8 +111,6 @@ class Lyrics3Line : AbstractDataType {
     /**
      * @param lineString
      * @param offset
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     fun readString(lineString: String, offset: Int) {
         var offset = offset

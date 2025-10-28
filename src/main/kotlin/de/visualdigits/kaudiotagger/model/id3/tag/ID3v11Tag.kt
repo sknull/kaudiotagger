@@ -75,7 +75,6 @@ class ID3v11Tag: ID3v1Tag {
      * Creates a new ID3v11 datatype from a non v11 tag
      *
      * @param mp3tag
-     * @throws UnsupportedOperationException
      */
     constructor(mp3tag: AbstractTag?) {
         if (mp3tag is ID3v1Tag) {
@@ -176,7 +175,6 @@ class ID3v11Tag: ID3v1Tag {
      * Read in a tag from the ByteBuffer
      *
      * @param byteBuffer from where to read in a tag
-     * @throws TagNotFoundException if unable to read a tag in the byteBuffer
      */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null || !seek(byteBuffer)) {
@@ -269,7 +267,6 @@ class ID3v11Tag: ID3v1Tag {
      * Write this representation of tag to the file indicated
      *
      * @param file that this tag should be written to
-     * @throws IOException thrown if there were problems writing to the file
      */
     override fun write(file: RandomAccessFile) {
         log.debug("Saving ID3v11 tag to file")
@@ -437,7 +434,6 @@ class ID3v11Tag: ID3v1Tag {
     /**
      * Delete all instance of artwork Field
      *
-     * @throws KeyNotFoundException
      */
     override fun deleteArtworkField() {
         throw java.lang.UnsupportedOperationException(

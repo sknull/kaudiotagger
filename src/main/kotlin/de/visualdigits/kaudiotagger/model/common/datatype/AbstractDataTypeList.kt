@@ -32,8 +32,6 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
      *
      * @param buffer buffer
      * @param offset initial offset into the buffer
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     override fun readByteArray(buffer: ByteArray, offset: Int) {
         if (offset < 0) {

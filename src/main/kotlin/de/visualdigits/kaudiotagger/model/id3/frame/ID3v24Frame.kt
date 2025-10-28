@@ -120,7 +120,6 @@ class ID3v24Frame: AbstractID3v2Frame {
      * is unknown.
      *
      * @param frame to construct a frame from
-     * @throws InvalidFrameException
      */
     constructor(frame: AbstractID3v2Frame?) {
         //Should not be called
@@ -156,7 +155,6 @@ class ID3v24Frame: AbstractID3v2Frame {
      * Creates a ID3v24Frame datatype by reading from byteBuffer.
      *
      * @param byteBuffer      to read from
-     * @throws org.jaudiotagger.tag.InvalidFrameException
      */
     constructor(byteBuffer: ByteBuffer) {
         read(byteBuffer)
@@ -166,7 +164,6 @@ class ID3v24Frame: AbstractID3v2Frame {
      * Creates a new ID3v2_4Frame datatype based on Lyrics3.
      *
      * @param field
-     * @throws InvalidTagException
      */
     constructor(field: Lyrics3v2Field) {
         val id = field.getIdentifier()
@@ -463,7 +460,6 @@ class ID3v24Frame: AbstractID3v2Frame {
      * or just throw exception
      *
      * @param byteBuffer
-     * @throws InvalidFrameException
      */
     private fun getFrameSize(byteBuffer: ByteBuffer) {
         //Read frame size as syncsafe integer
@@ -497,7 +493,6 @@ class ID3v24Frame: AbstractID3v2Frame {
      * unsynchronize them so this method checks both cases and goes with the option that fits best with the data
      *
      * @param byteBuffer
-     * @throws InvalidFrameException
      */
     private fun checkIfFrameSizeThatIsNotSyncSafe(byteBuffer: ByteBuffer) {
         if (frameSize > ID3SyncSafeInteger.MAX_SAFE_SIZE) {

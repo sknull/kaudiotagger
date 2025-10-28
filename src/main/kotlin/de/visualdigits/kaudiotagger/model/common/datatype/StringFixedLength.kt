@@ -17,7 +17,6 @@ open class StringFixedLength: AbstractString {
      * @param identifier
      * @param frameBody
      * @param size
-     * @throws IllegalArgumentException
      */
     constructor(
              identifier: String?,

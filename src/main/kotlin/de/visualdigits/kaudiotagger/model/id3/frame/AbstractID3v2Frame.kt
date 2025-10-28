@@ -166,8 +166,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      * @param byteBuffer
      * @param frameSize
      * @return
-     * @throws InvalidDataTypeException
-     * @throws InvalidTagException
      */
     fun readEncryptedBody(
         identifier: String?,

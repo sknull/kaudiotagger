@@ -23,7 +23,6 @@ interface TagField {
      * order to be directly written to the file.<br></br>
      *
      * @return Binary data representing the current tag field.<br></br>
-     * @throws java.io.UnsupportedEncodingException Most tag data represents text. In some cases the underlying
      * implementation will need to convert the text data in java to
      * a specific charset encoding. In these cases an
      * [java.io.UnsupportedEncodingException] may occur.

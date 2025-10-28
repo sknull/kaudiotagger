@@ -708,7 +708,6 @@ class ID3v24Tag : AbstractID3v2Tag {
      *
      * @param frame
      * @return
-     * @throws InvalidFrameException
      */
     override fun convertFrame(frame: AbstractID3v2Frame): MutableList<AbstractID3v2Frame> {
         var frame = frame
@@ -990,7 +989,6 @@ class ID3v24Tag : AbstractID3v2Tag {
      *
      * @param id
      * @return
-     * @throws KeyNotFoundException
      */
     override fun getAll(id: GenericFieldKey): List<String> {
         return if (id === GenericFieldKey.GENRE) {

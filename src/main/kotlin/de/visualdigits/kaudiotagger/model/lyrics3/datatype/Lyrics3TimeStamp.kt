@@ -129,8 +129,6 @@ class Lyrics3TimeStamp : AbstractDataType {
     /**
      * @param timeStamp
      * @param offset
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     fun readString(timeStamp: String, offset: Int) {
         var timeStamp = timeStamp

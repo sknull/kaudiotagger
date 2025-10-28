@@ -32,7 +32,6 @@ class FrameBodyMVIN: AbstractFrameBodyNumberTotal, ID3v24FrameBody, ID3v23FrameB
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws org.jaudiotagger.tag.InvalidTagException if unable to create framebody from buffer
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

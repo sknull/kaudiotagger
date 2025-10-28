@@ -39,8 +39,6 @@ interface Tag {
      *
      * @param genericKey
      * @param value
-     * @throws KeyNotFoundException
-     * @throws FieldDataInvalidException
      */
     fun addField(genericKey: GenericFieldKey, vararg value: String)
 
@@ -48,7 +46,6 @@ interface Tag {
      * Delete any fields with this key
      *
      * @param GenericFieldKey
-     * @throws KeyNotFoundException
      */
     fun deleteField(genericKey: GenericFieldKey)
 
@@ -56,7 +53,6 @@ interface Tag {
      * Delete any fields with this Flac (Vorbis Comment) id
      *
      * @param key
-     * @throws KeyNotFoundException
      */
     fun deleteField(key: String)
 
@@ -100,7 +96,6 @@ interface Tag {
      *
      * @param id
      * @return
-     * @throws KeyNotFoundException
      */
     fun getAll(id: GenericFieldKey): List<String>
 
@@ -113,7 +108,6 @@ interface Tag {
      * We need this additional deleteField method because in some formats artwork can be stored
      * in multiple fields
      *
-     * @throws KeyNotFoundException
      */
     fun deleteArtworkField()
 
@@ -122,7 +116,6 @@ interface Tag {
      *
      * @param artwork
      * @return suitable tagfield for this format that represents the artwork data
-     * @throws FieldDataInvalidException
      */
     fun createField(artwork: Artwork): TagField
 
@@ -130,7 +123,6 @@ interface Tag {
      * Create artwork field based on the data in artwork and then add it to the tag itself
      *
      * @param artwork
-     * @throws FieldDataInvalidException
      */
     fun addField(artwork: Artwork)
 
@@ -138,7 +130,6 @@ interface Tag {
      * Adds a field to the structure, used internally by the library<br></br>
      *
      * @param field The field to add.
-     * @throws FieldDataInvalidException
      */
     fun addField(field: TagField)
 
@@ -157,8 +148,6 @@ interface Tag {
      * @param genericKey is the generic key
      * @param value      to store
      * @return
-     * @throws KeyNotFoundException
-     * @throws FieldDataInvalidException
      */
     fun createField(genericKey: GenericFieldKey, vararg value: String): TagField
 
@@ -171,8 +160,6 @@ interface Tag {
      *
      * @param value
      * @return
-     * @throws KeyNotFoundException
-     * @throws FieldDataInvalidException
      */
     fun createCompilationField(value: Boolean): TagField
 

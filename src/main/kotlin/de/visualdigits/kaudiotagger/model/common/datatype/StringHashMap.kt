@@ -22,7 +22,6 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
      * @param identifier
      * @param frameBody
      * @param size
-     * @throws IllegalArgumentException
      */
     constructor(
         identifier: String?,

@@ -40,7 +40,6 @@ class FrameBodyTIT3: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

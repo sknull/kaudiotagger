@@ -26,7 +26,6 @@ class FieldFrameBodyETT : AbstractLyrics3v2FieldFrameBody {
      * Creates a new FieldBodyETT datatype.
      *
      * @param byteBuffer
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)

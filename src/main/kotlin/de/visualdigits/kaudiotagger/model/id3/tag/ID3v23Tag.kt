@@ -759,7 +759,6 @@ class ID3v23Tag : AbstractID3v2Tag {
      *
      * @param id
      * @return
-     * @throws KeyNotFoundException
      */
     override fun getAll(id: GenericFieldKey): List<String> {
         return if (id === GenericFieldKey.GENRE) {

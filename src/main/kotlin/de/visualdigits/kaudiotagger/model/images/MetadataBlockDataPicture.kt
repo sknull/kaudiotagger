@@ -59,8 +59,6 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
      * Initialize MetaBlockDataPicture from byteBuffer
      *
      * @param rawdata
-     * @throws IOException
-     * @throws InvalidFrameException
      */
     constructor(rawdata: ByteBuffer) {
         initFromByteBuffer(rawdata)
@@ -125,8 +123,6 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
      *
      * @param header
      * @param fc
-     * @throws IOException
-     * @throws InvalidFrameException
      */
     //TODO check for buffer underflows see http://research.eeye.com/html/advisories/published/AD20071115.html
     constructor(header: MetadataBlockHeader, fc: FileChannel) {
@@ -260,7 +256,6 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
      * order to be directly written to the file.<br></br>
      *
      * @return Binary data representing the current tag field.<br></br>
-     * @throws UnsupportedEncodingException Most tag data represents text. In some cases the underlying
      * implementation will need to convert the text data in java to
      * a specific charset encoding. In these cases an
      * [UnsupportedEncodingException] may occur.

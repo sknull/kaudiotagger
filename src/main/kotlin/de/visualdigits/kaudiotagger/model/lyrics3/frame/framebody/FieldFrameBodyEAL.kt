@@ -26,7 +26,6 @@ class FieldFrameBodyEAL : AbstractLyrics3v2FieldFrameBody {
      * Creates a new FieldBodyEAL datatype.
      *
      * @param byteBuffer
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer) {
         read(byteBuffer)

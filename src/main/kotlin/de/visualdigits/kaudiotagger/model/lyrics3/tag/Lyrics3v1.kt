@@ -54,7 +54,6 @@ class Lyrics3v1: AbstractLyrics3 {
 
     /**
      * @param byteBuffer
-     * @throws IOException
      */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null || !seek(byteBuffer)) {
@@ -75,7 +74,6 @@ class Lyrics3v1: AbstractLyrics3 {
      *
      * @param byteBuffer
      * @return
-     * @throws IOException
      */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
         return false
@@ -84,7 +82,6 @@ class Lyrics3v1: AbstractLyrics3 {
     /**
      * @param file
      * @return
-     * @throws IOException
      */
     fun seek(file: RandomAccessFile): Boolean {
         val buffer = ByteArray(5100 + 9 + 11)
@@ -156,7 +153,6 @@ class Lyrics3v1: AbstractLyrics3 {
 
     /**
      * @param file
-     * @throws IOException
      */
     override fun write(file: RandomAccessFile) {
         var str: String

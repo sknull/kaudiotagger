@@ -26,7 +26,6 @@ class FieldFrameBodyAUT : AbstractLyrics3v2FieldFrameBody {
      * Creates a new FieldBodyAUT datatype.
      *
      * @param byteBuffer
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)

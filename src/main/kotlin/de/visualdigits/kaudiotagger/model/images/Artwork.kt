@@ -33,8 +33,7 @@ class Artwork(
          *
          * @param file
          * @return
-         * @throws IOException
-         */
+             */
         fun createArtworkFromFile(file: File): Artwork {
             val artwork = Artwork()
             artwork.setFromFile(file)
@@ -66,7 +65,6 @@ class Artwork(
      * Create Artwork from File
      *
      * @param file
-     * @throws IOException
      */
     fun setFromFile(file: File) {
         val imageFile = RandomAccessFile(file, "r")

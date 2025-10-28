@@ -99,8 +99,6 @@ open class MP3AudioHeader : AudioHeader {
      * allows you to provide the length of the tag header as a parameter so the tag can be skipped over.
      *
      * @param seekFile
-     * @throws IOException
-     * @throws InvalidAudioFrameException
      */
     constructor(seekFile: File?) {
         if (seekFile == null || !seek(seekFile, 0)) {
@@ -126,8 +124,6 @@ open class MP3AudioHeader : AudioHeader {
      *
      * @param seekFile
      * @param startByte
-     * @throws IOException
-     * @throws InvalidAudioFrameException
      */
     constructor(seekFile: File?, startByte: Long) {
         if (seekFile == null || !seek(seekFile, startByte)) {
@@ -146,7 +142,6 @@ open class MP3AudioHeader : AudioHeader {
      * @param seekFile  MP3 file to seek
      * @param startByte if there is an ID3v2tag we dont want to start reading from the start of the tag
      * @return true if the first MP3 frame can be found
-     * @throws IOException on any I/O error
      */
     fun seek(seekFile: File, startByte: Long): Boolean {
         return FileInputStream(seekFile).use { fis ->
@@ -256,7 +251,6 @@ open class MP3AudioHeader : AudioHeader {
      * @param bb
      * @param fc
      * @return true if frame is valid
-     * @throws IOException
      */
     private fun isNextFrameValid(
         seekFile: File,

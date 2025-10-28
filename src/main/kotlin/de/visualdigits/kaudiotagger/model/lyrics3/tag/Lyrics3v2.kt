@@ -33,7 +33,6 @@ class Lyrics3v2 : AbstractLyrics3 {
      * Creates a new Lyrics3v2 datatype.
      *
      * @param mp3tag
-     * @throws UnsupportedOperationException
      */
     constructor(mp3tag: AbstractTag) {
         if (mp3tag is Lyrics3v2) {
@@ -111,7 +110,6 @@ class Lyrics3v2 : AbstractLyrics3 {
      *
      * @param byteBuffer
      * @return
-     * @throws IOException
      */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
         return false
@@ -174,7 +172,6 @@ class Lyrics3v2 : AbstractLyrics3 {
     /**
      * @param file
      * @return
-     * @throws IOException
      */
     fun seek(file: RandomAccessFile): Boolean {
         val buffer = ByteArray(11)
@@ -259,7 +256,6 @@ class Lyrics3v2 : AbstractLyrics3 {
 
     /**
      * @param file
-     * @throws IOException
      */
     override fun write(file: RandomAccessFile) {
         var offset = 0

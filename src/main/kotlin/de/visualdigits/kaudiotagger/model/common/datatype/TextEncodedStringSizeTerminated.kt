@@ -173,7 +173,6 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @param i
      * @param noOfValues
      * @return
-     * @throws CharacterCodingException
      */
     fun writeString(
         encoder: CharsetEncoder,
@@ -205,7 +204,6 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @param i
      * @param noOfValues
      * @return
-     * @throws CharacterCodingException
      */
     fun writeStringUTF16LEBOM(
         next: String,
@@ -237,7 +235,6 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @param i
      * @param noOfValues
      * @return
-     * @throws CharacterCodingException
      */
     fun writeStringUTF16BEBOM(
         next: String,
@@ -317,7 +314,6 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      *
      * @param index
      * @return the nth value
-     * @throws IndexOutOfBoundsException if value does not exist
      */
     open fun getValueAtIndex(index: Int): String? {
         //Split String into separate components

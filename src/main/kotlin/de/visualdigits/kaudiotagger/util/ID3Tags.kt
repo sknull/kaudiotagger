@@ -202,7 +202,6 @@ object ID3Tags {
      *
      * @param copyObject
      * @return
-     * @throws IllegalArgumentException if no suitable constructor exists
      */
     fun copyObject(copyObject: Any?): Any? {
         return try {

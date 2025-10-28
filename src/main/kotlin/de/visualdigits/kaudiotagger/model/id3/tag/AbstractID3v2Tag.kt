@@ -134,8 +134,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
          *
          * @param raf
          * @return
-         * @throws IOException
-         */
+             */
         fun isID3V2Header(raf: RandomAccessFile): Boolean {
             val start = raf.filePointer
             val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
@@ -164,8 +163,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
          *
          * @param file
          * @return the end of the tag in the file or zero if no tag exists.
-         * @throws IOException
-         */
+             */
         fun getV2TagSizeIfExists(file: File?): Long {
             if (file == null) {
                 return 0
@@ -494,7 +492,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * created frames will be at end of tag.
      *
      * @return ByteBuffer Contains all the frames written within the tag ready for writing to file
-     * @throws IOException
      */
     fun writeFramesToBuffer(): ByteArrayOutputStream {
         val bodyBuffer = ByteArrayOutputStream()
@@ -550,7 +547,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param file
      * @param audioStartByte
      * @return new audioStartByte - different only if the audio content had to be moved
-     * @throws IOException
      */
     abstract fun write(file: File?, audioStartByte: Long): Long
 
@@ -584,7 +580,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param padding
      * @param sizeIncPadding
      * @param audioStartLocation
-     * @throws IOException
      */
     fun writeBufferToFile(
         file: File?,
@@ -640,8 +635,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param fileChannel
      * @param filePath
      * @return lock or null if locking is not supported
-     * @throws IOException                                    if unable to get lock because already locked by another program
-     * @throws java.nio.channels.OverlappingFileLockException if already locked by another thread in the same VM, we dont catch this
      * because indicates a programming error
      */
     fun getFileLockForWriting(
@@ -667,10 +660,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param paddingSize This is total size required to store tag before audio
      * @param audioStart
      * @param file        The file to adjust the padding length of
-     * @throws FileNotFoundException if the file exists but is a directory
      * rather than a regular file or cannot be opened for any other
      * reason
-     * @throws IOException           on any I/O error
      */
     fun adjustPadding(file: File?, paddingSize: Int, audioStart: Long) {
         if (file == null) {
@@ -751,7 +742,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @param newFile
      * @param originalFile
-     * @throws IOException
      */
     private fun replaceFile(originalFile: File?, newFile: File?) {
         if (originalFile == null || newFile == null) {
@@ -878,7 +868,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * Write tag to file.
      *
      * @param file
-     * @throws IOException TODO should be abstract
      */
     override fun write(file: RandomAccessFile) {
     }
@@ -1035,7 +1024,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * Delete all instance of artwork Field
      *
-     * @throws KeyNotFoundException
      */
     override fun deleteArtworkField() {
         this.deleteField(GenericFieldKey.COVER_ART)
@@ -1059,7 +1047,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param formatKey
      * @param values
      * @return
-     * @throws KeyNotFoundException
      */
     fun doCreateTagField(formatKey: FrameAndSubId, vararg values: String): TagField {
         val value: String = values[0]
@@ -1140,7 +1127,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @param id
      * @return
-     * @throws KeyNotFoundException
      */
     override fun getAll(id: GenericFieldKey): List<String> {
         //Special case here because the generic key to frameid/subid mapping is identical for trackno versus tracktotal
@@ -1275,7 +1261,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @param formatKey
      * @return
-     * @throws KeyNotFoundException
      */
     fun doGetValues(formatKey: FrameAndSubId): List<String> {
         val values = mutableListOf<String>()
@@ -1365,7 +1350,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param formatKey
      * @param index     the index specified by the user
      * @return
-     * @throws KeyNotFoundException
      */
     fun doGetValueAtIndex(formatKey: FrameAndSubId, index: Int): String? {
         val values = doGetValues(formatKey)
@@ -1517,7 +1501,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * Internal delete method, for deleting/modifying an individual ID3 frame
      *
      * @param formatKey
-     * @throws KeyNotFoundException
      */
     fun doDeleteTagField(formatKey: FrameAndSubId) {
         //Get list of frames that this uses
@@ -1624,7 +1607,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param genericKey is the generic key
      * @param values
      * @return
-     * @throws KeyNotFoundException
      */
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
         if (genericKey == null) {

@@ -39,8 +39,6 @@ class FrameBodyTPE3: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws java.io.IOException
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

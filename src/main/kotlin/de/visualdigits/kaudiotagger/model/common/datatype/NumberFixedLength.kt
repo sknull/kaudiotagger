@@ -19,7 +19,6 @@ open class NumberFixedLength(
      * @param identifier
      * @param frameBody
      * @param size       the number of significant places that the number is held to
-     * @throws IllegalArgumentException
      */
     constructor(
             identifier: String?,

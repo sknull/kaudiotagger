@@ -44,7 +44,6 @@ class PairedTextEncodedStringNullTerminated: AbstractDataType {
      *
      * @param arr    to read the Strings from
      * @param offset in the array to start reading from
-     * @throws InvalidDataTypeException if unable to find any null terminated Strings
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         var offset = offset

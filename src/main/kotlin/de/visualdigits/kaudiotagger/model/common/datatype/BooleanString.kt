@@ -27,8 +27,6 @@ class BooleanString : AbstractDataType {
 
     /**
      * @param offset
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         val b = arr[offset]

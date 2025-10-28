@@ -15,7 +15,6 @@ class BooleanByte : AbstractDataType {
      * @param identifier
      * @param frameBody
      * @param bitPosition
-     * @throws IndexOutOfBoundsException
      */
     constructor(
         identifier: String?,
@@ -55,8 +54,6 @@ class BooleanByte : AbstractDataType {
     /**
      * @param arr
      * @param offset
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         if ((offset < 0) || (offset >= arr.size)) {

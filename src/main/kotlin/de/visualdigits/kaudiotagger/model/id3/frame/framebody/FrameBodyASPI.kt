@@ -88,7 +88,6 @@ class FrameBodyASPI
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

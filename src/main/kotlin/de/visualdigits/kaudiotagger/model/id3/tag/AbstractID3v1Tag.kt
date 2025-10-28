@@ -63,7 +63,6 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
      * Looks for tag and if found lops it off the file.
      *
      * @param file to delete the tag from
-     * @throws IOException if there was a problem accessing the file
      */
     override fun delete(file: RandomAccessFile) {
         //Read into Byte Buffer

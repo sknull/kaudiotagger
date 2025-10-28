@@ -45,8 +45,6 @@ class FrameBodyTPOS: AbstractFrameBodyNumberTotal, ID3v23FrameBody, ID3v24FrameB
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws java.io.IOException
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

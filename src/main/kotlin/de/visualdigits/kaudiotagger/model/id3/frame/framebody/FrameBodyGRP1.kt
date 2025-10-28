@@ -34,7 +34,6 @@ class FrameBodyGRP1: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws org.jaudiotagger.tag.InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

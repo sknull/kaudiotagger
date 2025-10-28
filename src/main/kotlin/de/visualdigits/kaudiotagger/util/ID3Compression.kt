@@ -18,7 +18,6 @@ object ID3Compression {
      * @param decompressedFrameSize
      * @param realFrameSize
      * @return
-     * @throws InvalidFrameException
      */
     fun uncompress(
         identifier: String?,

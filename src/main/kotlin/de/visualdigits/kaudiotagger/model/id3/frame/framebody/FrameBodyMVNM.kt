@@ -30,8 +30,6 @@ class FrameBodyMVNM: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws java.io.IOException
-     * @throws org.jaudiotagger.tag.InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

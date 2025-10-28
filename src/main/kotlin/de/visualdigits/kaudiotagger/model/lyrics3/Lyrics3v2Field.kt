@@ -45,7 +45,6 @@ class Lyrics3v2Field: AbstractTagFrame {
      * Creates a new Lyrics3v2Field datatype.
      *
      * @param frame
-     * @throws TagException
      */
     constructor(frame: AbstractID3v2Frame) {
         val textFrame: AbstractFrameBodyTextInfo?
@@ -91,7 +90,6 @@ class Lyrics3v2Field: AbstractTagFrame {
      * Creates a new Lyrics3v2Field datatype.
      *
      * @param byteBuffer
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)
@@ -99,8 +97,6 @@ class Lyrics3v2Field: AbstractTagFrame {
 
     /**
      * @param byteBuffer
-     * @throws InvalidTagException
-     * @throws java.io.IOException
      */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
@@ -131,7 +127,6 @@ class Lyrics3v2Field: AbstractTagFrame {
      * @param identifier
      * @param byteBuffer
      * @return
-     * @throws InvalidTagException
      */
     private fun readBody(
         identifier: String?,
@@ -176,7 +171,6 @@ class Lyrics3v2Field: AbstractTagFrame {
 
     /**
      * @param file
-     * @throws java.io.IOException
      */
     fun write(file: RandomAccessFile) {
         if (((frameBody?.getSize()?:0) > 0) ||

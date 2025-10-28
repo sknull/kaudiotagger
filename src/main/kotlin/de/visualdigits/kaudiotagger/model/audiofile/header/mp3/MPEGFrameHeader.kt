@@ -115,7 +115,6 @@ class MPEGFrameHeader {
      * If decoding header causes a problem it is not a valid header
      *
      * @param b the array of bytes representing this mpeg frame
-     * @throws InvalidAudioFrameException if does not match expected format
      */
     private constructor(b: ByteArray) {
         mpegBytes = b
@@ -143,7 +142,6 @@ class MPEGFrameHeader {
     /**
      * Set the version of this frame as an int value (see constants)
      *
-     * @throws InvalidAudioFrameException
      */
     private fun setVersion() {
         //MPEG Version
@@ -178,7 +176,6 @@ class MPEGFrameHeader {
     /**
      * Get the setBitrate of this frame
      *
-     * @throws InvalidAudioFrameException
      */
     private fun setBitrate() {
         /* BitRate, get by checking header setBitrate bits and MPEG Version and Layer */
@@ -196,7 +193,6 @@ class MPEGFrameHeader {
     /**
      * Set the Mpeg channel mode of this frame as a constant (see constants)
      *
-     * @throws InvalidAudioFrameException
      */
     private fun setChannelMode() {
         channelMode = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE) ushr 6
@@ -209,7 +205,6 @@ class MPEGFrameHeader {
     /**
      * Get the setEmphasis mode of this frame in a string representation
      *
-     * @throws InvalidAudioFrameException
      */
     private fun setEmphasis() {
         emphasis = mpegBytes[BYTE_4].toInt() and MASK_MP3_EMPHASIS
@@ -229,7 +224,6 @@ class MPEGFrameHeader {
     /**
      * Get the layer version of this frame as a constant int value (see constants)
      *
-     * @throws InvalidAudioFrameException
      */
     private fun setLayer() {
         layer = (mpegBytes[BYTE_2].toInt() and MASK_MP3_LAYER) ushr 1
@@ -242,7 +236,6 @@ class MPEGFrameHeader {
     /**
      * Sets the string representation of the mode extension of this frame
      *
-     * @throws InvalidAudioFrameException
      */
     private fun setModeExtension() {
         val index = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE_EXTENSION) shr 4
@@ -262,7 +255,6 @@ class MPEGFrameHeader {
     /**
      * set the sampling rate in Hz of this frame
      *
-     * @throws InvalidAudioFrameException
      */
     private fun setSamplingRate() {
         //Frequency
@@ -713,8 +705,7 @@ class MPEGFrameHeader {
          *
          * @param bb the byte buffer containing the header
          * @return
-         * @throws InvalidAudioFrameException if there is no header at this point
-         */
+             */
         fun parseMPEGHeader(bb: ByteBuffer): MPEGFrameHeader {
             val position = bb.position()
             bb.get(header, 0, HEADER_SIZE)

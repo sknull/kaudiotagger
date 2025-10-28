@@ -102,7 +102,6 @@ open class AudioFile {
      * @param file
      * @param readOnly
      * @return
-     * @throws FileNotFoundException
      */
     fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
         val newFile: RandomAccessFile
@@ -131,7 +130,6 @@ open class AudioFile {
      * Check does file exist
      *
      * @param file
-     * @throws FileNotFoundException if file not found
      */
     fun checkFileExists(file: File) {
         log.debug("Reading file:path${file.path}:abs:${file.absolutePath}")

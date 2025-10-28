@@ -53,9 +53,8 @@ abstract class AbstractDataType {
             is Long -> obj
             is Short -> obj
 
-//            is MultipleTextEncodedStringNullTerminated.Values -> obj
-//            is PairedTextEncodedStringNullTerminated.ValuePairs valuePairs -> obj
-//            is PartOfSet.PartOfSetValue partOfSetValue -> obj
+            is ValuePairs -> obj
+            is PartOfSetValue -> obj
             is BooleanArray -> obj.clone()
             is ByteArray -> obj.clone()
             is CharArray -> obj.clone()
@@ -78,7 +77,6 @@ abstract class AbstractDataType {
      * for non String Objects
      *
      * @param arr
-     * @throws InvalidDataTypeException
      */
     fun readByteArray(arr: ByteArray) {
         readByteArray(arr, 0)
@@ -91,7 +89,6 @@ abstract class AbstractDataType {
      *
      * @param arr
      * @param offset
-     * @throws InvalidDataTypeException
      */
     abstract fun readByteArray(arr: ByteArray, offset: Int)
 

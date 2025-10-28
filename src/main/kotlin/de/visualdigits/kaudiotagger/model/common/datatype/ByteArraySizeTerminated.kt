@@ -18,8 +18,6 @@ class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
     /**
      * @param arr
      * @param offset
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         if (arr == null) {

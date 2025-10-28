@@ -108,8 +108,7 @@ class MetadataBlockHeader {
          *
          * @param fc
          * @return
-         * @throws IOException
-         */
+             */
         @JvmStatic
             fun readHeader(fc: FileChannel): MetadataBlockHeader {
             val rawdata = ByteBuffer.allocate(HEADER_LENGTH)

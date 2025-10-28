@@ -78,7 +78,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
      * Creates a new FieldBodyIMG datatype.
      *
      * @param byteBuffer
-     * @throws InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)
@@ -207,7 +206,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
 
     /**
      * @param file
-     * @throws IOException
      */
     override fun write(file: RandomAccessFile) {
         val size: Int

@@ -26,7 +26,6 @@ class FieldFrameBodyINF : AbstractLyrics3v2FieldFrameBody {
      * Creates a new FieldBodyINF datatype.
      *
      * @param byteBuffer
-     * @throws org.jaudiotagger.tag.InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)

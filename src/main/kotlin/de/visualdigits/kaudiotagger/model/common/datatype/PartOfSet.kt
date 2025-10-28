@@ -43,8 +43,6 @@ class PartOfSet : AbstractString {
      *
      * @param arr    this is the buffer for the frame
      * @param offset this is where to start reading in the buffer for this field
-     * @throws NullPointerException
-     * @throws IndexOutOfBoundsException
      */
     override fun readByteArray(arr: ByteArray, offset: Int) {
         log.debug("Reading from array from offset:$offset")

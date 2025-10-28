@@ -210,7 +210,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * Write this tag to the file, replacing any tag previously existing
      *
      * @param file
-     * @throws IOException
      */
     override fun write(file: RandomAccessFile) {
         log.debug("Saving ID3v1 tag to file")
@@ -421,7 +420,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * Set Comment
      *
      * @param comment
-     * @throws IllegalArgumentException if comment null
      */
     open fun setComment(comment: String) {
         this.comment = ID3Tags.truncate(comment, FIELD_COMMENT_LENGTH)
@@ -521,7 +519,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @param id
      * @return
-     * @throws KeyNotFoundException
      */
     override fun getAll(id: GenericFieldKey): List<String> {
         return getFirst(id)?.let { f -> listOf(f) }?:listOf()
@@ -548,7 +545,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     /**
      * Delete all instance of artwork Field
      *
-     * @throws KeyNotFoundException
      */
     override fun deleteArtworkField() {
         throw java.lang.UnsupportedOperationException(

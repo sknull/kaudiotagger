@@ -19,8 +19,6 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
      *
      * @param file
      * @return
-     * @throws InvalidTagException
-     * @throws IOException
      */
     fun readHeader(file: RandomAccessFile): Int {
         val size: Int
@@ -44,8 +42,6 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
      * header is passed to the frame constructor when reading from file.
      *
      * @param byteBuffer file to read
-     * @throws IOException         on any I/O error
-     * @throws InvalidTagException if there is any error in the data format.
      */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
@@ -83,7 +79,6 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
      * currently at.
      *
      * @param file destination file
-     * @throws IOException on any I/O error
      */
     open fun write(file: RandomAccessFile) {
         //Write the various fields to file in order

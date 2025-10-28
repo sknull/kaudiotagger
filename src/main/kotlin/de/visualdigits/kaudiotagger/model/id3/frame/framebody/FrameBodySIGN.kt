@@ -7,6 +7,7 @@ import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import java.nio.ByteBuffer
 
 class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
+    
     /**
      * Creates a new FrameBodySIGN datatype.
      */
@@ -30,7 +31,6 @@ class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws InvalidTagException if unable to create framebody from buffer
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

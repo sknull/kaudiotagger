@@ -77,7 +77,6 @@ class FrameBodyENCR
      *
      * @param byteBuffer
      * @param frameSize
-     * @throws InvalidTagException if unable to create framebody from buffer
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 

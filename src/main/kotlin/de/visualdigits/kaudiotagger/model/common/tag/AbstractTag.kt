@@ -27,7 +27,6 @@ abstract class AbstractTag : AbstractTagItem {
      * Writes the tag to the file
      *
      * @param file
-     * @throws IOException
      */
     abstract fun write(file: RandomAccessFile)
 
@@ -35,7 +34,6 @@ abstract class AbstractTag : AbstractTagItem {
      * Removes the specific tag from the file
      *
      * @param file MP3 file to append to.
-     * @throws IOException on any I/O error
      */
     abstract fun delete(file: RandomAccessFile)
 

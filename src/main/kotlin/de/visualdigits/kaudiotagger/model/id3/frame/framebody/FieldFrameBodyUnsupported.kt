@@ -32,7 +32,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
      * Creates a new FieldBodyUnsupported datatype.
      *
      * @param byteBuffer
-     * @throws org.jaudiotagger.tag.InvalidTagException
      */
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)
@@ -40,7 +39,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
 
     /**
      * @param byteBuffer
-     * @throws IOException
      */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
@@ -105,7 +103,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
 
     /**
      * @param file
-     * @throws IOException
      */
     override fun write(file: RandomAccessFile) {
         var offset = 0

@@ -16,7 +16,6 @@ class FrameBodyEncrypted: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBo
      * @param identifier
      * @param byteBuffer
      * @param frameSize
-     * @throws InvalidTagException
      */
     constructor(
         identifier: String?,
