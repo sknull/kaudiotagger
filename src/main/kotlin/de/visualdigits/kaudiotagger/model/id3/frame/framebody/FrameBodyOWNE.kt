@@ -6,7 +6,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringDate
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringSizeTerminated
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream

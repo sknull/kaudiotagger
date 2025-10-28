@@ -1,4 +1,4 @@
-package de.visualdigits.kaudiotagger.model.common.types
+package de.visualdigits.kaudiotagger.model.id3.types
 
 /**
  * Categorises id3 fields to aid in mapping to generic keys

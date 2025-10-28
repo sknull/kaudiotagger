@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.id3.frame
 
-import de.visualdigits.kaudiotagger.model.common.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.common.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 
 abstract class ID3Frames {
 

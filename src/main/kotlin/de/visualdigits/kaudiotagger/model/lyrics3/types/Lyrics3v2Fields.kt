@@ -1,4 +1,4 @@
-package de.visualdigits.kaudiotagger.model.common.types
+package de.visualdigits.kaudiotagger.model.lyrics3.types
 
 enum class Lyrics3v2Fields(
     val id: String

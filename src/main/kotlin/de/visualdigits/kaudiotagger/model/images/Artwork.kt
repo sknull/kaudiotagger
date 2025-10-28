@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.images
 
-import de.visualdigits.kaudiotagger.model.common.types.ImageFormats
-import de.visualdigits.kaudiotagger.model.common.types.PictureTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.File

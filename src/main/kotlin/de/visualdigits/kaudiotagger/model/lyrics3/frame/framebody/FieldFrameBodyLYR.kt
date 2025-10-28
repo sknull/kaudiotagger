@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.ID3v2LyricLine
-import de.visualdigits.kaudiotagger.model.common.datatype.Lyrics3Line
-import de.visualdigits.kaudiotagger.model.common.datatype.Lyrics3TimeStamp
-import de.visualdigits.kaudiotagger.model.common.types.Lyrics3v2Fields
+import de.visualdigits.kaudiotagger.model.id3.datatype.ID3v2LyricLine
+import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
+import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3TimeStamp
+import de.visualdigits.kaudiotagger.model.lyrics3.types.Lyrics3v2Fields
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodySYLT
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT

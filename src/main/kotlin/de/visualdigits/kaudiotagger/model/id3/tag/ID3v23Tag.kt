@@ -3,9 +3,9 @@ package de.visualdigits.kaudiotagger.model.id3.tag
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.common.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.common.types.PictureTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException

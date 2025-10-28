@@ -1,5 +1,7 @@
-package de.visualdigits.kaudiotagger.model.common.types
+package de.visualdigits.kaudiotagger.model.id3.types
 
+import de.visualdigits.kaudiotagger.model.common.types.FieldKey
+import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyCOMM
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTXXX
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUFID

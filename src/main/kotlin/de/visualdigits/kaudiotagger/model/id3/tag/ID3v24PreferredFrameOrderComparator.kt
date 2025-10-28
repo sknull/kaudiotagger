@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 
 class ID3v24PreferredFrameOrderComparator private constructor() : Comparator<String> {
 

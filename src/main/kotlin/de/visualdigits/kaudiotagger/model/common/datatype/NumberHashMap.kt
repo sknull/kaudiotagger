@@ -1,11 +1,11 @@
 package de.visualdigits.kaudiotagger.model.common.datatype
 
 import de.visualdigits.kaudiotagger.model.common.types.ChannelTypes
-import de.visualdigits.kaudiotagger.model.common.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.common.types.EventTimingTypes
-import de.visualdigits.kaudiotagger.model.common.types.GenreTypes
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
+import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.common.types.InterpolationTypes
-import de.visualdigits.kaudiotagger.model.common.types.PictureTypes
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.types.ReceivedAsTypes
 import de.visualdigits.kaudiotagger.model.common.types.SynchronisedLyricsContentType
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
@@ -50,7 +50,6 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Int, String>  {
         frameBody: AbstractTagFrameBody? = null,
         size: Int
     ): super(identifier, frameBody, size) {
-
         if (identifier == DataTypes.OBJ_GENRE) {
             valueToKeyMap = GenreTypes.getValueToIdMap()
             keyToValueMap = GenreTypes.getIdToValueMap()

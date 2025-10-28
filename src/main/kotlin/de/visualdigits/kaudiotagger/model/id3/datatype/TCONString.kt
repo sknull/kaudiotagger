@@ -1,5 +1,6 @@
-package de.visualdigits.kaudiotagger.model.common.datatype
+package de.visualdigits.kaudiotagger.model.id3.datatype
 
+import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 
 class TCONString : TextEncodedStringSizeTerminated {

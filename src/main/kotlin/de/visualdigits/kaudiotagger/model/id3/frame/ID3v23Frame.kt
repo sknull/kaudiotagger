@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.frame
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException

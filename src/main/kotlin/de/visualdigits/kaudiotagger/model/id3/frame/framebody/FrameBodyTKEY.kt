@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.common.types.MusicalKey
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.MusicalKey
 import java.nio.ByteBuffer
 
 /**

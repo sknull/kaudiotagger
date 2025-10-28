@@ -2,8 +2,8 @@ package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.common.types.GenreTypes
-import de.visualdigits.kaudiotagger.model.common.types.ID3v1FieldKey
+import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField

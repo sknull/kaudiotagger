@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.images
 
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.common.types.PictureTypes
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.util.Utils

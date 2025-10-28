@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.common.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
 import de.visualdigits.kaudiotagger.util.FileConstants
 import de.visualdigits.kaudiotagger.util.StatusFlags

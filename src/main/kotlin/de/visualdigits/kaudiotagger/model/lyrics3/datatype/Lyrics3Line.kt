@@ -1,6 +1,8 @@
-package de.visualdigits.kaudiotagger.model.common.datatype
+package de.visualdigits.kaudiotagger.model.lyrics3.datatype
 
+import de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.datatype.ID3v2LyricLine
 import java.nio.charset.StandardCharsets
 import java.util.LinkedList
 

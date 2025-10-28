@@ -5,6 +5,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberFixedLength
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
 
 /**
  * A single synchronized tempo code. Part of a list of temnpo codes ([SynchronisedTempoCodeList]), that are contained in

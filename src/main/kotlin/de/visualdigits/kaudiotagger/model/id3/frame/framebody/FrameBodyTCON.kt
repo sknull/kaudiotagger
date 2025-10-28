@@ -2,10 +2,10 @@ package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
-import de.visualdigits.kaudiotagger.model.common.datatype.TCONString
-import de.visualdigits.kaudiotagger.model.common.types.GenreTypes
-import de.visualdigits.kaudiotagger.model.common.types.ID3V2ExtendedGenreTypes
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.datatype.TCONString
+import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V2ExtendedGenreTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 

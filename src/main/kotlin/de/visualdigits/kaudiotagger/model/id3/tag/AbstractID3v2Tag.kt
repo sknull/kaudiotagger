@@ -4,9 +4,9 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.types.FileSystemMessage
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.common.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.common.types.Languages
-import de.visualdigits.kaudiotagger.model.common.types.PictureTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.Languages
+import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField

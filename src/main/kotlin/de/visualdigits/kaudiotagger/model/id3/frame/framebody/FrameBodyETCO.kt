@@ -1,11 +1,11 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.EventTimingCode
-import de.visualdigits.kaudiotagger.model.common.datatype.EventTimingCodeList
+import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCode
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
-import de.visualdigits.kaudiotagger.model.common.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCodeList
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import java.nio.ByteBuffer
 
 /**

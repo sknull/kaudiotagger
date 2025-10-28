@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.common.datatype
 
-import de.visualdigits.kaudiotagger.model.common.types.Languages
+import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets

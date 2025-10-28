@@ -4,7 +4,7 @@ import de.visualdigits.kaudiotagger.model.common.datatype.ByteArraySizeTerminate
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.NumberFixedLength
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import java.nio.ByteBuffer
 
 /**

@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 import de.visualdigits.kaudiotagger.model.common.datatype.ByteArraySizeTerminated
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
-import de.visualdigits.kaudiotagger.model.common.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
 import java.nio.ByteBuffer
 
 /**

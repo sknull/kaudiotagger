@@ -6,8 +6,8 @@ import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.StringHashMap
 import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringSizeTerminated
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
-import de.visualdigits.kaudiotagger.model.common.types.Languages
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion

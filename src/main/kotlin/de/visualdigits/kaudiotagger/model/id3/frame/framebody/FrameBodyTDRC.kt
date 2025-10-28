@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 import java.text.ParseException

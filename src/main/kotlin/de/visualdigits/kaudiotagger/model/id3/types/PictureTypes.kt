@@ -1,4 +1,4 @@
-package de.visualdigits.kaudiotagger.model.common.types
+package de.visualdigits.kaudiotagger.model.id3.types
 
 enum class PictureTypes(
     val id: Int,

@@ -1,4 +1,7 @@
-package de.visualdigits.kaudiotagger.model.common.types
+package de.visualdigits.kaudiotagger.model.id3.types
+
+import de.visualdigits.kaudiotagger.model.common.types.Frames
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 
 enum class ID3v22Frames(
     override val id: String,

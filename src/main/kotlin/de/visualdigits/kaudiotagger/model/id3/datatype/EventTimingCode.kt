@@ -1,6 +1,6 @@
-package de.visualdigits.kaudiotagger.model.common.datatype
+package de.visualdigits.kaudiotagger.model.id3.datatype
 
-import de.visualdigits.kaudiotagger.model.common.types.EventTimingTypes
+import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 
@@ -11,15 +11,15 @@ import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFram
  * @author [Hendrik Schreiber](mailto:hs@tagtraum.com)
  * @version $Id:$
  */
-class EventTimingCode : AbstractDataType, Cloneable {
+class EventTimingCode : de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataType, Cloneable {
 
-    private val type = NumberHashMap(
-        DataTypes.OBJ_TYPE_OF_EVENT,
+    private val type = _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap(
+        _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.DataTypes.OBJ_TYPE_OF_EVENT,
         null,
         1
     )
-    private val timestamp = NumberFixedLength(
-        DataTypes.OBJ_DATETIME,
+    private val timestamp = _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.NumberFixedLength(
+        _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.DataTypes.OBJ_DATETIME,
         null,
         4
     )

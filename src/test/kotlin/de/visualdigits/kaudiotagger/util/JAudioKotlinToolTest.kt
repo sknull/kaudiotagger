@@ -2,9 +2,9 @@ package de.visualdigits.kaudiotagger.util
 
 import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.types.ID3v22Frames
-import de.visualdigits.kaudiotagger.model.common.types.ID3v23Frames
-import de.visualdigits.kaudiotagger.model.common.types.ID3v24Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23Frames
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24Frames
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File

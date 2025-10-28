@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.lyrics3
 
-import de.visualdigits.kaudiotagger.model.common.types.Lyrics3v2Fields
+import de.visualdigits.kaudiotagger.model.lyrics3.types.Lyrics3v2Fields
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame

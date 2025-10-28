@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.Lyrics3Image
-import de.visualdigits.kaudiotagger.model.common.types.Lyrics3v2Fields
+import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Image
+import de.visualdigits.kaudiotagger.model.lyrics3.types.Lyrics3v2Fields
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.RandomAccessFile
