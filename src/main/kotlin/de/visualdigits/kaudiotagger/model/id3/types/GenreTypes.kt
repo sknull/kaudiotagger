@@ -210,9 +210,9 @@ enum class GenreTypes(
 
         fun fromName(name: String): GenreTypes? = entries.find { e -> name == e.name }
 
-        fun getValueToIdMap(): Map<String, Int> = entries.associate { e -> Pair(e.friendlyName, e.id) }
+        fun getValueToIdMap(): Map<String, Long> = entries.associate { e -> Pair(e.friendlyName, e.id.toLong()) }
 
-        fun getIdToValueMap(): Map<Int, String> = entries.associate { e -> Pair(e.id, e.friendlyName) }
+        fun getIdToValueMap(): Map<Long, String> = entries.associate { e -> Pair(e.id.toLong(), e.friendlyName) }
 
     }
 }

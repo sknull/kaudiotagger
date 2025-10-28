@@ -338,14 +338,6 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @return
      */
     open fun getValueWithoutTrailingNull(): String {
-        val values = splitByNullSeperator(getValue() as String)
-        val sb = StringBuffer()
-        for (i in values.indices) {
-            if (i != 0) {
-                sb.append("\u0000")
-            }
-            sb.append(values.get(i))
-        }
-        return sb.toString()
+        return (getValue() as String).substringBefore(0.toChar())
     }
 }

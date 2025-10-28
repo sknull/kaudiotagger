@@ -30,9 +30,9 @@ enum class TextEncoding(
 
         fun fromCharset(charSet: Charset): TextEncoding? = entries.find { e -> charSet == e.charSet }
 
-        fun getValueToIdMap(): Map<String, Int> = entries.associate { e -> Pair(e.charSet.name(), e.id.toInt()) }
+        fun getValueToIdMap(): Map<String, Long> = entries.associate { e -> Pair(e.charSet.name(), e.id.toLong()) }
 
-        fun getIdToValueMap(): Map<Int, String> = entries.associate { e -> Pair(e.id.toInt(), e.charSet.name()) }
+        fun getIdToValueMap(): Map<Long, String> = entries.associate { e -> Pair(e.id.toLong(), e.charSet.name()) }
     }
 
 

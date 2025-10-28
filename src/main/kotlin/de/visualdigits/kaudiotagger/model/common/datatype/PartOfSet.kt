@@ -27,6 +27,10 @@ class PartOfSet : AbstractString {
      */
     constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
+    override fun getValue(): PartOfSetValue? {
+        return super.getValue() as? PartOfSetValue
+    }
+
     /**
      * Read a 'n' bytes from buffer into a String where n is the frameSize - offset
      * so therefore cannot use this if there are other objects after it because it has no
@@ -68,7 +72,7 @@ class PartOfSet : AbstractString {
         setValue(PartOfSetValue(stringValue))
 
         //SetSize, important this is correct for finding the next datatype
-        setValue(arr.size - offset)
+        setSize(arr.size - offset)
         log.debug("Read SizeTerminatedString:${getValue()} size:${getSize()}")
     }
 
@@ -135,5 +139,9 @@ class PartOfSet : AbstractString {
         }
         setValue(data.size)
         return data
+    }
+
+    override fun toString(): String {
+        return getValue().toString()
     }
 }

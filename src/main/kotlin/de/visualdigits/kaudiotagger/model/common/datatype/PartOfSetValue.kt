@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.common.datatype
 
-import de.visualdigits.kaudiotagger.util.PadNumberOption
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.util.regex.Pattern
 
@@ -18,7 +17,7 @@ class PartOfSetValue {
     var extra: String? = null //Any extraneous info such as null chars
     var rawCount: String? = null //count value as provided
     var rawTotal: String? = null //total value as provided
-    var rawText: String = "" // raw text representation used to actually save the data IF !TagOptionSingleton.getInstance().isPadNumbers()
+    var rawText: String = "" // raw text representation used to actually save the data IF !TagOptionSingleton.isPadNumbers()
 
     constructor() {
         rawText = ""
@@ -94,59 +93,11 @@ class PartOfSetValue {
      *
      * @return
      */
-    fun getCountAsText(): String? {
-        //Don't Pad
-        val sb = StringBuffer()
-        if (!TagOptionSingleton.padNumbers) {
-            return rawCount
+    fun getCountAsText(): String {
+        return if (!TagOptionSingleton.padNumbers) {
+            rawCount?.substringBefore(0.toChar())?:"0"
         } else {
-            padNumber(
-                sb,
-                count,
-                TagOptionSingleton.padNumberTotalLength
-            )
-        }
-        return sb.toString()
-    }
-
-    /**
-     * Pad number so number is defined as long as length
-     *
-     * @param sb
-     * @param count
-     * @param padNumberLength
-     */
-    private fun padNumber(
-        sb: StringBuffer,
-        count: Int?,
-        padNumberLength: PadNumberOption
-    ) {
-        if (count != null) {
-            if (padNumberLength == PadNumberOption.PAD_ONE_ZERO) {
-                if (count in 1..<10) {
-                    sb.append("0").append(count)
-                } else {
-                    sb.append(count)
-                }
-            } else if (padNumberLength == PadNumberOption.PAD_TWO_ZERO) {
-                if (count in 1..<10) {
-                    sb.append("00").append(count)
-                } else if (count in 10..<100) {
-                    sb.append("0").append(count)
-                } else {
-                    sb.append(count)
-                }
-            } else if (padNumberLength == PadNumberOption.PAD_THREE_ZERO) {
-                if (count in 1..<10) {
-                    sb.append("000").append(count)
-                } else if (count in 10..<100) {
-                    sb.append("00").append(count)
-                } else if (count in 100..<1000) {
-                    sb.append("0").append(count)
-                } else {
-                    sb.append(count)
-                }
-            }
+            count.toString().padStart(TagOptionSingleton.padNumberTotalLength.length)
         }
     }
 
@@ -157,15 +108,25 @@ class PartOfSetValue {
      */
     fun getTotalAsText(): String {
         //Don't Pad
-        val sb = StringBuffer()
-        if (!TagOptionSingleton.padNumbers) {
-            return rawTotal?:"0"
+        return if (!TagOptionSingleton.padNumbers) {
+            rawTotal?.substringBefore(0.toChar())?:"0"
         } else {
-            padNumber(
-                sb,
-                total,
-                TagOptionSingleton.padNumberTotalLength
-            )
+            total.toString().padStart(TagOptionSingleton.padNumberTotalLength.length)
+        }
+    }
+
+    override fun toString(): String {
+        //Don't Pad
+        val sb = StringBuilder()
+        if (!TagOptionSingleton.padNumbers) {
+            sb.append(rawText.substringBefore(0.toChar()))
+        } else {
+            sb.append(count.toString().padStart(TagOptionSingleton.padNumberTotalLength.length))
+            sb.append(SEPARATOR)
+            sb.append(total.toString().padStart(TagOptionSingleton.padNumberTotalLength.length))
+            if (extra != null) {
+                sb.append(extra)
+            }
         }
         return sb.toString()
     }

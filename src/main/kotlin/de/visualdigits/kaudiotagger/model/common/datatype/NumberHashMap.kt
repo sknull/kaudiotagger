@@ -13,17 +13,17 @@ import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 
-class NumberHashMap: NumberFixedLength, HashMapInterface<Int, String>  {
+class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
 
     /**
      * key to value map
      */
-    var keyToValueMap: Map<Int, String> = mapOf()
+    var keyToValueMap: Map<Long, String> = mapOf()
 
     /**
      * value to key map
      */
-    var valueToKeyMap: Map<String, Int> = mapOf()
+    var valueToKeyMap: Map<String, Long> = mapOf()
 
     /**
      *
@@ -109,12 +109,11 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Int, String>  {
     override fun readByteArray(arr: ByteArray, offset: Int) {
         super.readByteArray(arr, offset)
 
-        //Mismatch:Superclass uses Long, but maps expect Integer
-        val intValue = (getValue() as Long).toInt()
-        if (!keyToValueMap.containsKey(intValue)) {
+        val value = (getValue() as Long)
+        if (!keyToValueMap.containsKey(value)) {
             if (!hasEmptyValue) {
                 throw InvalidDataTypeException(
-                    ErrorMessage.MP3_REFERENCE_KEY_INVALID.getMsg(identifier, intValue)
+                    ErrorMessage.MP3_REFERENCE_KEY_INVALID.getMsg(identifier, value)
                 )
             } else if (identifier == DataTypes.OBJ_PICTURE_TYPE) {
                 log.warn(ErrorMessage.MP3_PICTURE_TYPE_INVALID.getMsg(getValue()))
@@ -122,11 +121,11 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Int, String>  {
         }
     }
 
-    override fun getKeyToValue(): Map<Int, String> {
+    override fun getKeyToValue(): Map<Long, String> {
         return keyToValueMap
     }
 
-    override fun getValueToKey(): Map<String, Int> {
+    override fun getValueToKey(): Map<String, Long> {
         return valueToKeyMap
     }
 
