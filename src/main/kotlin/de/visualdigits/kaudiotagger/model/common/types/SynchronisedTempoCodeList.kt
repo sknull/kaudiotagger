@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.common.types
 
-import de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataTypeList
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataTypeList
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodySYTC
 
 /**

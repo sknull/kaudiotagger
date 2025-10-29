@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.ByteArraySizeTerminated
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import java.nio.ByteBuffer
 
 class FrameBodyEncrypted: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {

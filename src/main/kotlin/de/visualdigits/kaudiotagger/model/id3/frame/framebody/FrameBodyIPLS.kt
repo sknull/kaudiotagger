@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.ValuePairs
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.ValuePairs
 import de.visualdigits.kaudiotagger.model.id3.types.ID3V23Frame
 import java.nio.ByteBuffer
 

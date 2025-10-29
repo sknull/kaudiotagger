@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
-import de.visualdigits.kaudiotagger.model.common.datatype.PairedTextEncodedStringNullTerminated
-import de.visualdigits.kaudiotagger.model.common.datatype.ValuePairs
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
+import de.visualdigits.kaudiotagger.model.id3.datatype.PairedTextEncodedStringNullTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.ValuePairs
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer

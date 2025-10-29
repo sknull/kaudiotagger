@@ -11,15 +11,15 @@ import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
  * @author [Hendrik Schreiber](mailto:hs@tagtraum.com)
  * @version $Id:$
  */
-class EventTimingCode : de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataType, Cloneable {
+class EventTimingCode : AbstractDataType, Cloneable {
 
-    private val type = _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap(
-        _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.DataTypes.OBJ_TYPE_OF_EVENT,
+    private val type = NumberHashMap(
+        DataTypes.OBJ_TYPE_OF_EVENT,
         null,
         1
     )
-    private val timestamp = _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.NumberFixedLength(
-        _root_ide_package_.de.visualdigits.kaudiotagger.model.common.datatype.DataTypes.OBJ_DATETIME,
+    private val timestamp = NumberFixedLength(
+        DataTypes.OBJ_DATETIME,
         null,
         4
     )

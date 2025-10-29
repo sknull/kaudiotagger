@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.StringFixedLength
-import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
-import de.visualdigits.kaudiotagger.model.common.datatype.StringSizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringFixedLength
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringSizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import java.nio.ByteBuffer
 

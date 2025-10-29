@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.common.types
 
-import de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataType
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.ID3Tags

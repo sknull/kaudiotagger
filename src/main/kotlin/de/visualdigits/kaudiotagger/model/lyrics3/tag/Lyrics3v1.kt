@@ -3,9 +3,8 @@ package de.visualdigits.kaudiotagger.model.lyrics3.tag
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
-import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyLYR
+import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyLYR
 import de.visualdigits.kaudiotagger.util.ID3Tags
-import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 

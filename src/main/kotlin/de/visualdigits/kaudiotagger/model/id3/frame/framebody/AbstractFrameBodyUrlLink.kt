@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.StringSizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringSizeTerminated
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import java.io.ByteArrayOutputStream
 import java.net.URLEncoder

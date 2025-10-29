@@ -1,10 +1,10 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.ByteArraySizeTerminated
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
-import de.visualdigits.kaudiotagger.model.common.datatype.StringHashMap
-import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringHashMap
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
 import de.visualdigits.kaudiotagger.model.id3.types.Languages

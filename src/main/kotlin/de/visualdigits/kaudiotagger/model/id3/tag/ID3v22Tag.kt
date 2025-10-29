@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException

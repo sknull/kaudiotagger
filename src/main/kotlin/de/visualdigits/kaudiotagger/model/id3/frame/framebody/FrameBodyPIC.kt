@@ -1,11 +1,11 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.AbstractString
-import de.visualdigits.kaudiotagger.model.common.datatype.ByteArraySizeTerminated
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
-import de.visualdigits.kaudiotagger.model.common.datatype.StringFixedLength
-import de.visualdigits.kaudiotagger.model.common.datatype.StringNullTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractString
+import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringFixedLength
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
 import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes

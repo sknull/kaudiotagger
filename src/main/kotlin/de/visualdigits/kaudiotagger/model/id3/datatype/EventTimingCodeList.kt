@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.datatype
 
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyETCO
 
 /**
@@ -9,10 +8,10 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyETCO
  * @author [Hendrik Schreiber](mailto:hs@tagtraum.com)
  * @version $Id:$
  */
-class EventTimingCodeList : de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataTypeList<EventTimingCode> {
+class EventTimingCodeList : AbstractDataTypeList<EventTimingCode> {
     /**
      * Mandatory, concretely-typed copy constructor, as required by
-     * [de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataTypeList.AbstractDataTypeList].
+     * [AbstractDataTypeList.AbstractDataTypeList].
      *
      * @param copy instance to copy
      */

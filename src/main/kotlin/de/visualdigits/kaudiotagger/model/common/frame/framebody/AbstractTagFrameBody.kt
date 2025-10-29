@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.common.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
-import de.visualdigits.kaudiotagger.model.common.datatype.AbstractDataType
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTagItem
 import de.visualdigits.kaudiotagger.util.ID3Tags
 

@@ -6,9 +6,9 @@ import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
-import de.visualdigits.kaudiotagger.model.lyrics3.Lyrics3v2Field
-import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyIND
-import de.visualdigits.kaudiotagger.model.lyrics3.frame.framebody.FieldFrameBodyLYR
+import de.visualdigits.kaudiotagger.model.lyrics3.field.Lyrics3v2Field
+import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyIND
+import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyLYR
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer

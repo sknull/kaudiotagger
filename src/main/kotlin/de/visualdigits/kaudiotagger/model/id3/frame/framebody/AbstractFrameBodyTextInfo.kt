@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.common.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.common.datatype.NumberHashMap
-import de.visualdigits.kaudiotagger.model.common.datatype.TextEncodedStringSizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
+import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
