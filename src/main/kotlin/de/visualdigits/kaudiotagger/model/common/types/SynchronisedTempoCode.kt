@@ -79,6 +79,7 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
         val objectData = ByteArray(typeData.size + timeData.size)
         System.arraycopy(typeData, 0, objectData, 0, typeData.size)
         System.arraycopy(timeData, 0, objectData, typeData.size, timeData.size)
+
         return objectData
     }
 

@@ -2,6 +2,7 @@ package de.visualdigits.kaudiotagger.model.common.tag
 
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.images.Artwork
 
 /**
@@ -100,6 +101,8 @@ interface Tag {
     fun getAll(id: GenericFieldKey): List<String>
 
     fun getFirst(genericKey: GenericFieldKey): String?
+
+    fun getFirst(id: String): String? = getFirst(GenericFieldKey.valueOf(id))
 
     /**
      * Delete any instance of tag fields used to store artwork

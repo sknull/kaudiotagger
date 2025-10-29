@@ -154,7 +154,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
             data = ByteArray(outputBuffer.limit())
             outputBuffer.rewind()
             outputBuffer.get(data, 0, outputBuffer.limit())
-            setValue(data.size)
+            setSize(data.size)
         } catch (ce: CharacterCodingException) { //https://bitbucket.org/ijabz/jaudiotagger/issue/1/encoding-metadata-to-utf-16-can-fail-if
             log.error("${ce.message}:$charset:${getValue()}")
             throw RuntimeException(ce)
@@ -262,12 +262,8 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      */
     fun stripTrailingNull() {
         if (TagOptionSingleton.removeTrailingTerminatorOnWrite) {
-            var stringValue = getValue() as String
-            if (stringValue.isNotEmpty()) {
-                if (stringValue.get(stringValue.length - 1) == '\u0000') {
-                    stringValue = stringValue.take(stringValue.length - 1)
-                    setValue(stringValue)
-                }
+            (getValue() as? String)?.also { s ->
+                setValue(s.substringBefore('\u0000'))
             }
         }
     }
@@ -281,10 +277,8 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      */
     fun checkTrailingNull(values: MutableList<String>, stringValue: String) {
         if (!TagOptionSingleton.removeTrailingTerminatorOnWrite) {
-            if (stringValue.isNotEmpty() &&
-                stringValue[stringValue.length - 1] == '\u0000'
-            ) {
-                val lastVal = values[values.size - 1]
+            if (stringValue.isNotEmpty() && stringValue.endsWith('\u0000')) {
+                val lastVal = values.last()
                 val newLastVal = "$lastVal\u0000"
                 values[values.size - 1] = newLastVal
             }

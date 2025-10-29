@@ -2,11 +2,12 @@ package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCode
-import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCodeList
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
 import java.nio.ByteBuffer
+import java.util.Collections
 
 /**
  * Event timing codes frame.
@@ -225,6 +226,36 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     /**
+     * Chronological map of timing codes.
+     *
+     * @return map of timing codes
+     */
+    fun getTimingCodes(): MutableMap<Long, IntArray> {
+        val map = mutableMapOf<Long, IntArray>()
+        val codes = getObjectValue(
+            DataTypes.OBJ_TIMED_EVENT_LIST
+        ) as MutableList<EventTimingCode>
+        var lastTimestamp: Long = 0
+        for (code in codes) {
+            val translatedTimestamp = if (code.getTimestamp() == 0L)
+                lastTimestamp
+            else
+                code.getTimestamp()
+            val types = map.get(translatedTimestamp)
+            if (types == null) {
+                map.put(translatedTimestamp, intArrayOf(code.getType()))
+            } else {
+                val newTypes = IntArray(types.size + 1)
+                System.arraycopy(types, 0, newTypes, 0, types.size)
+                newTypes[newTypes.size - 1] = code.getType()
+                map.put(translatedTimestamp, newTypes)
+            }
+            lastTimestamp = translatedTimestamp
+        }
+        return Collections.unmodifiableMap<Long?, IntArray?>(map)
+    }
+
+    /**
      * Remove all timing codes.
      */
     fun clearTimingCodes() {
@@ -266,7 +297,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return identifier
      */
     override fun getIdentifier(): String {
-        return ID3V24Frame.EVENT_TIMING_CODES.id
+        return ID3V24FrameId.EVENT_TIMING_CODES.id
     }
 
     /**

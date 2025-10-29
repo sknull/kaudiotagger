@@ -29,7 +29,7 @@ object Utils {
     internal val log: Logger = LoggerFactory.getLogger(Utils::class.java)
 
     private const val MAX_BASE_TEMP_FILENAME_LENGTH = 20
-    private val boxed2primitive: MutableMap<Class<*>?, Class<*>?> = HashMap<Class<*>?, Class<*>?>()
+    private val boxed2primitive: MutableMap<Class<*>?, Class<*>?> = mutableMapOf<Class<*>?, Class<*>?>()
 
     var BITS_IN_BYTE_MULTIPLIER: Int = 8
     var KILOBYTE_MULTIPLIER: Int = 1000

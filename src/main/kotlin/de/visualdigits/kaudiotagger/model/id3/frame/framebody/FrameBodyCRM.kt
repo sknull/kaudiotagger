@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22FrameId
 import java.nio.ByteBuffer
 
 /**
@@ -77,7 +77,7 @@ class FrameBodyCRM
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3V22Frame.ENCRYPTED_FRAME.id
+        return ID3V22FrameId.ENCRYPTED_FRAME.id
     }
 
     /**

@@ -3,6 +3,7 @@ package de.visualdigits.kaudiotagger.model.lyrics3.tag
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
@@ -15,7 +16,7 @@ import java.nio.ByteBuffer
 
 class Lyrics3v2 : AbstractLyrics3 {
 
-    var fieldMap = HashMap<String?, Lyrics3v2Field>()
+    var fieldMap = mutableMapOf<String, Lyrics3v2Field>()
 
     /**
      * Creates a new Lyrics3v2 datatype.
@@ -71,6 +72,8 @@ class Lyrics3v2 : AbstractLyrics3 {
         }
     }
 
+    override fun supportedTag(): SupportedTag = SupportedTag.Lyrics3V2Tag
+
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null || !seek(byteBuffer)) {
             return false
@@ -81,7 +84,7 @@ class Lyrics3v2 : AbstractLyrics3 {
         // reset file pointer to the beginning of the tag;
         seek(byteBuffer)
 
-        fieldMap = HashMap<String?, Lyrics3v2Field>()
+        fieldMap = mutableMapOf()
 
         var lyric: Lyrics3v2Field?
 

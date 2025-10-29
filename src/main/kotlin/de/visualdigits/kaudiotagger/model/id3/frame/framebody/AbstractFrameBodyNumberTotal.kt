@@ -51,53 +51,47 @@ abstract class AbstractFrameBodyNumberTotal: AbstractID3v2FrameBody {
         val value = getObjectValue(
             DataTypes.OBJ_TEXT
         ) as PartOfSetValue
-        return value.count.toString()
+        return value.getCount().toString()
     }
 
-    fun getText(): String {
-        return getObjectValue(DataTypes.OBJ_TEXT).toString()
+    fun getText(): String? {
+        return getObjectValue(DataTypes.OBJ_TEXT)?.toString()
     }
 
     open fun setText(text: String) {
         setObjectValue(DataTypes.OBJ_TEXT, PartOfSetValue(text))
     }
 
-    fun getNumber(): Int {
-        val value: PartOfSetValue = getObjectValue(
-            DataTypes.OBJ_TEXT
-        ) as PartOfSetValue
-        return value.count
+    fun getNumber(): Int? {
+        return (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.getCount()
     }
 
     fun setNumber(trackNo: Int) {
-        (getObjectValue(DataTypes.OBJ_TEXT) as PartOfSetValue).count = trackNo
+        (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setCount(trackNo)
     }
 
     fun setNumber(trackNo: String) {
-        (getObjectValue(DataTypes.OBJ_TEXT) as PartOfSetValue).count = trackNo.toInt()
+        (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setCount(trackNo)
     }
 
     fun getNumberAsText(): String? {
-        return (getObjectValue(DataTypes.OBJ_TEXT) as PartOfSetValue
-                ).getCountAsText()
+        return (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.getCountAsText()
     }
 
-    fun getTotal(): Int {
-        return (getObjectValue(DataTypes.OBJ_TEXT) as PartOfSetValue
-                ).total
+    fun getTotal(): Int? {
+        return (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.getTotal()
     }
 
     fun setTotal(trackTotal: Int) {
-        (getObjectValue(DataTypes.OBJ_TEXT) as PartOfSetValue).total = trackTotal
+        (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setTotal(trackTotal)
     }
 
     fun setTotal(trackTotal: String) {
-        (getObjectValue(DataTypes.OBJ_TEXT) as PartOfSetValue).total = trackTotal.toInt()
+        (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setTotal(trackTotal.toInt())
     }
 
-    fun getTotalAsText(): String {
-        return (getObjectValue(DataTypes.OBJ_TEXT) as PartOfSetValue
-                ).getTotalAsText()
+    fun getTotalAsText(): String? {
+        return (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.getTotalAsText()
     }
 
     override fun setupObjectList() {

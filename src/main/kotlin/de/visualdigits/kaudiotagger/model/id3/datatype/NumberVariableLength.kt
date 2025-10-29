@@ -125,11 +125,12 @@ class NumberVariableLength : AbstractDataType {
 
             //keeps shifting the number downwards and masking the last 8 bist to get the value for the next byte
             //to be written
-            for (i in size - 1 downTo 0) {
+            (size - 1 downTo 0).forEach { i ->
                 arr[i] = (temp and 0xFFL).toByte()
                 temp = temp shr 8
             }
         }
+
         return arr
     }
 

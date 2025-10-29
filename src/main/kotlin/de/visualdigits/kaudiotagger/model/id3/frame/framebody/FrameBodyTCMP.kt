@@ -2,7 +2,7 @@ package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
 import java.nio.ByteBuffer
 
 /**
@@ -55,11 +55,11 @@ class FrameBodyTCMP: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3V24Frame.IS_COMPILATION.id
+        return ID3V24FrameId.IS_COMPILATION.id
     }
 
     companion object {
         //TODO does iTunes have to have null terminator?
-        var IS_COMPILATION: String = "1\u0000"
+        var IS_COMPILATION: String = "1"
     }
 }

@@ -11,6 +11,7 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyTextInfo
@@ -18,8 +19,8 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTDRC
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -104,6 +105,8 @@ class ID3v22Tag : AbstractID3v2Tag {
             log.debug("Created tag from a tag of a different version")
         }
     }
+
+    override fun supportedTag(): SupportedTag = SupportedTag.ID3v22Tag
 
     /**
      * Copy primitives applicable to v2.2
@@ -396,17 +399,17 @@ class ID3v22Tag : AbstractID3v2Tag {
     override fun convertFrame(frame: AbstractID3v2Frame): MutableList<AbstractID3v2Frame> {
         val frames = mutableListOf<AbstractID3v2Frame>()
         val tmpBody = frame.frameBody
-        if ((frame.getIdentifier() == ID3V24Frame.YEAR.id) && (tmpBody is FrameBodyTDRC)) {
+        if ((frame.getIdentifier() == ID3V24FrameId.YEAR.id) && (tmpBody is FrameBodyTDRC)) {
             var newFrame: ID3v22Frame
             if (tmpBody.year.isNotEmpty()) {
                 //Create Year frame (v2.2 id,but uses v2.3 body)
-                newFrame = ID3v22Frame(ID3V22Frame.TYER.id)
+                newFrame = ID3v22Frame(ID3V22FrameId.TYER.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.year)
                 frames.add(newFrame)
             }
             if (tmpBody.time.isNotEmpty()) {
                 //Create Time frame (v2.2 id,but uses v2.3 body)
-                newFrame = ID3v22Frame(ID3V22Frame.TIME.id)
+                newFrame = ID3v22Frame(ID3V22FrameId.TIME.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.time)
                 frames.add(newFrame)
             }
@@ -529,7 +532,7 @@ class ID3v22Tag : AbstractID3v2Tag {
     }
 
     override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
-        val id3v22FieldKey = ID3V22Frame.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
+        val id3v22FieldKey = ID3V22FrameId.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
         return FrameAndSubId(
             genericKey,
             id3v22FieldKey.id,

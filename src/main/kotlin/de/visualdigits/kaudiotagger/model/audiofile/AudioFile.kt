@@ -1,6 +1,7 @@
 package de.visualdigits.kaudiotagger.model.audiofile
 
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
+import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.SupportedFileFormat
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
@@ -66,7 +67,7 @@ open class AudioFile {
     /**
      * The tag
      */
-    val tags: MutableMap<SupportedTag, Tag> = mutableMapOf()
+    val tags: MutableMap<SupportedTag, AbstractTag> = mutableMapOf()
 
     /**
      * Retrieve the file extension

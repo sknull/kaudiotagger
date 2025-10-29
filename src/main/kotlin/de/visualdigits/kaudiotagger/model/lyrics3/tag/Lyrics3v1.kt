@@ -2,6 +2,7 @@ package de.visualdigits.kaudiotagger.model.lyrics3.tag
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyLYR
 import de.visualdigits.kaudiotagger.util.ID3Tags
@@ -50,6 +51,8 @@ class Lyrics3v1: AbstractLyrics3 {
             log.error("Something went wrong", e)
         }
     }
+
+    override fun supportedTag(): SupportedTag = SupportedTag.Lyrics3V1Tag
 
     /**
      * @param byteBuffer

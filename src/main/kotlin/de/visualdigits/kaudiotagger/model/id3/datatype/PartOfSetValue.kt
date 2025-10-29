@@ -12,16 +12,14 @@ class PartOfSetValue {
         const val SEPARATOR: String = "/"
     }
 
-    var count: Int = 0
-    var total: Int = 0
+    private var count: Int? = null
+    private var total: Int? = null
     var extra: String? = null //Any extraneous info such as null chars
     var rawCount: String? = null //count value as provided
     var rawTotal: String? = null //total value as provided
-    var rawText: String = "" // raw text representation used to actually save the data IF !TagOptionSingleton.isPadNumbers()
+    var rawText: String? = null // raw text representation used to actually save the data IF !TagOptionSingleton.isPadNumbers()
 
-    constructor() {
-        rawText = ""
-    }
+    constructor()
 
     constructor(value: String) {
         rawText = value
@@ -34,7 +32,7 @@ class PartOfSetValue {
      * @param count
      * @param total
      */
-    constructor(count: Int, total: Int): this() {
+    constructor(count: Int, total: Int) : this() {
         this.count = count
         this.rawCount = count.toString()
         this.total = total
@@ -95,9 +93,9 @@ class PartOfSetValue {
      */
     fun getCountAsText(): String {
         return if (!TagOptionSingleton.padNumbers) {
-            rawCount?.substringBefore(0.toChar())?:"0"
+            rawCount?.substringBefore(0.toChar()) ?: "0"
         } else {
-            count.toString().padStart(TagOptionSingleton.padNumberTotalLength.length)
+            count.toString().padStart(TagOptionSingleton.padNumberTotalLength.length, '0')
         }
     }
 
@@ -109,23 +107,51 @@ class PartOfSetValue {
     fun getTotalAsText(): String {
         //Don't Pad
         return if (!TagOptionSingleton.padNumbers) {
-            rawTotal?.substringBefore(0.toChar())?:"0"
+            rawTotal?.substringBefore(0.toChar()) ?: "0"
         } else {
-            total.toString().padStart(TagOptionSingleton.padNumberTotalLength.length)
+            total.toString().padStart(TagOptionSingleton.padNumberTotalLength.length, '0')
         }
+    }
+
+    fun getCount(): Int? = count
+
+    fun setCount(count: Int) {
+        this.count = count;
+        this.rawCount = count.toString();
+        resetValueFromCounts();
+    }
+
+    fun setCount(count: String) {
+        this.count = count.toInt()
+        this.rawCount = count;
+        resetValueFromCounts();
+    }
+
+    fun getTotal(): Int? = total
+
+    fun setTotal(total: Int) {
+        this.total = total;
+        this.rawTotal = total.toString();
+        resetValueFromCounts();
+    }
+
+    fun setTotal(total: String) {
+        this.total = total.toInt()
+        this.rawTotal = total;
+        resetValueFromCounts();
     }
 
     override fun toString(): String {
         //Don't Pad
         val sb = StringBuilder()
         if (!TagOptionSingleton.padNumbers) {
-            sb.append(rawText.substringBefore(0.toChar()))
+            rawText?.substringBefore(0.toChar())?.also { t -> sb.append(t) }
         } else {
-            sb.append(count.toString().padStart(TagOptionSingleton.padNumberTotalLength.length))
+            count?.toString()?.padStart(TagOptionSingleton.padNumberTotalLength.length, '0')?.also { t -> sb.append(t) }
             sb.append(SEPARATOR)
-            sb.append(total.toString().padStart(TagOptionSingleton.padNumberTotalLength.length))
+            total?.toString()?.padStart(TagOptionSingleton.padNumberTotalLength.length, '0')?.also { t -> sb.append(t) }
             if (extra != null) {
-                sb.append(extra)
+                extra?.also { t -> sb.append(t) }
             }
         }
         return sb.toString()

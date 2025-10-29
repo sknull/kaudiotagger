@@ -7,7 +7,7 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.StringHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
@@ -129,7 +129,7 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3V24Frame.UNSYNC_LYRICS.id
+        return ID3V24FrameId.UNSYNC_LYRICS.id
     }
 
     /**
@@ -186,21 +186,15 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
 
     override fun write(tagBuffer: ByteArrayOutputStream) {
         //Ensure valid for type
-        this.setTextEncoding(
-            ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding())
-        )
+        this.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding()))
 
         //Ensure valid for data
         if (!(getObject(DataTypes.OBJ_DESCRIPTION) as AbstractString).canBeEncoded()
         ) {
-            this.setTextEncoding(
-                ID3TextEncodingConversion.getUnicodeTextEncoding(header)
-            )
+            this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(header))
         }
         if (!(getObject(DataTypes.OBJ_LYRICS) as AbstractString).canBeEncoded()) {
-            this.setTextEncoding(
-                ID3TextEncodingConversion.getUnicodeTextEncoding(header)
-            )
+            this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(header))
         }
         super.write(tagBuffer)
     }

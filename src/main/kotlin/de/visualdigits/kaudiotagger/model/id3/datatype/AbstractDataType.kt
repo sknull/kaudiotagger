@@ -128,6 +128,14 @@ abstract class AbstractDataType {
 
     open fun getValue(): Any? = value
 
+    open fun toByte(): Byte? {
+        return when (val value = getValue()) {
+            is Byte -> value
+            is Number -> value.toByte()
+            else -> null
+        }
+    }
+
     open fun setValue(value: Any?) {
         this.value = value
         when (value) {

@@ -147,8 +147,8 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
             "Writing frame body for${this.getIdentifier()}:Est Size:${getSize()}"
         )
         //Write the various fields to file in order
-        for (`object` in objectList) {
-            val objectData = `object`.writeByteArray()
+        objectList.forEach { o ->
+            val objectData = o.writeByteArray()
             if (objectData != null) {
                 try {
                     tagBuffer.write(objectData)

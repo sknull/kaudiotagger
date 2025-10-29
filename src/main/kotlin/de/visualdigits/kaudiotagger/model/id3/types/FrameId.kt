@@ -2,7 +2,7 @@ package de.visualdigits.kaudiotagger.model.id3.types
 
 import de.visualdigits.kaudiotagger.model.common.types.FieldKey
 
-interface Frame {
+interface FrameId {
 
     val id: String
     val genericFieldKey: FieldKey?

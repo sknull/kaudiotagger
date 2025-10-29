@@ -1,12 +1,12 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.SynchronisedTempoCode
+import de.visualdigits.kaudiotagger.model.common.types.SynchronisedTempoCodeList
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCode
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
-import de.visualdigits.kaudiotagger.model.common.types.SynchronisedTempoCode
-import de.visualdigits.kaudiotagger.model.common.types.SynchronisedTempoCodeList
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
 import java.nio.ByteBuffer
 import java.util.Collections
 
@@ -129,14 +129,14 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      *
      * @return map of tempi
      */
-    fun getTempi(): MutableMap<Long?, Int?> {
-        val map: MutableMap<Long?, Int?> = LinkedHashMap<Long?, Int?>()
+    fun getTempi(): MutableMap<Long, Int> {
+        val map: MutableMap<Long, Int> = LinkedHashMap<Long, Int>()
         val codes: MutableList<SynchronisedTempoCode> =
             getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
         for (code in codes) {
             map.put(code.getTimestamp(), code.getTempo())
         }
-        return Collections.unmodifiableMap<Long?, Int?>(map)
+        return Collections.unmodifiableMap<Long, Int>(map)
     }
 
     /**
@@ -144,14 +144,14 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      *
      * @return list of timestamps
      */
-    fun getTimestamps(): MutableList<Long?> {
-        val list: MutableList<Long?> = ArrayList<Long?>()
+    fun getTimestamps(): MutableList<Long> {
+        val list: MutableList<Long> = mutableListOf<Long>()
         val codes: MutableList<SynchronisedTempoCode> =
             getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
         for (code in codes) {
             list.add(code.getTimestamp())
         }
-        return Collections.unmodifiableList<Long?>(list)
+        return Collections.unmodifiableList<Long>(list)
     }
 
     /**
@@ -165,7 +165,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         removeTempo(timestamp)
         val codes = getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
         var insertIndex = 0
-        if (!codes.isEmpty() && codes.get(0).getTimestamp() <= timestamp) {
+        if (!codes.isEmpty() && codes[0].getTimestamp() <= timestamp) {
             for (code in codes) {
                 val translatedTimestamp = code.getTimestamp()
                 if (timestamp < translatedTimestamp) {
@@ -192,8 +192,12 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return `true`, if any timestamps were removed
      */
     fun removeTempo(timestamp: Long): Boolean {
-        return (getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>)
-            .any { code -> timestamp == code.getTimestamp() }
+        val codes = getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
+        return codes.find { code -> timestamp == code.getTimestamp() }
+            ?.let { code ->
+                codes.remove(code)
+                true
+            }?:false
     }
 
     /**
@@ -206,7 +210,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     override fun getIdentifier(): String {
-        return ID3V24Frame.SYNC_TEMPO.id
+        return ID3V24FrameId.SYNC_TEMPO.id
     }
 
     override fun read(byteBuffer: ByteBuffer?): Boolean {

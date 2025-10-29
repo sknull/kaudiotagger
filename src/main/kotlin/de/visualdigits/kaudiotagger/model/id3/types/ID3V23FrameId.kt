@@ -2,7 +2,7 @@ package de.visualdigits.kaudiotagger.model.id3.types
 
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 
-enum class ID3V23Frame(
+enum class ID3V23FrameId(
     override val id: String,
     override val genericFieldKey: GenericFieldKey?,
     override val fieldKey: ID3v23FieldKey?,
@@ -13,7 +13,7 @@ enum class ID3V23Frame(
     override val isSupported: Boolean,
     override val isExtension: Boolean,
     override val isDiscardedIfFileAltered: Boolean
-) : Frame {
+) : FrameId {
 
         ACCOMPANIMENT("TPE2", GenericFieldKey.ALBUM_ARTIST, ID3v23FieldKey.ALBUM_ARTIST, "Text: Band/Orchestra/Accompaniment", false, false, false, true, false, false),
         ALBUM("TALB", GenericFieldKey.ALBUM, ID3v23FieldKey.ALBUM, "Text: Album/Movie/Show title", true, false, false, true, false, false),
@@ -108,21 +108,21 @@ enum class ID3V23Frame(
 
         fun contains(id: String?): Boolean = entries.any { e -> id == e.id }
 
-        fun fromId(id: String?): ID3V23Frame? = entries.find { e -> id == e.id }
+        fun fromId(id: String?): ID3V23FrameId? = entries.find { e -> id == e.id }
 
-        fun fromFieldKey(fieldKey: GenericFieldKey): ID3V23Frame? = entries.find { e -> fieldKey == e.genericFieldKey }
+        fun fromFieldKey(fieldKey: GenericFieldKey): ID3V23FrameId? = entries.find { e -> fieldKey == e.genericFieldKey }
 
-        fun commonFrames(): List<ID3V23Frame> = entries.filter { e -> e.isCommon }
+        fun commonFrames(): List<ID3V23FrameId> = entries.filter { e -> e.isCommon }
 
-        fun binaryFrames(): List<ID3V23Frame> = entries.filter { e -> e.isBinary }
+        fun binaryFrames(): List<ID3V23FrameId> = entries.filter { e -> e.isBinary }
 
-        fun multipleFrames(): List<ID3V23Frame> = entries.filter { e -> e.isMultipleAllowed }
+        fun multipleFrames(): List<ID3V23FrameId> = entries.filter { e -> e.isMultipleAllowed }
 
-        fun supprtedFrames(): List<ID3V23Frame> = entries.filter { e -> e.isSupported }
+        fun supprtedFrames(): List<ID3V23FrameId> = entries.filter { e -> e.isSupported }
 
-        fun extensionFrames(): List<ID3V23Frame> = entries.filter { e -> e.isExtension }
+        fun extensionFrames(): List<ID3V23FrameId> = entries.filter { e -> e.isExtension }
 
-        fun discardIfFileAltered(): List<ID3V23Frame> = entries.filter { e -> e.isDiscardedIfFileAltered }
+        fun discardIfFileAltered(): List<ID3V23FrameId> = entries.filter { e -> e.isDiscardedIfFileAltered }
 
         fun isSupported(id: String?): Boolean = supprtedFrames().any { e -> e.id == id }
 

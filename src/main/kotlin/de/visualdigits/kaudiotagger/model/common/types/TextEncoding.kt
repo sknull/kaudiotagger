@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets
 enum class TextEncoding(
     val id: Byte,
     val charSet: Charset
-) {
+): ByteRepresentation {
 
     //Supported ID3 charset ids
     ISO_8859_1(0, StandardCharsets.ISO_8859_1),
@@ -37,4 +37,6 @@ enum class TextEncoding(
 
 
     var value: String? = null
+
+    override fun toByte(): Byte = id.toByte()
 }

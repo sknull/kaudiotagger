@@ -66,6 +66,7 @@ class TempoCode : AbstractDataType {
             temp -= 0xFF
         }
         arr[offset] = (temp and 0xFFL).toByte()
+
         return arr
     }
 

@@ -39,7 +39,7 @@ object FileTypeUtil {
     val extensionMap: MutableMap<String, String>
 
     init {
-        signatureMap = HashMap<String, Array<Int?>>()
+        signatureMap = mutableMapOf<String, Array<Int?>>()
         signatureMap.put("MP3IDv2", mp3v2Sig)
         signatureMap.put("MP3IDv1_1", mp3v1Sig_1)
         signatureMap.put("MP3IDv1_2", mp3v1Sig_2)
@@ -47,7 +47,7 @@ object FileTypeUtil {
         signatureMap.put("MP3IDv1_4", mp3v1Sig_4)
         signatureMap.put("MP4", mp4Sig)
 
-        extensionMap = HashMap<String, String>()
+        extensionMap = mutableMapOf<String, String>()
         extensionMap.put("MP3IDv2", "mp3")
         extensionMap.put("MP3IDv1_1", "mp3")
         extensionMap.put("MP3IDv1_2", "mp3")

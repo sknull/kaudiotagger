@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.model.common.types
 enum class ReceivedAsType(
     val id: Int,
     val friendlyName: String
-) {
+): ByteRepresentation {
 
     OTHER(0x00, "Other"),
     STANDARD_CD_ALBUM_WITH_OTHER_SONGS(0x01, "Standard CD album with other songs"),
@@ -26,4 +26,6 @@ enum class ReceivedAsType(
         fun getIdToValueMap(): Map<Long, String> = entries.associate { e -> Pair(e.id.toLong(), e.friendlyName) }
 
     }
+
+    override fun toByte(): Byte = id.toByte()
 }

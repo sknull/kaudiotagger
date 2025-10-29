@@ -25,7 +25,7 @@ abstract class AbstractTagDisplayFormatter {
 
     companion object {
 
-        val hexBinaryMap = HashMap<String, String>()
+        val hexBinaryMap = mutableMapOf<String, String>()
 
         init {
             hexBinaryMap.put("0", "0000")

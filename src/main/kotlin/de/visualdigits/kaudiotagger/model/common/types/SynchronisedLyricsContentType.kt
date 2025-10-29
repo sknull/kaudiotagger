@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.model.common.types
 enum class SynchronisedLyricsContentType(
     val id: Int,
     val friendlyName: String
-) {
+): ByteRepresentation {
 
     OTHER(0x00, "other"),
     LYRICS(0x01, "lyrics3"),
@@ -24,4 +24,6 @@ enum class SynchronisedLyricsContentType(
 
         fun getIdToValueMap(): Map<Long, String> = entries.associate { e -> Pair(e.id.toLong(), e.friendlyName) }
     }
+
+    override fun toByte(): Byte = id.toByte()
 }

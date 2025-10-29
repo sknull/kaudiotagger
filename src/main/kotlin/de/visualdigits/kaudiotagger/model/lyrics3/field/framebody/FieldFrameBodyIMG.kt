@@ -12,7 +12,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
     /**
      *
      */
-    var images = ArrayList<Lyrics3Image>()
+    var images = mutableListOf<Lyrics3Image>()
 
     /**
      * Creates a new FieldBodyIMG datatype.
@@ -46,7 +46,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         var token: String?
         var offset = 0
         var delim = imageString.indexOf(Lyrics3v2Fields.CRLF)
-        images = ArrayList<Lyrics3Image>()
+        images = mutableListOf<Lyrics3Image>()
 
         while (delim >= 0) {
             token = imageString.substring(offset, delim)

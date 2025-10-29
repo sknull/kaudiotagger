@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.model.common.types
 enum class ChannelType(
     val id: Int,
     val friendlyName: String
-) {
+): ByteRepresentation {
 
     OTHER(0x00, "Other"),
     MASTER_VOLUME(0x01, "Master volume"),
@@ -22,4 +22,6 @@ enum class ChannelType(
 
         fun getIdToValueMap(): Map<Long, String> = entries.associate { e -> Pair(e.id.toLong(), e.friendlyName) }
     }
+
+    override fun toByte(): Byte = id.toByte()
 }

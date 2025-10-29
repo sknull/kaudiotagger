@@ -63,7 +63,16 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
     }
 
     override fun setValue(value: Any?) {
-        super.setValue(if (value == null) mutableListOf() else mutableListOf(value))
+        when (value) {
+            is MutableList<*> -> super.setValue(value)
+            else -> {
+                if (value != null) {
+                    super.setValue(mutableListOf(value))
+                } else {
+                    super.setValue(mutableListOf<T>())
+                }
+            }
+        }
     }
 
     /**
@@ -83,7 +92,7 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
         log.debug("Writing DataTypeList " + this.identifier)
         val buffer = ByteArray(getSize())
         var offset = 0
-        for (data in getValue()!!) {
+        getValue()?.forEach { data ->
             val bytes = data.writeByteArray()
             System.arraycopy(bytes, 0, buffer, offset, bytes.size)
             offset += bytes.size

@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.frame.AggregatedFrame
@@ -9,6 +8,8 @@ import de.visualdigits.kaudiotagger.model.common.frame.TyerTdatAggregatedFrame
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyNumberTotal
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyPairs
@@ -26,7 +27,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUFID
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWOAR
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWXXX
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V22Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -248,7 +249,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             when (frame) {
                 is AbstractID3v2Frame -> frame.getSize()
                 is AggregatedFrame -> frame.getFrames().sumOf { f -> f.getSize() }
-                is MutableList<*> -> (frame as? java.util.ArrayList<AbstractID3v2Frame>)?.let { f -> f.sumOf { e -> e.getSize() } }
+                is MutableList<*> -> (frame as? List<AbstractID3v2Frame>)?.let { f -> f.sumOf { e -> e.getSize() } }
                 else -> 0
             }
         }
@@ -362,8 +363,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     }
                 }
 
-                is java.util.ArrayList<*> -> {
-                    for (frame in o as java.util.ArrayList<AbstractID3v2Frame>) {
+                is List<*> -> {
+                    for (frame in o as List<AbstractID3v2Frame>) {
                         addFrame(frame)
                     }
                 }
@@ -434,7 +435,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * Decides what to with the frame that has just been read from file.
      * If the frame is an allowable duplicate frame and is a duplicate we add all
-     * frames into an ArrayList and add the ArrayList to the HashMap. if not allowed
+     * frames into an List and add the ArrayList to the HashMap. if not allowed
      * to be duplicate we store the number of bytes in the duplicateBytes variable and discard
      * the frame itself.
      *
@@ -447,19 +448,19 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         frameId: String?,
         next: AbstractID3v2Frame
     ) {
-        if ((ID3V22Frame.isMultipleAllowed(frameId)) ||
-            (ID3V22Frame.isMultipleAllowed(frameId)) ||
-            (ID3V22Frame.isMultipleAllowed(frameId))
+        if ((ID3V22FrameId.isMultipleAllowed(frameId)) ||
+            (ID3V22FrameId.isMultipleAllowed(frameId)) ||
+            (ID3V22FrameId.isMultipleAllowed(frameId))
         ) {
             //If a frame already exists of this type
             if (map.containsKey(frameId)) {
                 val o = map[frameId]
-                if (o is ArrayList<*>) {
-                    val multiValues = o as ArrayList<AbstractID3v2Frame>
+                if (o is MutableList<*>) {
+                    val multiValues = o as MutableList<AbstractID3v2Frame>
                     multiValues.add(next)
                     log.debug("Adding Multi Frame(1)$frameId")
                 } else {
-                    val multiValues = ArrayList<AbstractID3v2Frame>()
+                    val multiValues = mutableListOf<AbstractID3v2Frame>()
                     multiValues.add(o as AbstractID3v2Frame)
                     multiValues.add(next)
                     frameId?.also { fid -> map[fid] = multiValues }
@@ -937,7 +938,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         existingFrame: AbstractID3v2Frame?,
         frame: AbstractID3v2Frame
     ) {
-        val mergedList = ArrayList<TagField?>()
+        val mergedList = mutableListOf<TagField?>()
         mergedList.add(existingFrame)
 
         /**
@@ -986,12 +987,16 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         } else if (frameBody is AbstractFrameBodyNumberTotal) {
             val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyNumberTotal
 
-            if (frameBody.getNumber() > 0) {
-                existingFrameBody?.setNumber(frameBody.getNumberAsText() ?: "0")
+            frameBody.getNumber()?.let {
+                if (it > 0) {
+                    existingFrameBody?.setNumber(frameBody.getNumberAsText() ?: "0")
+                }
             }
 
-            if (frameBody.getTotal() > 0) {
-                existingFrameBody?.setTotal(frameBody.getTotalAsText())
+            frameBody.getTotal()?.let {
+                if (it > 0) {
+                    frameBody.getTotalAsText()?.also { t -> existingFrameBody?.setTotal(t) }
+                }
             }
         } else {
             addNewFrameToMap(list, frameMap, existingFrame, frame)
@@ -1142,9 +1147,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         } else if (ID3NumberTotalFields.isTotal(id)) {
             if (fields.isNotEmpty()) {
                 val frame = fields.get(0) as AbstractID3v2Frame
-                values.add(
-                    (frame.frameBody as AbstractFrameBodyNumberTotal).getTotalAsText()
-                )
+                (frame.frameBody as AbstractFrameBodyNumberTotal).getTotalAsText()?.also { t -> values.add(t) }
             }
             return values
         } else if (id === GenericFieldKey.RATING) {
@@ -1168,6 +1171,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     override fun getFirst(genericKey: GenericFieldKey): String? {
         return getValue(genericKey, 0)
+    }
+
+    fun setFrame(frame: AbstractID3v2Frame) {
+        frame.getIdentifier()?.also { id -> frameMap[id] = frame }
     }
 
     /**
@@ -1705,7 +1712,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 frame = o
                 frame.createStructure()
             } else {
-                val multiFrames = o as ArrayList<AbstractID3v2Frame>
+                val multiFrames = o as List<AbstractID3v2Frame>
                 multiFrames.forEach { frame ->
                     frame.createStructure()
                 }
@@ -1789,7 +1796,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         }
                     } else {
                         //TODO must be a better way
-                        val l: MutableList<TagField> = ArrayList<TagField>()
+                        val l: MutableList<TagField> = mutableListOf<TagField>()
                         l.add(e.value as TagField)
                         fieldsIt = l.iterator()
                         break

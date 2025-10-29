@@ -87,15 +87,12 @@ class ID3v2LyricLine : AbstractDataType {
      * @return
      */
     override fun writeByteArray(): ByteArray {
-        var i: Int
         val arr = ByteArray(getSize())
-
-        i = 0
-        while (i < text.length) {
-            arr[i] = text.get(i).code.toByte()
-            i++
+        (0 until text.length).forEach { i ->
+            arr[i] = text[i].code.toByte()
         }
 
+        var i = text.length
         arr[i++] = 0
         arr[i++] = ((timeStamp and 0xFF000000L) shr 24).toByte()
         arr[i++] = ((timeStamp and 0x00FF0000L) shr 16).toByte()

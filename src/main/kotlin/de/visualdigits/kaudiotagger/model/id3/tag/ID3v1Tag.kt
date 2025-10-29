@@ -6,6 +6,7 @@ import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -96,6 +97,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         this.year = convertedTag.getYear()
         this.genre = convertedTag.getGenre()
     }
+
+    override fun supportedTag(): SupportedTag = SupportedTag.ID3v1Tag
 
     /**
      * Retrieve the Release

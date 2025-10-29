@@ -32,7 +32,7 @@ open class NumberFixedLength(
     }
 
     constructor(copy: NumberFixedLength): this(copy.identifier) {
-        setValue(copy.getSize())
+        setSize(copy.getSize())
     }
 
     /**

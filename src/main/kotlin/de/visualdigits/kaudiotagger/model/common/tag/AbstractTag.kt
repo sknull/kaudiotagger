@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.common.tag
 
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
@@ -14,6 +15,8 @@ abstract class AbstractTag : AbstractTagItem {
     constructor()
 
     constructor(copyObject: AbstractTag): super(copyObject)
+
+    abstract fun supportedTag(): SupportedTag
 
     /**
      * Looks for this tag in the buffer

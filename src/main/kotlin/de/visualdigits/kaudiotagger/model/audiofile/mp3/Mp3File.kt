@@ -3,15 +3,19 @@ package de.visualdigits.kaudiotagger.model.audiofile.mp3
 import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MP3AudioHeader
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
+import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.LoadOptions
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
+import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v11Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
+import de.visualdigits.kaudiotagger.model.lyrics3.tag.Lyrics3v1
+import de.visualdigits.kaudiotagger.model.lyrics3.tag.Lyrics3v2
 import de.visualdigits.kaudiotagger.util.AbstractTagDisplayFormatter
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.PlainTextTagDisplayFormatter
@@ -43,11 +47,12 @@ class MP3File : AudioFile {
             tagFormatter = PlainTextTagDisplayFormatter()
         }
 
-        fun read(file: File, readOnly: Boolean = false, loadOptions: LoadOptions = LoadOptions.LOAD_ALL): MP3File {
-            val mp3File = MP3File()
-            mp3File.readFile(file, readOnly, loadOptions)
-
-            return mp3File
+        fun read(file: File?, readOnly: Boolean = false, loadOptions: LoadOptions = LoadOptions.LOAD_ALL): MP3File {
+            return file?.let { f ->
+                val mp3File = MP3File()
+                mp3File.readFile(f, readOnly, loadOptions)
+                mp3File
+            }?:error("File was null")
         }
     }
 
@@ -368,10 +373,13 @@ class MP3File : AudioFile {
                         ?.also { tag -> write(tag as ID3v24Tag, file) }
                         ?:also { (ID3v24Tag()).delete(rfile) }
                 }
-                if (TagOptionSingleton.lyrics3Save) {
-                    tags[SupportedTag.Lyrics3Tag]
-                        ?.also { tag -> write(tag as ID3v22Tag, file) }
-                }
+// todo
+//                if (TagOptionSingleton.lyrics3Save) {
+//                    tags[SupportedTag.Lyrics3V1Tag]
+//                        ?.also { tag -> write(tag as Lyrics3v1, file) }
+//                    tags[SupportedTag.Lyrics3V2Tag]
+//                        ?.also { tag -> write(tag as Lyrics3v2, file) }
+//                }
                 if (TagOptionSingleton.id3v1Save) {
                     log.debug("Processing ID3v1")
                     tags[SupportedTag.ID3v1Tag]
@@ -443,6 +451,25 @@ class MP3File : AudioFile {
                 )
             )
         }
+    }
+
+    /**
+     * Returns the highest tag.
+     */
+    fun getTag(): Tag? = (getID3v2Tag()?:getID3v1Tag()) as? Tag
+
+    /**
+     * Returns the highest v2 tag.
+     */
+    fun getID3v2Tag(): AbstractID3v2Tag? = ((tags[SupportedTag.ID3v24Tag]?:tags[SupportedTag.ID3v23Tag]?:tags[SupportedTag.ID3v22Tag]) as? AbstractID3v2Tag)
+
+    /**
+     * Returns the highest v1 tag.
+     */
+    fun getID3v1Tag(): AbstractID3v1Tag? = ((tags[SupportedTag.ID3v11Tag]?:tags[SupportedTag.ID3v1Tag]) as? AbstractID3v1Tag)
+
+    fun setID3v2Tag(tag: AbstractTag) {
+        tags[tag.supportedTag()] = tag
     }
 
     /**

@@ -12,7 +12,7 @@ import java.nio.ByteBuffer
 
 class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
 
-    var lines: ArrayList<Lyrics3Line> = ArrayList<Lyrics3Line>()
+    var lines = mutableListOf<Lyrics3Line>()
 
     /**
      * Creates a FieldBodyLYR datatype.
@@ -146,7 +146,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         var token: String?
         var offset = 0
         var delim: Int = lineString.indexOf(Lyrics3v2Fields.CRLF)
-        lines = java.util.ArrayList<Lyrics3Line>()
+        lines = mutableListOf()
 
         var line: Lyrics3Line?
 
@@ -207,8 +207,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
             return false
         }
 
-        val superset: java.util.ArrayList<Lyrics3Line> = obj.lines
-
+        val superset = obj.lines
         for (line in lines) {
             if (!superset.contains(line)) {
                 return false

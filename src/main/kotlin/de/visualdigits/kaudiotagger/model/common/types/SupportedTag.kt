@@ -7,5 +7,6 @@ enum class SupportedTag {
     ID3v22Tag,
     ID3v23Tag,
     ID3v24Tag,
-    Lyrics3Tag
+    Lyrics3V1Tag,
+    Lyrics3V2Tag
 }

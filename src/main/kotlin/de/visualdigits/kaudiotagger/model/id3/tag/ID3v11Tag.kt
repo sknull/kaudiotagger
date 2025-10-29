@@ -6,6 +6,7 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyCOMM
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTALB
@@ -15,12 +16,11 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTRCK
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24Frame
+import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
-import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -60,7 +60,7 @@ class ID3v11Tag: ID3v1Tag {
     /**
      * Track is held as a single byte in v1.1
      */
-    var track: Int = TRACK_UNDEFINED
+    var track: Int? = TRACK_UNDEFINED
 
     /**
      * Creates a new ID3v11 datatype.
@@ -100,38 +100,38 @@ class ID3v11Tag: ID3v1Tag {
             }
             var frame: ID3v24Frame
             var text: String
-            if (id3tag.hasFrame(ID3V24Frame.TITLE.id)) {
-                frame = id3tag.getFrame(ID3V24Frame.TITLE.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24FrameId.TITLE.id)) {
+                frame = id3tag.getFrame(ID3V24FrameId.TITLE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTIT2).getText()
                 setTitle(ID3Tags.truncate(text, FIELD_TITLE_LENGTH))
             }
-            if (id3tag.hasFrame(ID3V24Frame.ARTIST.id)) {
-                frame = id3tag.getFrame(ID3V24Frame.ARTIST.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24FrameId.ARTIST.id)) {
+                frame = id3tag.getFrame(ID3V24FrameId.ARTIST.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTPE1).getText()
                 setArtist(ID3Tags.truncate(text, FIELD_ARTIST_LENGTH))
             }
-            if (id3tag.hasFrame(ID3V24Frame.ALBUM.id)) {
-                frame = id3tag.getFrame(ID3V24Frame.ALBUM.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24FrameId.ALBUM.id)) {
+                frame = id3tag.getFrame(ID3V24FrameId.ALBUM.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTALB).getText()
                 setAlbum(ID3Tags.truncate(text, FIELD_ALBUM_LENGTH))
             }
-            if (id3tag.hasFrame(ID3V24Frame.YEAR.id)) {
-                frame = id3tag.getFrame(ID3V24Frame.YEAR.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24FrameId.YEAR.id)) {
+                frame = id3tag.getFrame(ID3V24FrameId.YEAR.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTDRC).getText()
                 setYear(ID3Tags.truncate(text, FIELD_YEAR_LENGTH))
             }
 
-            if (id3tag.hasFrame(ID3V24Frame.COMMENT.id)) {
+            if (id3tag.hasFrame(ID3V24FrameId.COMMENT.id)) {
                 text = ""
                 id3tag.getFrameOfType(
-                    ID3V24Frame.COMMENT.id
+                    ID3V24FrameId.COMMENT.id
                 ).forEach { frame ->
                     text += (((frame as ID3v24Frame).frameBody as FrameBodyCOMM).getText() + " ")
                 }
                 setComment(ID3Tags.truncate(text, FIELD_COMMENT_LENGTH))
             }
-            if (id3tag.hasFrame(ID3V24Frame.GENRE.id)) {
-                frame = id3tag.getFrame(ID3V24Frame.GENRE.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24FrameId.GENRE.id)) {
+                frame = id3tag.getFrame(ID3V24FrameId.GENRE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTCON).getText()
                 try {
                     setGenre(ID3Tags.findNumber(text).toInt())
@@ -143,12 +143,14 @@ class ID3v11Tag: ID3v1Tag {
                     setGenre(GENRE_UNDEFINED)
                 }
             }
-            if (id3tag.hasFrame(ID3V24Frame.TRACK.id)) {
-                frame = id3tag.getFrame(ID3V24Frame.TRACK.id) as ID3v24Frame
+            if (id3tag.hasFrame(ID3V24FrameId.TRACK.id)) {
+                frame = id3tag.getFrame(ID3V24FrameId.TRACK.id) as ID3v24Frame
                 this.track = (frame.frameBody as FrameBodyTRCK).getTrackNo()
             }
         }
     }
+
+    override fun supportedTag(): SupportedTag = SupportedTag.ID3v11Tag
 
     /**
      * Retrieve the Release
@@ -328,7 +330,7 @@ class ID3v11Tag: ID3v1Tag {
             }
         }
         offset = FIELD_TRACK_POS
-        buffer[offset] = track.toByte() // skip one byte extra blank for 1.1 definition
+        buffer[offset] = track?.toByte()?:0.toByte() // skip one byte extra blank for 1.1 definition
         offset = FIELD_GENRE_POS
         if (TagOptionSingleton.id3v1SaveGenre) {
             buffer[offset] = getGenre().toByte()
@@ -388,7 +390,7 @@ class ID3v11Tag: ID3v1Tag {
             )
             return listOf(field)
         } else {
-            return ArrayList<TagField>()
+            return mutableListOf()
         }
     }
 
@@ -403,7 +405,7 @@ class ID3v11Tag: ID3v1Tag {
             )
             return listOf(field)
         } else {
-            return ArrayList<TagField>()
+            return mutableListOf()
         }
     }
 
@@ -418,7 +420,7 @@ class ID3v11Tag: ID3v1Tag {
             )
             return listOf(field)
         } else {
-            return ArrayList<TagField>()
+            return mutableListOf()
         }
     }
 
@@ -428,7 +430,7 @@ class ID3v11Tag: ID3v1Tag {
      * @return track
      */
     fun getFirstTrack(): String {
-        return (track and BYTE_TO_UNSIGNED).toString()
+        return ((track?:0) and BYTE_TO_UNSIGNED).toString()
     }
 
     /**
@@ -458,7 +460,7 @@ class ID3v11Tag: ID3v1Tag {
         MP3File.tagFormatter?.addElement(TYPE_ALBUM, this.getAlbum())
         MP3File.tagFormatter?.addElement(TYPE_YEAR, this.getYear())
         MP3File.tagFormatter?.addElement(TYPE_COMMENT, this.getComment())
-        MP3File.tagFormatter?.addElement(TYPE_TRACK, this.track)
+        MP3File.tagFormatter?.addElement(TYPE_TRACK, this.track?:0)
         MP3File.tagFormatter?.addElement(TYPE_GENRE, this.getGenre())
         MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
     }

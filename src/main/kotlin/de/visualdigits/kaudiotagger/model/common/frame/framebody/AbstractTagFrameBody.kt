@@ -4,6 +4,7 @@ import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTagItem
+import de.visualdigits.kaudiotagger.model.common.types.ByteRepresentation
 import de.visualdigits.kaudiotagger.util.ID3Tags
 
 abstract class AbstractTagFrameBody : AbstractTagItem {
@@ -50,7 +51,13 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
     fun getTextEncoding(): Byte {
         return getObject(DataTypes.OBJ_TEXT_ENCODING)
             ?.let { o ->
-                (o.getValue() as Long).toByte()
+                when (val value = o.getValue()) {
+                    is Byte -> value
+                    is Number -> value.toByte()
+                    is AbstractDataType -> value.toByte()
+                    is ByteRepresentation -> value.toByte()
+                    else -> error("Unexpected value class: ${value?.javaClass}")
+                }
             } ?: 0
     }
 
@@ -72,8 +79,12 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      */
     fun setObjectValue(identifier: String?, value: Any?) {
         objectList
-            .find { obj -> obj.identifier == identifier }
-            ?.also { obj -> obj.setValue(value) }
+            .find { obj ->
+                obj.identifier == identifier
+            }
+            ?.also { obj ->
+                obj.setValue(value)
+            }
     }
 
     /**
@@ -168,14 +179,7 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      * @return estimated size in bytes of this datatype
      */
     override fun getSize(): Int {
-        var size = 0
-        var `object`: AbstractDataType
-        val iterator: MutableIterator<AbstractDataType> = objectList.listIterator()
-        while (iterator.hasNext()) {
-            `object` = iterator.next()
-            size += `object`.getSize()
-        }
-        return size
+        return objectList.sumOf { o -> o.getSize() }
     }
 
     /**

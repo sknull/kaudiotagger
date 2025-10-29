@@ -45,6 +45,22 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
     }
 
     /**
+     * @param value
+     */
+    override fun setValue(value: Any?) {
+        if (value is String) {
+            //Issue #273 temporary hack for MM
+            if (value.equals("XXX")) {
+                super.setValue(value)
+            } else {
+                super.setValue((value as? String)?.lowercase())
+            }
+        } else {
+            super.setValue(value)
+        }
+    }
+
+    /**
      * @return
      */
     override fun getKeyToValue(): Map<String, String> {
@@ -63,5 +79,18 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
      */
     override fun getTextEncodingCharSet(): Charset {
         return StandardCharsets.ISO_8859_1
+    }
+
+    /**
+     * @return
+     */
+    override fun toString(): String {
+        val keyToValue = getKeyToValue()
+        val value = getValue()
+        if (value == null || keyToValue.get(value) == null) {
+            return ""
+        } else {
+            return keyToValue.get(value)?:""
+        }
     }
 }

@@ -205,7 +205,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
             log.error("${ce.message}:${charset.name()}:${getValue()}")
             throw RuntimeException(ce)
         }
-        setValue(data.size)
+        setSize(data.size)
 
         return data
     }

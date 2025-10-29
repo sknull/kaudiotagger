@@ -398,7 +398,7 @@ class MPEGFrameHeader {
         /**
          * Constants for MPEG Version
          */
-        val mpegVersionMap: MutableMap<Int?, String> = HashMap<Int?, String>()
+        val mpegVersionMap: MutableMap<Int?, String> = mutableMapOf<Int?, String>()
         const val VERSION_2_5: Int = 0
         const val VERSION_2: Int = 2
         const val VERSION_1: Int = 3
@@ -406,7 +406,7 @@ class MPEGFrameHeader {
         /**
          * Constants for MPEG Layer
          */
-        val mpegLayerMap: MutableMap<Int?, String> = HashMap<Int?, String>()
+        val mpegLayerMap: MutableMap<Int?, String> = mutableMapOf<Int?, String>()
         const val LAYER_I: Int = 3
         const val LAYER_II: Int = 2
         const val LAYER_III: Int = 1
@@ -421,7 +421,7 @@ class MPEGFrameHeader {
         /**
          * Constants for Channel mode
          */
-        val modeMap: MutableMap<Int?, String> = HashMap<Int?, String>()
+        val modeMap: MutableMap<Int?, String> = mutableMapOf<Int?, String>()
         const val MODE_STEREO: Int = 0
         const val MODE_JOINT_STEREO: Int = 1
         const val MODE_DUAL_CHANNEL: Int = 2
@@ -444,18 +444,18 @@ class MPEGFrameHeader {
         /**
          * Bit Rates, the setBitrate varies for different Version and Layer
          */
-        val bitrateMap: MutableMap<Int?, Int> = HashMap<Int?, Int>()
+        val bitrateMap: MutableMap<Int?, Int> = mutableMapOf<Int?, Int>()
 
         /**
          * Constants for Emphasis
          */
-        val emphasisMap: MutableMap<Int?, String?> = HashMap<Int?, String?>()
-        val modeExtensionMap: MutableMap<Int?, String?> = HashMap<Int?, String?>()
+        val emphasisMap: MutableMap<Int?, String?> = mutableMapOf<Int?, String?>()
+        val modeExtensionMap: MutableMap<Int?, String?> = mutableMapOf<Int?, String?>()
         private const val MODE_EXTENSION_NONE = 0
         private const val MODE_EXTENSION_ONE = 1
         private const val MODE_EXTENSION_TWO = 2
         private const val MODE_EXTENSION_THREE = 3
-        val modeExtensionLayerIIIMap: MutableMap<Int?, String?> = HashMap<Int?, String?>()
+        val modeExtensionLayerIIIMap: MutableMap<Int?, String?> = mutableMapOf<Int?, String?>()
         private const val MODE_EXTENSION_OFF_OFF = 0
         private const val MODE_EXTENSION_ON_OFF = 1
         private const val MODE_EXTENSION_OFF_ON = 2

@@ -68,7 +68,7 @@ class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
      * @return a byte array that that contians the data that should be perisisted to file
      */
     override fun writeByteArray(): ByteArray {
-        log.debug("Writing byte array" + identifier)
+        log.debug("Writing byte array$identifier")
         return getValue() as ByteArray
     }
 }

@@ -13,17 +13,17 @@ object TagOptionSingleton {
      * Map of lyric ID's to Boolean objects if we should or should not save the
      * specific lyrics3 field. Defaults to true.
      */
-    var lyrics3SaveFieldMap = HashMap<String, Boolean>()
+    var lyrics3SaveFieldMap = mutableMapOf<String, Boolean>()
 
     /**
      * parenthesis map stuff
      */
-    var parenthesisMap = HashMap<String, String>()
+    var parenthesisMap = mutableMapOf<String, String>()
 
     /**
-     * `HashMap` listing words to be replaced if found
+     * `mutableMapOf` listing words to be replaced if found
      */
-    var replaceWordMap = HashMap<String, String>()
+    var replaceWordMap = mutableMapOf<String, String>()
 
     /**
      * default language for any ID3v2 tags frames which require it. This string
