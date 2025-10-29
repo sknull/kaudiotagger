@@ -116,7 +116,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
             stripTrailingNull()
 
             //Special Handling because there is no UTF16 BOM LE charset
-            val stringValue = getValue() as String
+            val stringValue = getValue() as? String
             var actualCharSet: Charset? = null
             if (StandardCharsets.UTF_16 == charset) {
                 actualCharSet = if (TagOptionSingleton.isEncodeUTF16BomAsLittleEndian) {
@@ -128,11 +128,11 @@ open class TextEncodedStringSizeTerminated : AbstractString {
 
             //Ensure large enough for any encoding
             val outputBuffer = ByteBuffer.allocate(
-                (stringValue.length + 3) * 3
+                ((stringValue?.length?:0) + 3) * 3
             )
 
             //Ensure each string (if multiple values) is written with BOM by writing separately
-            val values = splitByNullSeperator(stringValue)
+            val values = stringValue?.let { s -> splitByNullSeperator(s) }?:mutableListOf()
             checkTrailingNull(values, stringValue)
 
             //For each value
@@ -275,9 +275,9 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @param values
      * @param stringValue
      */
-    fun checkTrailingNull(values: MutableList<String>, stringValue: String) {
+    fun checkTrailingNull(values: MutableList<String>, stringValue: String?) {
         if (!TagOptionSingleton.removeTrailingTerminatorOnWrite) {
-            if (stringValue.isNotEmpty() && stringValue.endsWith('\u0000')) {
+            if (stringValue?.isNotEmpty() == true && stringValue.endsWith('\u0000')) {
                 val lastVal = values.last()
                 val newLastVal = "$lastVal\u0000"
                 values[values.size - 1] = newLastVal

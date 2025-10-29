@@ -21,7 +21,7 @@ open class EncodingFlags(
     }
 
     override fun equals(obj: Any?): Boolean {
-        if (this == obj) {
+        if (this === obj) {
             return true
         }
 

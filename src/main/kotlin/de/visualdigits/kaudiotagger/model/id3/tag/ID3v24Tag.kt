@@ -996,7 +996,7 @@ class ID3v24Tag : AbstractID3v2Tag {
      * @return
      */
     override fun getAll(id: GenericFieldKey): List<String> {
-        return if (id === GenericFieldKey.GENRE) {
+        return if (id == GenericFieldKey.GENRE) {
             getFields(id).firstOrNull()?.let { f ->
                 ((f as AbstractID3v2Frame).frameBody as FrameBodyTCON)
                     .getValues()
@@ -1084,4 +1084,6 @@ class ID3v24Tag : AbstractID3v2Tag {
 
         MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
     }
+
+    override fun isMultipleAllowed(identifier: String?): Boolean = ID3v24FrameId.isMultipleAllowed(identifier)
 }

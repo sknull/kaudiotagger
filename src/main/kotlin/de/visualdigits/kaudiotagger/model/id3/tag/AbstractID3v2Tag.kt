@@ -31,6 +31,8 @@ import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
+import de.visualdigits.kaudiotagger.util.FileUtil.adjustPadding
+import de.visualdigits.kaudiotagger.util.FileUtil.getFileLockForWriting
 import de.visualdigits.kaudiotagger.util.ID3SyncSafeInteger
 import de.visualdigits.kaudiotagger.util.Utils
 import java.io.ByteArrayOutputStream
@@ -605,6 +607,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     fc.write(headerBuffer)
                     fc.write(ByteBuffer.wrap(bodyByteBuffer))
                     fc.write(ByteBuffer.wrap(ByteArray(padding)))
+                    fileLock.release()
                 }
             }
         } catch (e: FileNotFoundException) {
@@ -623,187 +626,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
             }
             throw e
-        }
-    }
-
-    /**
-     * Get file lock for writing too file
-     *
-     *
-     * TODO:this appears to have little effect on Windows Vista
-     *
-     * @param fileChannel
-     * @param filePath
-     * @return lock or null if locking is not supported
-     * because indicates a programming error
-     */
-    fun getFileLockForWriting(
-        fileChannel: FileChannel,
-        filePath: String?
-    ): FileLock? {
-        log.debug("locking fileChannel for $filePath")
-        return try {
-            fileChannel.tryLock()
-        } catch (exception: IOException) { //Assumes locking is not supported on this platform so just returns null
-            null
-        } ?: throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_FILE_LOCKED.getMsg(filePath))
-    }
-
-    /**
-     * Adjust the length of the  padding at the beginning of the MP3 file, this is only called when there is currently
-     * not enough space before the start of the audio to write the tag.
-     *
-     *
-     * A new file will be created with enough size to fit the `ID3v2` tag.
-     * The old file will be deleted, and the new file renamed.
-     *
-     * @param paddingSize This is total size required to store tag before audio
-     * @param audioStart
-     * @param file        The file to adjust the padding length of
-     * rather than a regular file or cannot be opened for any other
-     * reason
-     */
-    fun adjustPadding(file: File?, paddingSize: Int, audioStart: Long) {
-        if (file == null) {
-            return
-        }
-        log.debug("Need to move audio file to accommodate tag")
-        var fcIn: FileChannel? = null
-        val fcOut: FileChannel?
-
-        //Create buffer holds the necessary padding
-        val paddingBuffer = ByteBuffer.wrap(ByteArray(paddingSize))
-
-        //Create Temporary File and write channel, make sure it is locked
-
-        val paddedFile = File.createTempFile(Utils.getBaseFilenameForTempFile(file), ".new", file.getParentFile())
-        try {
-            FileOutputStream(paddedFile).getChannel().use { fcOut ->
-                //Create read channel from original file
-                //TODO lock so cant be modified by anything else whilst reading from it ?
-                fcIn = FileInputStream(file).getChannel()
-
-                //Write padding to new file (this is where the tag will be written to later)
-                val written = fcOut.write(paddingBuffer).toLong()
-
-                //Write rest of file starting from audio
-                log.debug("Copying:" + (file.length() - audioStart) + "bytes")
-
-                //If the amount to be copied is very large we split into 10MB lumps to try and avoid
-                //out of memory errors
-                val audiolength = file.length() - audioStart
-                if (audiolength <= MAXIMUM_WRITABLE_CHUNK_SIZE) {
-                    fcIn.position(audioStart)
-                    val written2 = fcOut.transferFrom(fcIn, paddingSize.toLong(), audiolength)
-                    log.debug("Written padding:$written Data:$written2")
-                    if (written2 != audiolength) {
-                        throw RuntimeException(ErrorMessage.MP3_UNABLE_TO_ADJUST_PADDING.getMsg(audiolength, written2))
-                    }
-                } else {
-                    val noOfChunks = audiolength / MAXIMUM_WRITABLE_CHUNK_SIZE
-                    val lastChunkSize = audiolength % MAXIMUM_WRITABLE_CHUNK_SIZE
-                    var written2: Long = 0
-                    for (i in 0..<noOfChunks) {
-                        written2 += fcIn.transferTo(
-                            audioStart + (i * MAXIMUM_WRITABLE_CHUNK_SIZE),
-                            MAXIMUM_WRITABLE_CHUNK_SIZE,
-                            fcOut
-                        )
-                    }
-                    written2 += fcIn.transferTo(
-                        audioStart + (noOfChunks * MAXIMUM_WRITABLE_CHUNK_SIZE),
-                        lastChunkSize,
-                        fcOut
-                    )
-                    log.debug("Written padding:$written Data:$written2")
-                    if (written2 != audiolength) {
-                        throw RuntimeException(ErrorMessage.MP3_UNABLE_TO_ADJUST_PADDING.getMsg(audiolength, written2))
-                    }
-                }
-            }
-
-            //Store original modification time
-            val lastModified = file.lastModified()
-
-            //Replace file with paddedFile
-            replaceFile(file, paddedFile)
-            paddedFile.setLastModified(lastModified)
-        } catch (e: IOException) {
-            paddedFile.delete()
-            throw e
-        }
-    }
-
-    /**
-     * Replace originalFile with the contents of newFile
-     *
-     *
-     * Both files must exist in the same folder so that there are no problems with filesystem mount points
-     *
-     * @param newFile
-     * @param originalFile
-     */
-    private fun replaceFile(originalFile: File?, newFile: File?) {
-        if (originalFile == null || newFile == null) {
-            return
-        }
-        var renameOriginalResult: Boolean
-        //Rename Original File to make a backup in case problem with new file
-        var originalFileBackup = File(
-            originalFile.getAbsoluteFile().getParentFile().path,
-            originalFile.nameWithoutExtension + ".old"
-        )
-        //If already exists modify the suffix
-        var count = 1
-        while (originalFileBackup.exists()) {
-            originalFileBackup = File(
-                originalFile.getAbsoluteFile().getParentFile().path,
-                originalFile.nameWithoutExtension + ".old" + count
-            )
-            count++
-        }
-
-        renameOriginalResult = originalFile.renameTo(originalFileBackup)
-        if (!renameOriginalResult) {
-            log.warn(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(
-                    originalFile.absolutePath,
-                    originalFileBackup.getName()
-                ))
-            newFile.delete()
-            error(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(originalFile.absolutePath, originalFileBackup.getName()))
-        }
-
-        //Rename new Temporary file to the final file
-        val renameResult = newFile.renameTo(originalFile)
-        if (!renameResult) {
-            //Renamed failed so lets do some checks rename the backup back to the original file
-            //New File doesnt exist
-            if (!newFile.exists()) {
-                log.warn(ErrorMessage.GENERAL_WRITE_FAILED_NEW_FILE_DOESNT_EXIST.getMsg(newFile.absolutePath))
-            }
-
-            //Rename the backup back to the original
-            renameOriginalResult = originalFileBackup.renameTo(originalFile)
-            if (!renameOriginalResult) {
-                //TODO now if this happens we are left with testfile.old instead of testfile.mp3
-                log.warn(
-                    ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_BACKUP_TO_ORIGINAL.getMsg(
-                        originalFileBackup.absolutePath,
-                        originalFile.getName()
-                    )
-                )
-            }
-
-            log.warn(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(originalFile.absolutePath, newFile.getName()))
-            newFile.delete()
-            error(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(originalFile.absolutePath, newFile.getName()))
-        } else {
-            //Rename was okay so we can now deleteField the backup of the original
-            val deleteResult = originalFileBackup.delete()
-            if (!deleteResult) {
-                //Not a disaster but can't deleteField the backup so make a warning
-                log.warn(ErrorMessage.GENERAL_WRITE_WARNING_UNABLE_TO_DELETE_BACKUP_FILE.getMsg(originalFileBackup.absolutePath))
-            }
         }
     }
 
@@ -1149,7 +971,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 (frame.frameBody as AbstractFrameBodyNumberTotal).getTotalAsText()?.also { t -> values.add(t) }
             }
             return values
-        } else if (id === GenericFieldKey.RATING) {
+        } else if (id == GenericFieldKey.RATING) {
             if (fields.isNotEmpty()) {
                 val frame = fields.get(0) as AbstractID3v2Frame
                 values.add(
@@ -1724,7 +1546,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return iterator of all fields, multiple values for the same Id (e.g multiple TXXX frames) count as separate
      * fields
      */
-    fun getFields(): MutableIterator<TagField?> {
+    override fun getFields(): MutableIterator<TagField?> {
         //Iterator of each different frameId in this tag
         val it = this.frameMap.entries.iterator()
 
@@ -1807,6 +1629,179 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 fieldsIt?.remove()
             }
         }
+    }
+
+    override fun setField(genericKey: GenericFieldKey, vararg values: String) {
+        setField(createField(genericKey, *values))
+    }
+
+    /**
+     * Set Field
+     *
+     * @param field
+     * @throws FieldDataInvalidException
+     */
+    override fun setField(field: TagField) {
+        if ((field !is AbstractID3v2Frame) && (field !is AggregatedFrame)) {
+            error("Field $field is not of type AbstractID3v2Frame nor AggregatedFrame")
+        }
+
+        val identifier = field.getIdentifier()?:error("No identifier")
+        if (field is AbstractID3v2Frame) {
+            val obj = frameMap[identifier]
+
+            //If no frame of this type exist or if multiples are not allowed
+            if (obj == null) {
+                frameMap.put(identifier, field)
+            } else if (obj is AbstractID3v2Frame) {
+                val frames = mutableListOf<AbstractID3v2Frame>()
+                frames.add(obj)
+                mergeDuplicateFrames(field, frames)
+            } else if (obj is MutableList<*>) {
+                mergeDuplicateFrames(field, obj as MutableList<AbstractID3v2Frame>)
+            }
+        } else {
+            frameMap.put(identifier, field)
+        }
+    }
+
+    /**
+     * Add frame taking into account existing frames of the same type
+     *
+     * @param newFrame
+     * @param frames
+     */
+    fun mergeDuplicateFrames(
+        newFrame: AbstractID3v2Frame,
+        frames: MutableList<AbstractID3v2Frame>
+    ) {
+        val li = frames.listIterator()
+        val identifier = newFrame.getIdentifier()?:error("No identifier")
+        while (li.hasNext()) {
+            val nextFrame = li.next()
+            if (newFrame.frameBody is FrameBodyTXXX) {
+                //Value with matching key exists so replace
+                if ((newFrame.frameBody as FrameBodyTXXX).getDescription().equals(
+                        (nextFrame.frameBody as FrameBodyTXXX).getDescription()
+                    )
+                ) {
+                    li.set(newFrame)
+                    frameMap[identifier] = frames
+                    return
+                }
+            } else if (newFrame.frameBody is FrameBodyWXXX) {
+                //Value with matching key exists so replace
+                if ((newFrame.frameBody as FrameBodyWXXX).getDescription().equals(
+                        (nextFrame.frameBody as FrameBodyWXXX).getDescription()
+                    )
+                ) {
+                    li.set(newFrame)
+                    frameMap[identifier] = frames
+                    return
+                }
+            } else if (newFrame.frameBody is FrameBodyCOMM) {
+                if ((newFrame.frameBody as FrameBodyCOMM).getDescription().equals(
+                        (nextFrame.frameBody as FrameBodyCOMM).getDescription()
+                    )
+                ) {
+                    li.set(newFrame)
+                    frameMap[identifier] = frames
+                    return
+                }
+            } else if (newFrame.frameBody is FrameBodyUFID) {
+                if ((newFrame.frameBody as FrameBodyUFID).getOwner().equals(
+                        (nextFrame.frameBody as FrameBodyUFID).getOwner()
+                    )
+                ) {
+                    li.set(newFrame)
+                    frameMap[identifier] = frames
+                    return
+                }
+            } else if (newFrame.frameBody is FrameBodyUSLT) {
+                if ((newFrame.frameBody as FrameBodyUSLT).getDescription().equals(
+                        (nextFrame.frameBody as FrameBodyUSLT).getDescription()
+                    )
+                ) {
+                    li.set(newFrame)
+                    frameMap[identifier] = frames
+                    return
+                }
+            } else if (newFrame.frameBody is FrameBodyPOPM) {
+                if ((newFrame.frameBody as FrameBodyPOPM).getEmailToUser().equals(
+                        (nextFrame.frameBody as FrameBodyPOPM).getEmailToUser()
+                    )
+                ) {
+                    li.set(newFrame)
+                    frameMap[identifier] = frames
+                    return
+                }
+            } else if (newFrame.frameBody is AbstractFrameBodyNumberTotal) {
+                mergeNumberTotalFrames(newFrame, nextFrame)
+                return
+            } else if (newFrame.frameBody is AbstractFrameBodyPairs) {
+                val frameBody = newFrame.frameBody as AbstractFrameBodyPairs
+                val existingFrameBody = nextFrame.frameBody as AbstractFrameBodyPairs
+                existingFrameBody.addPair(frameBody.getText())
+                return
+            }
+        }
+
+        if (!isMultipleAllowed(identifier)) {
+            frameMap.put(identifier, newFrame)
+        } else {
+            //No match found so addField new one
+            frames.add(newFrame)
+            frameMap.put(identifier, frames)
+        }
+    }
+
+    abstract fun isMultipleAllowed(identifier: String?): Boolean
+
+    /**
+     * All Number/Count frames  are treated the same (TCK, TPOS, MVNM)
+     *
+     * @param newFrame
+     * @param nextFrame
+     */
+    fun mergeNumberTotalFrames(
+        newFrame: AbstractID3v2Frame,
+        nextFrame: AbstractID3v2Frame
+    ) {
+        val newBody =
+            newFrame.frameBody as AbstractFrameBodyNumberTotal
+        val oldBody =
+            nextFrame.frameBody as AbstractFrameBodyNumberTotal
+
+        if (newBody.getNumber() != null && newBody.getNumber()!! > 0) {
+            oldBody.setNumber(newBody.getNumberAsText()!!)
+        }
+
+        if (newBody.getTotal() != null && newBody.getTotal()!! > 0) {
+            oldBody.setTotal(newBody.getTotalAsText()!!)
+        }
+    }
+
+    /**
+     * Count number of frames/fields in this tag
+     *
+     * @return
+     */
+    fun getFieldCount(): Int {
+        val it = getFields()
+        var count = 0
+
+        //Done this way because it.hasNext() incorrectly counts empty list
+        //whereas it.next() works correctly
+        try {
+            while (true) {
+                it.next()
+                count++
+            }
+        } catch (nse: NoSuchElementException) {
+            // this is thrown when no more elements
+        }
+        
+        return count
     }
 
     override fun toString(): String {

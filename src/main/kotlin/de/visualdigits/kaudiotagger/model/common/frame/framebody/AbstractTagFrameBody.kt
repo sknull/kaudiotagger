@@ -56,7 +56,13 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
                     is Number -> value.toByte()
                     is AbstractDataType -> value.toByte()
                     is ByteRepresentation -> value.toByte()
-                    else -> error("Unexpected value class: ${value?.javaClass}")
+                    else -> {
+                        if (value == null) {
+                            value
+                        } else {
+                            error("Unexpected value class: ${value?.javaClass}")
+                        }
+                    }
                 }
             } ?: 0
     }

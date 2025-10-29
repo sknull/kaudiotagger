@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.common.tag
 
+import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
-import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 

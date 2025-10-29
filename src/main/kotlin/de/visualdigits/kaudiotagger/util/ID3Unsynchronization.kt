@@ -48,39 +48,41 @@ object ID3Unsynchronization {
      * @return a unsynchronized representation of the source
      */
     fun unsynchronize(abySource: ByteArray): ByteArray {
-        val input = ByteArrayInputStream(abySource)
-        val output = ByteArrayOutputStream(abySource.size)
-
-        var count = 0
-        while (input.available() > 0) {
-            val firstByte = input.read()
-            count++
-            output.write(firstByte)
-            if ((firstByte and MPEGFrameHeader.SYNC_BYTE1) == MPEGFrameHeader.SYNC_BYTE1
-            ) {
-                // if byte is $FF, we must check the following byte if there is one
-                if (input.available() > 0) {
-                    input.mark(1) // remember where we were, if we don't need to unsynchronize
-                    val secondByte = input.read()
-                    if ((secondByte and MPEGFrameHeader.SYNC_BYTE2) ==
-                        MPEGFrameHeader.SYNC_BYTE2
-                    ) {
-                        // we need to unsynchronize here
-                        if (log.isDebugEnabled) {
-                            log.debug("Writing unsynchronisation bit at:" + count)
+        val output = ByteArrayInputStream(abySource).use { input ->
+            ByteArrayOutputStream(abySource.size).use { output ->
+                var count = 0
+                while (input.available() > 0) {
+                    val firstByte = input.read()
+                    count++
+                    output.write(firstByte)
+                    if ((firstByte and MPEGFrameHeader.SYNC_BYTE1) == MPEGFrameHeader.SYNC_BYTE1) {
+                        // if byte is $FF, we must check the following byte if there is one
+                        if (input.available() > 0) {
+                            input.mark(1) // remember where we were, if we don't need to unsynchronize
+                            val secondByte = input.read()
+                            if ((secondByte and MPEGFrameHeader.SYNC_BYTE2) ==
+                                MPEGFrameHeader.SYNC_BYTE2
+                            ) {
+                                // we need to unsynchronize here
+                                if (log.isDebugEnabled) {
+                                    log.debug("Writing unsynchronisation bit at:" + count)
+                                }
+                                output.write(0)
+                            } else if (secondByte == 0) {
+                                // we need to unsynchronize here
+                                if (log.isDebugEnabled) {
+                                    log.debug("Inserting zero unsynchronisation bit at:" + count)
+                                }
+                                output.write(0)
+                            }
+                            input.reset()
                         }
-                        output.write(0)
-                    } else if (secondByte == 0) {
-                        // we need to unsynchronize here
-                        if (log.isDebugEnabled) {
-                            log.debug("Inserting zero unsynchronisation bit at:" + count)
-                        }
-                        output.write(0)
                     }
-                    input.reset()
                 }
+                output
             }
         }
+
         // if we needed to unsynchronize anything, and this tag ends with 0xff, we have to append a zero byte,
         // which will be removed on de-unsynchronization later
         if ((abySource[abySource.size - 1].toInt() and MPEGFrameHeader.SYNC_BYTE1) ==

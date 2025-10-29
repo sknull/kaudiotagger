@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
@@ -13,7 +12,6 @@ import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
-import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -332,12 +330,12 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         setField(genericKey, *value)
     }
 
-    open fun setField(genericKey: GenericFieldKey, vararg value: String) {
+    override fun setField(genericKey: GenericFieldKey, vararg value: String) {
         val tagfield = createField(genericKey, *value)
         setField(tagfield)
     }
 
-    open fun setField(field: TagField) {
+    override fun setField(field: TagField) {
         val genericKey: GenericFieldKey = GenericFieldKey.valueOf(field.getIdentifier()?:error("No id"))
         when (genericKey) {
             GenericFieldKey.ARTIST -> setArtist(field.toString())
@@ -613,6 +611,10 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
 
     override fun getArtworkList(): List<Artwork> {
         return listOf()
+    }
+
+    override fun getFields(): MutableIterator<TagField?> {
+        throw java.lang.UnsupportedOperationException("TODO:Not done yet")
     }
 
     /**

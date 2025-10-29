@@ -95,9 +95,7 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
         }
 
         val that = other as SynchronisedTempoCode
-        return (this.getTempo() == that.getTempo() &&
-                this.getTimestamp() == that.getTimestamp()
-                )
+        return (this.getTempo() == that.getTempo() && this.getTimestamp() == that.getTimestamp())
     }
 
     fun getTimestamp(): Long {

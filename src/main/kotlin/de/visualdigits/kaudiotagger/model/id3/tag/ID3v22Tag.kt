@@ -19,6 +19,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTDRC
+import de.visualdigits.kaudiotagger.model.id3.types.FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
@@ -83,7 +84,7 @@ class ID3v22Tag : AbstractID3v2Tag {
      *
      * @param mp3tag
      */
-    constructor(mp3tag: AbstractTag) {
+    constructor(mp3tag: AbstractTag?) {
         log.debug("Creating tag from a tag of a different version")
         //Default Superclass constructor does nothing
         if (mp3tag != null) {
@@ -520,7 +521,7 @@ class ID3v22Tag : AbstractID3v2Tag {
      * @return
      */
     override fun getAll(id: GenericFieldKey): List<String> {
-        return if (id === GenericFieldKey.GENRE) {
+        return if (id == GenericFieldKey.GENRE) {
             getFields(id).firstOrNull()?.let { f ->
                 ((f as AbstractID3v2Frame).frameBody as FrameBodyTCON)
                     .getValues()
@@ -645,4 +646,6 @@ class ID3v22Tag : AbstractID3v2Tag {
 
         MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
     }
+
+    override fun isMultipleAllowed(identifier: String?): Boolean = ID3v22FrameId.isMultipleAllowed(identifier)
 }

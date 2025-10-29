@@ -57,32 +57,30 @@ object FileTypeUtil {
         extensionMap.put("UNKNOWN", "")
     }
 
-    fun getMagicFileType(f: File?): String {
+    fun getMagicFileType(file: File?): String {
+        var fileType = "UNKNOWN"
         val buffer = ByteArray(BUFFER_SIZE)
-        val `in`: InputStream = FileInputStream(f)
-        try {
-            var n = `in`.read(buffer, 0, BUFFER_SIZE)
-            var m = n
-            while ((m < MAX_SIGNATURE_SIZE) && (n > 0)) {
-                n = `in`.read(buffer, m, BUFFER_SIZE - m)
-                m += n
-            }
-
-            var fileType: String = "UNKNOWN"
-            val i = signatureMap.keys.iterator()
-            while (i.hasNext()
-
-            ) {
-                val key = i.next()
-                if (matchesSignature(signatureMap.get(key)?:arrayOf(), buffer, m)) {
-                    fileType = key
-                    break
+        file?.let { f ->
+            FileInputStream(f).use { ins ->
+                var n = ins.read(buffer, 0, BUFFER_SIZE)
+                var m = n
+                while ((m < MAX_SIGNATURE_SIZE) && (n > 0)) {
+                    n = ins.read(buffer, m, BUFFER_SIZE - m)
+                    m += n
                 }
+
+                val i = signatureMap.keys.iterator()
+                while (i.hasNext()) {
+                    val key = i.next()
+                    if (matchesSignature(signatureMap.get(key) ?: arrayOf(), buffer, m)) {
+                        fileType = key
+                        break
+                    }
+                }
+                fileType
             }
-            return fileType
-        } finally {
-            `in`.close()
         }
+        return fileType
     }
 
     private fun matchesSignature(

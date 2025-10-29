@@ -44,11 +44,13 @@ abstract class AbstractString: AbstractDataType {
      */
     fun canBeEncoded(): Boolean {
         return getBody()?.getTextEncoding()?.let { te ->
-            TextEncoding
-                .fromId(te)
-                ?.charSet
-                ?.newEncoder()
-                ?.canEncode(getValue() as String) == true
+            (getValue() as? String)?.let { s ->
+                TextEncoding
+                    .fromId(te)
+                    ?.charSet
+                    ?.newEncoder()
+                    ?.canEncode(s) == true
+            }
         }?:false
     }
 

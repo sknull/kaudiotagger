@@ -238,7 +238,7 @@ class ID3v24Frame: AbstractID3v2Frame {
         // Is it a straight conversion e.g TALB - TALB
         setIdentifier(ID3Tags.convertFrameID23To24(frame.getIdentifier()))
         log.debug(
-            "Creating V24frame from v23:" + frame.getIdentifier() + ":" + this@ID3v24Frame.getIdentifier()
+            "Creating V24frame from v23:" + frame.getIdentifier() + ":" + getIdentifier()
         )
 
         //We cant convert unsupported bodies properly
@@ -249,9 +249,9 @@ class ID3v24Frame: AbstractID3v2Frame {
             this.frameBody?.header = this
             setIdentifier(frame.getIdentifier())
             log.debug(
-                "V3:UnsupportedBody:Orig id is:${frame.getIdentifier()}:New id is:${this@ID3v24Frame.getIdentifier()}"
+                "V3:UnsupportedBody:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
             )
-        } else if (this@ID3v24Frame.getIdentifier() != null) {
+        } else if (getIdentifier() != null) {
             //Special Case
             if ((frame.getIdentifier() == ID3v23FrameId.USER_DEFINED_INFO.id) &&
                 ((frame.frameBody as FrameBodyTXXX).getDescription() == FrameBodyTXXX.MOOD)
@@ -261,7 +261,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                 setIdentifier(frameBody?.getIdentifier())
             } else {
                 log.debug(
-                    "V3:Orig id is:${frame.getIdentifier()}:New id is:${this@ID3v24Frame.getIdentifier()}"
+                    "V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
                 )
                 this.frameBody = ID3Tags.copyObject(
                     frame.frameBody
@@ -270,12 +270,12 @@ class ID3v24Frame: AbstractID3v2Frame {
             }
         } else if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
             setIdentifier(ID3Tags.forceFrameID23To24(frame.getIdentifier()))
-            if (this@ID3v24Frame.getIdentifier() != null) {
+            if (getIdentifier() != null) {
                 log.debug(
-                    "V3:Orig id is:${frame.getIdentifier()}:New id is:${this@ID3v24Frame.getIdentifier()}"
+                    "V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
                 )
                 this.frameBody = this.readBody(
-                    this@ID3v24Frame.getIdentifier(),
+                    getIdentifier(),
                     frame.frameBody as AbstractID3v2FrameBody
                 )
                 this.frameBody?.header = this
@@ -286,7 +286,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                 this.frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
                 log.debug(
-                    "V3:Deprecated:Orig id is:${frame.getIdentifier()}:New id is:${this@ID3v24Frame.getIdentifier()}"
+                    "V3:Deprecated:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
                 )
             }
         } else {
@@ -296,7 +296,7 @@ class ID3v24Frame: AbstractID3v2Frame {
             this.frameBody?.header = this
             setIdentifier(frame.getIdentifier())
             log.debug(
-                "V3:Unknown:Orig id is:${frame.getIdentifier()}:New id is:${this@ID3v24Frame.getIdentifier()}"
+                "V3:Unknown:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
             )
         }
     }
@@ -318,11 +318,11 @@ class ID3v24Frame: AbstractID3v2Frame {
             //If not valid move file pointer back to one byte after
             //the original check so can try again.
             log.debug(
-                "Invalid identifier:${this@ID3v24Frame.getIdentifier()}"
+                "Invalid identifier:${getIdentifier()}"
             )
             byteBuffer.position(byteBuffer.position() - (getFrameIdSize() - 1))
             throw InvalidFrameIdentifierException(
-                "${this@ID3v24Frame.getIdentifier()}:is not a valid ID3v2.30 frame"
+                "${getIdentifier()}:is not a valid ID3v2.30 frame"
             )
         }
 
@@ -407,7 +407,7 @@ class ID3v24Frame: AbstractID3v2Frame {
             }
             if (frameBody !is ID3v24FrameBody) {
                 log.debug(
-                    "Converted frame body with:${this@ID3v24Frame.getIdentifier()} to deprecated framebody"
+                    "Converted frame body with:${getIdentifier()} to deprecated framebody"
                 )
                 frameBody = FrameBodyDeprecated((frameBody as AbstractID3v2FrameBody))
             }
@@ -467,21 +467,21 @@ class ID3v24Frame: AbstractID3v2Frame {
 
         if (frameSize < 0) {
             log.warn(
-                "Invalid Frame size:${this@ID3v24Frame.getIdentifier()}"
+                "Invalid Frame size:${getIdentifier()}"
             )
-            throw InvalidFrameException("${this@ID3v24Frame.getIdentifier()} is invalid frame")
+            throw InvalidFrameException("${getIdentifier()} is invalid frame")
         } else if (frameSize == 0) {
-            log.warn("Empty Frame:${this@ID3v24Frame.getIdentifier()}")
+            log.warn("Empty Frame:${getIdentifier()}")
             //We dont process this frame or add to framemap becuase contains no useful information
             //Skip the two flag bytes so in correct position for subsequent frames
             byteBuffer.get()
             byteBuffer.get()
-            throw EmptyFrameException("${this@ID3v24Frame.getIdentifier()} is empty frame")
+            throw EmptyFrameException("${getIdentifier()} is empty frame")
         } else if (frameSize > (byteBuffer.remaining() - FRAME_FLAGS_SIZE)) {
             log.warn(
-                "Invalid Frame size larger than size before mp3 audio:${this@ID3v24Frame.getIdentifier()}"
+                "Invalid Frame size larger than size before mp3 audio:${getIdentifier()}"
             )
-            throw InvalidFrameException("${this@ID3v24Frame.getIdentifier()} is invalid frame")
+            throw InvalidFrameException("${getIdentifier()} is invalid frame")
         }
 
         checkIfFrameSizeThatIsNotSyncSafe(byteBuffer)
@@ -515,7 +515,7 @@ class ID3v24Frame: AbstractID3v2Frame {
 
             if (isNotSyncSafe) {
                 log.warn(
-                    "Frame size is NOT stored as a sync safe integer:${this@ID3v24Frame.getIdentifier()}"
+                    "Frame size is NOT stored as a sync safe integer:${getIdentifier()}"
                 )
 
                 //This will return a larger frame size so need to check against buffer size if too large then we are
@@ -524,9 +524,9 @@ class ID3v24Frame: AbstractID3v2Frame {
                         nonSyncSafeFrameSize > (byteBuffer.remaining() - -getFrameFlagsSize())
                 ) {
                     log.warn(
-                        "Invalid Frame size larger than size before mp3 audio:${this@ID3v24Frame.getIdentifier()}"
+                        "Invalid Frame size larger than size before mp3 audio:${getIdentifier()}"
                     )
-                    throw InvalidFrameException("${this@ID3v24Frame.getIdentifier()} is invalid frame")
+                    throw InvalidFrameException("${getIdentifier()} is invalid frame")
                 } else {
                     frameSize = nonSyncSafeFrameSize
                 }
@@ -584,7 +584,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                                 if (isValidID3v2FrameIdentifier(readAheadIdentifier)) {
                                     frameSize = nonSyncSafeFrameSize
                                     log.warn(
-                                        "Assuming frame size is NOT stored as a sync safe integer:${this@ID3v24Frame.getIdentifier()}"
+                                        "Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}"
                                     )
                                 }
                                 //no data found so assume entered padding in which case assume it is last
@@ -594,7 +594,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                                 else if (ID3SyncSafeInteger.isBufferEmpty(readAheadbuffer)) {
                                     frameSize = nonSyncSafeFrameSize
                                     log.warn(
-                                        "Assuming frame size is NOT stored as a sync safe integer:${this@ID3v24Frame.getIdentifier()}"
+                                        "Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}"
                                     )
                                 }
                                 //invalid so assume syncsafe as that is is the standard
@@ -627,7 +627,7 @@ class ID3v24Frame: AbstractID3v2Frame {
     override fun write(tagBuffer: ByteArrayOutputStream) {
         val unsynchronization: Boolean
 
-        log.debug("Writing frame to file:" + this@ID3v24Frame.getIdentifier())
+        log.debug("Writing frame to file:" + getIdentifier())
 
         //This is where we will write header, move position to where we can
         //write bodybuffer
@@ -652,11 +652,11 @@ class ID3v24Frame: AbstractID3v2Frame {
         //Write Frame Header
         //Write Frame ID, the identifier must be 4 bytes bytes long it may not be
         //because converted an unknown v2.2 id (only 3 bytes long)
-        if (this@ID3v24Frame.getIdentifier()?.length == 3) {
-            setIdentifier(this@ID3v24Frame.getIdentifier() + ' ')
+        if (getIdentifier()?.length == 3) {
+            setIdentifier(getIdentifier() + ' ')
         }
         headerBuffer.put(
-            this@ID3v24Frame.getIdentifier()?.toByteArray(StandardCharsets.ISO_8859_1),
+            getIdentifier()?.toByteArray(StandardCharsets.ISO_8859_1),
             0,
             FRAME_ID_SIZE
         )
@@ -739,7 +739,7 @@ class ID3v24Frame: AbstractID3v2Frame {
     override fun createStructure() {
         MP3File.tagFormatter?.openHeadingElement(
             TYPE_FRAME,
-            this@ID3v24Frame.getIdentifier() ?:""
+            getIdentifier() ?:""
         )
         MP3File.tagFormatter?.addElement(TYPE_FRAME_SIZE, frameSize)
         statusFlags?.createStructure()

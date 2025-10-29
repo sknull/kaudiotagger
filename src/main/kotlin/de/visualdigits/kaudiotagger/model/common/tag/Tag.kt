@@ -2,7 +2,6 @@ package de.visualdigits.kaudiotagger.model.common.tag
 
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
-import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.images.Artwork
 
 /**
@@ -33,6 +32,13 @@ import de.visualdigits.kaudiotagger.model.images.Artwork
 interface Tag {
 
     /**
+     * Iterator over all the fields within the tag, handle multiple fields with the same id
+     *
+     * @return iterator over whole list
+     */
+    fun getFields(): MutableIterator<TagField?>
+
+    /**
      * Create the field based on the generic key and add it to the tag
      *
      *
@@ -57,6 +63,23 @@ interface Tag {
      */
     fun deleteField(key: String)
 
+    /**
+     * Create the field based on the generic key and set it in the tag
+     *
+     * @param genericKey
+     * @param value
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    fun setField(genericKey: GenericFieldKey, vararg value: String)
+
+    /**
+     * Sets a field in the structure, used internally by the library<br></br>
+     *
+     * @param field The field to add.
+     * @throws FieldDataInvalidException
+     */
+    fun setField(field: TagField)
 
     /**
      * Returns `true`, if at least one of the contained

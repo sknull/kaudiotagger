@@ -25,6 +25,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIME
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIPL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTMCL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTYER
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
@@ -764,13 +765,13 @@ class ID3v23Tag : AbstractID3v2Tag {
      * @return
      */
     override fun getAll(id: GenericFieldKey): List<String> {
-        return if (id === GenericFieldKey.GENRE) {
+        return if (id == GenericFieldKey.GENRE) {
             getFields(id).firstOrNull()?.let { f ->
                 ((f as AbstractID3v2Frame).frameBody as FrameBodyTCON)
                     .getValues()
                     .mapNotNull { next -> FrameBodyTCON.convertID3v22GenreToGeneric(next) }
             }?:listOf()
-        } else if (id === GenericFieldKey.YEAR) {
+        } else if (id == GenericFieldKey.YEAR) {
             getFields(id).mapNotNull { next ->
                 (next as? TagTextField)?.getContent()
             }
@@ -820,4 +821,6 @@ class ID3v23Tag : AbstractID3v2Tag {
         super.createStructureBody()
         MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
     }
+
+    override fun isMultipleAllowed(identifier: String?): Boolean = ID3v23FrameId.isMultipleAllowed(identifier)
 }

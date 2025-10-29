@@ -76,6 +76,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
     constructor(
         identifier: String
     ) {
+        this.identifier = identifier
         log.debug("Creating empty frame of type$identifier")
 
         // Use reflection to map id to frame body, which makes things much easier
@@ -388,7 +389,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
     open fun createStructure() {
         MP3File.tagFormatter?.openHeadingElement(
             TYPE_FRAME,
-            this@AbstractID3v2Frame.getIdentifier() ?:""
+            getIdentifier() ?:""
         )
         MP3File.tagFormatter?.closeHeadingElement(TYPE_FRAME)
     }

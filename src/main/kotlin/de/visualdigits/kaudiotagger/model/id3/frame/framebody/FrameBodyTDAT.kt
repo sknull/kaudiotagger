@@ -29,4 +29,12 @@ class FrameBodyTDAT : AbstractFrameBodyTextInfo, ID3v23FrameBody {
         byteBuffer: ByteBuffer? = null,
         frameSize: Int = 0
     ): super(byteBuffer, frameSize)
+
+    /**
+     * Creates a new FrameBodyTDAT datatype.
+     *
+     * @param textEncoding
+     * @param text
+     */
+    constructor(textEncoding: Byte, text: String?): super(textEncoding, text)
 }

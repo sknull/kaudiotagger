@@ -93,7 +93,7 @@ open class AudioFile {
      * TODO Maybe this can be changed ?
      */
     override fun toString(): String {
-        return ("AudioFile ${file?.name}  --------\n$audioHeader\n${tags.map { (k, v) -> "${k.name}:\n$v\n-------------------"}}\n===================")
+        return ("AudioFile ${file?.name}  --------\n$audioHeader\n${tags.map { (k, v) -> "${k.name}:\n$v\n-------------------"}}\n=============")
     }
 
     /**
@@ -165,29 +165,39 @@ open class AudioFile {
      * @return the converted tag or the original if no conversion necessary
      */
     fun convertID3Tag(
-        tag: AbstractID3v2Tag?,
+        tag: AbstractID3v2Tag,
         id3V2Version: ID3v2Version
     ): AbstractID3v2Tag? {
-        if (tag is ID3v24Tag) {
-            when (id3V2Version) {
-                ID3v2Version.ID3_V22 -> return ID3v22Tag(tag)
-                ID3v2Version.ID3_V23 -> return ID3v23Tag(tag)
-                ID3v2Version.ID3_V24 -> return tag
+        return when (tag) {
+            is ID3v24Tag -> {
+                when (id3V2Version) {
+                    ID3v2Version.ID3_V22 -> ID3v22Tag(tag)
+                    ID3v2Version.ID3_V23 -> ID3v23Tag(tag)
+                    ID3v2Version.ID3_V24 -> tag
+                    else -> null
+                }
             }
-        } else if (tag is ID3v23Tag) {
-            when (id3V2Version) {
-                ID3v2Version.ID3_V22 -> return ID3v22Tag(tag)
-                ID3v2Version.ID3_V23 -> return tag
-                ID3v2Version.ID3_V24 -> return ID3v24Tag(tag)
+
+            is ID3v23Tag -> {
+                when (id3V2Version) {
+                    ID3v2Version.ID3_V22 -> ID3v22Tag(tag)
+                    ID3v2Version.ID3_V23 -> tag
+                    ID3v2Version.ID3_V24 -> ID3v24Tag(tag)
+                    else -> null
+                }
             }
-        } else if (tag is ID3v22Tag) {
-            when (id3V2Version) {
-                ID3v2Version.ID3_V22 -> return tag
-                ID3v2Version.ID3_V23 -> return ID3v23Tag(tag)
-                ID3v2Version.ID3_V24 -> return ID3v24Tag(tag)
+
+            is ID3v22Tag -> {
+                when (id3V2Version) {
+                    ID3v2Version.ID3_V22 -> tag
+                    ID3v2Version.ID3_V23 -> ID3v23Tag(tag)
+                    ID3v2Version.ID3_V24 -> ID3v24Tag(tag)
+                    else -> null
+                }
             }
+
+            else -> null
         }
-        return null
     }
 
     companion object {
