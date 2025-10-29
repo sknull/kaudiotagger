@@ -5,7 +5,7 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCode
 import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCodeList
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import java.nio.ByteBuffer
 import java.util.Collections
 
@@ -297,7 +297,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return identifier
      */
     override fun getIdentifier(): String {
-        return ID3V24FrameId.EVENT_TIMING_CODES.id
+        return ID3v24FrameId.EVENT_TIMING_CODES.id
     }
 
     /**

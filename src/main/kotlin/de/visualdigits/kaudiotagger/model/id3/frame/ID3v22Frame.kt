@@ -8,8 +8,8 @@ import de.visualdigits.kaudiotagger.model.id3.types.FrameId
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V22FrameId
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -63,10 +63,10 @@ class ID3v22Frame: AbstractID3v2Frame {
             } else if (bodyIdentifier == "CRM") {
                 //Do not convert.
                 //TODO we don't have a way of converting this to v23 which is why its not in the ForceMap
-            } else if ((bodyIdentifier == ID3V22FrameId.TYER.id) ||
-                (bodyIdentifier == ID3V22FrameId.TIME.id)
+            } else if ((bodyIdentifier == ID3v22FrameId.TYER.id) ||
+                (bodyIdentifier == ID3v22FrameId.TIME.id)
             ) {
-                bodyIdentifier = ID3V24FrameId.YEAR.id
+                bodyIdentifier = ID3v24FrameId.YEAR.id
             } else if (ID3Tags.isID3v22FrameIdentifier(bodyIdentifier)) {
                 bodyIdentifier = ID3Tags.convertFrameID22To23(bodyIdentifier)?.id?:UNSUPPORTED_ID
             }
@@ -169,14 +169,14 @@ class ID3v22Frame: AbstractID3v2Frame {
      * @return true if considered a common frame
      */
     override fun isBinary(): Boolean {
-        return ID3V22FrameId.isBinary(getIdentifier())
+        return ID3v22FrameId.isBinary(getIdentifier())
     }
 
     /**
      * @return true if considered a common frame
      */
     override fun isCommon(): Boolean {
-        return ID3V22FrameId.isCommon(getIdentifier())
+        return ID3v22FrameId.isCommon(getIdentifier())
     }
 
     /**
@@ -237,7 +237,7 @@ class ID3v22Frame: AbstractID3v2Frame {
                     // Is it a valid v22 identifier so should be able to find a
                     // frame body for it.
                     if (ID3Tags.isID3v22FrameIdentifier(identifier)) {
-                        id = ID3V22FrameId.fromId(identifier)
+                        id = ID3v22FrameId.fromId(identifier)
                     } else {
                         id = null
                     }

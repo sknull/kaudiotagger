@@ -2,7 +2,7 @@ package de.visualdigits.kaudiotagger.model.id3.types
 
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 
-enum class ID3V1FrameId(
+enum class ID3v1FrameId(
     override val id: String,
     override val genericFieldKey: GenericFieldKey?,
     override val fieldKey: ID3v1FieldKey?,
@@ -25,21 +25,21 @@ enum class ID3V1FrameId(
     ;
 
     companion object {
-        fun fromId(id: String): ID3V1FrameId? = entries.find { e -> id == e.id }
+        fun fromId(id: String): ID3v1FrameId? = entries.find { e -> id == e.id }
 
-        fun fromFieldKey(fieldKey: GenericFieldKey): ID3V1FrameId? = entries.find { e -> fieldKey == e.genericFieldKey }
+        fun fromFieldKey(fieldKey: GenericFieldKey): ID3v1FrameId? = entries.find { e -> fieldKey == e.genericFieldKey }
 
-        fun commonFrames(): List<ID3V1FrameId> = entries.filter { e -> e.isCommon }
+        fun commonFrames(): List<ID3v1FrameId> = entries.filter { e -> e.isCommon }
 
-        fun binaryFrames(): List<ID3V1FrameId> = entries.filter { e -> e.isBinary }
+        fun binaryFrames(): List<ID3v1FrameId> = entries.filter { e -> e.isBinary }
 
-        fun multipleFrames(): List<ID3V1FrameId> = entries.filter { e -> e.isMultipleAllowed }
+        fun multipleFrames(): List<ID3v1FrameId> = entries.filter { e -> e.isMultipleAllowed }
 
-        fun supprtedFrames(): List<ID3V1FrameId> = entries.filter { e -> e.isSupported }
+        fun supprtedFrames(): List<ID3v1FrameId> = entries.filter { e -> e.isSupported }
 
-        fun extensionFrames(): List<ID3V1FrameId> = entries.filter { e -> e.isExtension }
+        fun extensionFrames(): List<ID3v1FrameId> = entries.filter { e -> e.isExtension }
 
-        fun discardIfFileAltered(): List<ID3V1FrameId> = entries.filter { e -> e.isDiscardedIfFileAltered }
+        fun discardIfFileAltered(): List<ID3v1FrameId> = entries.filter { e -> e.isDiscardedIfFileAltered }
 
         fun isMultipleAllowed(id: String): Boolean = multipleFrames().any { e -> e.id == id }
 

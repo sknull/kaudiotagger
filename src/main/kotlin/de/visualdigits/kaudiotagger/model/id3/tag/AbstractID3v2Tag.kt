@@ -8,7 +8,6 @@ import de.visualdigits.kaudiotagger.model.common.frame.TyerTdatAggregatedFrame
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
-import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyNumberTotal
@@ -27,7 +26,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUFID
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWOAR
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWXXX
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V22FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -448,9 +447,9 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         frameId: String?,
         next: AbstractID3v2Frame
     ) {
-        if ((ID3V22FrameId.isMultipleAllowed(frameId)) ||
-            (ID3V22FrameId.isMultipleAllowed(frameId)) ||
-            (ID3V22FrameId.isMultipleAllowed(frameId))
+        if ((ID3v22FrameId.isMultipleAllowed(frameId)) ||
+            (ID3v22FrameId.isMultipleAllowed(frameId)) ||
+            (ID3v22FrameId.isMultipleAllowed(frameId))
         ) {
             //If a frame already exists of this type
             if (map.containsKey(frameId)) {

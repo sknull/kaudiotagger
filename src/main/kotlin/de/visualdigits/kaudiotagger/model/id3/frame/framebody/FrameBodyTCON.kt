@@ -4,8 +4,8 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.TCONString
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V2ExtendedGenreTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v2ExtendedGenreTypes
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 
@@ -82,14 +82,14 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                 // to preserve iTunes compatibility, don't write genre ids higher than getMaxStandardGenreId, rather use string
                 return if (genreId != null && genreId.id <= GenreTypes.MAX_GENRE_ID) {
                     genreId.id.toString()
-                } else if (value.equals(ID3V2ExtendedGenreTypes.RX.description, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.RX.name
-                } else if (value.equals(ID3V2ExtendedGenreTypes.CR.description, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.CR.name
-                } else if (value.equals(ID3V2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.RX.name
-                } else if (value.equals(ID3V2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
-                    ID3V2ExtendedGenreTypes.CR.name
+                } else if (value.equals(ID3v2ExtendedGenreTypes.RX.description, ignoreCase = true)) {
+                    ID3v2ExtendedGenreTypes.RX.name
+                } else if (value.equals(ID3v2ExtendedGenreTypes.CR.description, ignoreCase = true)) {
+                    ID3v2ExtendedGenreTypes.CR.name
+                } else if (value.equals(ID3v2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
+                    ID3v2ExtendedGenreTypes.RX.name
+                } else if (value.equals(ID3v2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
+                    ID3v2ExtendedGenreTypes.CR.name
                 } else {
                     ""
                 }
@@ -117,14 +117,14 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                 // to preserve iTunes compatibility, don't write genre ids higher than getMaxStandardGenreId, rather use string
                 return if (genreId != null && genreId.id <= GenreTypes.MAX_GENRE_ID) {
                     return bracketWrap(genreId.toString())
-                } else if (value.equals(ID3V2ExtendedGenreTypes.RX.description, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.RX.name)
-                } else if (value.equals(ID3V2ExtendedGenreTypes.CR.description, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.CR.name)
-                } else if (value.equals(ID3V2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.RX.name)
-                } else if (value.equals(ID3V2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
-                    bracketWrap(ID3V2ExtendedGenreTypes.CR.name)
+                } else if (value.equals(ID3v2ExtendedGenreTypes.RX.description, ignoreCase = true)) {
+                    bracketWrap(ID3v2ExtendedGenreTypes.RX.name)
+                } else if (value.equals(ID3v2ExtendedGenreTypes.CR.description, ignoreCase = true)) {
+                    bracketWrap(ID3v2ExtendedGenreTypes.CR.name)
+                } else if (value.equals(ID3v2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
+                    bracketWrap(ID3v2ExtendedGenreTypes.RX.name)
+                } else if (value.equals(ID3v2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
+                    bracketWrap(ID3v2ExtendedGenreTypes.CR.name)
                 } else {
                     ""
                 }
@@ -175,10 +175,10 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                 value1
             }
         } catch (nfe: NumberFormatException) {
-            if (value1.equals(ID3V2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
-                ID3V2ExtendedGenreTypes.RX.description
-            } else if (value1.equals(ID3V2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
-                ID3V2ExtendedGenreTypes.CR.description
+            if (value1.equals(ID3v2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
+                ID3v2ExtendedGenreTypes.RX.description
+            } else if (value1.equals(ID3v2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
+                ID3v2ExtendedGenreTypes.CR.description
             } else {
                 value1
             }
@@ -216,7 +216,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3V24FrameId.GENRE.id
+        return ID3v24FrameId.GENRE.id
     }
 
     fun setV23Format() {

@@ -13,7 +13,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23StatusFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V23FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.ID3Compression
 import de.visualdigits.kaudiotagger.util.ID3Tags
@@ -501,14 +501,14 @@ class ID3v23Frame: AbstractID3v2Frame {
      * @return true if considered a common frame
      */
     override fun isCommon(): Boolean {
-        return ID3V23FrameId.isCommon(getIdentifier())
+        return ID3v23FrameId.isCommon(getIdentifier())
     }
 
     /**
      * @return true if considered a common frame
      */
     override fun isBinary(): Boolean {
-        return ID3V23FrameId.isBinary(getIdentifier())
+        return ID3v23FrameId.isBinary(getIdentifier())
     }
 
     /**

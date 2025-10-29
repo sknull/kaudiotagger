@@ -6,7 +6,7 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.StringHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V24FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.common.types.SynchronisedLyricsContentType
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
@@ -196,7 +196,7 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return frame identifier
      */
     override fun getIdentifier(): String {
-        return ID3V24FrameId.SYNC_LYRIC.id
+        return ID3v24FrameId.SYNC_LYRIC.id
     }
 
     /**

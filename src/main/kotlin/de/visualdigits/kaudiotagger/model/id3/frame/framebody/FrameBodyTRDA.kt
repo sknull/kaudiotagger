@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V23FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import java.nio.ByteBuffer
 
 class FrameBodyTRDA: AbstractFrameBodyTextInfo, ID3v23FrameBody {
@@ -31,6 +31,6 @@ class FrameBodyTRDA: AbstractFrameBodyTextInfo, ID3v23FrameBody {
      * @return the ID3v2 frame identifier  for this frame type
      */
     override fun getIdentifier(): String {
-        return ID3V23FrameId.TRDA.id
+        return ID3v23FrameId.TRDA.id
     }
 }

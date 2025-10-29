@@ -1,11 +1,7 @@
 package de.visualdigits.kaudiotagger.util
 
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
-import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
-import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
-import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V2Version
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v2Version
 
 object TagOptionSingleton {
 
@@ -236,5 +232,5 @@ object TagOptionSingleton {
      */
     var preserveFileIdentity = true
 
-    var id3v2Version = ID3V2Version.ID3_V23
+    var id3v2Version = ID3v2Version.ID3_V23
 }

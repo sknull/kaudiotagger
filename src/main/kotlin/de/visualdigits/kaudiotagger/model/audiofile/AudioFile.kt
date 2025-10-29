@@ -3,13 +3,12 @@ package de.visualdigits.kaudiotagger.model.audiofile
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
-import de.visualdigits.kaudiotagger.model.common.types.SupportedFileFormat
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
-import de.visualdigits.kaudiotagger.model.id3.types.ID3V2Version
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v2Version
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import org.slf4j.LoggerFactory
@@ -167,25 +166,25 @@ open class AudioFile {
      */
     fun convertID3Tag(
         tag: AbstractID3v2Tag?,
-        id3V2Version: ID3V2Version
+        id3V2Version: ID3v2Version
     ): AbstractID3v2Tag? {
         if (tag is ID3v24Tag) {
             when (id3V2Version) {
-                ID3V2Version.ID3_V22 -> return ID3v22Tag(tag)
-                ID3V2Version.ID3_V23 -> return ID3v23Tag(tag)
-                ID3V2Version.ID3_V24 -> return tag
+                ID3v2Version.ID3_V22 -> return ID3v22Tag(tag)
+                ID3v2Version.ID3_V23 -> return ID3v23Tag(tag)
+                ID3v2Version.ID3_V24 -> return tag
             }
         } else if (tag is ID3v23Tag) {
             when (id3V2Version) {
-                ID3V2Version.ID3_V22 -> return ID3v22Tag(tag)
-                ID3V2Version.ID3_V23 -> return tag
-                ID3V2Version.ID3_V24 -> return ID3v24Tag(tag)
+                ID3v2Version.ID3_V22 -> return ID3v22Tag(tag)
+                ID3v2Version.ID3_V23 -> return tag
+                ID3v2Version.ID3_V24 -> return ID3v24Tag(tag)
             }
         } else if (tag is ID3v22Tag) {
             when (id3V2Version) {
-                ID3V2Version.ID3_V22 -> return tag
-                ID3V2Version.ID3_V23 -> return ID3v23Tag(tag)
-                ID3V2Version.ID3_V24 -> return ID3v24Tag(tag)
+                ID3v2Version.ID3_V22 -> return tag
+                ID3v2Version.ID3_V23 -> return ID3v23Tag(tag)
+                ID3v2Version.ID3_V24 -> return ID3v24Tag(tag)
             }
         }
         return null
