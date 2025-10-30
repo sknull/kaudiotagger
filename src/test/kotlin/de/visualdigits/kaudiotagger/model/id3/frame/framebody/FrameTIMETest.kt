@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test
 class FrameTIMETest : AbstractTestCase() {
 
     @Test
-    @Disabled("currently not working") // todo fix test
     fun testID3Specific() {
         var e: Exception? = null
         try {
@@ -37,7 +36,6 @@ class FrameTIMETest : AbstractTestCase() {
     }
 
     @Test
-    @Disabled("currently not working") // todo fix test
     fun testConvertingPartialTime() {
         var e: Exception? = null
         try {

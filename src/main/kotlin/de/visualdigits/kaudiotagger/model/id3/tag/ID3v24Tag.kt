@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
@@ -14,6 +13,7 @@ import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
@@ -30,6 +30,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTMCL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTRCK
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
@@ -758,6 +759,56 @@ class ID3v24Tag : AbstractID3v2Tag {
             frames.add(ID3v24Frame(frame))
         }
         return frames
+    }
+
+    /**
+     * Two different frames both converted to TDRCFrames, now if this is the case one of them
+     * may have actually have been created as a FrameUnsupportedBody because TDRC is only
+     * supported in ID3v24, but is often created in v23 tags as well together with the valid TYER
+     * frame OR it might be that we have two v23 frames that map to TDRC such as TYER,TIME or TDAT
+     *
+     * @param newFrame
+     * @param existingFrame
+     */
+    override fun processDuplicateFrame(
+        newFrame: AbstractID3v2Frame,
+        existingFrame: AbstractID3v2Frame
+    ) {
+        //We dont add this new frame we just add the contents to existing frame
+        //
+        if (newFrame.frameBody is FrameBodyTDRC) {
+            val newBody = newFrame.frameBody as FrameBodyTDRC
+            if (existingFrame.frameBody is FrameBodyTDRC) {
+                val body = existingFrame.frameBody as FrameBodyTDRC
+                //#304:Check for NullPointer, just ignore this frame
+
+                if (newBody.originalID == null) {
+                    return
+                }
+                //Just add the data to the frame
+                if (newBody.originalID == ID3v23FrameId.TYER.id) {
+                    body.year = newBody.year
+                } else if (newBody.originalID == ID3v23FrameId.TDAT.id) {
+                    body.date = newBody.date
+                    body.monthOnly = newBody.monthOnly
+                } else if (newBody.originalID == ID3v23FrameId.TIME.id) {
+                    body.time = newBody.time
+                    body.hoursOnly = newBody.hoursOnly
+                }
+                val formattedText = body.getFormattedText()
+                body.setObjectValue(DataTypes.OBJ_TEXT, formattedText)
+            } else if (existingFrame.frameBody is FrameBodyUnsupported) {
+                frameMap[newFrame.getIdentifier()!!] = newFrame
+            } else {
+                //we just lose this frame, we have already got one with the correct id.
+                log.warn("Found duplicate TDRC frame in invalid situation,discarding:${newFrame.getIdentifier()}")
+            }
+        } else {
+            val list: MutableList<AbstractID3v2Frame?> = ArrayList<AbstractID3v2Frame?>()
+            list.add(existingFrame)
+            list.add(newFrame)
+            frameMap[newFrame.getIdentifier()!!] = list
+        }
     }
 
     /**

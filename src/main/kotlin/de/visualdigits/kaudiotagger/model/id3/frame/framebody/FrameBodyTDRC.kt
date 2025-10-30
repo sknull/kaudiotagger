@@ -160,28 +160,29 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * i.e if the v3 frames contain a valid value this will return a valid
      * v4 value, if not this won't.
      */
-
-    fun getFormattedText(): String? {
-        return if (originalID == null) {
-            this.getText()
+    fun getFormattedText(): String {
+        val sb = StringBuilder();
+        if (originalID == null) {
+            return this.getText()?:""
         } else {
-            if (year != null && year?.trim()?.isEmpty() == false) {
-                formatAndParse(formatYearOut, formatYearIn, year)
-            } else if (date?.isNotEmpty() == true) {
-                if (monthOnly) {
-                    formatAndParse(formatMonthOut, formatDateIn, date)
-                } else {
-                    formatAndParse(formatDateOut, formatDateIn, date)
-                }
-            } else if (time?.isNotEmpty() == true) {
-                if (hoursOnly) {
-                    formatAndParse(formatHoursOut, formatTimeIn, time)
-                } else {
-                    formatAndParse(formatTimeOut, formatTimeIn, time)
-                }
-            } else {
-                null
+            if (year != null && year?.trim()?.isNotEmpty() == true) {
+                sb.append(formatAndParse(formatYearOut, formatYearIn, year));
             }
+            if (!date.equals("")) {
+                if (monthOnly) {
+                    sb.append(formatAndParse(formatMonthOut, formatDateIn, date));
+                } else {
+                    sb.append(formatAndParse(formatDateOut, formatDateIn, date));
+                }
+            }
+            if (!time.equals("")) {
+                if (hoursOnly) {
+                    sb.append(formatAndParse(formatHoursOut, formatTimeIn, time));
+                } else {
+                    sb.append(formatAndParse(formatTimeOut, formatTimeIn, time));
+                }
+            }
+            return sb.toString();
         }
     }
 
@@ -207,15 +208,16 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         formatDate: SimpleDateFormat,
         parseDate: SimpleDateFormat,
         text: String?
-    ): String? {
+    ): String {
         try {
-            val date = parseDate.parse(text)
-            val result = formatDate.format(date)
-            return result
-        } catch (e: ParseException) {
-            log.warn("Unable to parse:" + text)
+            return text
+                ?.let { t -> parseDate.parse(t) }
+                ?.let { d -> formatDate.format(d) }
+                ?:""
+        } catch (_: ParseException) {
+            log.warn("Unable to parse:$text")
         }
-        return null
+        return ""
     }
 
     /**

@@ -354,12 +354,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     addFrame(value)
                 }
                 is TyerTdatAggregatedFrame -> {
-                    for (frame in value.getFrames()) {
+                    value.getFrames().forEach { frame ->
                         addFrame(frame)
                     }
                 }
                 is List<*> -> {
-                    for (frame in value as List<AbstractID3v2Frame>) {
+                    (value as List<AbstractID3v2Frame>).forEach { frame ->
                         addFrame(frame)
                     }
                 }
@@ -421,7 +421,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     fun getFrameOfType(identifier: String): Set<Any?> {
         return frameMap.keys.mapNotNull { key ->
             if (key.startsWith(identifier)) {
-                val o = frameMap.get(key)
+                val o = frameMap[key]
                 o as? List<*> ?: listOf(o)
             } else null
         }.flatten().toSet()
@@ -720,7 +720,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
         val fieldId = field.getIdentifier() ?: error("No id")
         if (field is AbstractID3v2Frame) {
-            val o = frameMap.get(fieldId)
+            val o = frameMap[fieldId]
 
             //No frame of this type
             if (o == null) {
@@ -1675,7 +1675,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
             //If no frame of this type exist or if multiples are not allowed
             if (obj == null) {
-                frameMap.put(identifier, field)
+                frameMap[identifier] = field
             } else if (obj is AbstractID3v2Frame) {
                 val frames = mutableListOf<AbstractID3v2Frame>()
                 frames.add(obj)
@@ -1684,7 +1684,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 mergeDuplicateFrames(field, obj as MutableList<AbstractID3v2Frame>)
             }
         } else {
-            frameMap.put(identifier, field)
+            frameMap[identifier] = field
         }
     }
 
@@ -1770,11 +1770,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         }
 
         if (!isMultipleAllowed(identifier)) {
-            frameMap.put(identifier, newFrame)
+            frameMap[identifier] = newFrame
         } else {
             //No match found so addField new one
             frames.add(newFrame)
-            frameMap.put(identifier, frames)
+            frameMap[identifier] = frames
         }
     }
 

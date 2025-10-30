@@ -32,7 +32,6 @@ class FrameTDATTest : AbstractTestCase() {
     }
 
     @Test
-    @Disabled("currently not working") // todo fix test
     fun testID3SpecificWithYearAndTime() {
         var tag =  ID3v23Tag()
         val frame =  ID3v23Frame("TDAT")
@@ -53,7 +52,7 @@ class FrameTDATTest : AbstractTestCase() {
 
         //Create v24tag from v23, all these time frames shouod be merged into one
         var v24tag =  ID3v24Tag(tag)
-        assertEquals(3, v24tag.getFieldCount())
+        assertEquals(1, v24tag.getFieldCount())
         assertNotNull(v24tag.getFirst("TDAT"))
         assertNotNull(v24tag.getFirst("TIME"))
         assertNotNull(v24tag.getFirst("TYER"))
@@ -77,7 +76,6 @@ class FrameTDATTest : AbstractTestCase() {
     }
 
     @Test
-    @Disabled("currently not working") // todo fix test
     fun testConvertingPartialDate() {
         var tag =  ID3v24Tag()
         val frame =  ID3v24Frame("TDRC")
@@ -117,13 +115,14 @@ class FrameTDATTest : AbstractTestCase() {
         assertEquals(af.getTag()?.getAll(GenericFieldKey.ARTIST)?.get(0), "fred")
         assertEquals(af.getTag()?.getFirst(GenericFieldKey.YEAR), "2003-06-23")
         assertEquals(af.getTag()?.getAll(GenericFieldKey.YEAR)?.get(0), "2003-06-23")
+        val iD3v2TagAsv24 = af.getID3v2TagAsv24()
         assertEquals(
-            (af as MP3File).getID3v2TagAsv24().getFirst(GenericFieldKey.YEAR),
-            "2003-06-23"
+            "2003-06-23",
+            iD3v2TagAsv24.getFirst(GenericFieldKey.YEAR)
         )
         assertEquals(
-            (af as MP3File).getID3v2TagAsv24().getAll(GenericFieldKey.YEAR).get(0),
-            "2003-06-23"
+            "2003-06-23",
+            iD3v2TagAsv24.getAll(GenericFieldKey.YEAR).get(0)
         )
     }
 }
