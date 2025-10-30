@@ -88,7 +88,7 @@ class FrameBodyPOPM: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return the memail of the user who rated this
      */
     fun getEmailToUser(): String? {
-        return getObjectValue(DataTypes.OBJ_EMAIL) as String?
+        return getObjectValue(DataTypes.OBJ_EMAIL) as? String
     }
 
     /**

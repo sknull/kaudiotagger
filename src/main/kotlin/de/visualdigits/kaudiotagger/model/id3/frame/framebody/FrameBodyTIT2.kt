@@ -10,7 +10,7 @@ class FrameBodyTIT2: AbstractFrameBodyTextInfo, ID3v23FrameBody {
      */
     constructor()
 
-    constructor(body: FrameBodyTIT2): super(body)
+    constructor(copyObject: FrameBodyTIT2): super(copyObject)
 
     /**
      * Creates a new FrameBodyTIT2 datatype.

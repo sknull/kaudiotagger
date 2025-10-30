@@ -34,7 +34,7 @@ class TCONString : TextEncodedStringSizeTerminated {
      *
      * @param object
      */
-    constructor(`object`: TCONString) : super(`object`)
+    constructor(copyObject: TCONString): super(copyObject)
 
     override fun equals(obj: Any?): Boolean {
         if (this === obj) {

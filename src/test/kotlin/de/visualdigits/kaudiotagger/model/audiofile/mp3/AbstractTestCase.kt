@@ -88,12 +88,12 @@ abstract class AbstractTestCase {
             directory
         }
         val resource = if (fileName == null) {
-            ClassLoader.getSystemResource(dir).toURI()
+            ClassLoader.getSystemResource(dir)?.toURI()
         } else {
-            ClassLoader.getSystemResource(dir + fileName).toURI()
+            ClassLoader.getSystemResource(dir + fileName)?.toURI()
         }
         
-        return  File(resource)
+        return  resource?.let { r -> File(r) }?:error("File not found: $directory/$fileName")
     }
 
     fun tempFileResource(fileName: String?): File {

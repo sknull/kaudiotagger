@@ -19,7 +19,6 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTDRC
-import de.visualdigits.kaudiotagger.model.id3.types.FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
@@ -402,13 +401,13 @@ class ID3v22Tag : AbstractID3v2Tag {
         val tmpBody = frame.frameBody
         if ((frame.getIdentifier() == ID3v24FrameId.YEAR.id) && (tmpBody is FrameBodyTDRC)) {
             var newFrame: ID3v22Frame
-            if (tmpBody.year.isNotEmpty()) {
+            if (tmpBody.year?.isNotEmpty() == true) {
                 //Create Year frame (v2.2 id,but uses v2.3 body)
                 newFrame = ID3v22Frame(ID3v22FrameId.TYER.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.year)
                 frames.add(newFrame)
             }
-            if (tmpBody.time.isNotEmpty()) {
+            if (tmpBody.time?.isNotEmpty() == true) {
                 //Create Time frame (v2.2 id,but uses v2.3 body)
                 newFrame = ID3v22Frame(ID3v22FrameId.TIME.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.time)
@@ -532,8 +531,8 @@ class ID3v22Tag : AbstractID3v2Tag {
         }
     }
 
-    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
-        val id3v22FieldKey = ID3v22FrameId.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
+    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId {
+        val id3v22FieldKey = ID3v22FrameId.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey?.name)
         return FrameAndSubId(
             genericKey,
             id3v22FieldKey.id,

@@ -1,8 +1,10 @@
 package de.visualdigits.kaudiotagger.model.id3.datatype
 
-class ValuePairs() {
-
+class ValuePairs(
     val mapping: MutableList<Pair<String, String>> = mutableListOf()
+) {
+
+    constructor(copyObject: ValuePairs): this(copyObject.mapping.toMutableList())
 
     fun add(pair: Pair<String, String>) {
         mapping.add(pair)

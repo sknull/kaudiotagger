@@ -13,11 +13,11 @@ abstract class AbstractFrameBodyNumberTotal: AbstractID3v2FrameBody {
      * Creates a new FrameBodyTRCK datatype.
      */
     constructor() {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, PartOfSetValue())
     }
 
-    constructor(body: AbstractFrameBodyNumberTotal): super(body)
+    constructor(copyObject: AbstractFrameBodyNumberTotal): super(copyObject)
 
     /**
      * Creates a new FrameBodyTRCK datatype, the value is parsed literally

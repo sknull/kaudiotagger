@@ -4,6 +4,7 @@ import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFram
 
 
 class BooleanString : AbstractDataType {
+
     /**
      * Creates a new ObjectBooleanString datatype.
      *
@@ -43,7 +44,7 @@ class BooleanString : AbstractDataType {
     /**
      * @return
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val booleanValue = ByteArray(1)
         if (getValue() == null) {
             booleanValue[0] = '0'.code.toByte()

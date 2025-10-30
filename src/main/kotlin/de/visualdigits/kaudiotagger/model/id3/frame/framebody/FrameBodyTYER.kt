@@ -9,7 +9,7 @@ class FrameBodyTYER: AbstractFrameBodyTextInfo, ID3v23FrameBody {
 
     constructor()
 
-    constructor(body: FrameBodyTYER): super(body)
+    constructor(copyObject: FrameBodyTYER): super(copyObject)
 
     /**
      * When converting v4 TDRC frame to v3 TYER
@@ -17,7 +17,7 @@ class FrameBodyTYER: AbstractFrameBodyTextInfo, ID3v23FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTDRC) {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, body.getText())
     }
 

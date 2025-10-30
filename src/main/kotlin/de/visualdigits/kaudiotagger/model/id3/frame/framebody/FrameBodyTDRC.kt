@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -24,7 +24,14 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         val formatTimeOut = SimpleDateFormat("'T'HH:mm", Locale.UK)
         val formatHoursOut = SimpleDateFormat("'T'HH", Locale.UK)
         
-        val formatters: MutableList<SimpleDateFormat> = mutableListOf()
+        val formatters = listOf(
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.UK),
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.UK),
+            SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.UK),
+            SimpleDateFormat("yyyy-MM-dd", Locale.UK),
+            SimpleDateFormat("yyyy-MM", Locale.UK),
+            SimpleDateFormat("yyyy", Locale.UK)
+        )
         
         const val PRECISION_SECOND: Int = 0
         const val PRECISION_MINUTE: Int = 1
@@ -38,37 +45,15 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * Used when converting from v3 tags , these fields should ALWAYS hold the v23 value
      */
     var originalID: String? = null
-    var year: String = ""
-    var time = ""
-    var date = ""
+    var year: String? = null
+    var time: String? = null
+    var date: String? = null
     var monthOnly = false
     var hoursOnly = false
 
-    constructor() {
-        //This is allowable v24 format , we use UK Locale not because we are restricting to UK
-        //but because these formats are fixed in ID3 spec, and could possibly get unexpected results if library
-        //used with a default locale that has Date Format Symbols that interfere with the pattern
-        formatters.add(
-            SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm:ss",
-                Locale.UK
-            )
-        )
-        formatters.add(
-            SimpleDateFormat(
-                "yyyy-MM-dd'T'HH:mm",
-                Locale.UK
-            )
-        )
-        formatters.add(SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.UK))
-        formatters.add(SimpleDateFormat("yyyy-MM-dd", Locale.UK))
-        formatters.add(SimpleDateFormat("yyyy-MM", Locale.UK))
-        formatters.add(SimpleDateFormat("yyyy", Locale.UK))
+    constructor()
 
-        //These are formats used by v23 Frames
-    }
-
-    constructor(body: FrameBodyTDRC): super(body)
+    constructor(copyObject: FrameBodyTDRC): super(copyObject)
 
     constructor(
         byteBuffer: ByteBuffer? = null,
@@ -83,7 +68,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
     constructor(body: FrameBodyTYER) {
         originalID = ID3v23FrameId.TYER.id
         year = body.getText()
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
     }
 
@@ -96,7 +81,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         originalID = ID3v23FrameId.TIME.id
         time = body.getText()
         hoursOnly = body.hoursOnly
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
     }
 
@@ -109,7 +94,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         originalID = ID3v23FrameId.TDAT.id
         date = body.getText()
         monthOnly = body.isMonthOnly
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
     }
 
@@ -121,7 +106,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
     constructor(body: FrameBodyTRDA) {
         originalID = ID3v23FrameId.TRDA.id
         date = body.getText()
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, getFormattedText())
     }
 
@@ -138,6 +123,36 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         findMatchingMaskAndExtractV3Values()
     }
 
+    fun findMatchingMaskAndExtractV3Values() {
+        //Find the date format of the text
+        for (i in formatters.indices) {
+            try {
+                val d: Date?
+                synchronized(formatters.get(i)) {
+                    d = formatters.get(i).parse(getText())
+                }
+                //If able to parse a date from the text
+                if (d != null) {
+                    extractID3v23Formats(d, i)
+                    break
+                }
+            } catch (e: ParseException) { //Dont display will occur for each failed format
+                //Do nothing;
+            } catch (nfe: NumberFormatException) {
+                //Do nothing except log warning because not really expecting this to happen
+                log.warn(
+                    "Date Formatter:" +
+                            formatters.get(i).toPattern() +
+                            "failed to parse:" +
+                            getText() +
+                            "with " +
+                            nfe.message,
+                    nfe
+                )
+            }
+        }
+    }
+
     /**
      * When this has been generated as an amalgamation of v3 frames assumes
      * the v3 frames match the the format in specification and convert them
@@ -146,29 +161,27 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * v4 value, if not this won't.
      */
 
-    fun getFormattedText(): String {
-        val sb = StringBuffer()
-        if (originalID == null) {
-            return this.getText()
+    fun getFormattedText(): String? {
+        return if (originalID == null) {
+            this.getText()
         } else {
-            if (year != null && !(year.trim().isEmpty())) {
-                sb.append(formatAndParse(formatYearOut, formatYearIn, year))
-            }
-            if (!date.equals("")) {
+            if (year != null && year?.trim()?.isEmpty() == false) {
+                formatAndParse(formatYearOut, formatYearIn, year)
+            } else if (date?.isNotEmpty() == true) {
                 if (monthOnly) {
-                    sb.append(formatAndParse(formatMonthOut, formatDateIn, date))
+                    formatAndParse(formatMonthOut, formatDateIn, date)
                 } else {
-                    sb.append(formatAndParse(formatDateOut, formatDateIn, date))
+                    formatAndParse(formatDateOut, formatDateIn, date)
                 }
-            }
-            if (!time.equals("")) {
+            } else if (time?.isNotEmpty() == true) {
                 if (hoursOnly) {
-                    sb.append(formatAndParse(formatHoursOut, formatTimeIn, time))
+                    formatAndParse(formatHoursOut, formatTimeIn, time)
                 } else {
-                    sb.append(formatAndParse(formatTimeOut, formatTimeIn, time))
+                    formatAndParse(formatTimeOut, formatTimeIn, time)
                 }
+            } else {
+                null
             }
-            return sb.toString()
         }
     }
 
@@ -202,37 +215,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         } catch (e: ParseException) {
             log.warn("Unable to parse:" + text)
         }
-        return ""
-    }
-
-    fun findMatchingMaskAndExtractV3Values() {
-        //Find the date format of the text
-        for (i in formatters.indices) {
-            try {
-                val d: Date?
-                synchronized(formatters.get(i)) {
-                    d = formatters.get(i).parse(getText())
-                }
-                //If able to parse a date from the text
-                if (d != null) {
-                    extractID3v23Formats(d, i)
-                    break
-                }
-            } catch (e: ParseException) { //Dont display will occur for each failed format
-                //Do nothing;
-            } catch (nfe: NumberFormatException) {
-                //Do nothing except log warning because not really expecting this to happen
-                log.warn(
-                    "Date Formatter:" +
-                            formatters.get(i).toPattern() +
-                            "failed to parse:" +
-                            getText() +
-                            "with " +
-                            nfe.message,
-                    nfe
-                )
-            }
-        }
+        return null
     }
 
     /**

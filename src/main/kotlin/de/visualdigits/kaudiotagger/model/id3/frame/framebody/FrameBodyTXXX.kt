@@ -108,7 +108,7 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      * Creates a new FrameBodyTXXX datatype.
      */
     constructor() {
-        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         this.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
         this.setObjectValue(DataTypes.OBJ_TEXT, "")
     }
@@ -120,12 +120,12 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      */
     constructor(body: FrameBodyTMOO) {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding())
-        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         this.setObjectValue(DataTypes.OBJ_DESCRIPTION, MOOD)
         this.setObjectValue(DataTypes.OBJ_TEXT, body.getText())
     }
 
-    constructor(body: FrameBodyTXXX): super(body)
+    constructor(copyObject: FrameBodyTXXX): super(copyObject)
 
     /**
      * Creates a new FrameBodyTXXX datatype.
@@ -157,7 +157,7 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      *
      * @param description
      */
-    fun setDescription(description: String) {
+    fun setDescription(description: String?) {
         setObjectValue(DataTypes.OBJ_DESCRIPTION, description)
     }
 

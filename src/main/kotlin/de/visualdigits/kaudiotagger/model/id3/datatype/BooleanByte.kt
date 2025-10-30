@@ -28,8 +28,8 @@ class BooleanByte : AbstractDataType {
         this.bitPosition = bitPosition
     }
 
-    constructor(copy: BooleanByte) : super(copy) {
-        this.bitPosition = copy.bitPosition
+    constructor(copyObject: BooleanByte): super(copyObject) {
+        this.bitPosition = copyObject.bitPosition
     }
 
     /**
@@ -82,7 +82,7 @@ class BooleanByte : AbstractDataType {
     /**
      * @return
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val retValue = ByteArray(1)
         if (getValue() != null) {
             retValue[0] = (if (getValue() as Boolean) 1 else 0).toByte()

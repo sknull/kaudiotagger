@@ -99,7 +99,7 @@ class ID3v11Tag: ID3v1Tag {
                 id3tag = mp3tag
             }
             var frame: ID3v24Frame
-            var text: String
+            var text: String?
             if (id3tag.hasFrame(ID3v24FrameId.TITLE.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.TITLE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTIT2).getText()
@@ -134,7 +134,7 @@ class ID3v11Tag: ID3v1Tag {
                 frame = id3tag.getFrame(ID3v24FrameId.GENRE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTCON).getText()
                 try {
-                    setGenre(ID3Tags.findNumber(text).toInt())
+                    setGenre(ID3Tags.findNumber(text?:"")?.toInt()?:-1)
                 } catch (ex: TagException) {
                     log.warn(
                         "Unable to convert TCON frame to format suitable for v11 tag",

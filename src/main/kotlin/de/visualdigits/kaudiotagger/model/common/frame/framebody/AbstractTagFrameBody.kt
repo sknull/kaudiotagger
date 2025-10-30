@@ -32,12 +32,9 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      *
      * @param copyObject
      */
-    constructor(copyObject: AbstractTagFrameBody) : this() {
-        var newObject: AbstractDataType
-        for (i in copyObject.objectList.indices) {
-            newObject = ID3Tags.copyObject(
-                copyObject.objectList.get(i)
-            ) as AbstractDataType
+    constructor(copyObject: AbstractTagFrameBody) {
+        copyObject.objectList.forEach { o ->
+            val newObject = ID3Tags.copyObject(o) as AbstractDataType
             newObject.setBody(this)
             this.objectList.add(newObject)
         }
@@ -49,7 +46,8 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      * @return the text encoding used by this framebody
      */
     fun getTextEncoding(): Byte {
-        return getObject(DataTypes.OBJ_TEXT_ENCODING)
+        val type = getObject(DataTypes.OBJ_TEXT_ENCODING)
+        return type
             ?.let { o ->
                 when (val value = o.getValue()) {
                     is Byte -> value

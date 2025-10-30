@@ -7,6 +7,7 @@ import de.visualdigits.kaudiotagger.util.ID3Tags
  * Represents a timestamp field
  */
 class StringDate : StringFixedLength {
+
     /**
      * Creates a new ObjectStringDate datatype.
      *

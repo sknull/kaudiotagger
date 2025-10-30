@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets
  * The String will be encoded using the default encoding regardless of what encoding may be specified in the framebody
  */
 class StringNullTerminated : TextEncodedStringNullTerminated {
+
     /**
      * Creates a new ObjectStringNullTerminated datatype.
      *

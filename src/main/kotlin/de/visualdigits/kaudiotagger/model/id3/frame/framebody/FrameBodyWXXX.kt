@@ -29,7 +29,7 @@ class FrameBodyWXXX: AbstractFrameBodyUrlLink, ID3v24FrameBody, ID3v23FrameBody 
      * Creates a new FrameBodyWXXX datatype.
      */
     constructor() {
-        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         this.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
         this.setObjectValue(DataTypes.OBJ_URLLINK, "")
     }
@@ -58,7 +58,7 @@ class FrameBodyWXXX: AbstractFrameBodyUrlLink, ID3v24FrameBody, ID3v23FrameBody 
      * @return a description of the hyperlink
      */
     fun getDescription(): String? {
-        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
     /**

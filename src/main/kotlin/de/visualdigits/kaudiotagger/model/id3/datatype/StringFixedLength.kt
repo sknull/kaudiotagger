@@ -91,7 +91,7 @@ open class StringFixedLength : AbstractString {
      *
      * @return the byte array to be written to the file
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val dataBuffer: ByteBuffer?
         val data: ByteArray
 
@@ -114,7 +114,7 @@ open class StringFixedLength : AbstractString {
             if (StandardCharsets.UTF_16 == charset) {
                 //Note remember LE BOM is ff fe but tis is handled by encoder Unicode char is fe ff
                 encoder = StandardCharsets.UTF_16LE.newEncoder()
-                dataBuffer = encoder.encode(CharBuffer.wrap("\uFEFF${getValue() as String?}"))
+                dataBuffer = encoder.encode(CharBuffer.wrap("\uFEFF${getValue() as? String}"))
             } else {
                 encoder = charset?.newEncoder()
                 dataBuffer = encoder?.encode(CharBuffer.wrap(getValue() as? String))

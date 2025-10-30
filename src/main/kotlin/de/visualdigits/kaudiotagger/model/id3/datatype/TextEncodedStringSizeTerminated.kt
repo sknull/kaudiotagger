@@ -48,9 +48,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      *
      * @param `object`
      */
-    constructor(
-        copyObject: TextEncodedStringSizeTerminated
-    ) : super(copyObject)
+    constructor(copyObject: TextEncodedStringSizeTerminated) : super(copyObject)
 
     /**
      * Read a 'n' bytes from buffer into a String where n is the framesize - offset
@@ -108,7 +106,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      *
      * @return the data as a byte array in format to write to file
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val data: ByteArray
         //Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
         val charset = getTextEncodingCharSet()?:error("No charset found")

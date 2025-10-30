@@ -134,7 +134,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         val codes: MutableList<SynchronisedTempoCode> =
             getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
         for (code in codes) {
-            map.put(code.getTimestamp(), code.getTempo())
+            map[code.getTimestamp()] = code.getTempo()
         }
         return Collections.unmodifiableMap<Long, Int>(map)
     }

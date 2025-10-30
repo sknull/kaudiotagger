@@ -25,6 +25,8 @@ class FrameBodyTDAT : AbstractFrameBodyTextInfo, ID3v23FrameBody {
         return ID3v23FrameId.TDAT.id
     }
 
+    constructor()
+
     constructor(
         byteBuffer: ByteBuffer? = null,
         frameSize: Int = 0

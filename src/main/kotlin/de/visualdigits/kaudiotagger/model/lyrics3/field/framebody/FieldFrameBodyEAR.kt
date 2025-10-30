@@ -18,7 +18,7 @@ class FieldFrameBodyEAR : AbstractLyrics3v2FieldFrameBody {
      *
      * @param artist
      */
-    constructor(artist: String) {
+    constructor(artist: String?) {
         this.setObjectValue("Artist", artist)
     }
 
@@ -35,7 +35,7 @@ class FieldFrameBodyEAR : AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     fun getArtist(): String? {
-        return getObjectValue("Artist") as String?
+        return getObjectValue("Artist") as? String
     }
 
     /**

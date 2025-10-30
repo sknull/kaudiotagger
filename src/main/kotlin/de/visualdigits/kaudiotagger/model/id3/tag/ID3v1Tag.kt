@@ -525,13 +525,17 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         return getFirst(id)?.let { f -> listOf(f) }?:listOf()
     }
 
+    override fun getFirst(identifier: String): String? {
+        return getFirst(GenericFieldKey.valueOf(identifier))
+    }
+
     /**
      * Retrieve the first value that exists for this generic key
      *
      * @param genericKey
      * @return
      */
-    override fun getFirst(genericKey: GenericFieldKey): String? {
+    override fun getFirst(genericKey: GenericFieldKey?): String? {
         return when (genericKey) {
             GenericFieldKey.ARTIST -> artist
             GenericFieldKey.ALBUM -> album
@@ -541,6 +545,15 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             GenericFieldKey.COMMENT -> comment
             else -> ""
         }
+    }
+
+    override fun getFirstField(genericKey: GenericFieldKey): TagField? {
+        val l = getFields(genericKey)
+        return if (l.size != 0) l.get(0) else null
+    }
+
+    override fun getFirstField(id: String?): TagField? {
+        return id?.let { i -> getFirstField(GenericFieldKey.valueOf(i)) }
     }
 
     /**
@@ -615,6 +628,25 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
 
     override fun getFields(): MutableIterator<TagField?> {
         throw java.lang.UnsupportedOperationException("TODO:Not done yet")
+    }
+
+    /**
+     * Returns a [list][List] of [TagField] objects whose &quot;[id][TagField.getId]&quot;
+     * is the specified one.<br></br>
+     *
+     * @param genericKey The generic field key
+     * @return A list of [TagField] objects with the given &quot;id&quot;.
+     */
+    override fun getFields(genericKey: GenericFieldKey?): List<TagField> {
+        return when (genericKey) {
+            GenericFieldKey.ARTIST -> getArtistTag()
+            GenericFieldKey.ALBUM -> getAlbumTag()
+            GenericFieldKey.TITLE -> getTitleTag()
+            GenericFieldKey.GENRE -> getGenreTag()
+            GenericFieldKey.YEAR -> getYearTag()
+            GenericFieldKey.COMMENT -> getCommentTag()
+            else -> listOf()
+        }
     }
 
     /**

@@ -16,7 +16,7 @@ class ID3v24FrameBodyTest {
                 java.lang.reflect.Modifier.isFinal(field.getModifiers()) &&
                 field.getName().startsWith("FRAME_ID")
             ) {
-                val frameID = field.get(null) as String?
+                val frameID = field.get(null) as? String
                 val packageName = ID3v24FrameBody::class.java.getPackage().getName()
                 val bodyClass = java.lang.Class.forName(
                     packageName + ".FrameBody" + frameID

@@ -10,7 +10,7 @@ class FrameBodyTALB: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      */
     constructor()
 
-    constructor(body: FrameBodyTALB): super(body)
+    constructor(copyObject: FrameBodyTALB): super(copyObject)
 
     /**
      * Creates a new FrameBodyTALB datatype.

@@ -12,7 +12,7 @@ class FrameBodyTRCK: AbstractFrameBodyNumberTotal, ID3v23FrameBody, ID3v24FrameB
      */
     constructor()
 
-    constructor(body: FrameBodyTRCK): super(body)
+    constructor(copyObject: FrameBodyTRCK): super(copyObject)
 
     /**
      * Creates a new FrameBodyTRCK datatype, the value is parsed literally

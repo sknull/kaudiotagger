@@ -39,6 +39,16 @@ interface Tag {
     fun getFields(): MutableIterator<TagField?>
 
     /**
+     * Returns a [list][List] of [TagField] objects whose &quot;[id][TagField.getId]&quot;
+     * is the specified one.<br></br>
+     *
+     * @param id The field id.
+     * @return A list of [TagField] objects with the given &quot;id&quot;.
+     * @throws KeyNotFoundException
+     */
+    fun getFields(id: GenericFieldKey?): List<TagField>
+
+    /**
      * Create the field based on the generic key and add it to the tag
      *
      *
@@ -98,6 +108,8 @@ interface Tag {
      */
     fun hasField(fieldKey: GenericFieldKey): Boolean
 
+    fun getFirstField(genericKey: GenericFieldKey): TagField?
+
     /**
      * Determines whether the tag has at least one field with the specified
      * &quot;id&quot;.
@@ -123,9 +135,20 @@ interface Tag {
      */
     fun getAll(id: GenericFieldKey): List<String>
 
-    fun getFirst(genericKey: GenericFieldKey): String?
+    fun getFirst(genericKey: GenericFieldKey?): String?
 
-    fun getFirst(id: String): String? = getFirst(GenericFieldKey.valueOf(id))
+    fun getFirst(id: String): String?
+
+    /**
+     * Retrieve the first field that exists for this format specific key
+     *
+     *
+     * Can be used to retrieve fields with any identifier, useful if the identifier is not within [FieldKey]
+     *
+     * @param id audio specific key
+     * @return tag field or null if doesn't exist
+     */
+    fun getFirstField(id: String?): TagField?
 
     /**
      * Delete any instance of tag fields used to store artwork

@@ -70,7 +70,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
      * Creates a new FrameBodyPIC datatype.
      */
     constructor() {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
     }
 
     constructor(body: FrameBodyPIC) : super(body)
@@ -108,7 +108,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
         this.setObjectValue(
             DataTypes.OBJ_IMAGE_FORMAT,
             ImageFormats.mimeType(
-                body.getObjectValue(DataTypes.OBJ_MIME_TYPE) as String?
+                body.getObjectValue(DataTypes.OBJ_MIME_TYPE) as? String
             )
         )
         this.setObjectValue(
@@ -131,7 +131,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
      * @return a description of the image
      */
     fun getDescription(): String? {
-        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
     /**
@@ -149,7 +149,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
      * @return
      */
     fun getImageData(): ByteArray? {
-        return getObjectValue(DataTypes.OBJ_PICTURE_DATA) as ByteArray?
+        return getObjectValue(DataTypes.OBJ_PICTURE_DATA) as? ByteArray
     }
 
     /**
@@ -203,7 +203,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
      * @return a description of the image
      */
     fun getMimeType(): String? {
-        return getObjectValue(DataTypes.OBJ_MIME_TYPE) as String?
+        return getObjectValue(DataTypes.OBJ_MIME_TYPE) as? String
     }
 
     /**
@@ -230,7 +230,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
      * @return a description of the image
      */
     fun getFormatType(): String? {
-        return getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as String?
+        return getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as? String
     }
 
     /**

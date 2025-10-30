@@ -91,7 +91,7 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
         }
     }
 
-    constructor(copyObject: NumberHashMap): this(copyObject.identifier) {
+    constructor(copyObject: NumberHashMap): super(copyObject) {
         this.hasEmptyValue = copyObject.hasEmptyValue
 
         // we don't need to clone/copy the maps here because they are static

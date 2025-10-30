@@ -25,7 +25,7 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
      *
      * @param copy instance
      */
-    constructor(copy: AbstractDataTypeList<T>) : super(copy)
+    constructor(copyObject: AbstractDataTypeList<T>): super(copyObject)
 
     /**
      * Reads list of [EventTimingCode]s from buffer starting at the given offset.
@@ -88,12 +88,12 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
      *
      * @return a byte array that that contains the data that should be persisted to file
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         log.debug("Writing DataTypeList " + this.identifier)
         val buffer = ByteArray(getSize())
         var offset = 0
         getValue()?.forEach { data ->
-            val bytes = data.writeByteArray()
+            val bytes = data.writeByteArray()?:error("Coulkd not write data")
             System.arraycopy(bytes, 0, buffer, offset, bytes.size)
             offset += bytes.size
         }

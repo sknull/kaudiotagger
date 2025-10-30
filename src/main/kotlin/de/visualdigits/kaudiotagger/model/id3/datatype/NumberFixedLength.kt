@@ -4,15 +4,14 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeExcep
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.ID3Tags
 
-open class NumberFixedLength(
-    identifier: String?,
-    frameBody: AbstractTagFrameBody? = null,
-    value: Any? = null
-): AbstractDataType(
-    identifier,
-    frameBody,
-    value
-) {
+open class NumberFixedLength: AbstractDataType {
+
+    constructor(
+        identifier: String?,
+        frameBody: AbstractTagFrameBody? = null,
+        value: Any? = null
+    ): super(identifier, frameBody, value)
+
     /**
      * Creates a new ObjectNumberFixedLength datatype.
      *
@@ -31,7 +30,7 @@ open class NumberFixedLength(
         setSize(size)
     }
 
-    constructor(copy: NumberFixedLength): this(copy.identifier) {
+    constructor(copy: NumberFixedLength): super(copy) {
         setSize(copy.getSize())
     }
 
@@ -68,7 +67,7 @@ open class NumberFixedLength(
      *
      * @return the datatype converted to a byte array
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val arr = ByteArray(getSize())
         if (getValue() != null) {
             //Convert value to long

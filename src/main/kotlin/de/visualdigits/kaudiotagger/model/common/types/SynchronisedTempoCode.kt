@@ -27,9 +27,9 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
         4
     )
 
-    constructor(copy: SynchronisedTempoCode) : super(copy) {
-        this.tempo.setValue(copy.tempo.getValue())
-        this.timestamp!!.setValue(copy.timestamp!!.getValue())
+    constructor(copyObject: SynchronisedTempoCode): super(copyObject) {
+        this.tempo.setValue(copyObject.tempo.getValue())
+        this.timestamp!!.setValue(copyObject.timestamp!!.getValue())
     }
 
     constructor(
@@ -72,9 +72,9 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
         return this.tempo!!.getSize() + this.timestamp!!.getSize()
     }
 
-    override fun writeByteArray(): ByteArray {
-        val typeData = this.tempo!!.writeByteArray()
-        val timeData = this.timestamp!!.writeByteArray()
+    override fun writeByteArray(): ByteArray? {
+        val typeData = this.tempo.writeByteArray()?:error("Coulkd not write tempo")
+        val timeData = this.timestamp?.writeByteArray()?:error("Coulkd not write timedata")
 
         val objectData = ByteArray(typeData.size + timeData.size)
         System.arraycopy(typeData, 0, objectData, 0, typeData.size)

@@ -29,6 +29,7 @@ enum class ID3v24FrameId(
         CONDUCTOR("TPE3", GenericFieldKey.CONDUCTOR, ID3v24FieldKey.CONDUCTOR, "Text: Conductor/Performer refinement", false, false, false, true, false, false),
         CONTENT_GROUP_DESC("TIT1", GenericFieldKey.GROUPING, ID3v24FieldKey.GROUPING, "Text: Content group description", false, false, false, true, false, false),
         COPYRIGHTINFO("TCOP", null, null, "Text: Copyright message", false, false, false, true, false, false),
+        DISC_TOTAL("TPOS", GenericFieldKey.DISC_TOTAL, ID3v24FieldKey.DISC_TOTAL, "Musicbrainz Disc Total", false, false, false, true, false, false),
         ENCODEDBY("TENC", GenericFieldKey.ENCODER, ID3v24FieldKey.ENCODER, "Text: Encoded by", false, false, false, true, false, true),
         ENCODING_TIME("TDEN", null, null, "Text: Encoding time", false, false, false, true, false, false),
         ENCRYPTION("ENCR", null, null, "Encryption method registration", false, true, false, true, false, false),
@@ -88,6 +89,7 @@ enum class ID3v24FrameId(
         TITLE_REFINEMENT("TIT3", GenericFieldKey.SUBTITLE, ID3v24FieldKey.SUBTITLE, "Text: Subtitle/Description refinement", false, false, false, true, false, false),
         TITLE_SORT_ORDER("TSOT", GenericFieldKey.TITLE_SORT, ID3v24FieldKey.TITLE_SORT, "Text: title sort order", false, false, false, true, false, false),
         TRACK("TRCK", GenericFieldKey.TRACK, ID3v24FieldKey.TRACK, "Text: Track number/Position in setField", true, false, false, true, false, false),
+        TRACK_TOTAL("TRCK", GenericFieldKey.TRACK_TOTAL, ID3v24FieldKey.TRACK_TOTAL, "Text: Track number/Position in setField", true, false, false, true, false, false),
         UNIQUE_FILE_ID("UFID", GenericFieldKey.MUSICBRAINZ_TRACK_ID, ID3v24FieldKey.MUSICBRAINZ_TRACK_ID, "Unique file identifier", false, true, true, true, false, false),
         UNSYNC_LYRICS("USLT", GenericFieldKey.LYRICS, ID3v24FieldKey.LYRICS, "Unsychronized lyric/text transcription", false, false, true, true, false, false),
         URL_ARTIST_WEB("WOAR", GenericFieldKey.URL_OFFICIAL_ARTIST_SITE, ID3v24FieldKey.URL_OFFICIAL_ARTIST_SITE, "URL: Official artist/performer webpage", false, false, true, true, false, false),
@@ -112,7 +114,7 @@ enum class ID3v24FrameId(
 
         fun fromId(id: String?): ID3v24FrameId? = entries.find { e -> id == e.id }
 
-        fun fromFieldKey(fieldKey: GenericFieldKey): ID3v24FrameId? = entries.find { e -> fieldKey == e.genericFieldKey }
+        fun fromFieldKey(fieldKey: GenericFieldKey?): ID3v24FrameId? = entries.find { e -> fieldKey == e.genericFieldKey }
 
         fun commonFrames(): List<ID3v24FrameId> = entries.filter { e -> e.isCommon }
 

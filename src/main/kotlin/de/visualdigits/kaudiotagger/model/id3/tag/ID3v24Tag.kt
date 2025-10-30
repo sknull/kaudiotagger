@@ -311,35 +311,35 @@ class ID3v24Tag : AbstractID3v2Tag {
                 // convert id3v1 tags.
                 var newFrame: ID3v24Frame?
                 var newBody: AbstractID3v2FrameBody?
-                if ((mp3tag.getTitle()?.length ?: Int.MIN_VALUE) > 0) {
-                    newBody = FrameBodyTIT2(0, mp3tag.getTitle()?:"")
+                if ((mp3tag.getTitle().length) > 0) {
+                    newBody = FrameBodyTIT2(0, mp3tag.getTitle())
                     newFrame = ID3v24Frame(ID3v24FrameId.TITLE.id)
                     newFrame.frameBody = newBody
-                    frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                    frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                 }
-                if (mp3tag.getArtist().length > 0) {
+                if (mp3tag.getArtist().isNotEmpty()) {
                     newBody = FrameBodyTPE1(0, mp3tag.getArtist())
                     newFrame = ID3v24Frame(ID3v24FrameId.ARTIST.id)
                     newFrame.frameBody = newBody
-                    frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                    frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                 }
-                if (mp3tag.getAlbum().length > 0) {
+                if (mp3tag.getAlbum().isNotEmpty()) {
                     newBody = FrameBodyTALB(0, mp3tag.getAlbum())
                     newFrame = ID3v24Frame(ID3v24FrameId.ALBUM.id)
                     newFrame.frameBody = newBody
-                    frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                    frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                 }
-                if (mp3tag.getYear().length > 0) {
+                if (mp3tag.getYear().isNotEmpty()) {
                     newBody = FrameBodyTDRC(0, mp3tag.getYear())
                     newFrame = ID3v24Frame(ID3v24FrameId.YEAR.id)
                     newFrame.frameBody = newBody
-                    frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                    frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                 }
-                if (mp3tag.getComment().length > 0) {
+                if (mp3tag.getComment().isNotEmpty()) {
                     newBody = FrameBodyCOMM(0, "ENG", "", mp3tag.getComment())
                     newFrame = ID3v24Frame(ID3v24FrameId.COMMENT.id)
                     newFrame.frameBody = newBody
-                    frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                    frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                 }
                 if (((mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED) >= 0) &&
                     ((mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED) !=
@@ -351,7 +351,7 @@ class ID3v24Tag : AbstractID3v2Tag {
                     newBody = FrameBodyTCON(0, genre)
                     newFrame = ID3v24Frame(ID3v24FrameId.GENRE.id)
                     newFrame.frameBody = newBody
-                    frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                    frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                 }
                 if (mp3tag is ID3v11Tag) {
                     mp3tag.track?.let {
@@ -359,7 +359,7 @@ class ID3v24Tag : AbstractID3v2Tag {
                             newBody = FrameBodyTRCK(0, mp3tag.track.toString())
                             newFrame = ID3v24Frame(ID3v24FrameId.TRACK.id)
                             newFrame.frameBody = newBody
-                            frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                            frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                         }
                     }
                 }
@@ -374,7 +374,7 @@ class ID3v24Tag : AbstractID3v2Tag {
                 lyric.fieldMap.values.forEach { field ->
                     try {
                         val newFrame = ID3v24Frame(field)
-                        frameMap.put(newFrame.getIdentifier()?:error("No identifier"), newFrame)
+                        frameMap[newFrame.getIdentifier()?:error("No identifier")] = newFrame
                     } catch (ex: InvalidTagException) {
                         log.warn(
                             "Unable to convert Lyrics3 to v24 Frame:Frame Identifier"
@@ -694,17 +694,12 @@ class ID3v24Tag : AbstractID3v2Tag {
      * @param frame
      */
     override fun addFrame(frame: AbstractID3v2Frame) {
-        try {
-            if (frame is ID3v24Frame) {
-                copyFrameIntoMap(frame.getIdentifier(), frame)
-            } else {
-                val frames: MutableList<AbstractID3v2Frame> = convertFrame(frame)
-                for (next in frames) {
-                    copyFrameIntoMap(next.getIdentifier(), next)
-                }
+        if (frame is ID3v24Frame) {
+            copyFrameIntoMap(frame.getIdentifier(), frame)
+        } else {
+            convertFrame(frame).forEach { next ->
+                copyFrameIntoMap(next.getIdentifier(), next)
             }
-        } catch (ife: InvalidFrameException) {
-            log.error("Unable to convert frame:" + frame.getIdentifier())
         }
     }
 
@@ -1007,7 +1002,7 @@ class ID3v24Tag : AbstractID3v2Tag {
         }
     }
 
-    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
+    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId {
         if (genericKey == null) {
             throw IllegalArgumentException(
                 ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg()

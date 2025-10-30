@@ -10,7 +10,7 @@ class FrameBodyTPE1: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      */
     constructor()
 
-    constructor(body: FrameBodyTPE1): super(body)
+    constructor(copyObject: FrameBodyTPE1): super(copyObject)
 
     /**
      * Creates a new FrameBodyTPE1 datatype.

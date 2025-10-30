@@ -31,9 +31,9 @@ class Lyrics3TimeStamp : AbstractDataType {
 
     constructor(identifier: String) : super(identifier, null)
 
-    constructor(copy: Lyrics3TimeStamp) : super(copy) {
-        this.minute = copy.minute
-        this.second = copy.second
+    constructor(copyObject: Lyrics3TimeStamp): super(copyObject) {
+        this.minute = copyObject.minute
+        this.second = copyObject.second
     }
 
     /**
@@ -156,7 +156,7 @@ class Lyrics3TimeStamp : AbstractDataType {
         }
     }
 
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         return writeString().toByteArray(StandardCharsets.ISO_8859_1)
     }
 }

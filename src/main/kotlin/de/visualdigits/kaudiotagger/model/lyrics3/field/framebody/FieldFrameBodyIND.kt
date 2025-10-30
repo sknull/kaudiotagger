@@ -36,7 +36,7 @@ class FieldFrameBodyIND : AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     fun getAuthor(): String? {
-        return getObjectValue("Author") as String?
+        return getObjectValue("Author") as? String
     }
 
     /**

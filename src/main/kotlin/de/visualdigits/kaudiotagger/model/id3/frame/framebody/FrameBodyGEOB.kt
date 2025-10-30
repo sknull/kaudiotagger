@@ -51,7 +51,7 @@ class FrameBodyGEOB: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * Creates a new FrameBodyGEOB datatype.
      */
     constructor() {
-        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         this.setObjectValue(DataTypes.OBJ_MIME_TYPE, "")
         this.setObjectValue(DataTypes.OBJ_FILENAME, "")
         this.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
@@ -95,7 +95,7 @@ class FrameBodyGEOB: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return the description field
      */
     fun getDescription(): String? {
-        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
     /**

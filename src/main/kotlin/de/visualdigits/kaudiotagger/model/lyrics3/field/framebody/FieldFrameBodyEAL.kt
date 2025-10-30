@@ -18,7 +18,7 @@ class FieldFrameBodyEAL : AbstractLyrics3v2FieldFrameBody {
      *
      * @param album
      */
-    constructor(album: String) {
+    constructor(album: String?) {
         this.setObjectValue("Album", album)
     }
 
@@ -35,7 +35,7 @@ class FieldFrameBodyEAL : AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     fun getAlbum(): String? {
-        return getObjectValue("Album") as String?
+        return getObjectValue("Album") as? String
     }
 
     /**

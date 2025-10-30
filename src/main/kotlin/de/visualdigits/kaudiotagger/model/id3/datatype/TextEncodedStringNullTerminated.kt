@@ -34,9 +34,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
         value: String
     ) : super(identifier, frameBody, value)
 
-    constructor(
-        copyObject: TextEncodedStringNullTerminated
-    ) : super(copyObject)
+    constructor(copyObject: TextEncodedStringNullTerminated) : super(copyObject)
 
     /**
      * Read a string from buffer upto null character (if exists)
@@ -159,7 +157,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
      *
      * @return the data as a byte array in format to write to file
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         log.debug("Writing NullTerminatedString.{}", getValue())
         val data: ByteArray?
         //Write to buffer using the CharSet defined by getTextEncodingCharSet()
@@ -174,7 +172,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
 
                     //Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
                     val bb = encoder.encode(
-                        CharBuffer.wrap("\uFEFF${getValue() as String?}\u0000")
+                        CharBuffer.wrap("\uFEFF${getValue() as? String}\u0000")
                     )
                     data = ByteArray(bb.limit())
                     bb.get(data, 0, bb.limit())
@@ -185,7 +183,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
 
                     //Note  BE BOM will leave as fe ff
                     val bb = encoder.encode(
-                        CharBuffer.wrap("\uFEFF${getValue() as String?}\u0000")
+                        CharBuffer.wrap("\uFEFF${getValue() as? String}\u0000")
                     )
                     data = ByteArray(bb.limit())
                     bb.get(data, 0, bb.limit())
@@ -196,7 +194,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
                 encoder.onUnmappableCharacter(CodingErrorAction.IGNORE)
 
                 val bb = encoder.encode(
-                    CharBuffer.wrap("${getValue() as String?}\u0000")
+                    CharBuffer.wrap("${getValue() as? String}\u0000")
                 )
                 data = ByteArray(bb.limit())
                 bb.get(data, 0, bb.limit())

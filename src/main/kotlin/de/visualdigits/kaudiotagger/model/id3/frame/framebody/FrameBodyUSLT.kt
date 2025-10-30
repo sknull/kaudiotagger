@@ -53,7 +53,7 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * Creates a new FrameBodyUSLT dataType.
      */
     constructor() {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_LANGUAGE, "")
         setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
         setObjectValue(DataTypes.OBJ_LYRICS, "")
@@ -111,7 +111,7 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return description
      */
     fun getDescription(): String? {
-        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
     /**
@@ -138,7 +138,7 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return language
      */
     fun getLanguage(): String? {
-        return getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+        return getObjectValue(DataTypes.OBJ_LANGUAGE) as? String
     }
 
     /**
@@ -165,7 +165,7 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return lyrics
      */
     fun getLyric(): String? {
-        return getObjectValue(DataTypes.OBJ_LYRICS) as String?
+        return getObjectValue(DataTypes.OBJ_LYRICS) as? String
     }
 
     /**

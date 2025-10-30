@@ -42,7 +42,7 @@ class PartOfSet : AbstractString {
      *
      * @param object
      */
-    constructor(`object`: PartOfSet) : super(`object`)
+    constructor(copyObject: PartOfSet): super(copyObject)
 
     override fun equals(obj: Any?): Boolean {
         if (obj === this) {
@@ -126,7 +126,7 @@ class PartOfSet : AbstractString {
      *
      * @return the data as a byte array in format to write to file
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         var value = getValue().toString()
         val data: ByteArray?
         //Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
@@ -166,7 +166,7 @@ class PartOfSet : AbstractString {
     }
 
     override fun getValue(): PartOfSetValue? {
-        return super.getValue() as PartOfSetValue?
+        return super.getValue() as? PartOfSetValue
     }
 
     override fun toString(): String {

@@ -195,7 +195,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      */
     constructor()
 
-    constructor(body: FrameBodyTCON): super(body)
+    constructor(copyObject: FrameBodyTCON): super(copyObject)
 
     /**
      * Creates a new FrameBodyTCON datatype.

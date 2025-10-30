@@ -18,7 +18,7 @@ class FieldFrameBodyETT : AbstractLyrics3v2FieldFrameBody {
      *
      * @param title
      */
-    constructor(title: String) {
+    constructor(title: String?) {
         this.setObjectValue("Title", title)
     }
 
@@ -42,7 +42,7 @@ class FieldFrameBodyETT : AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     fun getTitle(): String? {
-        return getObjectValue("Title") as String?
+        return getObjectValue("Title") as? String
     }
 
     /**

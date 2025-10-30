@@ -35,7 +35,7 @@ class FieldFrameBodyINF : AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     fun getAdditionalInformation(): String? {
-        return getObjectValue("Additional Information") as String?
+        return getObjectValue("Additional Information") as? String
     }
 
     /**

@@ -25,7 +25,7 @@ class FrameBodyTDOR: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTORY) {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, body.getText())
     }
 

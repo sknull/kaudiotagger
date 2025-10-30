@@ -23,11 +23,11 @@ class FrameBodyTCMP: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
      * unless they are set to true
      */
     constructor() {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, IS_COMPILATION)
     }
 
-    constructor(body: FrameBodyTCMP) : super(body)
+    constructor(copyObject: FrameBodyTCMP) : super(copyObject)
 
     /**
      * Creates a new FrameBodyTCMP datatype.

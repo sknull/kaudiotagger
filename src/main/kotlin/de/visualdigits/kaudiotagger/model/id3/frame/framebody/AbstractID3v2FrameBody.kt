@@ -25,10 +25,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
 
     constructor()
 
-    constructor(
-        byteBuffer: ByteBuffer? = null,
-        frameSize: Int = 0
-    ): this() {
+    constructor(byteBuffer: ByteBuffer? = null, frameSize: Int = 0): this() {
         size = (frameSize)
         read(byteBuffer)
     }

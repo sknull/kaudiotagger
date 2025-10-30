@@ -24,9 +24,9 @@ class EventTimingCode : AbstractDataType, Cloneable {
         4
     )
 
-    constructor(copy: EventTimingCode) : super(copy) {
-        this.type.setValue(copy.type.getValue())
-        this.timestamp.setValue(copy.timestamp.getValue())
+    constructor(copyObject: EventTimingCode): super(copyObject) {
+        this.type.setValue(copyObject.type.getValue())
+        this.timestamp.setValue(copyObject.timestamp.getValue())
     }
 
     constructor(
@@ -74,9 +74,9 @@ class EventTimingCode : AbstractDataType, Cloneable {
         return SIZE
     }
 
-    override fun writeByteArray(): ByteArray {
-        val typeData = this.type.writeByteArray()
-        val timeData = this.timestamp.writeByteArray()
+    override fun writeByteArray(): ByteArray? {
+        val typeData = this.type.writeByteArray()?:error("Coulkd not write data")
+        val timeData = this.timestamp.writeByteArray()?:error("Coulkd not write data")
         val objectData = ByteArray(typeData.size + timeData.size)
         System.arraycopy(typeData, 0, objectData, 0, typeData.size)
         System.arraycopy(timeData, 0, objectData, typeData.size, timeData.size)

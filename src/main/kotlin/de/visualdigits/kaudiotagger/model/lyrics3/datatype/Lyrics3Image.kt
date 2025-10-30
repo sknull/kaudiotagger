@@ -21,10 +21,10 @@ class Lyrics3Image : AbstractDataType {
      */
     constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
-    constructor(copy: Lyrics3Image) : super(copy) {
-        this.timeStamp = copy.timeStamp?.let { ts -> Lyrics3TimeStamp(ts) }
-        this.description = copy.description
-        this.filename = copy.filename
+    constructor(copyObject: Lyrics3Image): super(copyObject) {
+        this.timeStamp = copyObject.timeStamp?.let { ts -> Lyrics3TimeStamp(ts) }
+        this.description = copyObject.description
+        this.filename = copyObject.filename
     }
 
     /**
@@ -125,7 +125,7 @@ class Lyrics3Image : AbstractDataType {
         }
     }
 
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         return writeString().toByteArray(StandardCharsets.ISO_8859_1)
     }
 

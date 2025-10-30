@@ -2,6 +2,7 @@ package de.visualdigits.kaudiotagger.model.id3.datatype
 
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import org.w3c.dom.Text
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import java.nio.charset.CharsetDecoder
@@ -43,15 +44,15 @@ abstract class AbstractString: AbstractDataType {
      * @return
      */
     fun canBeEncoded(): Boolean {
-        return getBody()?.getTextEncoding()?.let { te ->
-            (getValue() as? String)?.let { s ->
-                TextEncoding
-                    .fromId(te)
-                    ?.charSet
-                    ?.newEncoder()
-                    ?.canEncode(s) == true
-            }
-        }?:false
+        //Try and write to buffer using the CharSet defined by the textEncoding field (note if using UTF16 we dont
+        //need to worry about LE,BE at this point it makes no difference)
+        val textEncoding = this.getBody()?.getTextEncoding()
+        val charset = TextEncoding.fromId(textEncoding)?.charSet
+        val encoder = charset?.newEncoder()
+
+        val value = getValue()
+        val canEncode = value?.let { v -> encoder?.canEncode(v  as String) }?:false
+        return canEncode
     }
 
     /**

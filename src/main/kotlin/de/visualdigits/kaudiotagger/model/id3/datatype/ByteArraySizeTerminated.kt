@@ -60,15 +60,15 @@ class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
      *
      * @return the size in bytes
      */
-    override fun getSize(): Int = getValue()?.let { v -> (v as ByteArray).size}?:0
+    override fun getSize(): Int = getValue()?.let { v -> (v as? ByteArray)?.size}?:0
 
     /**
      * Write contents to a byte array
      *
      * @return a byte array that that contians the data that should be perisisted to file
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         log.debug("Writing byte array$identifier")
-        return getValue() as ByteArray
+        return getValue() as? ByteArray
     }
 }

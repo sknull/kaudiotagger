@@ -1,13 +1,38 @@
 package de.visualdigits.kaudiotagger.util
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
+import de.visualdigits.kaudiotagger.model.id3.datatype.BooleanByte
+import de.visualdigits.kaudiotagger.model.id3.datatype.BooleanString
+import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCode
+import de.visualdigits.kaudiotagger.model.id3.datatype.EventTimingCodeList
+import de.visualdigits.kaudiotagger.model.id3.datatype.ID3v2LyricLine
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberFixedLength
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
+import de.visualdigits.kaudiotagger.model.id3.datatype.NumberVariableLength
+import de.visualdigits.kaudiotagger.model.id3.datatype.PairedTextEncodedStringNullTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.PartOfSet
+import de.visualdigits.kaudiotagger.model.id3.datatype.PartOfSetValue
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringDate
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringFixedLength
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringHashMap
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringSizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.TCONString
+import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
+import de.visualdigits.kaudiotagger.model.id3.datatype.ValuePairs
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3Frames
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.util.ID3Tags.copyObject
+import org.slf4j.LoggerFactory
+import java.util.LinkedList
 
 object ID3Tags {
+
+    val log = LoggerFactory.getLogger(javaClass)
 
     /**
      * Returns true if the identifier is a valid ID3v2.2 frame identifier
@@ -204,19 +229,68 @@ object ID3Tags {
      * @return
      */
     fun copyObject(copyObject: Any?): Any? {
-        return try {
+        val co =  try {
             copyObject?.let { co ->
                 val constructorParameterArray = Array<Class<*>>(1, { co.javaClass })
-                val constructor = co.javaClass
-                    .getConstructor(*constructorParameterArray)
+                val constructor = co.javaClass.getConstructor(*constructorParameterArray)
                 val parameterArray = Array(1, { co })
-                parameterArray.let { pa ->
-                    constructor.newInstance(*pa)
-                }
-            }
+                constructor.newInstance(*parameterArray)            }
         } catch (e: Exception) {
             throw IllegalStateException("Something went wrong", e)
         }
+        return co
+    }
+
+    inline fun <reified T : Any> copyValue(value: T): T {
+        return when (value) {
+            // simple types which can be copied over
+            is String -> value
+            is Boolean -> value
+            is Byte -> value
+            is Character -> value
+            is Double -> value
+            is Float -> value
+            is Integer -> value
+            is Long -> value
+            is Short -> value
+
+            // colleections to be cloned
+            is BooleanArray -> value.clone()
+            is ByteArray -> value.clone()
+            is CharArray -> value.clone()
+            is DoubleArray -> value.clone()
+            is FloatArray -> value.clone()
+            is IntArray -> value.clone()
+            is LongArray -> value.clone()
+            is ShortArray -> value.clone()
+            is Array<*> -> value.clone()
+            is ArrayList<*> -> value.clone()
+            is LinkedList<*> -> value.clone()
+
+            // complex objects which have a copy constructor
+            is BooleanByte -> BooleanByte(value)
+            is BooleanString -> BooleanString(value)
+            is ByteArraySizeTerminated -> ByteArraySizeTerminated(value)
+            is EventTimingCode -> EventTimingCode(value)
+            is EventTimingCodeList -> EventTimingCodeList(value)
+            is ID3v2LyricLine -> ID3v2LyricLine(value)
+            is NumberHashMap -> NumberHashMap(value)
+            is NumberFixedLength -> NumberFixedLength(value)
+            is NumberVariableLength -> NumberVariableLength(value)
+            is PairedTextEncodedStringNullTerminated -> PairedTextEncodedStringNullTerminated(value)
+            is PartOfSet -> PartOfSet(value)
+            is PartOfSetValue -> PartOfSetValue(value)
+            is StringDate -> StringDate(value)
+            is StringHashMap -> StringHashMap(value)
+            is StringFixedLength -> StringFixedLength(value)
+            is StringNullTerminated -> StringNullTerminated(value)
+            is StringSizeTerminated -> StringSizeTerminated(value)
+            is TCONString -> TCONString(value)
+            is TextEncodedStringNullTerminated -> TextEncodedStringNullTerminated(value)
+            is TextEncodedStringSizeTerminated -> TextEncodedStringSizeTerminated(value)
+            is ValuePairs -> ValuePairs(value)
+            else -> error("Unable to create copy of class ${value?.javaClass}")
+        } as T
     }
 
     /**

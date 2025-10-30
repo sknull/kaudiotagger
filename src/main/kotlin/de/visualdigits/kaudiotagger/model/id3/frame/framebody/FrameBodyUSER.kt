@@ -81,7 +81,7 @@ class FrameBodyUSER: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return lanaguage
      */
     fun getLanguage(): String? {
-        return getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+        return getObjectValue(DataTypes.OBJ_LANGUAGE) as? String
     }
 
     /**

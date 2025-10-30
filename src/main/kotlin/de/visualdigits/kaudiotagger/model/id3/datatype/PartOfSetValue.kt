@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.datatype
 
+import de.visualdigits.kaudiotagger.model.id3.datatype.StringFixedLength
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.util.regex.Pattern
 
@@ -32,12 +33,24 @@ class PartOfSetValue {
      * @param count
      * @param total
      */
-    constructor(count: Int, total: Int) : this() {
+    constructor(
+        count: Int?,
+        total: Int?
+    ) : this() {
         this.count = count
         this.rawCount = count.toString()
         this.total = total
         this.rawTotal = total.toString()
         resetValueFromCounts()
+    }
+
+    constructor(copyObject: PartOfSetValue): this() {
+        this.count = copyObject.count
+        this.total = copyObject.total
+        this.extra = copyObject.extra
+        this.rawCount = copyObject.rawCount
+        this.rawTotal = copyObject.rawTotal
+        this.rawText = copyObject.rawText
     }
 
     /**

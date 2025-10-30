@@ -119,7 +119,7 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
      *
      * @return byteBuffer that should be written to file to persist this dataType.
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         log.debug("Writing PairTextEncodedStringNullTerminated")
 
         var localSize = 0

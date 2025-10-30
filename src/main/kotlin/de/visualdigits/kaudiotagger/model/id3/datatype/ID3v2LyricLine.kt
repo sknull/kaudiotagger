@@ -20,9 +20,9 @@ class ID3v2LyricLine : AbstractDataType {
 
     constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
-    constructor(copy: ID3v2LyricLine) : super(copy) {
-        this.text = copy.text
-        this.timeStamp = copy.timeStamp
+    constructor(copyObject: ID3v2LyricLine): super(copyObject) {
+        this.text = copyObject.text
+        this.timeStamp = copyObject.timeStamp
     }
 
     /**
@@ -86,7 +86,7 @@ class ID3v2LyricLine : AbstractDataType {
     /**
      * @return
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val arr = ByteArray(getSize())
         (0 until text.length).forEach { i ->
             arr[i] = text[i].code.toByte()

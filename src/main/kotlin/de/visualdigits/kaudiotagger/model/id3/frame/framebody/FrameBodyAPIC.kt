@@ -89,7 +89,7 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      */
     constructor() {
         //Initilise default text encoding
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
     }
 
     constructor(body: FrameBodyAPIC) : super(body)
@@ -161,7 +161,7 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return
      */
     fun getImageData(): ByteArray? {
-        return getObjectValue(DataTypes.OBJ_PICTURE_DATA) as ByteArray?
+        return getObjectValue(DataTypes.OBJ_PICTURE_DATA) as? ByteArray
     }
 
     /**
@@ -195,7 +195,7 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return a description of the image
      */
     fun getDescription(): String? {
-        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
     /**
@@ -213,7 +213,7 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return a description of the image
      */
     fun getMimeType(): String? {
-        return getObjectValue(DataTypes.OBJ_MIME_TYPE) as String?
+        return getObjectValue(DataTypes.OBJ_MIME_TYPE) as? String
     }
 
     /**
@@ -240,7 +240,7 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return a description of the image
      */
     fun getFormatType(): String? {
-        return getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as String?
+        return getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as? String
     }
 
     /**
@@ -251,7 +251,7 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
             this.setTextEncoding(TextEncoding.ISO_8859_1.id)
             if (!(getObject(DataTypes.OBJ_DESCRIPTION) as AbstractString).canBeEncoded()
             ) {
-                this.setDescription("")
+                this.setDescription(null)
             }
         } else {
             if (!(getObject(DataTypes.OBJ_DESCRIPTION) as AbstractString).canBeEncoded()

@@ -2,13 +2,26 @@ package de.visualdigits.kaudiotagger.model.id3.datatype
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.util.ID3Tags.copyValue
 import org.slf4j.LoggerFactory
 
 abstract class AbstractDataType {
 
-    val identifier: String?
+    companion object {
+
+        const val TYPE_ELEMENT: String = "element"
+    }
+
+    var identifier: String?
     private var frameBody: AbstractTagFrameBody? = null
     private var value: Any? = null
+
+    val log = LoggerFactory.getLogger(javaClass)
+
+    /**
+     * Holds the size of the data in file when read/written
+     */
+    private var size: Int = 0
 
     constructor(
         identifier: String? = null,
@@ -20,55 +33,17 @@ abstract class AbstractDataType {
         this.value = value
     }
 
-    val log = LoggerFactory.getLogger(javaClass)
-
-    companion object {
-
-        const val TYPE_ELEMENT: String = "element"
-    }
-
-    /**
-     * Holds the size of the data in file when read/written
-     */
-    private var size: Int = 0
-
     /**
      * This is used by subclasses, to clone the data within the copyObject
-     *
-     *
+     * <p>
      * TODO:It seems to be missing some of the more complex value types.
      *
      * @param copyObject
      */
-    constructor(copyObject: AbstractDataType): this(copyObject.identifier?:error("No identifier")) {
-        // no copy constructor in super class
-        this.value = when (val obj = copyObject.value) {
-            is String -> obj
-            is Boolean -> obj
-            is Byte -> obj
-            is Character -> obj
-            is Double -> obj
-            is Float -> obj
-            is Integer -> obj
-            is Long -> obj
-            is Short -> obj
+    constructor(copyObject: AbstractDataType): this(copyObject.identifier) {
+        this.value = copyObject.value?.let { v -> copyValue(v) }
 
-            is ValuePairs -> obj
-            is PartOfSetValue -> obj
-            is BooleanArray -> obj.clone()
-            is ByteArray -> obj.clone()
-            is CharArray -> obj.clone()
-            is DoubleArray -> obj.clone()
-            is FloatArray -> obj.clone()
-            is IntArray -> obj.clone()
-            is LongArray -> obj.clone()
-            is ShortArray -> obj.clone()
-            is Array<*> -> obj.clone()
-            is List<*> -> obj.toList()
-            is Map<*,*> -> obj.toMap()
-
-            else -> null
-        }
+        log.debug("Set value '$identifier' to '${value}'")
     }
 
     /**
@@ -151,7 +126,7 @@ abstract class AbstractDataType {
      *
      * @return the array of bytes representing this datatype that should be written to file
      */
-    abstract fun writeByteArray(): ByteArray
+    abstract fun writeByteArray(): ByteArray?
 
     /**
      * Return String Representation of Datatype     *

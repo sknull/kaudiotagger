@@ -146,7 +146,7 @@ class FrameBodyCOMR: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return
      */
     fun getOwner(): String? {
-        return getObjectValue(DataTypes.OBJ_OWNER) as String?
+        return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
 
     /**

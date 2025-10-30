@@ -9,7 +9,7 @@ class FrameBodyTMOO: AbstractFrameBodyTextInfo, ID3v24FrameBody {
 
     constructor()
 
-    constructor(body: FrameBodyTMOO): super(body)
+    constructor(copyObject: FrameBodyTMOO): super(copyObject)
 
     /**
      * Creates a new FrameBodyTMOO datatype.
@@ -21,7 +21,7 @@ class FrameBodyTMOO: AbstractFrameBodyTextInfo, ID3v24FrameBody {
 
     constructor(body: FrameBodyTXXX) {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding())
-        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         this.setObjectValue(DataTypes.OBJ_TEXT, body.getText())
     }
 

@@ -349,12 +349,12 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
                 Integer.TYPE,
             )
             val constructorParameterValues = arrayOf<Any>(byteBuffer, frameSize)
-            log.debug("constructorParameterTypes: ${constructorParameterTypes.toList()}")
-            log.debug("constructorParameterValues: ${constructorParameterValues.toList()}")
+            log.debug("constructorParameterTypes '$identifier': ${constructorParameterTypes.toList()}")
+            log.debug("constructorParameterValues '$identifier': ${constructorParameterValues.toList()}")
             val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(*constructorParameterTypes)
             frameBody = (construct.newInstance(*constructorParameterValues))
         } catch (cex: ClassNotFoundException) { //No class defined for this frame type,use FrameUnsupported
-            log.error("Identifier not recognised:$identifier using FrameBodyUnsupported")
+            log.error("Identifier not recognised: '$identifier' using FrameBodyUnsupported")
             try {
                 frameBody = FrameBodyUnsupported(byteBuffer, frameSize)
             } //read method to declare it can throw InvalidtagException //Should only throw InvalidFrameException but unfortunately legacy hierachy forces

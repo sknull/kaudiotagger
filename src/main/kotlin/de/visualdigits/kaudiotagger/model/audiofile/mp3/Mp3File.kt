@@ -380,7 +380,7 @@ class MP3File : AudioFile {
                 val mp3StartByte: Long = mp3AudioHeader.mp3StartByte
                 val newMp3StartByte: Long = id3v2tag.write(file, mp3StartByte)
                 if (mp3StartByte != newMp3StartByte) {
-                    log.debug("New mp3 start byte: " + newMp3StartByte)
+                    log.debug("New mp3 start byte: $newMp3StartByte")
                     mp3AudioHeader.mp3StartByte = newMp3StartByte
                 }
             }
@@ -389,9 +389,7 @@ class MP3File : AudioFile {
             //Lyrics 3 Tag
             if (TagOptionSingleton.lyrics3Save) {
                 val lyrics3tag = getLyrics3Tag()
-                if (lyrics3tag != null) {
-                    lyrics3tag.write(rfile)
-                }
+                lyrics3tag?.write(rfile)
             }
             //ID3v1 tag
             if (TagOptionSingleton.id3v1Save) {
@@ -467,6 +465,7 @@ class MP3File : AudioFile {
     }
 
     fun setTag(tag: AbstractTag) {
+        tags.clear()
         tags[tag.supportedTag()] = tag
     }
 

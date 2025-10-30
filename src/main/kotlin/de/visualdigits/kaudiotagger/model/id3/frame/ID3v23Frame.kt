@@ -65,8 +65,8 @@ class ID3v23Frame: AbstractID3v2Frame {
      * @param identifier
      */
     constructor(identifier: String): super(identifier) {
-        statusFlags = StatusFlags()
-        encodingFlags = EncodingFlags()
+        statusFlags = ID3v23StatusFlags()
+        encodingFlags = ID3v23EncodingFlags()
     }
 
     /**
@@ -109,53 +109,40 @@ class ID3v23Frame: AbstractID3v2Frame {
     constructor(frame: AbstractID3v2Frame) {
         log.debug("Creating frame from a frame of a different version")
         if (frame is ID3v23Frame) {
-            throw UnsupportedOperationException(
-                "Copy Constructor not called. Please type cast the argument"
-            )
+            throw UnsupportedOperationException("Copy Constructor not called. Please type cast the argument")
         } else if (frame is ID3v22Frame) {
             statusFlags = ID3v23StatusFlags(this)
             encodingFlags = ID3v23EncodingFlags(this)
         } else if (frame is ID3v24Frame) {
-            statusFlags = ID3v23StatusFlags(
-                this,
-                frame.statusFlags as ID3v24StatusFlags
-            )
+            statusFlags = ID3v23StatusFlags(this, frame.statusFlags as ID3v24StatusFlags)
             encodingFlags = ID3v23EncodingFlags(this, frame.encodingFlags?.flags?:0)
         }
 
         if (frame is ID3v24Frame) {
             //Unknown Frame e.g NCON, also protects when known id but has unsupported frame body
             if (frame.frameBody is FrameBodyUnsupported) {
-                frameBody = FrameBodyUnsupported(
-                    frame.frameBody as FrameBodyUnsupported
-                )
+                frameBody = FrameBodyUnsupported(frame.frameBody as FrameBodyUnsupported)
                 frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
                 log.debug("UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                
                 return
             } else if (frame.frameBody is FrameBodyDeprecated) {
                 //Was it valid for this tag version, if so try and reconstruct
                 if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
-                    frameBody =
-                        (frame.frameBody as FrameBodyDeprecated).originalFrameBody
+                    frameBody = (frame.frameBody as FrameBodyDeprecated).originalFrameBody
                     frameBody?.header = this
-                    frameBody?.setTextEncoding(
-                        ID3TextEncodingConversion.getTextEncoding(
-                            this,
-                            frameBody?.getTextEncoding()?: TextEncoding.ISO_8859_1.id
-                        )
-                    )
+                    frameBody?.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(this, frameBody?.getTextEncoding() ?: TextEncoding.ISO_8859_1.id))
                     setIdentifier(frame.getIdentifier())
                     log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                 } else {
-                    frameBody = FrameBodyDeprecated(
-                        frame.frameBody as FrameBodyDeprecated
-                    )
+                    frameBody = FrameBodyDeprecated(frame.frameBody as FrameBodyDeprecated)
                     frameBody?.header = this
                     frameBody?.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(this, frameBody?.getTextEncoding() ?: TextEncoding.ISO_8859_1.id))
 
                     setIdentifier(frame.getIdentifier())
                     log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                    
                     return
                 }
             } else if (ID3Tags.isID3v24FrameIdentifier(frame.getIdentifier())) {
@@ -164,45 +151,30 @@ class ID3v23Frame: AbstractID3v2Frame {
                 setIdentifier(ID3Tags.convertFrameID24To23(frame.getIdentifier()))
                 if (getIdentifier() != null) {
                     log.debug("V4:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                    frameBody = ID3Tags.copyObject(
-                        frame.frameBody
-                    ) as AbstractTagFrameBody
+                    frameBody = ID3Tags.copyObject(frame.frameBody) as AbstractTagFrameBody
                     frameBody?.header = this
-                    frameBody?.setTextEncoding(
-                        ID3TextEncodingConversion.getTextEncoding(
-                            this,
-                            frameBody?.getTextEncoding()?: TextEncoding.ISO_8859_1.id
-                        )
-                    )
+                    frameBody?.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(this, frameBody?.getTextEncoding() ?: TextEncoding.ISO_8859_1.id))
+                    
                     return
                 } else {
                     //Is it a known v4 frame which needs forcing to v3 frame e.g. TDRC - TYER,TDAT
                     setIdentifier(ID3Tags.forceFrameID24To23(frame.getIdentifier()))
                     if (getIdentifier() != null) {
                         log.debug("V4:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                        frameBody = readBody(
-                            getIdentifier(),
-                            frame.frameBody as AbstractID3v2FrameBody
-                        )
+                        frameBody = readBody(getIdentifier(), frame.frameBody as AbstractID3v2FrameBody)
                         frameBody?.header = this
-                        frameBody?.setTextEncoding(
-                            ID3TextEncodingConversion.getTextEncoding(
-                                this,
-                                frameBody?.getTextEncoding()?: TextEncoding.ISO_8859_1.id
-                            )
-                        )
+                        frameBody?.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(this, frameBody?.getTextEncoding() ?: TextEncoding.ISO_8859_1.id))
+                        
                         return
                     } else {
                         val baos = ByteArrayOutputStream()
                         (frame.frameBody as AbstractID3v2FrameBody).write(baos)
 
                         setIdentifier(frame.getIdentifier())
-                        frameBody = FrameBodyUnsupported(
-                            getIdentifier(),
-                            baos.toByteArray()
-                        )
+                        frameBody = FrameBodyUnsupported(getIdentifier(), baos.toByteArray())
                         frameBody?.header = this
                         log.debug("V4:Orig id is:${frame.getIdentifier()}:New Id Unsupported is:${getIdentifier()}")
+                        
                         return
                     }
                 }
@@ -215,39 +187,34 @@ class ID3v23Frame: AbstractID3v2Frame {
                 setIdentifier(ID3Tags.convertFrameID22To23(frame.getIdentifier())?.id)
                 if (getIdentifier() != null) {
                     log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                    frameBody = ID3Tags.copyObject(
-                        frame.frameBody
-                    ) as AbstractTagFrameBody?
+                    frameBody = ID3Tags.copyObject(frame.frameBody) as? AbstractTagFrameBody
                     frameBody?.header = this
+                    
                     return
                 } else if (ID3Tags.isID3v22FrameIdentifier(frame.getIdentifier())) {
                     //Force v2 to v3
                     setIdentifier(ID3Tags.forceFrameID22To23(frame.getIdentifier()))
                     if (getIdentifier() != null) {
                         log.debug("V22Orig id is:${frame.getIdentifier()}New id is:${getIdentifier()}")
-                        frameBody = readBody(
-                            getIdentifier(),
-                            frame.frameBody as AbstractID3v2FrameBody
-                        )
+                        frameBody = readBody(getIdentifier(), frame.frameBody as AbstractID3v2FrameBody)
                         frameBody?.header = this
+                        
                         return
                     } else {
-                        frameBody = FrameBodyDeprecated(
-                            frame.frameBody as AbstractID3v2FrameBody
-                        )
+                        frameBody = FrameBodyDeprecated(frame.frameBody as AbstractID3v2FrameBody)
                         frameBody?.header = this
                         setIdentifier(frame.getIdentifier())
                         log.debug("Deprecated:V22:orig id id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                        
                         return
                     }
                 }
             } else {
-                frameBody = FrameBodyUnsupported(
-                    frame.frameBody as FrameBodyUnsupported
-                )
+                frameBody = FrameBodyUnsupported(frame.frameBody as FrameBodyUnsupported)
                 frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
                 log.debug("UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                
                 return
             }
         }

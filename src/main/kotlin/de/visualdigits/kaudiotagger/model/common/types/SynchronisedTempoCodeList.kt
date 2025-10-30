@@ -17,7 +17,7 @@ class SynchronisedTempoCodeList: AbstractDataTypeList<SynchronisedTempoCode> {
      *
      * @param copy instance to copy
      */
-    constructor(copy: SynchronisedTempoCodeList) : super(copy)
+    constructor(copyObject: SynchronisedTempoCodeList): super(copyObject)
 
     constructor(body: FrameBodySYTC) : super(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST, body)
 

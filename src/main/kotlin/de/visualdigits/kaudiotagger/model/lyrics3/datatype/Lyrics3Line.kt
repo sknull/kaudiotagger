@@ -28,11 +28,11 @@ class Lyrics3Line : AbstractDataType {
      */
     constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
 
-    constructor(copy: Lyrics3Line) : super(copy) {
-        this.lyric = copy.lyric
+    constructor(copyObject: Lyrics3Line): super(copyObject) {
+        this.lyric = copyObject.lyric
         var newTimeStamp: Lyrics3TimeStamp
-        for (i in copy.timeStamp.indices) {
-            newTimeStamp = Lyrics3TimeStamp(copy.timeStamp.get(i))
+        for (i in copyObject.timeStamp.indices) {
+            newTimeStamp = Lyrics3TimeStamp(copyObject.timeStamp.get(i))
             this.timeStamp.add(newTimeStamp)
         }
     }
@@ -139,7 +139,7 @@ class Lyrics3Line : AbstractDataType {
         lyric = lineString.substring(offset)
     }
 
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         return writeString().toByteArray(StandardCharsets.ISO_8859_1)
     }
 

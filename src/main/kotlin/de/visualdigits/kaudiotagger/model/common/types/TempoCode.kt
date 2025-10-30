@@ -21,7 +21,7 @@ import de.visualdigits.kaudiotagger.util.ID3Tags
  */
 class TempoCode : AbstractDataType {
 
-    constructor(copy: TempoCode) : super(copy)
+    constructor(copyObject: TempoCode): super(copyObject)
 
     constructor(
         identifier: String?,
@@ -55,7 +55,7 @@ class TempoCode : AbstractDataType {
         setValue(lvalue)
     }
 
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val size = getSize()
         val arr = ByteArray(size)
         var temp = ID3Tags.getWholeNumber(getValue())

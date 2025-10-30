@@ -9,13 +9,14 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyETCO
  * @version $Id:$
  */
 class EventTimingCodeList : AbstractDataTypeList<EventTimingCode> {
+
     /**
      * Mandatory, concretely-typed copy constructor, as required by
      * [AbstractDataTypeList.AbstractDataTypeList].
      *
      * @param copy instance to copy
      */
-    constructor(copy: EventTimingCodeList) : super(copy)
+    constructor(copyObject: EventTimingCodeList): super(copyObject)
 
     constructor(body: FrameBodyETCO) : super(DataTypes.OBJ_TIMED_EVENT_LIST, body)
 

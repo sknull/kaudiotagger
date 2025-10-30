@@ -10,7 +10,7 @@ class FrameBodyTRDA: AbstractFrameBodyTextInfo, ID3v23FrameBody {
      */
     constructor()
 
-    constructor(body: FrameBodyTRDA): super(body)
+    constructor(copyObject: FrameBodyTRDA): super(copyObject)
 
     /**
      * Creates a new FrameBodyTRDA datatype.

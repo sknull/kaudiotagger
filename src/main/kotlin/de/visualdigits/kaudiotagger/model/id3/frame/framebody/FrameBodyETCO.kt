@@ -261,7 +261,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     fun clearTimingCodes() {
         (getObjectValue(
             DataTypes.OBJ_TIMED_EVENT_LIST
-        ) as MutableList<EventTimingCode?>).clear()
+        ) as? MutableList<EventTimingCode>)?.clear()
     }
 
     override fun read(byteBuffer: ByteBuffer?): Boolean {

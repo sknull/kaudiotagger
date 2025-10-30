@@ -15,7 +15,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
      * Creates a new AbstractFrameBodyPairs datatype.
      */
     constructor() {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
     }
 
     /**
@@ -54,10 +54,13 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
      * @param function
      * @param name
      */
-    fun addPair(function: String, name: String) {
+    fun addPair(function: String?, name: String) {
+        if (function == null) {
+            return
+        }
         val value = (getObject(
                 DataTypes.OBJ_TEXT
-            ) as PairedTextEncodedStringNullTerminated).getValue() as? ValuePairs
+            ) as? PairedTextEncodedStringNullTerminated)?.getValue() as? ValuePairs
         value?.add(function, name)
     }
 
@@ -68,7 +71,7 @@ abstract class AbstractFrameBodyPairs: AbstractID3v2FrameBody, ID3v24FrameBody {
         val value =
             (getObject(
                 DataTypes.OBJ_TEXT
-            ) as PairedTextEncodedStringNullTerminated).getValue() as? ValuePairs
+            ) as? PairedTextEncodedStringNullTerminated)?.getValue() as? ValuePairs
         value?.mapping?.clear()
     }
 

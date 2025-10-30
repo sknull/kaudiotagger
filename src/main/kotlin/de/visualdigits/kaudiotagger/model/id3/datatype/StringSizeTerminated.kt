@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets
  * using the default encoding regardless of what encoding may be specified in the framebody
  */
 open class StringSizeTerminated : TextEncodedStringSizeTerminated {
+    
     /**
      * Creates a new ObjectStringSizeTerminated datatype.
      *
@@ -25,7 +26,7 @@ open class StringSizeTerminated : TextEncodedStringSizeTerminated {
         frameBody: AbstractTagFrameBody
     ) : super(identifier, frameBody)
 
-    constructor(`object`: StringSizeTerminated) : super(`object`)
+    constructor(copyObject: StringSizeTerminated): super(copyObject)
 
     override fun equals(obj: Any?): Boolean {
         return obj is StringSizeTerminated && super.equals(obj)

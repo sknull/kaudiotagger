@@ -25,7 +25,6 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIME
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIPL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTMCL
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTYER
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
@@ -242,7 +241,7 @@ class ID3v23Tag : AbstractID3v2Tag {
         } else if ((frame.getIdentifier() == ID3v24FrameId.INVOLVED_PEOPLE.id) &&
             (frame.frameBody is FrameBodyTIPL)
         ) {
-            val pairs = (frame.frameBody as FrameBodyTIPL).getPairing()?.mapping
+            val pairs = (frame.frameBody as? FrameBodyTIPL)?.getPairing()?.mapping
             val ipls: AbstractID3v2Frame = ID3v23Frame(
                 frame as ID3v24Frame,
                 ID3v23FrameId.INVOLVED_PEOPLE.id
@@ -256,7 +255,7 @@ class ID3v23Tag : AbstractID3v2Tag {
         } else if ((frame.getIdentifier() == ID3v24FrameId.MUSICIAN_CREDITS.id) &&
             (frame.frameBody is FrameBodyTMCL)
         ) {
-            val pairs = (frame.frameBody as FrameBodyTMCL).getPairing()?.mapping
+            val pairs = (frame.frameBody as? FrameBodyTMCL)?.getPairing()?.mapping
             val ipls: AbstractID3v2Frame = ID3v23Frame(
                 frame as ID3v24Frame,
                 ID3v23FrameId.INVOLVED_PEOPLE.id
@@ -780,8 +779,8 @@ class ID3v23Tag : AbstractID3v2Tag {
         }
     }
 
-    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey): FrameAndSubId {
-        val id3v23FieldKey = ID3v23FrameId.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey.name)
+    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId {
+        val id3v23FieldKey = ID3v23FrameId.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey?.name)
         return FrameAndSubId(
             genericKey,
             id3v23FieldKey.id,

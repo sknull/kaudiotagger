@@ -39,13 +39,13 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * Creates a new FrameBodyCOMM datatype.
      */
     constructor() {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_LANGUAGE, Languages.DEFAULT_ID)
         setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
         setObjectValue(DataTypes.OBJ_TEXT, "")
     }
 
-    constructor(body: FrameBodyCOMM): super(body)
+    constructor(copyObject: FrameBodyCOMM): super(copyObject)
 
     /**
      * Creates a new FrameBodyCOMM datatype.
@@ -86,7 +86,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return description field
      */
     fun getDescription(): String? {
-        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
     /**
@@ -126,7 +126,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return the language
      */
     fun getLanguage(): String? {
-        return getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+        return getObjectValue(DataTypes.OBJ_LANGUAGE) as? String
     }
 
     /**

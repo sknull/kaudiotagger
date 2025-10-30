@@ -7,7 +7,9 @@ class FrameBodyTIME: AbstractFrameBodyTextInfo, ID3v23FrameBody {
 
     var hoursOnly = false
 
-    constructor(body: FrameBodyTIME): super(body)
+    constructor()
+
+    constructor(copyObject: FrameBodyTIME): super(copyObject)
 
     /**
      * Creates a new FrameBodyTIME datatype.

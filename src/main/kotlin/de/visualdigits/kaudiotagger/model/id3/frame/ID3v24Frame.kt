@@ -124,14 +124,9 @@ class ID3v24Frame: AbstractID3v2Frame {
     constructor(frame: AbstractID3v2Frame?) {
         //Should not be called
         if ((frame is ID3v24Frame)) {
-            throw UnsupportedOperationException(
-                "Copy Constructor not called. Please type cast the argument"
-            )
+            throw UnsupportedOperationException("Copy Constructor not called. Please type cast the argument")
         } else if (frame is ID3v23Frame) {
-            statusFlags = ID3v24StatusFlags(
-                this,
-                frame.statusFlags
-            )
+            statusFlags = ID3v24StatusFlags(this, frame.statusFlags)
             encodingFlags = ID3v24EncodingFlags(this, frame.encodingFlags?.flags?:0)
         } else if (frame is ID3v22Frame) {
             statusFlags = ID3v24StatusFlags(this)

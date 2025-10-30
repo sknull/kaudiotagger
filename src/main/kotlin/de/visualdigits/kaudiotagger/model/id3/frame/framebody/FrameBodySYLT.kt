@@ -167,7 +167,7 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return language code
      */
     fun getLanguage(): String? {
-        return getObjectValue(DataTypes.OBJ_LANGUAGE) as String?
+        return getObjectValue(DataTypes.OBJ_LANGUAGE) as? String
     }
 
     /**
@@ -189,7 +189,7 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return description
      */
     fun getDescription(): String? {
-        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as String?
+        return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
     /**
@@ -208,7 +208,7 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return lyrics
      */
     fun getLyrics(): ByteArray? {
-        return this.getObjectValue(DataTypes.OBJ_DATA) as ByteArray?
+        return this.getObjectValue(DataTypes.OBJ_DATA) as? ByteArray
     }
 
     /**

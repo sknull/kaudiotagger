@@ -98,7 +98,7 @@ enum class ID3v22FrameId(
 
         fun fromId(id: String?): ID3v22FrameId? = entries.find { e -> id == e.id }
 
-        fun fromFieldKey(fieldKey: GenericFieldKey): ID3v22FrameId? = entries.find { e -> fieldKey == e.genericFieldKey }
+        fun fromFieldKey(fieldKey: GenericFieldKey?): ID3v22FrameId? = entries.find { e -> fieldKey == e.genericFieldKey }
 
         fun commonFrames(): List<ID3v22FrameId> = entries.filter { e -> e.isCommon }
 

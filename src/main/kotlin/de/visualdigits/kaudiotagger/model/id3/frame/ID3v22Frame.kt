@@ -25,8 +25,6 @@ class ID3v22Frame: AbstractID3v2Frame {
         const val FRAME_SIZE_SIZE: Int = 3
         val FRAME_HEADER_SIZE: Int = FRAME_ID_SIZE + FRAME_SIZE_SIZE
         val validFrameIdentifier: Pattern = Pattern.compile("[A-Z][0-9A-Z]{2}")
-
-
     }
 
     constructor()
@@ -51,8 +49,9 @@ class ID3v22Frame: AbstractID3v2Frame {
      *
      * @param identifier
      */
-    constructor(identifier: String): super(identifier) {
+    constructor(identifier: String) {
         log.debug("Creating empty frame of type$identifier")
+        this.setIdentifier(identifier)
         var bodyIdentifier = identifier
 
         //If dealing with v22 identifier (Note this constructor is used by all three tag versions)
@@ -116,14 +115,14 @@ class ID3v22Frame: AbstractID3v2Frame {
     }
 
     private fun createV22FrameFromV23Frame(frame: ID3v23Frame) {
-        setIdentifier(ID3Tags.convertFrameID23To22(frame.getIdentifier())?:error("No identifier"))
+        setIdentifier(ID3Tags.convertFrameID23To22(frame.getIdentifier()))
         if (getIdentifier() != null) {
             log.debug(
                 "V2:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
             )
             this.frameBody = ID3Tags.copyObject(frame.frameBody) as AbstractID3v2FrameBody
         } else if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
-            setIdentifier(ID3Tags.forceFrameID23To22(frame.getIdentifier())?:error("No identifier"))
+            setIdentifier(ID3Tags.forceFrameID23To22(frame.getIdentifier()))
             if (getIdentifier() != null) {
                 log.debug(
                     "V2:Force:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"

@@ -42,8 +42,8 @@ class NumberVariableLength : AbstractDataType {
         this.minimumLength = minimumSize
     }
 
-    constructor(copy: NumberVariableLength) : super(copy) {
-        this.minimumLength = copy.minimumLength
+    constructor(copyObject: NumberVariableLength): super(copyObject) {
+        this.minimumLength = copyObject.minimumLength
     }
 
     /**
@@ -113,7 +113,7 @@ class NumberVariableLength : AbstractDataType {
      *
      * @return the datatype converted to a byte array
      */
-    override fun writeByteArray(): ByteArray {
+    override fun writeByteArray(): ByteArray? {
         val size = getSize()
         val arr: ByteArray?
 

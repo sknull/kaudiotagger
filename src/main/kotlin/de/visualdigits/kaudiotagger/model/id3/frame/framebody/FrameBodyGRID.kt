@@ -108,7 +108,7 @@ class FrameBodyGRID
      * @return
      */
     fun getOwner(): String? {
-        return getObjectValue(DataTypes.OBJ_OWNER) as String?
+        return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
 
     /**

@@ -61,22 +61,22 @@ class Lyrics3v2Field: AbstractTagFrame {
         } else if (frameIdentifier == "TCOM") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
             frameBody = FieldFrameBodyAUT("")
-            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
+            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
                 frameBody = FieldFrameBodyAUT(textFrame.getText())
             }
         } else if (frameIdentifier == "TALB") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
+            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
                 frameBody = FieldFrameBodyEAL(textFrame.getText())
             }
         } else if (frameIdentifier == "TPE1") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
+            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
                 frameBody = FieldFrameBodyEAR(textFrame.getText())
             }
         } else if (frameIdentifier == "TIT2") {
             textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText().isNotEmpty())) {
+            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
                 frameBody = FieldFrameBodyETT(textFrame.getText())
             }
         } else {

@@ -15,7 +15,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      * Constructor sets up the Object list for the frame.
      */
     constructor() {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         setObjectValue(DataTypes.OBJ_TEXT, "")
     }
 
@@ -24,7 +24,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      *
      * @param body AbstractFrameBodyTextInformation
      */
-    constructor(body: AbstractFrameBodyTextInfo): super(body)
+    constructor(copyObject: AbstractFrameBodyTextInfo): super(copyObject)
 
     /**
      * Creates a new FrameBodyTextInformation data type. This is used when user
@@ -69,8 +69,8 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      *
      * @return the text string
      */
-    fun getText(): String {
-        return (getObjectValue(DataTypes.OBJ_TEXT) as? String)?:""
+    fun getText(): String? {
+        return (getObjectValue(DataTypes.OBJ_TEXT) as? String)
     }
 
     /**
@@ -82,7 +82,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      *
      * @param text to set
      */
-    fun setText(text: String) {
+    fun setText(text: String?) {
         setObjectValue(DataTypes.OBJ_TEXT, text)
     }
 
@@ -152,13 +152,10 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
         )
 
         //Ensure valid for data
-        if (!(getObject(
-                DataTypes.OBJ_TEXT
-            ) as TextEncodedStringSizeTerminated).canBeEncoded()
-        ) {
-            this.setTextEncoding(
-                ID3TextEncodingConversion.getUnicodeTextEncoding(header)
-            )
+        val terminated = getObject(DataTypes.OBJ_TEXT) as? TextEncodedStringSizeTerminated
+        val bool = terminated?.canBeEncoded() == false
+        if (bool) {
+            this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(header))
         }
         super.write(tagBuffer)
     }
@@ -175,7 +172,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
             NumberHashMap(
                 DataTypes.OBJ_TEXT_ENCODING,
                 this,
-                TextEncoding.Companion.TEXT_ENCODING_FIELD_SIZE
+                TextEncoding.TEXT_ENCODING_FIELD_SIZE
             )
         )
         objectList.add(

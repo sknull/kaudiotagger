@@ -44,10 +44,10 @@ class FrameBodyTORY: AbstractFrameBodyTextInfo, ID3v23FrameBody {
      * @param body
      */
     constructor(body: FrameBodyTDOR) {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1)
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
         var year = body.getText()
-        if (body.getText().length > NUMBER_OF_DIGITS_IN_YEAR) {
-            year = body.getText().substring(0, NUMBER_OF_DIGITS_IN_YEAR)
+        if ((body.getText()?.length?:0) > NUMBER_OF_DIGITS_IN_YEAR) {
+            year = body.getText()?.substring(0, NUMBER_OF_DIGITS_IN_YEAR)
         }
         setObjectValue(DataTypes.OBJ_TEXT, year)
     }
