@@ -73,20 +73,6 @@ class Lyrics3Line : AbstractDataType {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is Lyrics3Line) {
-            return false
-        }
-        if (this.lyric != obj.lyric) {
-            return false
-        }
-        return this.timeStamp == obj.timeStamp && super.equals(obj)
-    }
-
-    /**
      * @return
      */
     fun hasTimeStamp(): Boolean {

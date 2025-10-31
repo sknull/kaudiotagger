@@ -39,15 +39,4 @@ abstract class AbstractTag : AbstractTagItem {
      * @param file MP3 file to append to.
      */
     abstract fun delete(file: RandomAccessFile)
-
-    /**
-     * Determines whether another datatype is equal to this tag. It just compares
-     * if they are the same class, then calls `super.equals(obj)`.
-     *
-     * @param obj The object to compare
-     * @return if they are equal
-     */
-    override fun equals(obj: Any?): Boolean {
-        return (obj is AbstractTag) && super.equals(obj)
-    }
 }

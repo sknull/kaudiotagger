@@ -22,10 +22,6 @@ class BooleanString : AbstractDataType {
         return 1
     }
 
-    override fun equals(obj: Any?): Boolean {
-        return obj is BooleanString && super.equals(obj)
-    }
-
     /**
      * @param offset
      */

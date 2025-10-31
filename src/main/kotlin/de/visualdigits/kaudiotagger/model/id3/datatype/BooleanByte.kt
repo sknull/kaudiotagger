@@ -40,18 +40,6 @@ class BooleanByte : AbstractDataType {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is BooleanByte) {
-            return false
-        }
-
-        return this.bitPosition == obj.bitPosition && super.equals(obj)
-    }
-
-    /**
      * @param arr
      * @param offset
      */

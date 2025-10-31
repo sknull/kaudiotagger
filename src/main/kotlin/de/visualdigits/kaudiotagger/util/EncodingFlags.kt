@@ -19,16 +19,4 @@ open class EncodingFlags(
     fun resetFlags() {
         flags = 0
     }
-
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-
-        if (obj !is EncodingFlags) {
-            return false
-        }
-
-        return EqualsUtil.areEqual(flags, obj.flags)
-    }
 }

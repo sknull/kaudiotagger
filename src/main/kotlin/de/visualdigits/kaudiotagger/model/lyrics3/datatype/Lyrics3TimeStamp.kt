@@ -66,22 +66,6 @@ class Lyrics3TimeStamp : AbstractDataType {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is Lyrics3TimeStamp) {
-            return false
-        }
-
-        if (this.minute != obj.minute) {
-            return false
-        }
-
-        return this.second == obj.second && super.equals(obj)
-    }
-
-    /**
      * @return
      */
     override fun toString(): String {

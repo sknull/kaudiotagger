@@ -47,18 +47,6 @@ class NumberVariableLength : AbstractDataType {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is NumberVariableLength) {
-            return false
-        }
-
-        return this.minimumLength == obj.minimumLength && super.equals(obj)
-    }
-
-    /**
      * Read from Byte Array
      *
      * @param arr

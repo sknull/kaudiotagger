@@ -28,10 +28,6 @@ open class StringSizeTerminated : TextEncodedStringSizeTerminated {
 
     constructor(copyObject: StringSizeTerminated): super(copyObject)
 
-    override fun equals(obj: Any?): Boolean {
-        return obj is StringSizeTerminated && super.equals(obj)
-    }
-
     override fun getTextEncodingCharSet(): Charset {
         return StandardCharsets.ISO_8859_1
     }

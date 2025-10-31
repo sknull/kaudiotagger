@@ -74,19 +74,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is FieldFrameBodyUnsupported) {
-            return false
-        }
-
-        return (this.value.contentEquals(obj.value) && super.equals(obj)
-                )
-    }
-
-    /**
      * @return
      */
     override fun toString(): String {

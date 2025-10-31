@@ -44,18 +44,6 @@ class PartOfSet : AbstractString {
      */
     constructor(copyObject: PartOfSet): super(copyObject)
 
-    override fun equals(obj: Any?): Boolean {
-        if (obj === this) {
-            return true
-        }
-
-        if (obj !is PartOfSet) {
-            return false
-        }
-
-        return EqualsUtil.areEqual(getValue(), obj.getValue())
-    }
-
     /**
      * Read a 'n' bytes from buffer into a String where n is the frameSize - offset
      * so therefore cannot use this if there are other objects after it because it has no

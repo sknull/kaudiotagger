@@ -34,10 +34,6 @@ class TempoCode : AbstractDataType {
         value: Any?
     ) : super(identifier, frameBody, value)
 
-    override fun equals(that: Any?): Boolean {
-        return that is TempoCode && super.equals(that)
-    }
-
     override fun readByteArray(arr: ByteArray, offset: Int) {
         if (arr == null) {
             throw NullPointerException("Byte array is null")

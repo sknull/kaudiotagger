@@ -40,36 +40,6 @@ class Lyrics3Image : AbstractDataType {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is Lyrics3Image) {
-            return false
-        }
-
-        if (this.description != obj.description) {
-            return false
-        }
-
-        if (this.filename != obj.filename) {
-            return false
-        }
-
-        if (this.timeStamp == null) {
-            if (obj.timeStamp != null) {
-                return false
-            }
-        } else {
-            if (this.timeStamp?.equals(obj.timeStamp) == false) {
-                return false
-            }
-        }
-
-        return super.equals(obj)
-    }
-
-    /**
      * @return
      */
     override fun toString(): String {

@@ -173,18 +173,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is FieldFrameBodyIMG) {
-            return false
-        }
-
-        return this.images == obj.images && super.equals(obj)
-    }
-
-    /**
      * @return
      */
     override fun toString(): String {

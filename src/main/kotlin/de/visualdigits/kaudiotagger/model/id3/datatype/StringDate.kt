@@ -37,8 +37,4 @@ class StringDate : StringFixedLength {
             setValue(ID3Tags.stripChar(value.toString(), '-'))
         }
     }
-
-    override fun equals(obj: Any?): Boolean {
-        return obj is StringDate && super.equals(obj)
-    }
 }

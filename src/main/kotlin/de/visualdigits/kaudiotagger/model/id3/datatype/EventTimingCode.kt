@@ -84,23 +84,6 @@ class EventTimingCode : AbstractDataType, Cloneable {
         return objectData
     }
 
-    override fun equals(o: Any?): Boolean {
-        if (this === o) {
-            return true
-        }
-        if (o == null || javaClass != o.javaClass) {
-            return false
-        }
-        if (!super.equals(o)) {
-            return false
-        }
-
-        val that = o as EventTimingCode
-        return (this.getType() == that.getType() &&
-                this.getTimestamp() == that.getTimestamp()
-                )
-    }
-
     fun getTimestamp(): Long {
         return (timestamp.getValue() as Number).toLong()
     }

@@ -146,18 +146,6 @@ class Lyrics3v2 : AbstractLyrics3 {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is Lyrics3v2) {
-            return false
-        }
-
-        return this.fieldMap == obj.fieldMap && super.equals(obj)
-    }
-
-    /**
      * @param identifier
      * @return
      */

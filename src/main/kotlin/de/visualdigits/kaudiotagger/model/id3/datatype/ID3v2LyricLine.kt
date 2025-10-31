@@ -26,22 +26,6 @@ class ID3v2LyricLine : AbstractDataType {
     }
 
     /**
-     * @param obj
-     * @return
-     */
-    override fun equals(obj: Any?): Boolean {
-        if (obj !is ID3v2LyricLine) {
-            return false
-        }
-
-        if (this.text != obj.text) {
-            return false
-        }
-
-        return this.timeStamp == obj.timeStamp && super.equals(obj)
-    }
-
-    /**
      * @param arr
      * @param offset
      */

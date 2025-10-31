@@ -11,10 +11,6 @@ class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
 
     constructor(copyObject: ByteArraySizeTerminated) : super(copyObject)
 
-    override fun equals(obj: Any?): Boolean {
-        return obj is ByteArraySizeTerminated && super.equals(obj)
-    }
-
     /**
      * @param arr
      * @param offset

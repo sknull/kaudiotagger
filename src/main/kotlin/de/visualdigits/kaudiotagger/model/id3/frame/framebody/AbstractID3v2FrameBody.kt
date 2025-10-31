@@ -96,15 +96,6 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
     }
 
     /**
-     * Are two bodies equal
-     *
-     * @param obj
-     */
-    override fun equals(obj: Any?): Boolean {
-        return (obj is AbstractID3v2FrameBody) && super.equals(obj)
-    }
-
-    /**
      * Return size of frame body,if frameBody already exist will take this value from the frame header
      * but it is always recalculated before writing any changes back to disk.
      *

@@ -16,18 +16,4 @@ open class StatusFlags(
 
     open fun createStructure() {
     }
-
-    override fun equals(obj: Any?): Boolean {
-        if (this === obj) {
-            return true
-        }
-
-        if (obj !is StatusFlags) {
-            return false
-        }
-
-        return (EqualsUtil.areEqual(originalFlags, obj.originalFlags) &&
-                EqualsUtil.areEqual(writeFlags, obj.writeFlags)
-                )
-    }
 }
