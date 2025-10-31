@@ -171,10 +171,9 @@ open class MP3AudioHeader : AudioHeader {
                                 syncFound = false
                             }
                         }
-                        // log.debug("fc:"+fc.position() + "bb"+bb.position())
                         if (MPEGFrameHeader.isMPEGFrame(bb)) {
                             try {
-                                log.debug("Found Possible header at:" + filePointerCount)
+                                log.debug("Found Possible header at:$filePointerCount")
 
                                 mp3FrameHeader = MPEGFrameHeader.parseMPEGHeader(bb)
                                 syncFound = true
@@ -353,13 +352,11 @@ open class MP3AudioHeader : AudioHeader {
 
         // Because when calculating framelength we may have altered the calculation slightly for MPEGVersion2
         // to account for mono/stereo we seem to have to make a corresponding modification to get the correct time
-        if ((mp3FrameHeader?.version == MPEGFrameHeader.VERSION_2) ||
-            (mp3FrameHeader?.version == MPEGFrameHeader.VERSION_2_5)
-        ) {
-            if ((mp3FrameHeader?.layer == MPEGFrameHeader.LAYER_II) ||
-                (mp3FrameHeader?.layer == MPEGFrameHeader.LAYER_III)
-            ) {
-                if (mp3FrameHeader?.getNumberOfChannels() == 1) {
+        when (mp3FrameHeader?.version) {
+            MPEGFrameHeader.VERSION_2, MPEGFrameHeader.VERSION_2_5 -> {
+                if (((mp3FrameHeader?.layer == MPEGFrameHeader.LAYER_II) ||
+                            (mp3FrameHeader?.layer == MPEGFrameHeader.LAYER_III)) && mp3FrameHeader?.getNumberOfChannels() == 1
+                ) {
                     timePerFrame = timePerFrame / 2
                 }
             }
@@ -438,12 +435,12 @@ open class MP3AudioHeader : AudioHeader {
      * for vbr.
      */
     override fun getBitRate(): String {
-        if (mp3XingFrame != null && mp3XingFrame?.isVbr == true) {
-            return isVbrIdentifier.toString() + bitrate.toString()
+        return if (mp3XingFrame != null && mp3XingFrame?.isVbr == true) {
+            isVbrIdentifier.toString() + bitrate.toString()
         } else if (mp3VbriFrame != null) {
-            return isVbrIdentifier.toString() + bitrate.toString()
+            isVbrIdentifier.toString() + bitrate.toString()
         } else {
-            return bitrate.toString()
+            bitrate.toString()
         }
     }
 
@@ -503,12 +500,12 @@ open class MP3AudioHeader : AudioHeader {
      * @return if the bitrate is variable, Xing header takes precedence if we have one
      */
     override fun isVariableBitRate(): Boolean {
-        if (mp3XingFrame != null) {
-            return mp3XingFrame?.isVbr == true
+        return if (mp3XingFrame != null) {
+            mp3XingFrame?.isVbr == true
         } else if (mp3VbriFrame != null) {
-            return mp3VbriFrame?.isVbr == true
+            mp3VbriFrame?.isVbr == true
         } else {
-            return mp3FrameHeader?.isVariableBitRate() == true
+            mp3FrameHeader?.isVariableBitRate() == true
         }
     }
 

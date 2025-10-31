@@ -26,7 +26,6 @@ import de.visualdigits.kaudiotagger.model.id3.frame.ID3Frames
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
-import de.visualdigits.kaudiotagger.util.ID3Tags.copyObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.LinkedList
@@ -43,10 +42,10 @@ object ID3Tags {
      */
     fun isID3v22FrameIdentifier(identifier: String?): Boolean {
         // If less than 3 cant be an identifier
-        if ((identifier?.length?:0) < 3) {
-            return false
+        return if ((identifier?.length?:0) < 3) {
+            false
         } else {
-            return ((identifier?.length?:0) == 3 && ID3v22FrameId.contains(identifier))
+            ((identifier?.length?:0) == 3 && ID3v22FrameId.contains(identifier))
         }
     }
 
@@ -99,16 +98,16 @@ object ID3Tags {
         if (v23id != null) {
             // has v2.3 been mapped to v2.4
             val v24id = ID3Frames.convertv23Tov24[v23id]
-            if (v24id == null) {
+            return if (v24id == null) {
                 // if not it may be because v2.3 and and v2.4 are same so wont be
                 // in mapping
                 if (ID3v24FrameId.contains(v23id.id)) {
-                    return ID3v24FrameId.fromId(v23id.id)
+                    ID3v24FrameId.fromId(v23id.id)
                 } else {
-                    return null
+                    null
                 }
             } else {
-                return v24id
+                v24id
             }
         } else {
             return null
@@ -148,10 +147,10 @@ object ID3Tags {
         // If it is a ID3v23 identifier
         if (ID3v23FrameId.contains(identifier)) {
             // If no change between ID3v23 and ID3v24 should be in ID3v24 list.
-            if (ID3v24FrameId.contains(identifier)) {
-                return ID3v24FrameId.fromId(identifier)?.id
+            return if (ID3v24FrameId.contains(identifier)) {
+                ID3v24FrameId.fromId(identifier)?.id
             } else {
-                return ID3Frames.convertv23Tov24[ID3v23FrameId.fromId(identifier?.take(4))]?.id
+                ID3Frames.convertv23Tov24[ID3v23FrameId.fromId(identifier?.take(4))]?.id
             }
         }
         return null
@@ -212,10 +211,8 @@ object ID3Tags {
             return null
         }
         var v23id = ID3Frames.convertv24Tov23[ID3v24FrameId.fromId(identifier)]
-        if (v23id == null) {
-            if (ID3v23FrameId.contains(identifier)) {
-                v23id = ID3v23FrameId.fromId(identifier)
-            }
+        if (v23id == null && ID3v23FrameId.contains(identifier)) {
+            v23id = ID3v23FrameId.fromId(identifier)
         }
         return v23id?.id
     }
@@ -401,17 +398,17 @@ object ID3Tags {
      * @return new String without the given charcter
      */
     fun stripChar(str: String?, ch: Char): String? {
-        if (str != null) {
+        return if (str != null) {
             val buffer = CharArray(str.length)
             var next = 0
-            for (i in 0..<str.length) {
-                if (str.get(i) != ch) {
-                    buffer[next++] = str.get(i)
+            (0..<str.length).forEach { i ->
+                if (str[i] != ch) {
+                    buffer[next++] = str[i]
                 }
             }
-            return String(buffer, 0, next)
+            String(buffer, 0, next)
         } else {
-            return null
+            null
         }
     }
 }

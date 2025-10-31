@@ -146,7 +146,7 @@ class MPEGFrameHeader {
     private fun setVersion() {
         // MPEG Version
         version = ((mpegBytes[BYTE_2].toInt() and MASK_MP3_VERSION) shr 3).toByte().toInt()
-        versionAsString = mpegVersionMap.get(version)
+        versionAsString = mpegVersionMap[version]
         if (versionAsString == null) {
             throw InvalidAudioFrameException("Invalid mpeg version")
         }
@@ -184,7 +184,7 @@ class MPEGFrameHeader {
                     (mpegBytes[BYTE_2].toInt() and MASK_MP3_ID) or
                     (mpegBytes[BYTE_2].toInt() and MASK_MP3_LAYER)
 
-        bitRate = bitrateMap.get(bitRateIndex)
+        bitRate = bitrateMap[bitRateIndex]
         if (bitRate == null) {
             throw InvalidAudioFrameException("Invalid bitrate")
         }
@@ -196,7 +196,7 @@ class MPEGFrameHeader {
      */
     private fun setChannelMode() {
         channelMode = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE) ushr 6
-        channelModeAsString = modeMap.get(channelMode)
+        channelModeAsString = modeMap[channelMode]
         if (channelModeAsString == null) {
             throw InvalidAudioFrameException("Invalid channel mode")
         }
@@ -208,7 +208,7 @@ class MPEGFrameHeader {
      */
     private fun setEmphasis() {
         emphasis = mpegBytes[BYTE_4].toInt() and MASK_MP3_EMPHASIS
-        emphasisAsString = emphasisMap.get(emphasis)
+        emphasisAsString = emphasisMap[emphasis]
         if (this.emphasisAsString == null) {
             throw InvalidAudioFrameException("Invalid emphasis")
         }
@@ -227,7 +227,7 @@ class MPEGFrameHeader {
      */
     private fun setLayer() {
         layer = (mpegBytes[BYTE_2].toInt() and MASK_MP3_LAYER) ushr 1
-        layerAsString = mpegLayerMap.get(layer)
+        layerAsString = mpegLayerMap[layer]
         if (layerAsString == null) {
             throw InvalidAudioFrameException("Invalid Layer")
         }
@@ -240,12 +240,12 @@ class MPEGFrameHeader {
     private fun setModeExtension() {
         val index = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE_EXTENSION) shr 4
         if (layer == LAYER_III) {
-            modeExtension = modeExtensionLayerIIIMap.get(index)
+            modeExtension = modeExtensionLayerIIIMap[index]
             if (this.modeExtension == null) {
                 throw InvalidAudioFrameException("Invalid Mode Extension")
             }
         } else {
-            modeExtension = modeExtensionMap.get(index)
+            modeExtension = modeExtensionMap[index]
             if (this.modeExtension == null) {
                 throw InvalidAudioFrameException("Invalid Mode Extension")
             }
@@ -260,7 +260,7 @@ class MPEGFrameHeader {
         // Frequency
         val index = (mpegBytes[BYTE_3].toInt() and MASK_MP3_FREQUENCY) ushr 2
         val samplingRateMapForVersion = samplingRateMap[version] ?: throw InvalidAudioFrameException("Invalid version")
-        samplingRate = samplingRateMapForVersion.get(index)
+        samplingRate = samplingRateMapForVersion[index]
         if (samplingRate == null) {
             throw InvalidAudioFrameException("Invalid sampling rate")
         }
@@ -272,12 +272,12 @@ class MPEGFrameHeader {
      * @return The setChannelMode value
      */
     fun getNumberOfChannels(): Int {
-        when (channelMode) {
-            MODE_DUAL_CHANNEL -> return 2
-            MODE_JOINT_STEREO -> return 2
-            MODE_MONO -> return 1
-            MODE_STEREO -> return 2
-            else -> return 0
+        return when (channelMode) {
+            MODE_DUAL_CHANNEL -> 2
+            MODE_JOINT_STEREO -> 2
+            MODE_MONO -> 1
+            MODE_STEREO -> 2
+            else -> 0
         }
     }
 
@@ -305,14 +305,14 @@ class MPEGFrameHeader {
                         getPaddingLength() * LAYER_II_SLOT_SIZE
                         )
 
-                LAYER_III -> if (this.channelMode == MODE_MONO) {
-                    return (((LAYER_III_FRAME_SIZE_COEFFICIENT / 2) *
+                LAYER_III -> return if (this.channelMode == MODE_MONO) {
+                    (((LAYER_III_FRAME_SIZE_COEFFICIENT / 2) *
                             (getBitRate() * SCALE_BY_THOUSAND)) /
                             getSamplingRate() +
                             getPaddingLength() * LAYER_III_SLOT_SIZE
                             )
                 } else {
-                    return (((LAYER_III_FRAME_SIZE_COEFFICIENT) *
+                    (((LAYER_III_FRAME_SIZE_COEFFICIENT) *
                             (getBitRate() * SCALE_BY_THOUSAND)) /
                             getSamplingRate() +
                             getPaddingLength() * LAYER_III_SLOT_SIZE
@@ -355,10 +355,10 @@ class MPEGFrameHeader {
      * @return The paddingLength value
      */
     fun getPaddingLength(): Int {
-        if (isPadding) {
-            return 1
+        return if (isPadding) {
+            1
         } else {
-            return 0
+            0
         }
     }
 
@@ -708,7 +708,7 @@ class MPEGFrameHeader {
              */
         fun parseMPEGHeader(bb: ByteBuffer): MPEGFrameHeader {
             val position = bb.position()
-            bb.get(header, 0, HEADER_SIZE)
+            bb[header, 0, HEADER_SIZE]
             bb.position(position)
             val frameHeader = MPEGFrameHeader(header)
 
@@ -723,9 +723,9 @@ class MPEGFrameHeader {
          */
         fun isMPEGFrame(bb: ByteBuffer): Boolean {
             val position = bb.position()
-            return (((bb.get(position).toInt() and SYNC_BYTE1) == SYNC_BYTE1) &&
-                    ((bb.get(position + 1).toInt() and SYNC_BYTE2) == SYNC_BYTE2) &&
-                    ((bb.get(position + 2).toInt() and SYNC_BIT_ANDSAMPING_BYTE3) !=
+            return (((bb[position].toInt() and SYNC_BYTE1) == SYNC_BYTE1) &&
+                    ((bb[position + 1].toInt() and SYNC_BYTE2) == SYNC_BYTE2) &&
+                    ((bb[position + 2].toInt() and SYNC_BIT_ANDSAMPING_BYTE3) !=
                             SYNC_BIT_ANDSAMPING_BYTE3)
                     )
         }

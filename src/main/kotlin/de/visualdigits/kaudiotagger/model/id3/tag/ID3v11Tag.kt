@@ -134,7 +134,7 @@ class ID3v11Tag: ID3v1Tag {
                 frame = id3tag.getFrame(ID3v24FrameId.GENRE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTCON).getText()
                 try {
-                    setGenre(ID3Tags.findNumber(text?:"")?.toInt()?:-1)
+                    setGenre(ID3Tags.findNumber(text?:"0").toInt())
                 } catch (ex: TagException) {
                     log.warn(
                         "Unable to convert TCON frame to format suitable for v11 tag",
@@ -187,7 +187,7 @@ class ID3v11Tag: ID3v1Tag {
         // Do single file read of data to cut down on file reads
         val dataBuffer = ByteArray(TAG_LENGTH)
         byteBuffer.position(0)
-        byteBuffer.get(dataBuffer, 0, TAG_LENGTH)
+        byteBuffer[dataBuffer, 0, TAG_LENGTH]
         setTitle(String(
             dataBuffer,
             FIELD_TITLE_POS,
@@ -289,7 +289,7 @@ class ID3v11Tag: ID3v1Tag {
             str = ID3Tags.truncate(getTitle(), FIELD_TITLE_LENGTH)
             i = 0
             while (i < str.length) {
-                buffer[i + offset] = str.get(i).code.toByte()
+                buffer[i + offset] = str[i].code.toByte()
                 i++
             }
         }
@@ -298,7 +298,7 @@ class ID3v11Tag: ID3v1Tag {
             str = ID3Tags.truncate(getArtist(), FIELD_ARTIST_LENGTH)
             i = 0
             while (i < str.length) {
-                buffer[i + offset] = str.get(i).code.toByte()
+                buffer[i + offset] = str[i].code.toByte()
                 i++
             }
         }
@@ -307,7 +307,7 @@ class ID3v11Tag: ID3v1Tag {
             str = ID3Tags.truncate(getAlbum(), FIELD_ALBUM_LENGTH)
             i = 0
             while (i < str.length) {
-                buffer[i + offset] = str.get(i).code.toByte()
+                buffer[i + offset] = str[i].code.toByte()
                 i++
             }
         }
@@ -316,7 +316,7 @@ class ID3v11Tag: ID3v1Tag {
             str = ID3Tags.truncate(getYear(), FIELD_YEAR_LENGTH)
             i = 0
             while (i < str.length) {
-                buffer[i + offset] = str.get(i).code.toByte()
+                buffer[i + offset] = str[i].code.toByte()
                 i++
             }
         }
@@ -325,7 +325,7 @@ class ID3v11Tag: ID3v1Tag {
             str = ID3Tags.truncate(getComment(), FIELD_COMMENT_LENGTH)
             i = 0
             while (i < str.length) {
-                buffer[i + offset] = str.get(i).code.toByte()
+                buffer[i + offset] = str[i].code.toByte()
                 i++
             }
         }
@@ -364,7 +364,7 @@ class ID3v11Tag: ID3v1Tag {
             GenericFieldKey.GENRE -> setGenreVal(field.toString())
             GenericFieldKey.YEAR -> setYear(field.toString())
             GenericFieldKey.COMMENT -> setComment(field.toString())
-            else -> {}
+            else -> { log.warn("Unknown field key '$genericKey'") }
         }
     }
 
@@ -383,14 +383,14 @@ class ID3v11Tag: ID3v1Tag {
      * @return album within list or empty if does not exist
      */
     override fun getAlbumTag(): List<TagField> {
-        if (getAlbum().isNotEmpty()) {
+        return if (getAlbum().isNotEmpty()) {
             val field = ID3v1TagField(
                 ID3v1FieldKey.ALBUM.name,
                 getAlbum()
             )
-            return listOf(field)
+            listOf(field)
         } else {
-            return mutableListOf()
+            mutableListOf()
         }
     }
 
@@ -398,14 +398,14 @@ class ID3v11Tag: ID3v1Tag {
      * @return Artist within list or empty if does not exist
      */
     override fun getArtistTag(): List<TagField> {
-        if (getArtist().length > 0) {
+        return if (getArtist().isNotEmpty()) {
             val field: ID3v1TagField = ID3v1TagField(
                 ID3v1FieldKey.ARTIST.name,
                 getArtist()
             )
-            return listOf(field)
+            listOf(field)
         } else {
-            return mutableListOf()
+            mutableListOf()
         }
     }
 
@@ -413,14 +413,14 @@ class ID3v11Tag: ID3v1Tag {
      * @return comment within list or empty if does not exist
      */
     override fun getCommentTag(): List<TagField> {
-        if (getComment().isNotEmpty()) {
+        return if (getComment().isNotEmpty()) {
             val field: ID3v1TagField = ID3v1TagField(
                 ID3v1FieldKey.COMMENT.name,
                 getComment()
             )
-            return listOf(field)
+            listOf(field)
         } else {
-            return mutableListOf()
+            mutableListOf()
         }
     }
 

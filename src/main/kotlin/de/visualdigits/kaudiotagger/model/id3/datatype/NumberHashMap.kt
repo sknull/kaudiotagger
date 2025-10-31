@@ -45,45 +45,56 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
         frameBody: AbstractTagFrameBody? = null,
         size: Int
     ): super(identifier, frameBody, size) {
-        if (identifier == DataTypes.OBJ_GENRE) {
-            valueToKeyMap = GenreTypes.getValueToIdMap()
-            keyToValueMap = GenreTypes.getIdToValueMap()
+        when (identifier) {
+            DataTypes.OBJ_GENRE -> {
+                valueToKeyMap = GenreTypes.getValueToIdMap()
+                keyToValueMap = GenreTypes.getIdToValueMap()
 
-            // genres can be an id or literal value
-            hasEmptyValue = true
-        } else if (identifier == DataTypes.OBJ_TEXT_ENCODING) {
-            valueToKeyMap = TextEncoding.getValueToIdMap()
-            keyToValueMap = TextEncoding.getIdToValueMap()
-        } else if (identifier == DataTypes.OBJ_INTERPOLATION_METHOD) {
-            valueToKeyMap = InterpolationTypes.getValueToIdMap()
-            keyToValueMap = InterpolationTypes.getIdToValueMap()
-        } else if (identifier == DataTypes.OBJ_PICTURE_TYPE) {
-            valueToKeyMap = PictureTypes.getValueToIdMap()
-            keyToValueMap = PictureTypes.getIdToValueMap()
+                // genres can be an id or literal value
+                hasEmptyValue = true
+            }
+            DataTypes.OBJ_TEXT_ENCODING -> {
+                valueToKeyMap = TextEncoding.getValueToIdMap()
+                keyToValueMap = TextEncoding.getIdToValueMap()
+            }
+            DataTypes.OBJ_INTERPOLATION_METHOD -> {
+                valueToKeyMap = InterpolationTypes.getValueToIdMap()
+                keyToValueMap = InterpolationTypes.getIdToValueMap()
+            }
+            DataTypes.OBJ_PICTURE_TYPE -> {
+                valueToKeyMap = PictureTypes.getValueToIdMap()
+                keyToValueMap = PictureTypes.getIdToValueMap()
 
-            // Issue #224 Values should map, but have examples where they dont, this is a workaround
-            hasEmptyValue = true
-        } else if (identifier == DataTypes.OBJ_TYPE_OF_EVENT) {
-            valueToKeyMap = EventTimingTypes.getValueToIdMap()
-            keyToValueMap = EventTimingTypes.getIdToValueMap()
-        } else if (identifier == DataTypes.OBJ_TIME_STAMP_FORMAT) {
-            valueToKeyMap = EventTimingTimestampTypes.getValueToIdMap()
-            keyToValueMap = EventTimingTimestampTypes.getIdToValueMap()
-        } else if (identifier == DataTypes.OBJ_TYPE_OF_CHANNEL) {
-            valueToKeyMap = ChannelType.getValueToIdMap()
-            keyToValueMap = ChannelType.getIdToValueMap()
-        } else if (identifier == DataTypes.OBJ_RECIEVED_AS) {
-            valueToKeyMap = ReceivedAsType.getValueToIdMap()
-            keyToValueMap = ReceivedAsType.getIdToValueMap()
-        } else if (identifier == DataTypes.OBJ_CONTENT_TYPE) {
-            valueToKeyMap =
-                SynchronisedLyricsContentType.getValueToIdMap()
-            keyToValueMap =
-                SynchronisedLyricsContentType.getIdToValueMap()
-        } else {
-            throw IllegalArgumentException(
-                "Hashmap identifier not defined in this class: $identifier"
-            )
+                // Issue #224 Values should map, but have examples where they dont, this is a workaround
+                hasEmptyValue = true
+            }
+            DataTypes.OBJ_TYPE_OF_EVENT -> {
+                valueToKeyMap = EventTimingTypes.getValueToIdMap()
+                keyToValueMap = EventTimingTypes.getIdToValueMap()
+            }
+            DataTypes.OBJ_TIME_STAMP_FORMAT -> {
+                valueToKeyMap = EventTimingTimestampTypes.getValueToIdMap()
+                keyToValueMap = EventTimingTimestampTypes.getIdToValueMap()
+            }
+            DataTypes.OBJ_TYPE_OF_CHANNEL -> {
+                valueToKeyMap = ChannelType.getValueToIdMap()
+                keyToValueMap = ChannelType.getIdToValueMap()
+            }
+            DataTypes.OBJ_RECIEVED_AS -> {
+                valueToKeyMap = ReceivedAsType.getValueToIdMap()
+                keyToValueMap = ReceivedAsType.getIdToValueMap()
+            }
+            DataTypes.OBJ_CONTENT_TYPE -> {
+                valueToKeyMap =
+                    SynchronisedLyricsContentType.getValueToIdMap()
+                keyToValueMap =
+                    SynchronisedLyricsContentType.getIdToValueMap()
+            }
+            else -> {
+                throw IllegalArgumentException(
+                    "Hashmap identifier not defined in this class: $identifier"
+                )
+            }
         }
     }
 

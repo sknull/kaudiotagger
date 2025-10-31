@@ -89,10 +89,10 @@ class NumberVariableLength : AbstractDataType {
      * @return String representation of the number
      */
     override fun toString(): String {
-        if (getValue() == null) {
-            return ""
+        return if (getValue() == null) {
+            ""
         } else {
-            return getValue().toString()
+            getValue().toString()
         }
     }
 
@@ -135,21 +135,24 @@ class NumberVariableLength : AbstractDataType {
      * @return the number of bytes required to write this to a file
      */
     override fun getSize(): Int {
-        if (getValue() == null) {
-            return 0
-        } else {
-            var temp = ID3Tags.getWholeNumber(getValue())
-            var size = 0
-
-            (MINIMUM_NO_OF_DIGITS..getMaximumLength()).forEach { i ->
-                val current = temp.toByte().toInt() and 0xFF
-                if (current != 0) {
-                    size = i
-                }
-                temp = temp shr getMaximumLength()
+        when {
+            getValue() == null -> {
+                return 0
             }
+            else -> {
+                var temp = ID3Tags.getWholeNumber(getValue())
+                var size = 0
 
-            return if (this.minimumLength > size) this.minimumLength else size
+                (MINIMUM_NO_OF_DIGITS..getMaximumLength()).forEach { i ->
+                    val current = temp.toByte().toInt() and 0xFF
+                    if (current != 0) {
+                        size = i
+                    }
+                    temp = temp shr getMaximumLength()
+                }
+
+                return if (this.minimumLength > size) this.minimumLength else size
+            }
         }
     }
 

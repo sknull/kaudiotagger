@@ -35,10 +35,10 @@ class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
     fun getGroupSymbol(): Byte {
-        if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
-            return (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as? Byte)?:0.toByte()
+        return if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
+            (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as? Byte)?:0.toByte()
         } else {
-            return 0.toByte()
+            0.toByte()
         }
     }
 

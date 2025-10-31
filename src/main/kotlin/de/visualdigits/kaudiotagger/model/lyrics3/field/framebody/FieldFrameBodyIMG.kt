@@ -20,7 +20,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         var old: Lyrics3Image?
 
         for (i in copyObject.images.indices) {
-            old = copyObject.images.get(i)
+            old = copyObject.images[i]
             this.images.add(Lyrics3Image(old))
         }
     }
@@ -89,7 +89,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         var buffer = ByteArray(5)
 
         // read the 5 character size
-        byteBuffer.get(buffer, 0, 5)
+        byteBuffer[buffer, 0, 5]
 
         val size = String(buffer, 0, 5).toInt()
 
@@ -102,7 +102,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         buffer = ByteArray(size)
 
         // read the SIZE length description
-        byteBuffer.get(buffer)
+        byteBuffer[buffer]
         imageString = String(buffer)
         readString(imageString)
 
@@ -196,10 +196,8 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         offset += (5 - str.length)
 
         for (i in 0..<str.length) {
-            buffer[i + offset] = str.get(i).code.toByte()
+            buffer[i + offset] = str[i].code.toByte()
         }
-
-        offset += str.length
 
         file.write(buffer, 0, 5)
 
@@ -208,7 +206,7 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
             buffer = ByteArray(str.length)
 
             for (i in 0..<str.length) {
-                buffer[i] = str.get(i).code.toByte()
+                buffer[i] = str[i].code.toByte()
             }
 
             file.write(buffer)
@@ -231,5 +229,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
      * TODO
      */
     override fun setupObjectList() {
+        // to be implemented
     }
 }

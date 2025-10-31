@@ -19,10 +19,10 @@ class StringDate : StringFixedLength {
     constructor(copyObject: StringDate) : super(copyObject)
 
     override fun getValue(): Any? {
-        if (getValue() != null) {
-            return ID3Tags.stripChar(getValue().toString(), '-')
+        return if (getValue() != null) {
+            ID3Tags.stripChar(getValue().toString(), '-')
         } else {
-            return null
+            null
         }
     }
 

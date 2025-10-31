@@ -70,7 +70,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
 
     fun isMediaMonkeyFrame(): Boolean {
         val desc = getDescription()
-        if (desc != null && desc.isNotEmpty()) {
+        if (desc?.isNotEmpty() == true) {
             return desc.startsWith(MM_PREFIX)
         }
         return false
@@ -96,7 +96,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
 
     fun isItunesFrame(): Boolean {
         val desc = getDescription()
-        if (desc != null && desc.isNotEmpty()) {
+        if (desc?.isNotEmpty() == true) {
             return desc == ITUNES_NORMALIZATION
         }
         return false
@@ -145,9 +145,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return the text field
      */
     fun getText(): String? {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
-        return text.getValueAtIndex(0)
+        return (getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated).getValueAtIndex(0)
     }
 
     /**
@@ -207,31 +205,6 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
     }
 
     /**
-     * Retrieve the complete text String but without any trailing nulls
-     *
-     *
-     * If multiple values are held these will be returned, needless trailing nulls will not be returned
-     *
-     * @return the text string
-     */
-    fun getTextWithoutTrailingNulls(): String {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
-        return text.getValueWithoutTrailingNull()
-    }
-
-    /**
-     * Get first value
-     *
-     * @return value at index 0
-     */
-    fun getFirstTextValue(): String? {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
-        return text.getValueAtIndex(0)
-    }
-
-    /**
      * Get text value at index
      *
      *
@@ -242,34 +215,10 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @return value at index
      */
     fun getValueAtIndex(index: Int): String? {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
-        return text.getValueAtIndex(index)
+        return (getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated).getValueAtIndex(index)
     }
 
     fun getValues(): MutableList<String> {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
-        return text.getValues()
-    }
-
-    /**
-     * Add additional value to value
-     *
-     * @param value at index
-     */
-    fun addTextValue(value: String) {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
-        text.addValue(value)
-    }
-
-    /**
-     * @return number of text values, usually one
-     */
-    fun getNumberOfValues(): Int {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
-        return text.getNumberOfValues()
+        return (getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated).getValues()
     }
 }

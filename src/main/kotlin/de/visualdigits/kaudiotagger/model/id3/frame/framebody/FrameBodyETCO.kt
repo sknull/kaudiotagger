@@ -95,7 +95,7 @@ import java.util.Collections
  * @author : Hendrik Schreiber
  * @version $Id$
  */
-class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
+class FrameBodyETCO : AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
 
     /**
      * Creates a new FrameBodyETCO datatype.
@@ -135,9 +135,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @see #getTimestampFormat()
      */
     fun setTimestampFormat(timestampFormat: Int) {
-        if (EventTimingTimestampTypes.fromId(timestampFormat) == null) {
-            throw IllegalArgumentException("Timestamp format must be 1 or 2 (ID3v2.4, 4.5): $timestampFormat");
-        }
+        requireNotNull(EventTimingTimestampTypes.fromId(timestampFormat)) { "Timestamp format must be 1 or 2 (ID3v2.4, 4.5): $timestampFormat" }
         setObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT, timestampFormat);
     }
 
@@ -154,7 +152,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         ) as MutableList<EventTimingCode>
         var lastTimestamp: Long = 0
         var insertIndex = 0
-        if (!codes.isEmpty() && codes.get(0).getTimestamp() <= timestamp) {
+        if (codes.isNotEmpty() && codes[0].getTimestamp() <= timestamp) {
             for (code in codes) {
                 val translatedTimestamp = if (code.getTimestamp() == 0L)
                     lastTimestamp
@@ -168,10 +166,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
             }
         }
         for (type in types) {
-            codes.add(
-                insertIndex,
-                EventTimingCode(DataTypes.OBJ_TIMED_EVENT, this, type, timestamp)
-            )
+            codes.add(insertIndex, EventTimingCode(DataTypes.OBJ_TIMED_EVENT, this, type, timestamp))
             insertIndex++ // preserve order of types
         }
     }
@@ -188,7 +183,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         // before we can remove anything, we have to resolve relative 0-timestamps
         // otherwise we might remove the anchor a relative timestamp relies on
         resolveRelativeTimestamps()
-        val typeSet: MutableSet<Int?> = toSet(*types)
+        val typeSet: Set<Int?> = toSet(*types)
         val codes = getObjectValue(
             DataTypes.OBJ_TIMED_EVENT_LIST
         ) as MutableList<EventTimingCode>
@@ -213,9 +208,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      */
     @Suppress("UNCHECKED_CAST")
     private fun resolveRelativeTimestamps() {
-        val codes = getObjectValue(
-            DataTypes.OBJ_TIMED_EVENT_LIST
-        ) as MutableList<EventTimingCode>
+        val codes = getObjectValue(DataTypes.OBJ_TIMED_EVENT_LIST) as List<EventTimingCode>
         var lastTimestamp: Long = 0
         for (code in codes) {
             val translatedTimestamp = if (code.getTimestamp() == 0L)
@@ -235,16 +228,14 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     @Suppress("UNCHECKED_CAST")
     fun getTimingCodes(): MutableMap<Long, IntArray> {
         val map = mutableMapOf<Long, IntArray>()
-        val codes = getObjectValue(
-            DataTypes.OBJ_TIMED_EVENT_LIST
-        ) as MutableList<EventTimingCode>
+        val codes = getObjectValue(DataTypes.OBJ_TIMED_EVENT_LIST) as List<EventTimingCode>
         var lastTimestamp: Long = 0
         for (code in codes) {
             val translatedTimestamp = if (code.getTimestamp() == 0L)
                 lastTimestamp
             else
                 code.getTimestamp()
-            val types = map.get(translatedTimestamp)
+            val types = map[translatedTimestamp]
             if (types == null) {
                 map[translatedTimestamp] = intArrayOf(code.getType())
             } else {

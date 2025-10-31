@@ -71,7 +71,7 @@ object FileTypeUtil {
                 val i = signatureMap.keys.iterator()
                 while (i.hasNext()) {
                     val key = i.next()
-                    if (matchesSignature(signatureMap.get(key) ?: arrayOf(), buffer, m)) {
+                    if (matchesSignature(signatureMap[key] ?: arrayOf(), buffer, m)) {
                         fileType = key
                         break
                     }
@@ -93,11 +93,9 @@ object FileTypeUtil {
 
         var b = true
         for (i in signature.indices) {
-            if (signature[i] != null) {
-                if (signature[i] != (0x00ff and buffer[i].toInt())) {
-                    b = false
-                    break
-                }
+            if (signature[i] != null && signature[i] != (0x00ff and buffer[i].toInt())) {
+                b = false
+                break
             }
         }
 
@@ -105,6 +103,6 @@ object FileTypeUtil {
     }
 
     fun getMagicExt(fileType: String?): String? {
-        return extensionMap.get(fileType)
+        return extensionMap[fileType]
     }
 }

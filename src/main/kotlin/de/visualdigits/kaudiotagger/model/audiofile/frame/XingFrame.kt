@@ -96,7 +96,7 @@ class XingFrame {
 
             // Check Identifier
             val identifier = ByteArray(XING_IDENTIFIER_BUFFER_SIZE)
-            header.get(identifier)
+            header[identifier]
             if (!identifier.contentEquals(XING_VBR_ID) && !identifier.contentEquals(XING_CBR_ID)) {
                 return null
             }
@@ -125,7 +125,7 @@ class XingFrame {
 
         // Read Flags, only the fourth byte of interest to us
         val flagBuffer = ByteArray(XING_FLAG_BUFFER_SIZE)
-        header.get(flagBuffer)
+        header[flagBuffer]
 
         // Read FrameCount if flag set
         if ((flagBuffer[BYTE_4].toInt() and (1).toByte().toInt()) != 0) {
@@ -155,7 +155,7 @@ class XingFrame {
     private fun setVbr() {
         // Is it VBR or CBR
         val identifier = ByteArray(XING_IDENTIFIER_BUFFER_SIZE)
-        header.get(identifier)
+        header[identifier]
         if (identifier.contentEquals(XING_VBR_ID)) {
             log.debug("Is Vbr")
             isVbr = true
@@ -167,7 +167,7 @@ class XingFrame {
      */
     private fun setFrameCount() {
         val frameCountBuffer = ByteArray(XING_FRAMECOUNT_BUFFER_SIZE)
-        header.get(frameCountBuffer)
+        header[frameCountBuffer]
         isFrameCountEnabled = true
         frameCount = ((frameCountBuffer[BYTE_1].toInt() shl 24) and -0x1000000) or
                     ((frameCountBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or
@@ -180,7 +180,7 @@ class XingFrame {
      */
     private fun setAudioSize() {
         val frameSizeBuffer = ByteArray(XING_AUDIOSIZE_BUFFER_SIZE)
-        header.get(frameSizeBuffer)
+        header[frameSizeBuffer]
         isAudioSizeEnabled = true
         audioSize = ((frameSizeBuffer[BYTE_1].toInt() shl 24) and -0x1000000) or
                     ((frameSizeBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or

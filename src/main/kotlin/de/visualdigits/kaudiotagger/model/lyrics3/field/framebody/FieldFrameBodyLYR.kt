@@ -22,7 +22,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
     constructor(copyObject: FieldFrameBodyLYR): super(copyObject) {
         var old: Lyrics3Line?
         copyObject.lines.indices.forEach { i ->
-            old = copyObject.lines.get(i)
+            old = copyObject.lines[i]
             this.lines.add(Lyrics3Line(old))
         }
     }
@@ -82,11 +82,11 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
             )
 
             if (lineMap.containsKey(currentLine.text)) {
-                newLine = lineMap.get(currentLine.text)
+                newLine = lineMap[currentLine.text]
                 newLine?.addTimeStamp(timeStamp)
             } else {
                 newLine = Lyrics3Line("Lyric Line", this)
-                newLine.lyric = currentLine.text?:""
+                newLine.lyric = currentLine.text
                 newLine.setTimeStamp(timeStamp)
                 lineMap[currentLine.text] = newLine
                 lines.add(newLine)
@@ -113,7 +113,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         var buffer = ByteArray(5)
 
         // read the 5 character size
-        byteBuffer.get(buffer, 0, 5)
+        byteBuffer[buffer, 0, 5]
 
         val size = Integer.parseInt(String(buffer, 0, 5))
 
@@ -127,7 +127,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         buffer = ByteArray(size)
 
         // read the SIZE length description
-        byteBuffer.get(buffer)
+        byteBuffer[buffer]
         lineString = String(buffer)
         readString(lineString)
 
@@ -168,7 +168,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         var str = ""
 
         for (line1 in lines) {
-            line = line1 as Lyrics3Line
+            line = line1
             str += (line.writeString() + Lyrics3v2Fields.CRLF)
         }
 
@@ -211,7 +211,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         var present = false
 
         for (line in lines) {
-            if ((line as Lyrics3Line).hasTimeStamp()) {
+            if (line.hasTimeStamp()) {
                 present = true
             }
         }
@@ -228,7 +228,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         var line: Lyrics3Line
 
         for (line1 in lines) {
-            line = line1 as Lyrics3Line
+            line = line1
             size += (line.getSize() + 2)
         }
 
@@ -241,5 +241,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
      * TODO
      */
     override fun setupObjectList() {
+        // to be implemented
     }
 }

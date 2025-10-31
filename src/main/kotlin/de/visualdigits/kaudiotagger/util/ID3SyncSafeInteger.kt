@@ -43,7 +43,7 @@ object ID3SyncSafeInteger {
      */
     fun bufferToValue(buffer: ByteBuffer): Int {
         val byteBuffer = ByteArray(INTEGRAL_SIZE)
-        buffer.get(byteBuffer, 0, INTEGRAL_SIZE)
+        buffer[byteBuffer, 0, INTEGRAL_SIZE]
         return bufferToValue(byteBuffer)
     }
 
@@ -85,7 +85,7 @@ object ID3SyncSafeInteger {
 
         // Check Bit7 not set
         for (i in 0..<INTEGRAL_SIZE) {
-            val nextByte = buffer.get(position + i)
+            val nextByte = buffer[position + i]
             if ((nextByte.toInt() and 0x80) > 0) {
                 return true
             }

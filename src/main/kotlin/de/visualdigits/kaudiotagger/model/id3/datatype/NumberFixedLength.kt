@@ -24,9 +24,7 @@ open class NumberFixedLength: AbstractDataType {
             frameBody: AbstractTagFrameBody? = null,
             size: Int
     ): this(identifier, frameBody) {
-        if (size < 0) {
-            throw IllegalArgumentException("Length is less than zero: $size")
-        }
+        require(size >= 0) { "Length is less than zero: $size" }
         setSize(size)
     }
 

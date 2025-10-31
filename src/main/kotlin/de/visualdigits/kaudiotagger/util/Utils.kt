@@ -107,7 +107,7 @@ object Utils {
     ): Long {
         var number: Long = 0
         for (i in 0..<(end - start + 1)) {
-            number += ((b.get(start + i).toInt() and 0xFF).toLong() shl (i * 8))
+            number += ((b[start + i].toInt() and 0xFF).toLong() shl (i * 8))
         }
 
         return number
@@ -185,7 +185,7 @@ object Utils {
     ): Long {
         var number: Long = 0
         for (i in 0..<(end - start + 1)) {
-            number += (((b.get(end - i).toInt() and 0xFF)).toLong() shl (i * 8))
+            number += (b[end - i].toInt() and 0xFF).toLong() shl (i * 8)
         }
 
         return number
@@ -244,7 +244,7 @@ object Utils {
     fun readPascalString(bb: ByteBuffer): String {
         val len = u(bb.get()) // Read as unsigned value
         val buf = ByteArray(len)
-        bb.get(buf)
+        bb[buf]
         return String(buf, 0, len, StandardCharsets.ISO_8859_1)
     }
 
@@ -281,7 +281,7 @@ object Utils {
     ): String {
         val b = ByteArray(length)
         buffer.position(buffer.position() + offset)
-        buffer.get(b)
+        buffer[b]
         return String(b, 0, length, encoding)
     }
 
@@ -297,7 +297,7 @@ object Utils {
         encoding: Charset
     ): String {
         val b = ByteArray(buffer.remaining())
-        buffer.get(b)
+        buffer[b]
         return String(b, encoding)
     }
 
@@ -360,14 +360,21 @@ object Utils {
         if (s.length >= 3) {
             return s
         }
-        if (s.length == 1) {
-            return s + "000"
-        } else if (s.length == 1) {
-            return s + "00"
-        } else if (s.length == 2) {
-            return s + "0"
+        return when (s.length) {
+            0 -> {
+                s + "000"
+            }
+
+            1 -> {
+                s + "00"
+            }
+
+            2 -> {
+                s + "0"
+            }
+
+            else -> s
         }
-        return s
     }
 
     /**
@@ -405,7 +412,7 @@ object Utils {
         }
         if (!result) {
             // Might be trying to rename over filesystem, so try copy and delete instead
-            if (copy(fromFile, toFile)) {
+            return if (copy(fromFile, toFile)) {
                 // If copy works but deletion of original file fails then it is because the file is being used
                 // so we need to delete the file we have just created
                 val deleteResult = fromFile.delete()
@@ -414,9 +421,9 @@ object Utils {
                     toFile.delete()
                     return false
                 }
-                return true
+                true
             } else {
-                return false
+                false
             }
         }
         return true
@@ -486,7 +493,7 @@ object Utils {
 
     fun toArray(buffer: ByteBuffer): ByteArray {
         val result = ByteArray(buffer.remaining())
-        buffer.duplicate().get(result)
+        buffer.duplicate()[result]
         return result
     }
 
@@ -534,7 +541,7 @@ object Utils {
         }
 
         val b = ByteArray(4)
-        bytes.get(b)
+        bytes[b]
         return String(b, StandardCharsets.ISO_8859_1)
     }
 
@@ -546,7 +553,7 @@ object Utils {
         charsToRead: Int
     ): String {
         val buf = ByteArray(charsToRead)
-        bytes.get(buf)
+        bytes[buf]
         return String(buf, StandardCharsets.US_ASCII)
     }
 
@@ -570,7 +577,7 @@ object Utils {
      */
     fun readThreeBytesAsChars(bytes: ByteBuffer): String {
         val b = ByteArray(3)
-        bytes.get(b)
+        bytes[b]
         return String(b, StandardCharsets.ISO_8859_1)
     }
 
@@ -694,7 +701,7 @@ object Utils {
         for (i in params.indices) {
             val cls = params[i]?.javaClass
             classes[i] = if (boxed2primitive.containsKey(cls))
-                boxed2primitive.get(cls)
+                boxed2primitive[cls]
             else
                 cls
         }

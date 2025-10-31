@@ -2,10 +2,6 @@ package de.visualdigits.kaudiotagger.util
 
 import java.lang.Double
 import java.lang.Float
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.Char
-import kotlin.Long
 
 object EqualsUtil {
 

@@ -47,10 +47,10 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
     override fun setValue(value: Any?) {
         if (value is String) {
             // Issue #273 temporary hack for MM
-            if (value.equals("XXX")) {
+            if (value == "XXX") {
                 super.setValue(value)
             } else {
-                super.setValue((value as? String)?.lowercase())
+                super.setValue(value.lowercase())
             }
         } else {
             super.setValue(value)
@@ -75,10 +75,10 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
     override fun toString(): String {
         val keyToValue = getKeyToValue()
         val value = getValue()
-        if (value == null || keyToValue.get(value) == null) {
-            return ""
+        return if (value == null || keyToValue[value] == null) {
+            ""
         } else {
-            return keyToValue.get(value)?:""
+            keyToValue[value] ?:""
         }
     }
 }

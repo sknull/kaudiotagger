@@ -225,22 +225,25 @@ class MP3File : AudioFile {
 
             // It matches the frameCount the header we just found so lends weight to the fact that the audio does indeed start at new header
             // however it maybe that neither are really headers and just contain the same data being misrepresented as headers.
-            if (headerTwo.numberOfFrames == headerOne.numberOfFrames) {
-                log.warn(
-                    (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                        file?.path,
-                        headerOne.mp3StartByte.toHexString()
-                    ))
-                )
-                return headerOne
-            } else {
-                log.warn(
-                    (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                        file?.path,
-                        firstHeaderAfterTag.mp3StartByte.toHexString()
-                    ))
-                )
-                return firstHeaderAfterTag
+            when (headerTwo.numberOfFrames) {
+                headerOne.numberOfFrames -> {
+                    log.warn(
+                        (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
+                            file?.path,
+                            headerOne.mp3StartByte.toHexString()
+                        ))
+                    )
+                    return headerOne
+                }
+                else -> {
+                    log.warn(
+                        (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
+                            file?.path,
+                            firstHeaderAfterTag.mp3StartByte.toHexString()
+                        ))
+                    )
+                    return firstHeaderAfterTag
+                }
             }
         }
     }
@@ -410,10 +413,10 @@ class MP3File : AudioFile {
         log.debug("Writing ID3v2 tag:" + file.getName())
         val mp3AudioHeader = this.audioHeader as? MP3AudioHeader
         val mp3StartByte = mp3AudioHeader?.mp3StartByte ?: 0
-        val newMp3StartByte = tag.write(file, mp3StartByte ?: 0)
+        val newMp3StartByte = tag.write(file, mp3StartByte)
         if (mp3StartByte != newMp3StartByte) {
             log.debug("New mp3 start byte: $newMp3StartByte")
-            mp3AudioHeader?.mp3StartByte = newMp3StartByte ?: 0
+            mp3AudioHeader?.mp3StartByte = newMp3StartByte
         }
     }
 

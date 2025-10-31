@@ -58,7 +58,7 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
                         if (value == null) {
                             value
                         } else {
-                            error("Unexpected value class: ${value?.javaClass}")
+                            error("Unexpected value class: ${value.javaClass}")
                         }
                     }
                 }
@@ -168,10 +168,8 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
         }
         val superset = obj.objectList
         objectList.forEach { anObjectList ->
-            if (anObjectList.getValue() != null) {
-                if (!superset.contains(anObjectList)) {
-                    return false
-                }
+            if (anObjectList.getValue() != null && !superset.contains(anObjectList)) {
+                return false
             }
         }
         return true
@@ -193,5 +191,6 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
     abstract fun setupObjectList()
 
     open fun createStructure() {
+        // to be implemented
     }
 }

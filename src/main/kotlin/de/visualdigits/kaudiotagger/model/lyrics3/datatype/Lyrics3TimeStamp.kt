@@ -31,6 +31,7 @@ class Lyrics3TimeStamp : AbstractDataType {
      * @param s
      */
     fun readString(s: String) {
+        // to be implemented
     }
 
     override fun getSize(): Int = 7
@@ -84,7 +85,7 @@ class Lyrics3TimeStamp : AbstractDataType {
     }
 
     override fun readByteArray(byteArray: ByteArray, offset: Int) {
-        readString(byteArray.toString(), offset)
+        readString(byteArray.contentToString(), offset)
     }
 
     /**

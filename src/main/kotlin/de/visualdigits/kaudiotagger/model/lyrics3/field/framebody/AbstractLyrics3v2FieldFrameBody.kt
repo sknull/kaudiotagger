@@ -49,7 +49,7 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
         val size = getSize()
         // Allocate a buffer to the size of the Frame Body and read from file
         val buffer = ByteArray(size)
-        byteBuffer.get(buffer)
+        byteBuffer[buffer]
         // Offset into buffer, incremented by length of previous MP3Object
         var offset = 0
 

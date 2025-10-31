@@ -60,6 +60,7 @@ class FrameBodyDeprecated : AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23Frame
      * This is handled by the wrapped class
      */
     override fun setupObjectList() {
+        // to be implemented
     }
 
     override fun getBriefDescription(): String {

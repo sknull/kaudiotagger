@@ -135,7 +135,8 @@ class FrameBodyPOPM: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
             val value = data.toInt()
             this.setRating(value.toLong())
             this.setEmailToUser(MEDIA_MONKEY_NO_EMAIL)
-        } catch (nfe: NumberFormatException) {
+        } catch (_: NumberFormatException) {
+            // ignore
         }
     }
 

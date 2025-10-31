@@ -128,8 +128,8 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         for (i in formatters.indices) {
             try {
                 val d: Date?
-                synchronized(formatters.get(i)) {
-                    d = formatters.get(i).parse(getText())
+                synchronized(formatters[i]) {
+                    d = formatters[i].parse(getText())
                 }
                 // If able to parse a date from the text
                 if (d != null) {
@@ -140,15 +140,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
                 // Do nothing;
             } catch (nfe: NumberFormatException) {
                 // Do nothing except log warning because not really expecting this to happen
-                log.warn(
-                    "Date Formatter:" +
-                            formatters.get(i).toPattern() +
-                            "failed to parse:" +
-                            getText() +
-                            "with " +
-                            nfe.message,
-                    nfe
-                )
+                log.warn("Date Formatter:${formatters[i].toPattern()}failed to parse:${getText()}with ${nfe.message}", nfe)
             }
         }
     }
@@ -163,8 +155,9 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
     fun getFormattedText(): String {
         val sb = StringBuilder();
         if (originalID == null) {
-            return this.getText()?:""
-        } else {
+            return this.getText() ?: ""
+        }
+        else {
             if (year != null && year?.trim()?.isNotEmpty() == true) {
                 sb.append(formatAndParse(formatYearOut, formatYearIn, year));
             }
@@ -238,28 +231,35 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         val d = dateRecord
 
         // Precision Year
-        if (precision == PRECISION_YEAR) {
-            year = formatDateAsYear(d)
-        } else if (precision == PRECISION_MONTH) {
-            year = formatDateAsYear(d)
-            date = formatDateAsDate(d)
-            monthOnly = true
-        } else if (precision == PRECISION_DAY) {
-            year = formatDateAsYear(d)
-            date = formatDateAsDate(d)
-        } else if (precision == PRECISION_HOUR) {
-            year = formatDateAsYear(d)
-            date = formatDateAsDate(d)
-            time = formatDateAsTime(d)
-            hoursOnly = true
-        } else if (precision == PRECISION_MINUTE) {
-            year = formatDateAsYear(d)
-            date = formatDateAsDate(d)
-            time = formatDateAsTime(d)
-        } else if (precision == PRECISION_SECOND) {
-            year = formatDateAsYear(d)
-            date = formatDateAsDate(d)
-            time = formatDateAsTime(d)
+        when (precision) {
+            PRECISION_YEAR -> {
+                year = formatDateAsYear(d)
+            }
+            PRECISION_MONTH -> {
+                year = formatDateAsYear(d)
+                date = formatDateAsDate(d)
+                monthOnly = true
+            }
+            PRECISION_DAY -> {
+                year = formatDateAsYear(d)
+                date = formatDateAsDate(d)
+            }
+            PRECISION_HOUR -> {
+                year = formatDateAsYear(d)
+                date = formatDateAsDate(d)
+                time = formatDateAsTime(d)
+                hoursOnly = true
+            }
+            PRECISION_MINUTE -> {
+                year = formatDateAsYear(d)
+                date = formatDateAsDate(d)
+                time = formatDateAsTime(d)
+            }
+            PRECISION_SECOND -> {
+                year = formatDateAsYear(d)
+                date = formatDateAsDate(d)
+                time = formatDateAsTime(d)
+            }
         }
     }
 

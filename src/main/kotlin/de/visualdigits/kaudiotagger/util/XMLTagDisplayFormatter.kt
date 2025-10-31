@@ -18,7 +18,7 @@ class XMLTagDisplayFormatter : AbstractTagDisplayFormatter() {
     }
 
     override fun openHeadingElement(type: String, value: String) {
-        if (value.length == 0) {
+        if (value.isEmpty()) {
             sb.append(xmlOpen(type))
         } else {
             sb.append(xmlOpenHeading(type, replaceXMLCharacters(value)))
@@ -129,7 +129,7 @@ class XMLTagDisplayFormatter : AbstractTagDisplayFormatter() {
             var tempChar: Char
             val replacedString = StringBuffer()
             for (i in 0..<xmlData.length) {
-                tempChar = xmlData.get(i)
+                tempChar = xmlData[i]
                 if ((Character.isLetterOrDigit(tempChar)) ||
                     (Character.isSpaceChar(tempChar))
                 ) {

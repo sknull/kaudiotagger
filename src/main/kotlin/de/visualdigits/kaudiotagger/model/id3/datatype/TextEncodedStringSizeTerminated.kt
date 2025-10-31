@@ -151,7 +151,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
             outputBuffer.flip()
             data = ByteArray(outputBuffer.limit())
             outputBuffer.rewind()
-            outputBuffer.get(data, 0, outputBuffer.limit())
+            outputBuffer[data, 0, outputBuffer.limit()]
             setSize(data.size)
         } catch (ce: CharacterCodingException) { // https:// bitbucket.org/ijabz/jaudiotagger/issue/1/encoding-metadata-to-utf-16-can-fail-if
             log.error("${ce.message}:$charset:${getValue()}")
@@ -274,12 +274,10 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @param stringValue
      */
     fun checkTrailingNull(values: MutableList<String>, stringValue: String?) {
-        if (!TagOptionSingleton.removeTrailingTerminatorOnWrite) {
-            if (stringValue?.isNotEmpty() == true && stringValue.endsWith('\u0000')) {
-                val lastVal = values.last()
-                val newLastVal = "$lastVal\u0000"
-                values[values.size - 1] = newLastVal
-            }
+        if (!TagOptionSingleton.removeTrailingTerminatorOnWrite && stringValue?.isNotEmpty() == true && stringValue.endsWith('\u0000')) {
+            val lastVal = values.last()
+            val newLastVal = "$lastVal\u0000"
+            values[values.size - 1] = newLastVal
         }
     }
 

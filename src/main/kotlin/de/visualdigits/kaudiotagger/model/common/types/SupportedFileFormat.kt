@@ -58,9 +58,7 @@ enum class SupportedFileFormat(filesuffix: String) {
             if (fileExtension == null) {
                 return UNKNOWN
             }
-            val format: SupportedFileFormat? = extensionMap.get(
-                fileExtension.lowercase()
-            )
+            val format: SupportedFileFormat? = extensionMap[fileExtension.lowercase()]
             return if (format == null) UNKNOWN else format
         }
     }

@@ -70,7 +70,7 @@ abstract class AbstractString: AbstractDataType {
                 // Get the Specified Decoder
                 getTextEncodingCharSet()?.newDecoder()
             } else {
-                if (inBuffer.get(0).toInt() == 0) {
+                if (inBuffer[0].toInt() == 0) {
                     StandardCharsets.UTF_16BE.newDecoder()
                 } else {
                     StandardCharsets.UTF_16LE.newDecoder()

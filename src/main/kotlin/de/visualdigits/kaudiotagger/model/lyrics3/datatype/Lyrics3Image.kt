@@ -47,7 +47,7 @@ class Lyrics3Image : AbstractDataType {
     }
 
     override fun readByteArray(byteArray: ByteArray, offset: Int) {
-        readString(byteArray.toString(), offset)
+        readString(byteArray.contentToString(), offset)
     }
 
     /**

@@ -108,14 +108,14 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
         lengthOfPictureInBytes = rawdata.getInt()
         // ImageData
         imageData = ByteArray(lengthOfPictureInBytes)
-        rawdata.get(imageData)
+        rawdata[imageData]
 
         log.debug("Read image:" + this)
     }
 
     private fun getString(rawdata: ByteBuffer, length: Int, charset: String): String {
         val tempbuffer = ByteArray(length)
-        rawdata.get(tempbuffer)
+        rawdata[tempbuffer]
         return String(tempbuffer, charset(charset))
     }
 
@@ -213,10 +213,10 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
      * @return the image url if there is otherwise return an empty String
      */
     fun getImageUrl(): String {
-        if (isImageUrl()) {
-            return imageData?.let { id -> String(id, StandardCharsets.ISO_8859_1) }?:""
+        return if (isImageUrl()) {
+            imageData?.let { id -> String(id, StandardCharsets.ISO_8859_1) }?:""
         } else {
-            return ""
+            ""
         }
     }
 

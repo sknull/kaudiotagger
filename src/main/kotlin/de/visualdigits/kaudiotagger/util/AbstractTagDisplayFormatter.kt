@@ -58,20 +58,24 @@ abstract class AbstractTagDisplayFormatter {
             var char1 = ""
             var char2 = ""
             try {
-                if (hexValue.length == 8) {
-                    char1 = hexValue.substring(6, 7)
-                    char2 = hexValue.substring(7, 8)
-                } else if (hexValue.length == 2) {
-                    char1 = hexValue.substring(0, 1)
-                    char2 = hexValue.substring(1, 2)
-                } else if (hexValue.length == 1) {
-                    char1 = "0"
-                    char2 = hexValue.substring(0, 1)
+                when (hexValue.length) {
+                    8 -> {
+                        char1 = hexValue.substring(6, 7)
+                        char2 = hexValue.substring(7, 8)
+                    }
+                    2 -> {
+                        char1 = hexValue.substring(0, 1)
+                        char2 = hexValue.substring(1, 2)
+                    }
+                    1 -> {
+                        char1 = "0"
+                        char2 = hexValue.substring(0, 1)
+                    }
                 }
             } catch (se: StringIndexOutOfBoundsException) {
                 return ""
             }
-            return hexBinaryMap.get(char1) + hexBinaryMap.get(char2)
+            return hexBinaryMap[char1] + hexBinaryMap[char2]
         }
     }
 }

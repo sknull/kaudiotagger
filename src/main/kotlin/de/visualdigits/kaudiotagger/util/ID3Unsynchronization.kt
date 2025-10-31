@@ -56,25 +56,29 @@ object ID3Unsynchronization {
                     val firstByte = input.read()
                     count++
                     output.write(firstByte)
-                    if ((firstByte and MPEGFrameHeader.SYNC_BYTE1) == MPEGFrameHeader.SYNC_BYTE1) {
-                        // if byte is $FF, we must check the following byte if there is one
-                        if (input.available() > 0) {
+                    // if byte is $FF, we must check the following byte if there is one
+                    when (MPEGFrameHeader.SYNC_BYTE1) {
+                        (firstByte and MPEGFrameHeader.SYNC_BYTE1) if input.available() > 0 -> {
                             input.mark(1) // remember where we were, if we don't need to unsynchronize
                             val secondByte = input.read()
-                            if ((secondByte and MPEGFrameHeader.SYNC_BYTE2) ==
-                                MPEGFrameHeader.SYNC_BYTE2
-                            ) {
-                                // we need to unsynchronize here
-                                if (log.isDebugEnabled) {
-                                    log.debug("Writing unsynchronisation bit at:" + count)
+                            when {
+                                (secondByte and MPEGFrameHeader.SYNC_BYTE2) ==
+                                        MPEGFrameHeader.SYNC_BYTE2
+                                    -> {
+                                    // we need to unsynchronize here
+                                    if (log.isDebugEnabled) {
+                                        log.debug("Writing unsynchronisation bit at:" + count)
+                                    }
+                                    output.write(0)
                                 }
-                                output.write(0)
-                            } else if (secondByte == 0) {
-                                // we need to unsynchronize here
-                                if (log.isDebugEnabled) {
-                                    log.debug("Inserting zero unsynchronisation bit at:" + count)
+
+                                secondByte == 0 -> {
+                                    // we need to unsynchronize here
+                                    if (log.isDebugEnabled) {
+                                        log.debug("Inserting zero unsynchronisation bit at:" + count)
+                                    }
+                                    output.write(0)
                                 }
-                                output.write(0)
                             }
                             input.reset()
                         }
@@ -109,7 +113,7 @@ object ID3Unsynchronization {
 
         val len = source.remaining()
         val bytes = ByteArray(len + 1) // an extra byte saves a check later.
-        source.get(bytes, 0, len)
+        source[bytes, 0, len]
         var from = 0
         var to = 0
         var copy = true // whether to copy the byte, if false, check the byte != 0.

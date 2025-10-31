@@ -118,9 +118,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @see #getTimestampFormat()
      */
     fun setTimestampFormat(timestampFormat: Int) {
-        if (EventTimingTimestampTypes.fromId(timestampFormat) == null) {
-            throw IllegalArgumentException("Timestamp format must be 1 or 2 (ID3v2.4, 4.7): $timestampFormat");
-        }
+        requireNotNull(EventTimingTimestampTypes.fromId(timestampFormat)) { "Timestamp format must be 1 or 2 (ID3v2.4, 4.7): $timestampFormat" }
         setObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT, timestampFormat);
     }
 
@@ -132,8 +130,8 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     @Suppress("UNCHECKED_CAST")
     fun getTempi(): MutableMap<Long, Int> {
         val map: MutableMap<Long, Int> = LinkedHashMap<Long, Int>()
-        val codes: MutableList<SynchronisedTempoCode> =
-            getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
+        val codes: List<SynchronisedTempoCode> =
+            getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as List<SynchronisedTempoCode>
         for (code in codes) {
             map[code.getTimestamp()] = code.getTempo()
         }
@@ -146,14 +144,10 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return list of timestamps
      */
     @Suppress("UNCHECKED_CAST")
-    fun getTimestamps(): MutableList<Long> {
-        val list: MutableList<Long> = mutableListOf()
-        val codes: MutableList<SynchronisedTempoCode> =
-            getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
-        for (code in codes) {
-            list.add(code.getTimestamp())
+    fun getTimestamps(): List<Long> {
+        return (getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>).map { code ->
+            code.getTimestamp()
         }
-        return Collections.unmodifiableList(list)
     }
 
     /**
@@ -168,7 +162,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         removeTempo(timestamp)
         val codes = getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
         var insertIndex = 0
-        if (!codes.isEmpty() && codes[0].getTimestamp() <= timestamp) {
+        if (codes.isNotEmpty() && codes[0].getTimestamp() <= timestamp) {
             for (code in codes) {
                 val translatedTimestamp = code.getTimestamp()
                 if (timestamp < translatedTimestamp) {

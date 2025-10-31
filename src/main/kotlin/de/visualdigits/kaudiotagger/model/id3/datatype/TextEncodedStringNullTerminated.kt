@@ -105,10 +105,8 @@ open class TextEncodedStringNullTerminated : AbstractString {
                 }
             } else {
                 // If UTF16, we should only be looking on 2 byte boundaries
-                if (!nullIsOneByte) {
-                    if (buffer.hasRemaining()) {
-                        buffer.get()
-                    }
+                if (!nullIsOneByte && buffer.hasRemaining()) {
+                    buffer.get()
                 }
             }
         }
@@ -175,7 +173,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
                         CharBuffer.wrap("\uFEFF${getValue() as? String}\u0000")
                     )
                     data = ByteArray(bb.limit())
-                    bb.get(data, 0, bb.limit())
+                    bb[data, 0, bb.limit()]
                 } else {
                     val encoder = StandardCharsets.UTF_16BE.newEncoder()
                     encoder.onMalformedInput(CodingErrorAction.IGNORE)
@@ -186,7 +184,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
                         CharBuffer.wrap("\uFEFF${getValue() as? String}\u0000")
                     )
                     data = ByteArray(bb.limit())
-                    bb.get(data, 0, bb.limit())
+                    bb[data, 0, bb.limit()]
                 }
             } else {
                 val encoder = charset.newEncoder()
@@ -197,7 +195,7 @@ open class TextEncodedStringNullTerminated : AbstractString {
                     CharBuffer.wrap("${getValue() as? String}\u0000")
                 )
                 data = ByteArray(bb.limit())
-                bb.get(data, 0, bb.limit())
+                bb[data, 0, bb.limit()]
             }
         } catch (ce: CharacterCodingException) { // https:// bitbucket.org/ijabz/jaudiotagger/issue/1/encoding-metadata-to-utf-16-can-fail-if
             log.error("${ce.message}:${charset.name()}:${getValue()}")

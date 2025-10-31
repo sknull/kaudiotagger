@@ -63,7 +63,7 @@ class Lyrics3v1: AbstractLyrics3 {
         }
 
         val buffer = ByteArray(5100 + 9 + 11)
-        byteBuffer.get(buffer)
+        byteBuffer[buffer]
         val lyricBuffer: String = String(buffer)
 
         lyric = lyricBuffer.substringBefore("LYRICSEND")
@@ -88,7 +88,6 @@ class Lyrics3v1: AbstractLyrics3 {
     fun seek(file: RandomAccessFile): Boolean {
         val buffer = ByteArray(5100 + 9 + 11)
         var lyricsEnd: String
-        val lyricsStart: String
         var offset: Long
 
         // check right before the ID3 1.0 tag for the lyrics3 tag
@@ -96,7 +95,7 @@ class Lyrics3v1: AbstractLyrics3 {
         file.read(buffer, 0, 9)
         lyricsEnd = String(buffer, 0, 9)
 
-        if (lyricsEnd.equals("LYRICSEND")) {
+        if (lyricsEnd == "LYRICSEND") {
             offset = file.filePointer
         } else {
             // check the end of the file for a lyrics3 tag incase an ID3
@@ -105,7 +104,7 @@ class Lyrics3v1: AbstractLyrics3 {
             file.read(buffer, 0, 9)
             lyricsEnd = String(buffer, 0, 9)
 
-            if (lyricsEnd.equals("LYRICSEND")) {
+            if (lyricsEnd == "LYRICSEND") {
                 offset = file.filePointer
             } else {
                 return false
@@ -116,7 +115,7 @@ class Lyrics3v1: AbstractLyrics3 {
         offset -= (5100 + 9 + 11)
         file.seek(offset)
         file.read(buffer)
-        lyricsStart = String(buffer)
+        val lyricsStart = String(buffer)
 
         // search for the tag
         val i = lyricsStart.indexOf("LYRICSBEGIN")
@@ -154,7 +153,6 @@ class Lyrics3v1: AbstractLyrics3 {
         var str: String
         var offset: Int
         val buffer: ByteArray?
-        val id3v1tag: ID3v1Tag? = null
 
         delete(file)
         file.seek(file.length())
@@ -164,7 +162,7 @@ class Lyrics3v1: AbstractLyrics3 {
         str = "LYRICSBEGIN"
 
         for (i in 0..<str.length) {
-            buffer[i] = str.get(i).code.toByte()
+            buffer[i] = str[i].code.toByte()
         }
 
         offset = str.length
@@ -172,7 +170,7 @@ class Lyrics3v1: AbstractLyrics3 {
         str = ID3Tags.truncate(lyric, 5100)
 
         for (i in 0..<str.length) {
-            buffer[i + offset] = str.get(i).code.toByte()
+            buffer[i + offset] = str[i].code.toByte()
         }
 
         offset += str.length
@@ -180,15 +178,11 @@ class Lyrics3v1: AbstractLyrics3 {
         str = "LYRICSEND"
 
         for (i in 0..<str.length) {
-            buffer[i + offset] = str.get(i).code.toByte()
+            buffer[i + offset] = str[i].code.toByte()
         }
 
         offset += str.length
 
         file.write(buffer, 0, offset)
-
-        if (id3v1tag != null) {
-            id3v1tag.write(file)
-        }
     }
 }

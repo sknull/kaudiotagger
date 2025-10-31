@@ -38,6 +38,7 @@ abstract class AggregatedFrame() : TagTextField {
      * @param content fields content.
      */
     override fun setContent(content: String) {
+        // to be implemented
     }
 
     /**
@@ -61,6 +62,7 @@ abstract class AggregatedFrame() : TagTextField {
      * @param encoding charset.
      */
     override fun setEncoding(encoding: Charset) {
+        // to be implemented
     }
 
     override fun getIdentifier(): String? {
@@ -80,6 +82,7 @@ abstract class AggregatedFrame() : TagTextField {
     }
 
     override fun isBinary(b: Boolean) {
+        // to be implemented
     }
 
     override fun isEmpty(): Boolean {

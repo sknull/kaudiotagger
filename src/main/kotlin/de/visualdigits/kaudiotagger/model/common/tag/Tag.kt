@@ -32,13 +32,6 @@ import de.visualdigits.kaudiotagger.model.images.Artwork
 interface Tag {
 
     /**
-     * Iterator over all the fields within the tag, handle multiple fields with the same id
-     *
-     * @return iterator over whole list
-     */
-    fun getFields(): MutableIterator<TagField?>
-
-    /**
      * Returns a [list][List] of [TagField] objects whose &quot;[id][TagField.getId]&quot;
      * is the specified one.<br></br>
      *

@@ -214,60 +214,68 @@ class ID3v23Tag : AbstractID3v2Tag {
 
     override fun convertFrame(frame: AbstractID3v2Frame): MutableList<AbstractID3v2Frame> {
         val frames = mutableListOf<AbstractID3v2Frame>()
-        if ((frame.getIdentifier() == ID3v24FrameId.YEAR.id) &&
-            (frame.frameBody is FrameBodyTDRC)
-        ) {
-            val tmpBody = frame.frameBody as FrameBodyTDRC
-            // TODO will overwrite any existing TYER or TIME frame, do we ever want multiples of these
-            tmpBody.findMatchingMaskAndExtractV3Values()
-            var newFrame: ID3v23Frame
-            if (tmpBody.year != "") {
-                newFrame = ID3v23Frame(ID3v23FrameId.TYER.id)
-                (newFrame.frameBody as FrameBodyTYER).setText(tmpBody.year)
-                frames.add(newFrame)
+        when {
+            (frame.getIdentifier() == ID3v24FrameId.YEAR.id) &&
+                    (frame.frameBody is FrameBodyTDRC)
+                -> {
+                val tmpBody = frame.frameBody as FrameBodyTDRC
+                // TODO will overwrite any existing TYER or TIME frame, do we ever want multiples of these
+                tmpBody.findMatchingMaskAndExtractV3Values()
+                var newFrame: ID3v23Frame
+                if (tmpBody.year != "") {
+                    newFrame = ID3v23Frame(ID3v23FrameId.TYER.id)
+                    (newFrame.frameBody as FrameBodyTYER).setText(tmpBody.year)
+                    frames.add(newFrame)
+                }
+                if (tmpBody.date != "") {
+                    newFrame = ID3v23Frame(ID3v23FrameId.TDAT.id)
+                    (newFrame.frameBody as FrameBodyTDAT).setText(tmpBody.date)
+                    (newFrame.frameBody as FrameBodyTDAT).isMonthOnly = tmpBody.monthOnly
+                    frames.add(newFrame)
+                }
+                if (!tmpBody.time.equals("")) {
+                    newFrame = ID3v23Frame(ID3v23FrameId.TIME.id)
+                    (newFrame.frameBody as FrameBodyTIME).setText(tmpBody.time)
+                    (newFrame.frameBody as FrameBodyTIME).hoursOnly = tmpBody.hoursOnly
+                    frames.add(newFrame)
+                }
             }
-            if (tmpBody.date != "") {
-                newFrame = ID3v23Frame(ID3v23FrameId.TDAT.id)
-                (newFrame.frameBody as FrameBodyTDAT).setText(tmpBody.date)
-                (newFrame.frameBody as FrameBodyTDAT).isMonthOnly = tmpBody.monthOnly
-                frames.add(newFrame)
+
+            (frame.getIdentifier() == ID3v24FrameId.INVOLVED_PEOPLE.id) &&
+                    (frame.frameBody is FrameBodyTIPL)
+                -> {
+                val pairs = (frame.frameBody as? FrameBodyTIPL)?.getPairing()?.mapping
+                val ipls: AbstractID3v2Frame = ID3v23Frame(
+                    frame as ID3v24Frame,
+                    ID3v23FrameId.INVOLVED_PEOPLE.id
+                )
+                val iplsBody = FrameBodyIPLS(
+                    frame.frameBody?.getTextEncoding() ?: 0,
+                    pairs ?: error("No mapping")
+                )
+                ipls.frameBody = iplsBody
+                frames.add(ipls)
             }
-            if (!tmpBody.time.equals("")) {
-                newFrame = ID3v23Frame(ID3v23FrameId.TIME.id)
-                (newFrame.frameBody as FrameBodyTIME).setText(tmpBody.time)
-                (newFrame.frameBody as FrameBodyTIME).hoursOnly = tmpBody.hoursOnly
-                frames.add(newFrame)
+
+            (frame.getIdentifier() == ID3v24FrameId.MUSICIAN_CREDITS.id) &&
+                    (frame.frameBody is FrameBodyTMCL)
+                -> {
+                val pairs = (frame.frameBody as? FrameBodyTMCL)?.getPairing()?.mapping
+                val ipls: AbstractID3v2Frame = ID3v23Frame(
+                    frame as ID3v24Frame,
+                    ID3v23FrameId.INVOLVED_PEOPLE.id
+                )
+                val iplsBody = FrameBodyIPLS(
+                    frame.frameBody?.getTextEncoding() ?: 0,
+                    pairs ?: error("No mapping")
+                )
+                ipls.frameBody = iplsBody
+                frames.add(ipls)
             }
-        } else if ((frame.getIdentifier() == ID3v24FrameId.INVOLVED_PEOPLE.id) &&
-            (frame.frameBody is FrameBodyTIPL)
-        ) {
-            val pairs = (frame.frameBody as? FrameBodyTIPL)?.getPairing()?.mapping
-            val ipls: AbstractID3v2Frame = ID3v23Frame(
-                frame as ID3v24Frame,
-                ID3v23FrameId.INVOLVED_PEOPLE.id
-            )
-            val iplsBody = FrameBodyIPLS(
-                frame.frameBody?.getTextEncoding() ?: 0,
-                pairs ?: error("No mapping")
-            )
-            ipls.frameBody = iplsBody
-            frames.add(ipls)
-        } else if ((frame.getIdentifier() == ID3v24FrameId.MUSICIAN_CREDITS.id) &&
-            (frame.frameBody is FrameBodyTMCL)
-        ) {
-            val pairs = (frame.frameBody as? FrameBodyTMCL)?.getPairing()?.mapping
-            val ipls: AbstractID3v2Frame = ID3v23Frame(
-                frame as ID3v24Frame,
-                ID3v23FrameId.INVOLVED_PEOPLE.id
-            )
-            val iplsBody = FrameBodyIPLS(
-                frame.frameBody?.getTextEncoding() ?: 0,
-                pairs ?: error("No mapping")
-            )
-            ipls.frameBody = iplsBody
-            frames.add(ipls)
-        } else {
-            frames.add(ID3v23Frame(frame))
+
+            else -> {
+                frames.add(ID3v23Frame(frame))
+            }
         }
         return frames
     }
@@ -448,7 +456,7 @@ class ID3v23Tag : AbstractID3v2Tag {
 
         // Extended Header
         if (isExtended) {
-            readExtendedHeader(byteBuffer, size)
+            readExtendedHeader(byteBuffer)
         }
 
         // Slice Buffer, so position markers tally with size (i.e do not include tagHeader)
@@ -549,11 +557,9 @@ class ID3v23Tag : AbstractID3v2Tag {
      * Read the optional extended header
      *
      * @param buffer
-     * @param size
      */
-    private fun readExtendedHeader(buffer: ByteBuffer, size: Int) {
+    private fun readExtendedHeader(buffer: ByteBuffer) {
         // Int is 4 bytes.
-        var size = size
         val extendedHeaderSize = buffer.getInt()
         // Extended header without CRC Data
         if (extendedHeaderSize == TAG_EXT_HEADER_DATA_LENGTH) {
@@ -679,7 +685,7 @@ class ID3v23Tag : AbstractID3v2Tag {
      * so that most important frames are written first.
      */
     override fun getPreferredFrameOrderComparator(): Comparator<String> {
-        return ID3v23PreferredFrameOrderComparator.instance
+        return ID3v23PreferredFrameOrderComparator
     }
 
     /**
@@ -699,21 +705,24 @@ class ID3v23Tag : AbstractID3v2Tag {
             getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART).frameId
         )
         val body = frame.frameBody as FrameBodyAPIC
-        if (!artwork.isLinked) {
-            body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
-            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, artwork.mimeType)
-            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-            return frame
-        } else {
-            body.setObjectValue(
-                DataTypes.OBJ_PICTURE_DATA,
-                artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
-            )
-            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
-            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-            return frame
+        when {
+            !artwork.isLinked -> {
+                body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
+                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+                body.setObjectValue(DataTypes.OBJ_MIME_TYPE, artwork.mimeType)
+                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+                return frame
+            }
+            else -> {
+                body.setObjectValue(
+                    DataTypes.OBJ_PICTURE_DATA,
+                    artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
+                )
+                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+                body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
+                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+                return frame
+            }
         }
     }
 

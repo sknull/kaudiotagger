@@ -59,7 +59,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
 
         // Allocate a buffer to the size of the Frame Body and read from file
         val buffer = ByteArray(sizeValue)
-        byteBuffer.get(buffer)
+        byteBuffer[buffer]
 
         // Offset into buffer, incremented by length of previous dataType
         // this offset is only used internally to decide where to look for the next

@@ -119,7 +119,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
 
         // Read the Frame Identifier
         if (getFrameIdSize() <= byteBuffer.remaining()) {
-            byteBuffer.get(buffer, 0, getFrameIdSize())
+            byteBuffer[buffer, 0, getFrameIdSize()]
         }
 
         if (isPadding(buffer)) {

@@ -27,6 +27,8 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWOAR
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyWXXX
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -182,7 +184,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
             // ID3 identifier
             val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
-            bb.get(tagIdentifier, 0, FIELD_TAGID_LENGTH)
+            bb[tagIdentifier, 0, FIELD_TAGID_LENGTH]
             if (!(tagIdentifier.contentEquals(TAG_ID))) {
                 return 0
             }
@@ -349,7 +351,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         encryptedFrameMap.clear()
 
         // Copy Frames that are a valid 2.4 type
-        copyObject.frameMap.forEach { (id, value) ->
+        copyObject.frameMap.values.forEach { value ->
             // SingleFrames
             when (value) {
                 is AbstractID3v2Frame -> {
@@ -448,8 +450,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         next: AbstractID3v2Frame
     ) {
         if ((ID3v22FrameId.isMultipleAllowed(frameId)) ||
-            (ID3v22FrameId.isMultipleAllowed(frameId)) ||
-            (ID3v22FrameId.isMultipleAllowed(frameId))
+            (ID3v23FrameId.isMultipleAllowed(frameId)) ||
+            (ID3v24FrameId.isMultipleAllowed(frameId))
         ) {
             // If a frame already exists of this type
             if (map.containsKey(frameId)) {
@@ -512,25 +514,28 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         bodyBuffer: ByteArrayOutputStream
     ) {
         // Sort keys into Preferred Order
-        val sortedWriteOrder = TreeSet(
-            getPreferredFrameOrderComparator()
-        )
+        val sortedWriteOrder = TreeSet(getPreferredFrameOrderComparator())
         sortedWriteOrder.addAll(map.keys)
 
         var frame: AbstractID3v2Frame
-        for (id in sortedWriteOrder) {
-            val o = map.get(id)
-            if (o is AbstractID3v2Frame) {
-                frame = o
-                frame.write(bodyBuffer)
-            } else if (o is AggregatedFrame) {
-                for (next in o.getFrames()) {
-                    next.write(bodyBuffer)
+        sortedWriteOrder.forEach { id ->
+            when (val o = map[id]) {
+                is AbstractID3v2Frame -> {
+                    frame = o
+                    frame.write(bodyBuffer)
                 }
-            } else {
-                val multiFrames = o as MutableList<AbstractID3v2Frame>
-                for (nextFrame in multiFrames) {
-                    nextFrame.write(bodyBuffer)
+
+                is AggregatedFrame -> {
+                    o.getFrames().forEach { next ->
+                        next.write(bodyBuffer)
+                    }
+                }
+
+                else -> {
+                    val multiFrames = o as List<AbstractID3v2Frame>
+                    multiFrames.forEach { nextFrame ->
+                        nextFrame.write(bodyBuffer)
+                    }
                 }
             }
         }
@@ -610,20 +615,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 }
             }
         } catch (e: FileNotFoundException) {
-            log.error(e.message, e)
-            if (e.message?.contains("Access is denied") ?: false || e.message?.contains("Permission denied") ?: false) {
-                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
-            } else {
-                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path))
-            }
+            log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.path), e)
             throw e
         } catch (e: IOException) {
-            log.error(e.message, e)
-            if (e.message == "Access is denied") {
-                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
-            } else {
-                log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path))
-            }
+            log.error(ErrorMessage.GENERAL_WRITE_FAILED_TO_OPEN_FILE_FOR_EDITING.getMsg(file.getParentFile().path), e)
             throw e
         }
     }
@@ -639,7 +634,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         log.debug("ByteBuffer pos:${byteBuffer.position()}:limit${byteBuffer.limit()}:cap${byteBuffer.capacity()}")
 
         val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
-        byteBuffer.get(tagIdentifier, 0, FIELD_TAGID_LENGTH)
+        byteBuffer[tagIdentifier, 0, FIELD_TAGID_LENGTH]
         if (!(tagIdentifier.contentEquals(TAG_ID))) {
             return false
         }
@@ -691,6 +686,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param file
      */
     override fun write(file: RandomAccessFile) {
+        // to be implemented
     }
 
     override fun addField(genericKey: GenericFieldKey, vararg values: String) {
@@ -767,60 +763,69 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
          * if same description otherwise we create a new frame
          */
         val frameBody = frame.frameBody
-        if (frameBody is FrameBodyTXXX) {
-            var match = false
-            val i: MutableIterator<TagField?> = mergedList.listIterator()
-            while (i.hasNext()) {
-                val existingFrameBody =
-                    (i.next() as AbstractID3v2Frame).frameBody as FrameBodyTXXX
-                if (frameBody.getDescription() == existingFrameBody.getDescription()
-                ) {
-                    frameBody.getText()?.also { t -> existingFrameBody.addTextValue(t) }
-                    match = true
-                    break
+        when (frameBody) {
+            is FrameBodyTXXX -> {
+                var match = false
+                val i: MutableIterator<TagField?> = mergedList.listIterator()
+                while (i.hasNext()) {
+                    val existingFrameBody = (i.next() as AbstractID3v2Frame).frameBody as FrameBodyTXXX
+                    if (frameBody.getDescription() == existingFrameBody.getDescription()) {
+                        frameBody.getText()?.also { t -> existingFrameBody.addTextValue(t) }
+                        match = true
+                        break
+                    }
                 }
-            }
-            if (!match) {
-                addNewFrameToMap(list, frameMap, existingFrame, frame)
-            }
-        } else if (frameBody is FrameBodyWXXX) {
-            var match = false
-            val i: MutableIterator<TagField?> = mergedList.listIterator()
-            while (i.hasNext()) {
-                val existingFrameBody =
-                    (i.next() as AbstractID3v2Frame).frameBody as FrameBodyWXXX
-                if (frameBody.getDescription() == existingFrameBody.getDescription()
-                ) {
-                    existingFrameBody.addUrlLink(frameBody.getUrlLink())
-                    match = true
-                    break
-                }
-            }
-            if (!match) {
-                addNewFrameToMap(list, frameMap, existingFrame, frame)
-            }
-        } else if (frameBody is AbstractFrameBodyTextInfo) {
-            val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyTextInfo
-            frameBody.getText()?.also { t -> existingFrameBody?.addTextValue(t) }
-        } else if (frameBody is AbstractFrameBodyPairs) {
-            val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyPairs
-            existingFrameBody?.addPair(frameBody.getText())
-        } else if (frameBody is AbstractFrameBodyNumberTotal) {
-            val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyNumberTotal
-
-            frameBody.getNumber()?.let {
-                if (it > 0) {
-                    existingFrameBody?.setNumber(frameBody.getNumberAsText() ?: "0")
+                if (!match) {
+                    addNewFrameToMap(list, frameMap, existingFrame, frame)
                 }
             }
 
-            frameBody.getTotal()?.let {
-                if (it > 0) {
-                    frameBody.getTotalAsText()?.also { t -> existingFrameBody?.setTotal(t) }
+            is FrameBodyWXXX -> {
+                var match = false
+                val i: MutableIterator<TagField?> = mergedList.listIterator()
+                while (i.hasNext()) {
+                    val existingFrameBody =
+                        (i.next() as AbstractID3v2Frame).frameBody as FrameBodyWXXX
+                    if (frameBody.getDescription() == existingFrameBody.getDescription()) {
+                        existingFrameBody.addUrlLink(frameBody.getUrlLink())
+                        match = true
+                        break
+                    }
+                }
+                if (!match) {
+                    addNewFrameToMap(list, frameMap, existingFrame, frame)
                 }
             }
-        } else {
-            addNewFrameToMap(list, frameMap, existingFrame, frame)
+
+            is AbstractFrameBodyTextInfo -> {
+                val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyTextInfo
+                frameBody.getText()?.also { t -> existingFrameBody?.addTextValue(t) }
+            }
+
+            is AbstractFrameBodyPairs -> {
+                val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyPairs
+                existingFrameBody?.addPair(frameBody.getText())
+            }
+
+            is AbstractFrameBodyNumberTotal -> {
+                val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyNumberTotal
+
+                frameBody.getNumber()?.let {
+                    if (it > 0) {
+                        existingFrameBody?.setNumber(frameBody.getNumberAsText() ?: "0")
+                    }
+                }
+
+                frameBody.getTotal()?.let {
+                    if (it > 0) {
+                        frameBody.getTotalAsText()?.also { t -> existingFrameBody?.setTotal(t) }
+                    }
+                }
+            }
+
+            else -> {
+                addNewFrameToMap(list, frameMap, existingFrame, frame)
+            }
         }
     }
 
@@ -878,67 +883,91 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         val value: String = values[0]
 
         val frame = createFrame(formatKey.frameId)
-        if (frame.frameBody is FrameBodyUFID) {
-            (frame.frameBody as FrameBodyUFID).setOwner(formatKey.subId)
-            (frame.frameBody as FrameBodyUFID).setUniqueIdentifier(
-                value.toByteArray(StandardCharsets.ISO_8859_1)
-            )
-        } else if (frame.frameBody is FrameBodyTXXX) {
-            (frame.frameBody as? FrameBodyTXXX)?.setDescription(formatKey.subId)
-            (frame.frameBody as FrameBodyTXXX).setText(value)
-        } else if (frame.frameBody is FrameBodyWXXX) {
-            (frame.frameBody as FrameBodyWXXX).setDescription(formatKey.subId)
-            (frame.frameBody as FrameBodyWXXX).setUrlLink(value)
-        } else if (frame.frameBody is FrameBodyCOMM) {
-            // Set description if set
-            if (formatKey.subId != null) {
-                (frame.frameBody as FrameBodyCOMM).setDescription(formatKey.subId)
-                // Special Handling for Media Monkey Compatability
-                if ((frame.frameBody as FrameBodyCOMM).isMediaMonkeyFrame()) {
-                    (frame.frameBody as FrameBodyCOMM).setLanguage(
-                        Languages.MEDIA_MONKEY_ID
-                    )
-                }
-            }
-            (frame.frameBody as FrameBodyCOMM).setText(value)
-        } else if (frame.frameBody is FrameBodyUSLT) {
-            (frame.frameBody as FrameBodyUSLT).setDescription("")
-            (frame.frameBody as FrameBodyUSLT).setLyric(value)
-        } else if (frame.frameBody is FrameBodyWOAR) {
-            (frame.frameBody as FrameBodyWOAR).setUrlLink(value)
-        } else if (frame.frameBody is AbstractFrameBodyTextInfo) {
-            (frame.frameBody as AbstractFrameBodyTextInfo).setText(value)
-        } else if (frame.frameBody is FrameBodyPOPM) {
-            (frame.frameBody as FrameBodyPOPM).parseString(value)
-        } else if (frame.frameBody is FrameBodyIPLS) {
-            if (formatKey.subId != null) {
-                ((frame.frameBody) as FrameBodyIPLS).addPair(
-                    formatKey.subId,
-                    value
+        when (frame.frameBody) {
+            is FrameBodyUFID -> {
+                (frame.frameBody as FrameBodyUFID).setOwner(formatKey.subId)
+                (frame.frameBody as FrameBodyUFID).setUniqueIdentifier(
+                    value.toByteArray(StandardCharsets.ISO_8859_1)
                 )
-            } else {
-                if (values.size >= 2) {
-                    ((frame.frameBody) as FrameBodyIPLS).addPair(values[0], values[1])
+            }
+
+            is FrameBodyTXXX -> {
+                (frame.frameBody as? FrameBodyTXXX)?.setDescription(formatKey.subId)
+                (frame.frameBody as FrameBodyTXXX).setText(value)
+            }
+
+            is FrameBodyWXXX -> {
+                (frame.frameBody as FrameBodyWXXX).setDescription(formatKey.subId)
+                (frame.frameBody as FrameBodyWXXX).setUrlLink(value)
+            }
+
+            is FrameBodyCOMM -> {
+                // Set description if set
+                if (formatKey.subId != null) {
+                    (frame.frameBody as FrameBodyCOMM).setDescription(formatKey.subId)
+                    // Special Handling for Media Monkey Compatability
+                    if ((frame.frameBody as FrameBodyCOMM).isMediaMonkeyFrame()) {
+                        (frame.frameBody as FrameBodyCOMM).setLanguage(
+                            Languages.MEDIA_MONKEY_ID
+                        )
+                    }
+                }
+                (frame.frameBody as FrameBodyCOMM).setText(value)
+            }
+
+            is FrameBodyUSLT -> {
+                (frame.frameBody as FrameBodyUSLT).setDescription("")
+                (frame.frameBody as FrameBodyUSLT).setLyric(value)
+            }
+
+            is FrameBodyWOAR -> {
+                (frame.frameBody as FrameBodyWOAR).setUrlLink(value)
+            }
+
+            is AbstractFrameBodyTextInfo -> {
+                (frame.frameBody as AbstractFrameBodyTextInfo).setText(value)
+            }
+
+            is FrameBodyPOPM -> {
+                (frame.frameBody as FrameBodyPOPM).parseString(value)
+            }
+
+            is FrameBodyIPLS -> {
+                if (formatKey.subId != null) {
+                    ((frame.frameBody) as FrameBodyIPLS).addPair(
+                        formatKey.subId,
+                        value
+                    )
                 } else {
-                    ((frame.frameBody) as FrameBodyIPLS).addPair(values[0])
+                    if (values.size >= 2) {
+                        ((frame.frameBody) as FrameBodyIPLS).addPair(values[0], values[1])
+                    } else {
+                        ((frame.frameBody) as FrameBodyIPLS).addPair(values[0])
+                    }
                 }
             }
-        } else if (frame.frameBody is FrameBodyTIPL) {
-            ((frame.frameBody) as? FrameBodyTIPL)?.addPair(formatKey.subId, value)
-        } else if (frame.frameBody is FrameBodyTMCL) {
-            if (values.size >= 2) {
-                ((frame.frameBody) as FrameBodyTMCL).addPair(values[0], values[1])
-            } else {
-                ((frame.frameBody) as FrameBodyTMCL).addPair(values[0])
+
+            is FrameBodyTIPL -> {
+                ((frame.frameBody) as? FrameBodyTIPL)?.addPair(formatKey.subId, value)
             }
-        } else if ((frame.frameBody is FrameBodyAPIC) ||
-            (frame.frameBody is FrameBodyPIC)
-        ) {
-            throw UnsupportedOperationException(
-                ErrorMessage.ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD.getMsg()
-            )
-        } else {
-            error("Field with key of:${formatKey.frameId}:does not accept cannot parse data:$value")
+
+            is FrameBodyTMCL -> {
+                if (values.size >= 2) {
+                    ((frame.frameBody) as FrameBodyTMCL).addPair(values[0], values[1])
+                } else {
+                    ((frame.frameBody) as FrameBodyTMCL).addPair(values[0])
+                }
+            }
+
+            is FrameBodyAPIC, is FrameBodyPIC -> {
+                throw UnsupportedOperationException(
+                    ErrorMessage.ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD.getMsg()
+                )
+            }
+
+            else -> {
+                error("Field with key of:${formatKey.frameId}:does not accept cannot parse data:$value")
+            }
         }
         return frame
     }
@@ -957,28 +986,36 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         // and discno versus disctotal so we have to handle here, also want to ignore index parameter.
         val fields = getFields(genericKey)
         val values = mutableListOf<String>()
-        if (ID3NumberTotalFields.isNumber(genericKey)) {
-            if (fields.isNotEmpty()) {
-                val frame = fields.get(0) as AbstractID3v2Frame
-                (frame.frameBody as? AbstractFrameBodyNumberTotal)?.getNumberAsText()?.also { v -> values.add(v) }
+        return when {
+            ID3NumberTotalFields.isNumber(genericKey) -> {
+                if (fields.isNotEmpty()) {
+                    val frame = fields[0] as AbstractID3v2Frame
+                    (frame.frameBody as? AbstractFrameBodyNumberTotal)?.getNumberAsText()?.also { v -> values.add(v) }
+                }
+                values
             }
-            return values
-        } else if (ID3NumberTotalFields.isTotal(genericKey)) {
-            if (fields.isNotEmpty()) {
-                val frame = fields.get(0) as AbstractID3v2Frame
-                (frame.frameBody as? AbstractFrameBodyNumberTotal)?.getTotalAsText()?.also { t -> values.add(t) }
+
+            ID3NumberTotalFields.isTotal(genericKey) -> {
+                if (fields.isNotEmpty()) {
+                    val frame = fields[0] as AbstractID3v2Frame
+                    (frame.frameBody as? AbstractFrameBodyNumberTotal)?.getTotalAsText()?.also { t -> values.add(t) }
+                }
+                values
             }
-            return values
-        } else if (genericKey == GenericFieldKey.RATING) {
-            if (fields.isNotEmpty()) {
-                val frame = fields.get(0) as AbstractID3v2Frame
-                values.add(
-                    java.lang.String.valueOf((frame.frameBody as FrameBodyPOPM).getRating())
-                )
+
+            genericKey == GenericFieldKey.RATING -> {
+                if (fields.isNotEmpty()) {
+                    val frame = fields[0] as AbstractID3v2Frame
+                    values.add(
+                        java.lang.String.valueOf((frame.frameBody as FrameBodyPOPM).getRating())
+                    )
+                }
+                values
             }
-            return values
-        } else {
-            return this.doGetValues(getFrameAndSubIdFromGenericKey(genericKey))
+
+            else -> {
+                this.doGetValues(getFrameAndSubIdFromGenericKey(genericKey))
+            }
         }
     }
 
@@ -1029,7 +1066,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             if (fields.isNotEmpty()) {
                 // Should only be one frame so ignore index value, and we ignore multiple values within the frame
                 // it would make no sense if it existed.
-                val frame = fields.get(0) as AbstractID3v2Frame
+                val frame = fields[0] as AbstractID3v2Frame
                 if (ID3NumberTotalFields.isNumber(genericKey)) {
                     return (frame.frameBody as AbstractFrameBodyNumberTotal
                             ).getNumberAsText()
@@ -1042,11 +1079,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
         } else if (genericKey == GenericFieldKey.RATING) {
             val fields = getFields(genericKey)
-            if (fields.size > index) {
-                val frame = fields.get(index) as AbstractID3v2Frame
-                return (frame.frameBody as FrameBodyPOPM).getRating().toString()
+            return if (fields.size > index) {
+                val frame = fields[index] as AbstractID3v2Frame
+                (frame.frameBody as FrameBodyPOPM).getRating().toString()
             } else {
-                return ""
+                ""
             }
         }
 
@@ -1107,35 +1144,44 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             // Get list of frames that this uses
             getFields(formatKey.frameId).forEach { field ->
                 val next = (field as AbstractID3v2Frame).frameBody
-                if (next is FrameBodyTXXX) {
-                    if (next.getDescription() == formatKey.subId
-                    ) {
-                        values.addAll((next.getValues()))
+                when (next) {
+                    is FrameBodyTXXX -> {
+                        if (next.getDescription() == formatKey.subId
+                        ) {
+                            values.addAll((next.getValues()))
+                        }
                     }
-                } else if (next is FrameBodyWXXX) {
-                    if (next.getDescription() == formatKey.subId
-                    ) {
-                        values.addAll((next.getUrlLinks()))
+
+                    is FrameBodyWXXX -> {
+                        if (next.getDescription() == formatKey.subId
+                        ) {
+                            values.addAll((next.getUrlLinks()))
+                        }
                     }
-                } else if (next is FrameBodyCOMM) {
-                    if (next.getDescription() == formatKey.subId
-                    ) {
-                        values.addAll((next.getValues()))
+
+                    is FrameBodyCOMM -> {
+                        if (next.getDescription() == formatKey.subId) {
+                            values.addAll((next.getValues()))
+                        }
                     }
-                } else if (next is FrameBodyUFID) {
-                    if (next.getOwner() == formatKey.subId) {
-                        if (next.getUniqueIdentifier() != null) {
+
+                    is FrameBodyUFID -> {
+                        if (next.getOwner() == formatKey.subId && next.getUniqueIdentifier() != null) {
                             values.add(String(next.getUniqueIdentifier() ?: byteArrayOf()))
                         }
                     }
-                } else if (next is AbstractFrameBodyPairs) {
-                    next.getPairing()?.mapping?.forEach { entry ->
-                        if (entry.first == formatKey.subId) {
-                            values.add(entry.second)
+
+                    is AbstractFrameBodyPairs -> {
+                        next.getPairing()?.mapping?.forEach { entry ->
+                            if (entry.first == formatKey.subId) {
+                                values.add(entry.second)
+                            }
                         }
                     }
-                } else {
-                    error("Need to implement getFields(GenericFieldKey genericKey) for:${next?.javaClass}")
+
+                    else -> {
+                        error("Need to implement getFields(GenericFieldKey genericKey) for:${next?.javaClass}")
+                    }
                 }
             }
         } else if ((formatKey.genericKey == GenericFieldKey.PERFORMER) ||
@@ -1145,13 +1191,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 val next = (field as AbstractID3v2Frame).frameBody
                 if (next is AbstractFrameBodyPairs) {
                     next.getPairing()?.mapping?.forEach { entry ->
-                        if (!StandardIPLSKey.isKey(entry.first)) {
-                            if (!entry.second.isEmpty()) {
-                                if (!entry.first.isEmpty()) {
-                                    values.add(entry.second)
-                                } else {
-                                    values.add(entry.second)
-                                }
+                        if (!StandardIPLSKey.isKey(entry.first) && entry.second.isNotEmpty()) {
+                            if (entry.first.isNotEmpty()) {
+                                values.add(entry.first)
+                            } else {
+                                values.add(entry.second)
                             }
                         }
                     }
@@ -1193,7 +1237,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     fun doGetValueAtIndex(formatKey: FrameAndSubId, index: Int): String? {
         val values = doGetValues(formatKey)
         if (values.size > index) {
-            return values.get(index)
+            return values[index]
         }
         return ""
     }
@@ -1238,18 +1282,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * key relating to one of them
      *
      * @param formatKey
-     * @param numberFieldKey
-     * @param totalFieldKey
      * @param deleteNumberFieldKey
      */
     private fun deleteNumberTotalFrame(
         formatKey: FrameAndSubId,
-        numberFieldKey: GenericFieldKey,
-        totalFieldKey: GenericFieldKey,
         deleteNumberFieldKey: Boolean
     ) {
         if (deleteNumberFieldKey) {
-            val total = this.getFirst(totalFieldKey)
             if (isEmpty()) {
                 doDeleteTagField(formatKey)
             } else {
@@ -1288,43 +1327,31 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         when (genericKey) {
             GenericFieldKey.TRACK -> deleteNumberTotalFrame(
                 formatKey,
-                GenericFieldKey.TRACK,
-                GenericFieldKey.TRACK_TOTAL,
                 true
             )
 
             GenericFieldKey.TRACK_TOTAL -> deleteNumberTotalFrame(
                 formatKey,
-                GenericFieldKey.TRACK,
-                GenericFieldKey.TRACK_TOTAL,
                 false
             )
 
             GenericFieldKey.DISC_NO -> deleteNumberTotalFrame(
                 formatKey,
-                GenericFieldKey.DISC_NO,
-                GenericFieldKey.DISC_TOTAL,
                 true
             )
 
             GenericFieldKey.DISC_TOTAL -> deleteNumberTotalFrame(
                 formatKey,
-                GenericFieldKey.DISC_NO,
-                GenericFieldKey.DISC_TOTAL,
                 false
             )
 
             GenericFieldKey.MOVEMENT_NO -> deleteNumberTotalFrame(
                 formatKey,
-                GenericFieldKey.MOVEMENT_NO,
-                GenericFieldKey.MOVEMENT_TOTAL,
                 true
             )
 
             GenericFieldKey.MOVEMENT_TOTAL -> deleteNumberTotalFrame(
                 formatKey,
-                GenericFieldKey.MOVEMENT_NO,
-                GenericFieldKey.MOVEMENT_TOTAL,
                 false
             )
 
@@ -1342,50 +1369,53 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         val list = getFields(formatKey.frameId)
         list.forEach { field ->
             val next = (field as AbstractID3v2Frame).frameBody
-            if (next is FrameBodyTXXX) {
-                if (next.getDescription() == formatKey.subId
-                ) {
-                    if (list.size == 1) {
+            when (next) {
+                is FrameBodyTXXX -> {
+                    if (next.getDescription() == formatKey.subId && list.size == 1) {
                         removeFrame(formatKey.frameId)
                     }
                 }
-            } else if (next is FrameBodyCOMM) {
-                if (next.getDescription() == formatKey.subId
-                ) {
-                    if (list.size == 1) {
+
+                is FrameBodyCOMM -> {
+                    if (next.getDescription() == formatKey.subId && list.size == 1) {
                         removeFrame(formatKey.frameId)
                     }
                 }
-            } else if (next is FrameBodyWXXX) {
-                if (next.getDescription() == formatKey.subId
-                ) {
-                    if (list.size == 1) {
+
+                is FrameBodyWXXX -> {
+                    if (next.getDescription() == formatKey.subId && list.size == 1) {
                         removeFrame(formatKey.frameId)
                     }
                 }
-            } else if (next is FrameBodyUFID) {
-                if (next.getOwner() == formatKey.subId) {
-                    if (list.size == 1) {
+
+                is FrameBodyUFID -> {
+                    if (next.getOwner() == formatKey.subId && list.size == 1) {
                         removeFrame(formatKey.frameId)
                     }
                 }
-            } else if (next is FrameBodyTIPL) {
-                val nextPairing = next.getPairing()?.mapping
-                    ?.filter { nextPair -> nextPair.first != formatKey.subId }
-                if (nextPairing?.isEmpty() == true) {
-                    removeFrame(formatKey.frameId)
+
+                is FrameBodyTIPL -> {
+                    val nextPairing = next.getPairing()?.mapping
+                        ?.filter { nextPair -> nextPair.first != formatKey.subId }
+                    if (nextPairing?.isEmpty() == true) {
+                        removeFrame(formatKey.frameId)
+                    }
                 }
-            } else if (next is FrameBodyIPLS) {
-                val nextPairing = next.getPairing()?.mapping
-                    ?.filter { nextPair -> nextPair.first != formatKey.subId }
-                if (nextPairing?.isEmpty() == true) {
-                    removeFrame(formatKey.frameId)
+
+                is FrameBodyIPLS -> {
+                    val nextPairing = next.getPairing()?.mapping
+                        ?.filter { nextPair -> nextPair.first != formatKey.subId }
+                    if (nextPairing?.isEmpty() == true) {
+                        removeFrame(formatKey.frameId)
+                    }
                 }
-            } else {
-                throw RuntimeException(
-                    "Need to implement getFields(GenericFieldKey genericKey) for:" +
-                            next?.javaClass
-                )
+
+                else -> {
+                    throw RuntimeException(
+                        "Need to implement getFields(GenericFieldKey genericKey) for:" +
+                                next?.javaClass
+                    )
+                }
             }
         }
     }
@@ -1446,7 +1476,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @see org.jaudiotagger.tag.Tag.isEmpty
      */
     override fun isEmpty(): Boolean {
-        return frameMap.size == 0
+        return frameMap.isEmpty()
     }
 
     /**
@@ -1465,28 +1495,32 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
         // FrameAndSubId does not contain enough info for these fields to be able to work out what to update
         // that is why we need the extra processing here instead of doCreateTagField()
-        if (ID3NumberTotalFields.isNumber(genericKey)) {
-            val frame = createFrame(formatKey.frameId)
-            val framebody =
-                frame.frameBody as AbstractFrameBodyNumberTotal
-            framebody.setNumber(value)
-            return frame
-        } else if (ID3NumberTotalFields.isTotal(genericKey)) {
-            val frame = createFrame(formatKey.frameId)
-            val framebody =
-                frame.frameBody as AbstractFrameBodyNumberTotal
-            framebody.setTotal(value)
-            return frame
-        } else {
-            return doCreateTagField(formatKey, *values)
+        return when {
+            ID3NumberTotalFields.isNumber(genericKey) -> {
+                val frame = createFrame(formatKey.frameId)
+                val framebody =
+                    frame.frameBody as AbstractFrameBodyNumberTotal
+                framebody.setNumber(value)
+                frame
+            }
+            ID3NumberTotalFields.isTotal(genericKey) -> {
+                val frame = createFrame(formatKey.frameId)
+                val framebody =
+                    frame.frameBody as AbstractFrameBodyNumberTotal
+                framebody.setTotal(value)
+                frame
+            }
+            else -> {
+                doCreateTagField(formatKey, *values)
+            }
         }
     }
 
     override fun createCompilationField(value: Boolean): TagField {
-        if (value) {
-            return createField(GenericFieldKey.IS_COMPILATION, "1")
+        return if (value) {
+            createField(GenericFieldKey.IS_COMPILATION, "1")
         } else {
-            return createField(GenericFieldKey.IS_COMPILATION, "0")
+            createField(GenericFieldKey.IS_COMPILATION, "0")
         }
     }
 
@@ -1562,96 +1596,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         MP3File.tagFormatter?.closeHeadingElement(TYPE_BODY)
     }
 
-    /**
-     * @return iterator of all fields, multiple values for the same Id (e.g multiple TXXX frames) count as separate
-     * fields
-     */
-    @Suppress("UNCHECKED_CAST")
-    override fun getFields(): MutableIterator<TagField?> {
-        // Iterator of each different frameId in this tag
-        val it = this.frameMap.entries.iterator()
-
-        // Iterator used by hasNext() so doesn't effect next()
-        val itHasNext = this.frameMap.entries.iterator()
-
-        return object : MutableIterator<TagField?> {
-            var latestEntry: MutableMap.MutableEntry<String, Any>? = null
-
-            // this iterates through frames through for a particular frameId
-            private var fieldsIt: MutableIterator<TagField?>? = null
-
-            // TODO assumes if have entry its valid, but what if empty list but very different to check this
-            // without causing a side effect on next() so leaving for now
-            override fun hasNext(): Boolean {
-                // Check Current frameId, does it contain more values
-                if (fieldsIt != null) {
-                    if (fieldsIt?.hasNext() == true) {
-                        return true
-                    }
-                }
-
-                // No remaining entries return false
-                if (!itHasNext.hasNext()) {
-                    return false
-                }
-
-                // Issue #236
-                // TODO assumes if have entry its valid, but what if empty list but very different to check this
-                // without causing a side effect on next() so leaving for now
-                return itHasNext.hasNext()
-            }
-
-            override fun next(): TagField? {
-                // Hasn't been initialized yet
-                if (fieldsIt == null) {
-                    changeIt()
-                }
-
-                fieldsIt?.let {
-                    if (!it.hasNext()) {
-                        changeIt()
-                    }
-                }
-
-                if (fieldsIt == null) {
-                    throw NoSuchElementException()
-                }
-                return fieldsIt?.next()
-            }
-
-            fun changeIt() {
-                if (!it.hasNext()) {
-                    return
-                }
-
-                while (it.hasNext()) {
-                    val e = it.next()
-                    latestEntry = itHasNext.next()
-                    if (e.value is MutableList<*>) {
-                        val l = e.value as MutableList<TagField>
-                        // If list is empty (which it shouldn't be) we skip over this entry
-                        if (l.size == 0) {
-                            continue
-                        } else {
-                            fieldsIt = l.iterator()
-                            break
-                        }
-                    } else {
-                        // TODO must be a better way
-                        val l: MutableList<TagField> = mutableListOf<TagField>()
-                        l.add(e.value as TagField)
-                        fieldsIt = l.iterator()
-                        break
-                    }
-                }
-            }
-
-            override fun remove() {
-                fieldsIt?.remove()
-            }
-        }
-    }
-
     override fun setField(genericKey: GenericFieldKey, vararg values: String) {
         setField(createField(genericKey, *values))
     }
@@ -1670,17 +1614,21 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
         val identifier = field.getIdentifier() ?: error("No identifier")
         if (field is AbstractID3v2Frame) {
-            val obj = frameMap[identifier]
-
             // If no frame of this type exist or if multiples are not allowed
-            if (obj == null) {
-                frameMap[identifier] = field
-            } else if (obj is AbstractID3v2Frame) {
-                val frames = mutableListOf<AbstractID3v2Frame>()
-                frames.add(obj)
-                mergeDuplicateFrames(field, frames)
-            } else if (obj is MutableList<*>) {
-                mergeDuplicateFrames(field, obj as MutableList<AbstractID3v2Frame>)
+            when (val obj = frameMap[identifier]) {
+                null -> {
+                    frameMap[identifier] = field
+                }
+
+                is AbstractID3v2Frame -> {
+                    val frames = mutableListOf<AbstractID3v2Frame>()
+                    frames.add(obj)
+                    mergeDuplicateFrames(field, frames)
+                }
+
+                is MutableList<*> -> {
+                    mergeDuplicateFrames(field, obj as MutableList<AbstractID3v2Frame>)
+                }
             }
         } else {
             frameMap[identifier] = field
@@ -1701,70 +1649,86 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         val identifier = newFrame.getIdentifier() ?: error("No identifier")
         while (li.hasNext()) {
             val nextFrame = li.next()
-            if (newFrame.frameBody is FrameBodyTXXX) {
-                // Value with matching key exists so replace
-                if ((newFrame.frameBody as FrameBodyTXXX).getDescription().equals(
-                        (nextFrame.frameBody as FrameBodyTXXX).getDescription()
-                    )
-                ) {
-                    li.set(newFrame)
-                    frameMap[identifier] = frames
+            when (newFrame.frameBody) {
+                is FrameBodyTXXX -> {
+                    // Value with matching key exists so replace
+                    if ((newFrame.frameBody as FrameBodyTXXX).getDescription().equals(
+                            (nextFrame.frameBody as FrameBodyTXXX).getDescription()
+                        )
+                    ) {
+                        li.set(newFrame)
+                        frameMap[identifier] = frames
+                        return
+                    }
+                }
+
+                is FrameBodyWXXX -> {
+                    // Value with matching key exists so replace
+                    if ((newFrame.frameBody as FrameBodyWXXX).getDescription().equals(
+                            (nextFrame.frameBody as FrameBodyWXXX).getDescription()
+                        )
+                    ) {
+                        li.set(newFrame)
+                        frameMap[identifier] = frames
+                        return
+                    }
+                }
+
+                is FrameBodyCOMM -> {
+                    if ((newFrame.frameBody as FrameBodyCOMM).getDescription().equals(
+                            (nextFrame.frameBody as FrameBodyCOMM).getDescription()
+                        )
+                    ) {
+                        li.set(newFrame)
+                        frameMap[identifier] = frames
+                        return
+                    }
+                }
+
+                is FrameBodyUFID -> {
+                    if ((newFrame.frameBody as FrameBodyUFID).getOwner().equals(
+                            (nextFrame.frameBody as FrameBodyUFID).getOwner()
+                        )
+                    ) {
+                        li.set(newFrame)
+                        frameMap[identifier] = frames
+                        return
+                    }
+                }
+
+                is FrameBodyUSLT -> {
+                    if ((newFrame.frameBody as FrameBodyUSLT).getDescription().equals(
+                            (nextFrame.frameBody as FrameBodyUSLT).getDescription()
+                        )
+                    ) {
+                        li.set(newFrame)
+                        frameMap[identifier] = frames
+                        return
+                    }
+                }
+
+                is FrameBodyPOPM -> {
+                    if ((newFrame.frameBody as FrameBodyPOPM).getEmailToUser().equals(
+                            (nextFrame.frameBody as FrameBodyPOPM).getEmailToUser()
+                        )
+                    ) {
+                        li.set(newFrame)
+                        frameMap[identifier] = frames
+                        return
+                    }
+                }
+
+                is AbstractFrameBodyNumberTotal -> {
+                    mergeNumberTotalFrames(newFrame, nextFrame)
                     return
                 }
-            } else if (newFrame.frameBody is FrameBodyWXXX) {
-                // Value with matching key exists so replace
-                if ((newFrame.frameBody as FrameBodyWXXX).getDescription().equals(
-                        (nextFrame.frameBody as FrameBodyWXXX).getDescription()
-                    )
-                ) {
-                    li.set(newFrame)
-                    frameMap[identifier] = frames
+
+                is AbstractFrameBodyPairs -> {
+                    val frameBody = newFrame.frameBody as AbstractFrameBodyPairs
+                    val existingFrameBody = nextFrame.frameBody as AbstractFrameBodyPairs
+                    existingFrameBody.addPair(frameBody.getText())
                     return
                 }
-            } else if (newFrame.frameBody is FrameBodyCOMM) {
-                if ((newFrame.frameBody as FrameBodyCOMM).getDescription().equals(
-                        (nextFrame.frameBody as FrameBodyCOMM).getDescription()
-                    )
-                ) {
-                    li.set(newFrame)
-                    frameMap[identifier] = frames
-                    return
-                }
-            } else if (newFrame.frameBody is FrameBodyUFID) {
-                if ((newFrame.frameBody as FrameBodyUFID).getOwner().equals(
-                        (nextFrame.frameBody as FrameBodyUFID).getOwner()
-                    )
-                ) {
-                    li.set(newFrame)
-                    frameMap[identifier] = frames
-                    return
-                }
-            } else if (newFrame.frameBody is FrameBodyUSLT) {
-                if ((newFrame.frameBody as FrameBodyUSLT).getDescription().equals(
-                        (nextFrame.frameBody as FrameBodyUSLT).getDescription()
-                    )
-                ) {
-                    li.set(newFrame)
-                    frameMap[identifier] = frames
-                    return
-                }
-            } else if (newFrame.frameBody is FrameBodyPOPM) {
-                if ((newFrame.frameBody as FrameBodyPOPM).getEmailToUser().equals(
-                        (nextFrame.frameBody as FrameBodyPOPM).getEmailToUser()
-                    )
-                ) {
-                    li.set(newFrame)
-                    frameMap[identifier] = frames
-                    return
-                }
-            } else if (newFrame.frameBody is AbstractFrameBodyNumberTotal) {
-                mergeNumberTotalFrames(newFrame, nextFrame)
-                return
-            } else if (newFrame.frameBody is AbstractFrameBodyPairs) {
-                val frameBody = newFrame.frameBody as AbstractFrameBodyPairs
-                val existingFrameBody = nextFrame.frameBody as AbstractFrameBodyPairs
-                existingFrameBody.addPair(frameBody.getText())
-                return
             }
         }
 
@@ -1794,11 +1758,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         val oldBody =
             nextFrame.frameBody as AbstractFrameBodyNumberTotal
 
-        if (newBody.getNumber() != null && (newBody.getNumber()?:0) > 0) {
+        if (newBody.getNumber() != null && (newBody.getNumber() ?: 0) > 0) {
             oldBody.setNumber(newBody.getNumberAsText())
         }
 
-        if (newBody.getTotal() != null && (newBody.getTotal()?:0) > 0) {
+        if (newBody.getTotal() != null && (newBody.getTotal() ?: 0) > 0) {
             oldBody.setTotal(newBody.getTotalAsText())
         }
     }
@@ -1809,13 +1773,18 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return
      */
     fun getFieldCount(): Int {
-        val toList = getFields().asSequence().toList()
-        return toList.size
+        return frameMap.size
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun toString(): String {
-        return "Tag content [${this::class.simpleName}]:\n${
-            getFields().asSequence().joinToString("\n") { field -> "\t${field?.getIdentifier() ?: "UNSET"}:$field" }
-        }"
+        return frameMap.values.mapNotNull { v ->
+            when (v) {
+                is TagField -> listOf(v)
+                is List<*> -> v as List<TagField>
+                else -> null
+            }
+        }.flatten()
+            .joinToString("\n") { field -> "\t${field.getIdentifier() ?: "UNSET"}:$field" }
     }
 }

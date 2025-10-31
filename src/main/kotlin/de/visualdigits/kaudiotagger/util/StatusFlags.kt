@@ -16,5 +16,6 @@ open class StatusFlags(
     }
 
     open fun createStructure() {
+        // to be implemented
     }
 }

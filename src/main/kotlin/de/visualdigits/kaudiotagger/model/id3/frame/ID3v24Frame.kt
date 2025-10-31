@@ -122,14 +122,20 @@ class ID3v24Frame: AbstractID3v2Frame {
      */
     constructor(frame: AbstractID3v2Frame?) {
         // Should not be called
-        if ((frame is ID3v24Frame)) {
-            throw UnsupportedOperationException("Copy Constructor not called. Please type cast the argument")
-        } else if (frame is ID3v23Frame) {
-            statusFlags = ID3v24StatusFlags(this, frame.statusFlags)
-            encodingFlags = ID3v24EncodingFlags(this, frame.encodingFlags?.flags?:0)
-        } else if (frame is ID3v22Frame) {
-            statusFlags = ID3v24StatusFlags(this)
-            encodingFlags = ID3v24EncodingFlags(this)
+        when (frame) {
+            is ID3v24Frame -> {
+                throw UnsupportedOperationException("Copy Constructor not called. Please type cast the argument")
+            }
+
+            is ID3v23Frame -> {
+                statusFlags = ID3v24StatusFlags(this, frame.statusFlags)
+                encodingFlags = ID3v24EncodingFlags(this, frame.encodingFlags?.flags ?: 0)
+            }
+
+            is ID3v22Frame -> {
+                statusFlags = ID3v24StatusFlags(this)
+                encodingFlags = ID3v24EncodingFlags(this)
+            }
         }
 
         // Convert Identifier. If the id was a known id for the original
@@ -162,60 +168,70 @@ class ID3v24Frame: AbstractID3v2Frame {
     constructor(field: Lyrics3v2Field) {
         val id = field.getIdentifier()
         val value: String?
-        if (id == "IND") {
-            throw InvalidTagException(
-                "Cannot create ID3v2.40 frame from Lyrics3 indications field."
-            )
-        } else if (id == "LYR") {
-            val lyric = field.frameBody as FieldFrameBodyLYR
-            val hasTimeStamp = lyric.hasTimeStamp()
-            // we'll create only one frame here.
-            // if there is any timestamp at all, we will create a sync'ed frame.
-            val sync = FrameBodySYLT(
-                0,
-                "ENG",
-                2.toByte().toInt(),
-                1.toByte().toInt(),
-                "",
-                ByteArray(0)
-            )
-            val unsync = FrameBodyUSLT(0, "ENG", "", "")
-            lyric.lines.forEach { line ->
-                if (!hasTimeStamp) {
-                    unsync.addLyric(line)
+        when (id) {
+            "IND" -> {
+                throw InvalidTagException(
+                    "Cannot create ID3v2.40 frame from Lyrics3 indications field."
+                )
+            }
+            "LYR" -> {
+                val lyric = field.frameBody as FieldFrameBodyLYR
+                val hasTimeStamp = lyric.hasTimeStamp()
+                // we'll create only one frame here.
+                // if there is any timestamp at all, we will create a sync'ed frame.
+                val sync = FrameBodySYLT(
+                    0,
+                    "ENG",
+                    2.toByte().toInt(),
+                    1.toByte().toInt(),
+                    "",
+                    ByteArray(0)
+                )
+                val unsync = FrameBodyUSLT(0, "ENG", "", "")
+                lyric.lines.forEach { line ->
+                    if (!hasTimeStamp) {
+                        unsync.addLyric(line)
+                    }
+                }
+                if (hasTimeStamp) {
+                    this.frameBody = sync
+                    frameBody?.header = this
+                } else {
+                    this.frameBody = unsync
+                    frameBody?.header = this
                 }
             }
-            if (hasTimeStamp) {
-                this.frameBody = sync
-                frameBody?.header = this
-            } else {
-                this.frameBody = unsync
+            "INF" -> {
+                value = (field.frameBody as FieldFrameBodyINF).getAdditionalInformation()
+                this.frameBody = FrameBodyCOMM(0, "ENG", "", value)
                 frameBody?.header = this
             }
-        } else if (id == "INF") {
-            value = (field.frameBody as FieldFrameBodyINF).getAdditionalInformation()
-            this.frameBody = FrameBodyCOMM(0, "ENG", "", value)
-            frameBody?.header = this
-        } else if (id == "AUT") {
-            value = (field.frameBody as FieldFrameBodyAUT).getAuthor()
-            this.frameBody = FrameBodyTCOM(0, value)
-            frameBody?.header = this
-        } else if (id == "EAL") {
-            value = (field.frameBody as FieldFrameBodyEAL).getAlbum()
-            this.frameBody = FrameBodyTALB(0, value)
-            frameBody?.header = this
-        } else if (id == "EAR") {
-            value = (field.frameBody as FieldFrameBodyEAR).getArtist()
-            this.frameBody = FrameBodyTPE1(0, value)
-            frameBody?.header = this
-        } else if (id == "ETT") {
-            value = (field.frameBody as FieldFrameBodyETT).getTitle()
-            this.frameBody = FrameBodyTIT2(0, value)
-            frameBody?.header = this
-        } else if (id == "IMG") {
-            throw InvalidTagException("Cannot create ID3v2.40 frame from Lyrics3 image field.")
-        } else {
-            throw InvalidTagException("Cannot caret ID3v2.40 frame from $id Lyrics3 field")
+            "AUT" -> {
+                value = (field.frameBody as FieldFrameBodyAUT).getAuthor()
+                this.frameBody = FrameBodyTCOM(0, value)
+                frameBody?.header = this
+            }
+            "EAL" -> {
+                value = (field.frameBody as FieldFrameBodyEAL).getAlbum()
+                this.frameBody = FrameBodyTALB(0, value)
+                frameBody?.header = this
+            }
+            "EAR" -> {
+                value = (field.frameBody as FieldFrameBodyEAR).getArtist()
+                this.frameBody = FrameBodyTPE1(0, value)
+                frameBody?.header = this
+            }
+            "ETT" -> {
+                value = (field.frameBody as FieldFrameBodyETT).getTitle()
+                this.frameBody = FrameBodyTIT2(0, value)
+                frameBody?.header = this
+            }
+            "IMG" -> {
+                throw InvalidTagException("Cannot create ID3v2.40 frame from Lyrics3 image field.")
+            }
+            else -> {
+                throw InvalidTagException("Cannot caret ID3v2.40 frame from $id Lyrics3 field")
+            }
         }
     }
 
@@ -225,52 +241,57 @@ class ID3v24Frame: AbstractID3v2Frame {
         log.debug("Creating V24frame from v23:" + frame.getIdentifier() + ":" + getIdentifier())
 
         // We cant convert unsupported bodies properly
-        if (frame.frameBody is FrameBodyUnsupported) {
-            this.frameBody = FrameBodyUnsupported(
-                frame.frameBody as FrameBodyUnsupported
-            )
-            this.frameBody?.header = this
-            setIdentifier(frame.getIdentifier())
-            log.debug("V3:UnsupportedBody:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-        } else if (getIdentifier() != null) {
-            // Special Case
-            if ((frame.getIdentifier() == ID3v23FrameId.USER_DEFINED_INFO.id) &&
-                ((frame.frameBody as FrameBodyTXXX).getDescription() == FrameBodyTXXX.MOOD)
-            ) {
-                this.frameBody = FrameBodyTMOO(frame.frameBody as FrameBodyTXXX)
-                this.frameBody?.header = this
-                setIdentifier(frameBody?.getIdentifier())
-            } else {
-                log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                this.frameBody = ID3Tags.copyObject(
-                    frame.frameBody
-                ) as? AbstractTagFrameBody
-                this.frameBody?.header = this
-            }
-        } else if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
-            setIdentifier(ID3Tags.forceFrameID23To24(frame.getIdentifier()))
-            if (getIdentifier() != null) {
-                log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                this.frameBody = this.readBody(
-                    getIdentifier(),
-                    frame.frameBody as AbstractID3v2FrameBody
-                )
-                this.frameBody?.header = this
-            } else {
-                this.frameBody = FrameBodyDeprecated(
-                    frame.frameBody as AbstractID3v2FrameBody
+        when {
+            frame.frameBody is FrameBodyUnsupported -> {
+                this.frameBody = FrameBodyUnsupported(
+                    frame.frameBody as FrameBodyUnsupported
                 )
                 this.frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
-                log.debug("V3:Deprecated:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                log.debug("V3:UnsupportedBody:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
             }
-        } else {
-            this.frameBody = FrameBodyUnsupported(
-                frame.frameBody as  FrameBodyUnsupported
-            )
-            this.frameBody?.header = this
-            setIdentifier(frame.getIdentifier())
-            log.debug("V3:Unknown:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+            getIdentifier() != null -> {
+                // Special Case
+                if ((frame.getIdentifier() == ID3v23FrameId.USER_DEFINED_INFO.id) &&
+                    ((frame.frameBody as FrameBodyTXXX).getDescription() == FrameBodyTXXX.MOOD)
+                ) {
+                    this.frameBody = FrameBodyTMOO(frame.frameBody as FrameBodyTXXX)
+                    this.frameBody?.header = this
+                    setIdentifier(frameBody?.getIdentifier())
+                } else {
+                    log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                    this.frameBody = ID3Tags.copyObject(
+                        frame.frameBody
+                    ) as? AbstractTagFrameBody
+                    this.frameBody?.header = this
+                }
+            }
+            ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier()) -> {
+                setIdentifier(ID3Tags.forceFrameID23To24(frame.getIdentifier()))
+                if (getIdentifier() != null) {
+                    log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                    this.frameBody = this.readBody(
+                        getIdentifier(),
+                        frame.frameBody as AbstractID3v2FrameBody
+                    )
+                    this.frameBody?.header = this
+                } else {
+                    this.frameBody = FrameBodyDeprecated(
+                        frame.frameBody as AbstractID3v2FrameBody
+                    )
+                    this.frameBody?.header = this
+                    setIdentifier(frame.getIdentifier())
+                    log.debug("V3:Deprecated:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+                }
+            }
+            else -> {
+                this.frameBody = FrameBodyUnsupported(
+                    frame.frameBody as FrameBodyUnsupported
+                )
+                this.frameBody?.header = this
+                setIdentifier(frame.getIdentifier())
+                log.debug("V3:Unknown:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
+            }
         }
     }
 
@@ -432,22 +453,25 @@ class ID3v24Frame: AbstractID3v2Frame {
         // Read frame size as syncsafe integer
         frameSize = ID3SyncSafeInteger.bufferToValue(byteBuffer)
 
-        if (frameSize < 0) {
-            log.warn("Invalid Frame size:${getIdentifier()}")
-            throw InvalidFrameException("${getIdentifier()} is invalid frame")
-        } else if (frameSize == 0) {
-            log.warn("Empty Frame:${getIdentifier()}")
-            // We dont process this frame or add to framemap becuase contains no useful information
-            // Skip the two flag bytes so in correct position for subsequent frames
-            byteBuffer.get()
-            byteBuffer.get()
-            throw EmptyFrameException("${getIdentifier()} is empty frame")
-        } else if (frameSize > (byteBuffer.remaining() - FRAME_FLAGS_SIZE)) {
-            log.warn("Invalid Frame size larger than size before mp3 audio:${getIdentifier()}")
-            throw InvalidFrameException("${getIdentifier()} is invalid frame")
+        when {
+            frameSize < 0 -> {
+                log.warn("Invalid Frame size:${getIdentifier()}")
+                throw InvalidFrameException("${getIdentifier()} is invalid frame")
+            }
+            frameSize == 0 -> {
+                log.warn("Empty Frame:${getIdentifier()}")
+                // We dont process this frame or add to framemap becuase contains no useful information
+                // Skip the two flag bytes so in correct position for subsequent frames
+                byteBuffer.get()
+                byteBuffer.get()
+                throw EmptyFrameException("${getIdentifier()} is empty frame")
+            }
+            frameSize > (byteBuffer.remaining() - FRAME_FLAGS_SIZE) -> {
+                log.warn("Invalid Frame size larger than size before mp3 audio:${getIdentifier()}")
+                throw InvalidFrameException("${getIdentifier()} is invalid frame")
+            }
+            else -> checkIfFrameSizeThatIsNotSyncSafe(byteBuffer)
         }
-
-        checkIfFrameSizeThatIsNotSyncSafe(byteBuffer)
     }
 
     /**
@@ -500,7 +524,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                     // reset position to just after framesize
                     byteBuffer.position(currentPosition)
                 } else {
-                    byteBuffer.get(readAheadbuffer, 0, getFrameIdSize())
+                    byteBuffer[readAheadbuffer, 0, getFrameIdSize()]
 
                     // reset position to just after framesize
                     byteBuffer.position(currentPosition)
@@ -529,7 +553,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                             )
 
                             if (byteBuffer.remaining() >= getFrameIdSize()) {
-                                byteBuffer.get(readAheadbuffer, 0, getFrameIdSize())
+                                byteBuffer[readAheadbuffer, 0, getFrameIdSize()]
                                 readAheadIdentifier = String(readAheadbuffer)
 
                                 // reset position to just after framesize
@@ -674,10 +698,8 @@ class ID3v24Frame: AbstractID3v2Frame {
      */
     override fun setEncoding(encoding: Charset) {
         val encodingId = TextEncoding.fromCharset(encoding)?.id
-        if (encodingId != null) {
-            if (encodingId < 4) {
-                this.frameBody?.setTextEncoding(encodingId)
-            }
+        if (encodingId != null && encodingId < 4) {
+            this.frameBody?.setTextEncoding(encodingId)
         }
     }
 

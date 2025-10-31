@@ -68,7 +68,7 @@ class VbriFrame {
 
             // Check Identifier
             val identifier = ByteArray(VBRI_IDENTIFIER_BUFFER_SIZE)
-            header.get(identifier)
+            header[identifier]
             if (!identifier.contentEquals(VBRI_VBR_ID)) {
                 return null
             }
@@ -99,7 +99,7 @@ class VbriFrame {
      */
     private fun setAudioSize() {
         val frameSizeBuffer = ByteArray(VBRI_AUDIOSIZE_BUFFER_SIZE)
-        header.get(frameSizeBuffer)
+        header[frameSizeBuffer]
         audioSize =
             ((frameSizeBuffer[BYTE_1].toInt() shl 24) and -0x1000000) or
                     ((frameSizeBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or
@@ -112,7 +112,7 @@ class VbriFrame {
      */
     private fun setFrameCount() {
         val frameCountBuffer = ByteArray(VBRI_FRAMECOUNT_BUFFER_SIZE)
-        header.get(frameCountBuffer)
+        header[frameCountBuffer]
         frameCount =
             ((frameCountBuffer[BYTE_1].toInt() shl 24) and -0x1000000) or
                     ((frameCountBuffer[BYTE_2].toInt() shl 16) and 0x00FF0000) or

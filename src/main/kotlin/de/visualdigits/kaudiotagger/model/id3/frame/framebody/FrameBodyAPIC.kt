@@ -147,11 +147,11 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     ): super(byteBuffer, frameSize)
 
     override fun getUserFriendlyValue(): String {
-        if (this.getImageData() != null) {
-            return (this.getMimeType() + ":" + this.getDescription() + ":" + this.getImageData()?.size
+        return if (this.getImageData() != null) {
+            (this.getMimeType() + ":" + this.getDescription() + ":" + this.getImageData()?.size
                     )
         } else {
-            return this.getMimeType() + ":" + this.getDescription() + ":0"
+            this.getMimeType() + ":" + this.getDescription() + ":0"
         }
     }
 
@@ -290,13 +290,13 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @return the image url if there is otherwise return an empty String
      */
     fun getImageUrl(): String {
-        if (isImageUrl()) {
-            return String(
-                    (getObjectValue(DataTypes.OBJ_PICTURE_DATA) as ByteArray),
-                    StandardCharsets.ISO_8859_1
+        return if (isImageUrl()) {
+            String(
+                (getObjectValue(DataTypes.OBJ_PICTURE_DATA) as ByteArray),
+                StandardCharsets.ISO_8859_1
             )
         } else {
-            return ""
+            ""
         }
     }
 

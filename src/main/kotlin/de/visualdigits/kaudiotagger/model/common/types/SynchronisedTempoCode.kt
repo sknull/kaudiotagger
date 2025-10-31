@@ -73,7 +73,7 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
     }
 
     override fun writeByteArray(): ByteArray {
-        val typeData = this.tempo.writeByteArray()?:error("Coulkd not write tempo")
+        val typeData = this.tempo.writeByteArray()
         val timeData = this.timestamp?.writeByteArray()?:error("Coulkd not write timedata")
 
         val objectData = ByteArray(typeData.size + timeData.size)

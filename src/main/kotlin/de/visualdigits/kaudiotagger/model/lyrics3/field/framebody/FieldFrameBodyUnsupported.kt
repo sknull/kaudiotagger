@@ -44,13 +44,13 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
         val buffer = ByteArray(5)
 
         // read the 5 character size
-        byteBuffer.get(buffer, 0, 5)
+        byteBuffer[buffer, 0, 5]
         size = String(buffer, 0, 5).toInt()
 
         value = ByteArray(size)
 
         // read the SIZE length description
-        byteBuffer.get(value)
+        byteBuffer[value]
 
         return false
     }
@@ -106,5 +106,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
      * TODO
      */
     override fun setupObjectList() {
+        // to be implemented
     }
 }

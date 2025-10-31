@@ -89,7 +89,6 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
                         TextEncodedStringSizeTerminated(identifier, getBody() ?: error("No frame body"))
                     result.readByteArray(byteArray, offset)
                     addSize(result.getSize())
-                    offset += result.getSize()
                     if (result.getSize() == 0) {
                         break
                     }
@@ -100,7 +99,7 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
                     )
                     break
                 }
-            } catch (idte: InvalidDataTypeException) {
+            } catch (_: InvalidDataTypeException) {
                 break
             }
 

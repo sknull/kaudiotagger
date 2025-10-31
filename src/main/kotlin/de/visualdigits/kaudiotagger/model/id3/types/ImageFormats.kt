@@ -26,20 +26,28 @@ enum class ImageFormats(
          * @return correct mimetype for the image data represented by this byte data
          */
         fun mimeTypeFromBinarySignature(data: ByteArray): String? {
-            if (binaryDataIsPngFormat(data)) {
-                return "image/png"
-            } else if (binaryDataIsJpgFormat(data)) {
-                return "image/jpeg"
-            } else if (binaryDataIsGifFormat(data)) {
-                return "image/gif"
-            } else if (binaryDataIsBmpFormat(data)) {
-                return "image/bmp"
-            } else if (binaryDataIsPdfFormat(data)) {
-                return "image/pdf"
-            } else if (binaryDataIsTiffFormat(data)) {
-                return "image/tiff"
-            } else {
-                return null
+            return when {
+                binaryDataIsPngFormat(data) -> {
+                    "image/png"
+                }
+                binaryDataIsJpgFormat(data) -> {
+                    "image/jpeg"
+                }
+                binaryDataIsGifFormat(data) -> {
+                    "image/gif"
+                }
+                binaryDataIsBmpFormat(data) -> {
+                    "image/bmp"
+                }
+                binaryDataIsPdfFormat(data) -> {
+                    "image/pdf"
+                }
+                binaryDataIsTiffFormat(data) -> {
+                    "image/tiff"
+                }
+                else -> {
+                    null
+                }
             }
         }
 

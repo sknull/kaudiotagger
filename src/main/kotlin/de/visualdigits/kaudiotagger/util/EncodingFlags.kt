@@ -15,6 +15,7 @@ open class EncodingFlags(
     }
 
     open fun createStructure() {
+        // to be implemented
     }
 
     fun resetFlags() {

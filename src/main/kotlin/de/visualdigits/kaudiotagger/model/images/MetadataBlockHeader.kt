@@ -27,17 +27,17 @@ class MetadataBlockHeader {
      * @param rawdata
      */
     constructor(rawdata: ByteBuffer) {
-        isLastBlock = ((rawdata.get(0).toInt() and 0x80) ushr 7) == 1
-        val type = rawdata.get(0).toInt() and 0x7F
+        isLastBlock = ((rawdata[0].toInt() and 0x80) ushr 7) == 1
+        val type = rawdata[0].toInt() and 0x7F
         if (type < BlockType.entries.size) {
             blockType = BlockType.entries[type]
             dataLength =
-                (u(rawdata.get(1).toInt()) shl 16) +
-                        (u(rawdata.get(2).toInt()) shl 8) +
-                        (u(rawdata.get(3).toInt()))
+                (u(rawdata[1].toInt()) shl 16) +
+                        (u(rawdata[2].toInt()) shl 8) +
+                        (u(rawdata[3].toInt()))
             bytes = ByteArray(HEADER_LENGTH)
             for (i in 0..<HEADER_LENGTH) {
-                bytes[i] = rawdata.get(i)
+                bytes[i] = rawdata[i]
             }
         } else {
             error(ErrorMessage.FLAC_NO_BLOCKTYPE.getMsg(type))
@@ -80,7 +80,7 @@ class MetadataBlockHeader {
 
         bytes = ByteArray(HEADER_LENGTH)
         for (i in 0..<HEADER_LENGTH) {
-            bytes[i] = rawdata.get(i)
+            bytes[i] = rawdata[i]
         }
     }
 

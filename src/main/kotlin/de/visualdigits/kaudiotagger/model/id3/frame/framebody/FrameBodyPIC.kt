@@ -210,13 +210,10 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
      * @return the image url if there is otherwise return an empty String
      */
     fun getImageUrl(): String {
-        if (isImageUrl()) {
-            return String(
-                    (getObjectValue(DataTypes.OBJ_PICTURE_DATA) as? ByteArray)?:byteArrayOf(),
-                    StandardCharsets.ISO_8859_1
-            )
+        return if (isImageUrl()) {
+            String((getObjectValue(DataTypes.OBJ_PICTURE_DATA) as? ByteArray) ?: byteArrayOf(), StandardCharsets.ISO_8859_1)
         } else {
-            return "";
+            "";
         }
     }
 

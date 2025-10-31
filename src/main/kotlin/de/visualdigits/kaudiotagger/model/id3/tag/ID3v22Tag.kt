@@ -114,15 +114,21 @@ class ID3v22Tag : AbstractID3v2Tag {
         super.copyPrimitives(copyObject)
 
         // Set the primitive types specific to v2_2.
-        if (copyObject is ID3v22Tag) {
-            this.isCompression = copyObject.isCompression
-            this.isUnsynchronization = copyObject.isUnsynchronization
-        } else if (copyObject is ID3v23Tag) {
-            this.isCompression = copyObject.isCompression
-            this.isUnsynchronization = copyObject.isUnsynchronization
-        } else if (copyObject is ID3v24Tag) {
-            this.isCompression = false
-            this.isUnsynchronization = copyObject.isUnsynchronization
+        when (copyObject) {
+            is ID3v22Tag -> {
+                this.isCompression = copyObject.isCompression
+                this.isUnsynchronization = copyObject.isUnsynchronization
+            }
+
+            is ID3v23Tag -> {
+                this.isCompression = copyObject.isCompression
+                this.isUnsynchronization = copyObject.isUnsynchronization
+            }
+
+            is ID3v24Tag -> {
+                this.isCompression = false
+                this.isUnsynchronization = copyObject.isUnsynchronization
+            }
         }
     }
 
@@ -220,7 +226,7 @@ class ID3v22Tag : AbstractID3v2Tag {
         )
 
         val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
-        byteBuffer.get(tagIdentifier, 0, FIELD_TAGID_LENGTH)
+        byteBuffer[tagIdentifier, 0, FIELD_TAGID_LENGTH]
         if (!(tagIdentifier.contentEquals(TAG_ID))) {
             return false
         }
@@ -407,7 +413,7 @@ class ID3v22Tag : AbstractID3v2Tag {
      * so that most important frames are written first.
      */
     override fun getPreferredFrameOrderComparator(): Comparator<String> {
-        return ID3v22PreferredFrameOrderComparator.instance
+        return ID3v22PreferredFrameOrderComparator
     }
 
     /**
@@ -528,15 +534,15 @@ class ID3v22Tag : AbstractID3v2Tag {
 
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
         val value: String = values[0]
-        if (genericKey == GenericFieldKey.GENRE) {
+        return if (genericKey == GenericFieldKey.GENRE) {
             val formatKey = getFrameAndSubIdFromGenericKey(genericKey)
             val frame: AbstractID3v2Frame = createFrame(formatKey.frameId)
             val framebody = frame.frameBody as FrameBodyTCON
             framebody.setV23Format()
             framebody.setText(FrameBodyTCON.convertGenericToID3v22Genre(value))
-            return frame
+            frame
         } else {
-            return super.createField(genericKey, *values)
+            super.createField(genericKey, *values)
         }
     }
 
@@ -549,27 +555,30 @@ class ID3v22Tag : AbstractID3v2Tag {
             getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART).frameId
         )
         val body = frame.frameBody as FrameBodyPIC
-        if (!artwork.isLinked) {
-            body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
-            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-            body.setObjectValue(
-                DataTypes.OBJ_IMAGE_FORMAT,
-                ImageFormats.fromMimeType(artwork.mimeType)
-            )
-            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-            return frame
-        } else {
-            body.setObjectValue(
-                DataTypes.OBJ_PICTURE_DATA,
-                artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
-            )
-            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-            body.setObjectValue(
-                DataTypes.OBJ_IMAGE_FORMAT,
-                FrameBodyAPIC.IMAGE_IS_URL
-            )
-            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-            return frame
+        when {
+            !artwork.isLinked -> {
+                body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
+                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+                body.setObjectValue(
+                    DataTypes.OBJ_IMAGE_FORMAT,
+                    ImageFormats.fromMimeType(artwork.mimeType)
+                )
+                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+                return frame
+            }
+            else -> {
+                body.setObjectValue(
+                    DataTypes.OBJ_PICTURE_DATA,
+                    artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
+                )
+                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+                body.setObjectValue(
+                    DataTypes.OBJ_IMAGE_FORMAT,
+                    FrameBodyAPIC.IMAGE_IS_URL
+                )
+                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+                return frame
+            }
         }
     }
 

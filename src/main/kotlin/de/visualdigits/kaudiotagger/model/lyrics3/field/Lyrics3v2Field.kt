@@ -49,40 +49,49 @@ class Lyrics3v2Field: AbstractTagFrame {
     constructor(frame: AbstractID3v2Frame) {
         val textFrame: AbstractFrameBodyTextInfo?
         val frameIdentifier = frame.getIdentifier()?:error("No frame identifier")
-        if (frameIdentifier?.startsWith("USLT") == true) {
-            frameBody = FieldFrameBodyLYR("")
-            (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodyUSLT)
-        } else if (frameIdentifier.startsWith("SYLT")) {
-            frameBody = FieldFrameBodyLYR("")
-            (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodySYLT)
-        } else if (frameIdentifier.startsWith("COMM")) {
-            val text = (frame.frameBody as FrameBodyCOMM).getText()
-            frameBody = FieldFrameBodyINF(text)
-        } else if (frameIdentifier == "TCOM") {
-            textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            frameBody = FieldFrameBodyAUT("")
-            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
-                frameBody = FieldFrameBodyAUT(textFrame.getText())
+        when {
+            frameIdentifier.startsWith("USLT") -> {
+                frameBody = FieldFrameBodyLYR("")
+                (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodyUSLT)
             }
-        } else if (frameIdentifier == "TALB") {
-            textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
-                frameBody = FieldFrameBodyEAL(textFrame.getText())
+            frameIdentifier.startsWith("SYLT") -> {
+                frameBody = FieldFrameBodyLYR("")
+                (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodySYLT)
             }
-        } else if (frameIdentifier == "TPE1") {
-            textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
-                frameBody = FieldFrameBodyEAR(textFrame.getText())
+            frameIdentifier.startsWith("COMM") -> {
+                val text = (frame.frameBody as FrameBodyCOMM).getText()
+                frameBody = FieldFrameBodyINF(text)
             }
-        } else if (frameIdentifier == "TIT2") {
-            textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
-            if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
-                frameBody = FieldFrameBodyETT(textFrame.getText())
+            frameIdentifier == "TCOM" -> {
+                textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
+                frameBody = FieldFrameBodyAUT("")
+                if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
+                    frameBody = FieldFrameBodyAUT(textFrame.getText())
+                }
             }
-        } else {
-            throw TagException(
-                "Cannot createField Lyrics3v2 field from given ID3v2 frame"
-            )
+            frameIdentifier == "TALB" -> {
+                textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
+                if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
+                    frameBody = FieldFrameBodyEAL(textFrame.getText())
+                }
+            }
+            frameIdentifier == "TPE1" -> {
+                textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
+                if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
+                    frameBody = FieldFrameBodyEAR(textFrame.getText())
+                }
+            }
+            frameIdentifier == "TIT2" -> {
+                textFrame = frame.frameBody as? AbstractFrameBodyTextInfo
+                if ((textFrame != null) && (textFrame.getText()?.isNotEmpty() == true)) {
+                    frameBody = FieldFrameBodyETT(textFrame.getText())
+                }
+            }
+            else -> {
+                throw TagException(
+                    "Cannot createField Lyrics3v2 field from given ID3v2 frame"
+                )
+            }
         }
     }
 
@@ -110,7 +119,7 @@ class Lyrics3v2Field: AbstractTagFrame {
         } while (b.toInt() == 0)
         byteBuffer.position(byteBuffer.position() - 1)
         // read the 3 character ID
-        byteBuffer.get(buffer, 0, 3)
+        byteBuffer[buffer, 0, 3]
         val identifier = String(buffer, 0, 3)
         // is this a valid identifier?
         if (!Lyrics3v2Fields.Companion.isLyrics3v2FieldIdentifier(identifier)) {
@@ -133,30 +142,40 @@ class Lyrics3v2Field: AbstractTagFrame {
         byteBuffer: ByteBuffer
     ): AbstractLyrics3v2FieldFrameBody {
         val newBody: AbstractLyrics3v2FieldFrameBody
-        if (identifier == Lyrics3v2Fields.AUTHOR.id) {
-            newBody = FieldFrameBodyAUT(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.ALBUM.id) {
-            newBody = FieldFrameBodyEAL(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.ARTIST.id) {
-            newBody = FieldFrameBodyEAR(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.TRACK.id) {
-            newBody = FieldFrameBodyETT(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.IMAGE.id) {
-            newBody = FieldFrameBodyIMG(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.INDICATIONS.id) {
-            newBody = FieldFrameBodyIND(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.ADDITIONAL_MULTI_LINE_TEXT.id) {
-            newBody = FieldFrameBodyINF(byteBuffer)
-        } else if (identifier == Lyrics3v2Fields.LYRICS_MULTI_LINE_TEXT.id) {
-            newBody = FieldFrameBodyLYR(byteBuffer)
-        } else {
-            newBody = FieldFrameBodyUnsupported(byteBuffer)
+        when (identifier) {
+            Lyrics3v2Fields.AUTHOR.id -> {
+                newBody = FieldFrameBodyAUT(byteBuffer)
+            }
+            Lyrics3v2Fields.ALBUM.id -> {
+                newBody = FieldFrameBodyEAL(byteBuffer)
+            }
+            Lyrics3v2Fields.ARTIST.id -> {
+                newBody = FieldFrameBodyEAR(byteBuffer)
+            }
+            Lyrics3v2Fields.TRACK.id -> {
+                newBody = FieldFrameBodyETT(byteBuffer)
+            }
+            Lyrics3v2Fields.IMAGE.id -> {
+                newBody = FieldFrameBodyIMG(byteBuffer)
+            }
+            Lyrics3v2Fields.INDICATIONS.id -> {
+                newBody = FieldFrameBodyIND(byteBuffer)
+            }
+            Lyrics3v2Fields.ADDITIONAL_MULTI_LINE_TEXT.id -> {
+                newBody = FieldFrameBodyINF(byteBuffer)
+            }
+            Lyrics3v2Fields.LYRICS_MULTI_LINE_TEXT.id -> {
+                newBody = FieldFrameBodyLYR(byteBuffer)
+            }
+            else -> {
+                newBody = FieldFrameBodyUnsupported(byteBuffer)
+            }
         }
         return newBody
     }
 
     override fun getSize(): Int {
-        return (frameBody?.getSize()?:0) + 5 + (getIdentifier()?.length?:0)
+        return (frameBody?.getSize()?:0) + 5 + (getIdentifier().length)
     }
 
     override fun getIdentifier(): String {
@@ -170,13 +189,8 @@ class Lyrics3v2Field: AbstractTagFrame {
         if (((frameBody?.getSize()?:0) > 0) ||
             TagOptionSingleton.lyrics3SaveEmptyField
         ) {
-            val buffer = ByteArray(3)
-            val str = getIdentifier()
-            for (i in 0..< (str?.length?:0)) {
-                str?.get(i)?.code?.toByte()?.also { b -> buffer[i] = b }
-            }
-            file.write(buffer, 0, (str?.length?:0))
-            // body.write(file);
+            val buffer = getIdentifier().map { char -> char.code.toByte() }.toByteArray()
+            file.write(buffer, 0, (getIdentifier().length))
         }
     }
 }

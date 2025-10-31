@@ -118,12 +118,8 @@ class PartOfSet : AbstractString {
         val data: ByteArray?
         // Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
         try {
-            if (TagOptionSingleton.removeTrailingTerminatorOnWrite) {
-                if (value.isNotEmpty()) {
-                    if (value.get(value.length - 1) == '\u0000') {
-                        value = value.substring(0, value.length - 1)
-                    }
-                }
+            if (TagOptionSingleton.removeTrailingTerminatorOnWrite && value.isNotEmpty() && value[value.length - 1] == '\u0000') {
+                value = value.substring(0, value.length - 1)
             }
 
             val charset = getTextEncodingCharSet()

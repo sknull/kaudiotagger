@@ -35,7 +35,7 @@ object ID3Compression {
         // Store position ( just after frame header and any extra bits)
         // Read frame data into array, and then put buffer back to where it was
         val position = byteBuffer.position()
-        byteBuffer.get(input, 0, realFrameSize)
+        byteBuffer[input, 0, realFrameSize]
         byteBuffer.position(position)
 
         val decompresser = Inflater()

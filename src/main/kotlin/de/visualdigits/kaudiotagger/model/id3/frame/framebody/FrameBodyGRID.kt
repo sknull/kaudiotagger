@@ -78,10 +78,10 @@ class FrameBodyGRID
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
     fun getGroupSymbol(): Byte {
-        if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
-            return (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as Long).toByte()
+        return if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
+            (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as Long).toByte()
         } else {
-            return 0.toByte()
+            0.toByte()
         }
     }
 

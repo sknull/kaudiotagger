@@ -23,9 +23,7 @@ open class StringFixedLength : AbstractString {
         frameBody: AbstractTagFrameBody,
         size: Int
     ) : super(identifier, frameBody) {
-        if (size < 0) {
-            throw IllegalArgumentException("size is less than zero: $size")
-        }
+        require(size >= 0) { "size is less than zero: $size" }
         setSize(size)
     }
 
@@ -133,29 +131,33 @@ open class StringFixedLength : AbstractString {
         if (dataBuffer != null) {
             // Everything ok
             val limit = dataBuffer.limit()
-            if (limit == size) {
-                data = ByteArray(limit)
-                dataBuffer.get(data, 0, limit)
-                return data
-            } else if (limit > size) {
-                log.warn(
-                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too long so stripping extra length"
-                )
-                data = ByteArray(size)
-                dataBuffer.get(data, 0, size)
-                return data
-            } else {
-                log.warn(
-                    "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too short so padding with spaces to make up extra length"
-                )
-
-                data = ByteArray(size)
-                dataBuffer.get(data, 0, limit)
-
-                (limit..<size).forEach { i ->
-                    data[i] = ' '.code.toByte()
+            when {
+                limit == size -> {
+                    data = ByteArray(limit)
+                    dataBuffer[data, 0, limit]
+                    return data
                 }
-                return data
+                limit > size -> {
+                    log.warn(
+                        "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too long so stripping extra length"
+                    )
+                    data = ByteArray(size)
+                    dataBuffer[data, 0, size]
+                    return data
+                }
+                else -> {
+                    log.warn(
+                        "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too short so padding with spaces to make up extra length"
+                    )
+
+                    data = ByteArray(size)
+                    dataBuffer[data, 0, limit]
+
+                    (limit..<size).forEach { i ->
+                        data[i] = ' '.code.toByte()
+                    }
+                    return data
+                }
             }
         } else {
             log.warn(

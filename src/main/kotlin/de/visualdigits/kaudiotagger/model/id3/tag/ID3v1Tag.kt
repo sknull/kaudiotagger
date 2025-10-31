@@ -133,7 +133,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         // Do single file read of data to cut down on file reads
         dataBuffer = ByteArray(TAG_LENGTH)
         byteBuffer.position(0)
-        byteBuffer.get(dataBuffer, 0, TAG_LENGTH)
+        byteBuffer[dataBuffer, 0, TAG_LENGTH]
 
         title = String(
             dataBuffer,
@@ -192,7 +192,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     override fun seek(byteBuffer: ByteBuffer): Boolean {
         val buffer = ByteArray(FIELD_TAGID_LENGTH)
         // read the TAG value
-        byteBuffer.get(buffer, 0, FIELD_TAGID_LENGTH)
+        byteBuffer[buffer, 0, FIELD_TAGID_LENGTH]
         return (buffer.contentEquals(TAG_ID))
     }
 
@@ -295,11 +295,12 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      */
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
         val value = values[0]
-        val idv1FieldKey = tagFieldToID3v1Field.get(genericKey)
+        val idv1FieldKey = tagFieldToID3v1Field[genericKey]
         return ID3v1TagField(idv1FieldKey?.name?:error("No id"), value)
     }
 
     override fun addField(tagField: TagField) {
+        // to be implemented
     }
 
     override fun addField(artwork: Artwork) {
@@ -326,7 +327,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             GenericFieldKey.GENRE -> setGenreVal(field.toString())
             GenericFieldKey.YEAR -> setYear(field.toString())
             GenericFieldKey.COMMENT -> setComment(field.toString())
-            else -> {}
+            else -> { log.warn("Unknown key '$genericKey'") }
         }
     }
 
@@ -336,14 +337,14 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return album within list or empty if does not exist
      */
     open fun getAlbumTag(): List<TagField> {
-        if (album.isNotEmpty()) {
+        return if (album.isNotEmpty()) {
             val field = ID3v1TagField(
                 ID3v1FieldKey.ALBUM.name,
                 album
             )
-            return mutableListOf(field)
+            mutableListOf(field)
         } else {
-            return mutableListOf()
+            mutableListOf()
         }
     }
 
@@ -362,14 +363,14 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return Artist within list or empty if does not exist
      */
     open fun getArtistTag(): List<TagField> {
-        if (artist.isNotEmpty()) {
+        return if (artist.isNotEmpty()) {
             val field = ID3v1TagField(
                 ID3v1FieldKey.ARTIST.name,
                 artist
             )
-            return mutableListOf(field)
+            mutableListOf(field)
         } else {
-            return mutableListOf()
+            mutableListOf()
         }
     }
 
@@ -386,14 +387,14 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return comment within list or empty if does not exist
      */
     open fun getCommentTag(): List<TagField> {
-        if (comment.isNotEmpty()) {
+        return if (comment.isNotEmpty()) {
             val field = ID3v1TagField(
                 ID3v1FieldKey.COMMENT.name,
                 comment
             )
-            return mutableListOf(field)
+            mutableListOf(field)
         } else {
-            return mutableListOf()
+            mutableListOf()
         }
     }
 
@@ -570,7 +571,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             GenericFieldKey.GENRE -> setGenreVal("")
             GenericFieldKey.YEAR -> setYear("")
             GenericFieldKey.COMMENT -> setComment("")
-            else -> {}
+            else -> { log.warn("Unknown key '$genericKey'") }
         }
     }
 
@@ -603,10 +604,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
 
     override fun getArtworkList(): List<Artwork> {
         return listOf()
-    }
-
-    override fun getFields(): MutableIterator<TagField?> {
-        throw java.lang.UnsupportedOperationException("TODO:Not done yet")
     }
 
     /**

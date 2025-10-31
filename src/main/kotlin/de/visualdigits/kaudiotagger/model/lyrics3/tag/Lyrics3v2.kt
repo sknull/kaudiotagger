@@ -25,7 +25,7 @@ class Lyrics3v2 : AbstractLyrics3 {
 
     constructor(copyObject: Lyrics3v2) : super(copyObject) {
         copyObject.fieldMap.keys.forEach { key ->
-            val newObject = Lyrics3v2Field(copyObject.fieldMap.get(key)?:error("No field with id '$key'"))
+            val newObject = Lyrics3v2Field(copyObject.fieldMap[key] ?:error("No field with id '$key'"))
             fieldMap[key] = newObject
         }
     }
@@ -79,7 +79,7 @@ class Lyrics3v2 : AbstractLyrics3 {
             return false
         }
 
-        val lyricSize: Int = seekSize(byteBuffer)
+        val lyricSize: Int = seekSize()
 
         // reset file pointer to the beginning of the tag;
         seek(byteBuffer)
@@ -119,12 +119,10 @@ class Lyrics3v2 : AbstractLyrics3 {
     }
 
     /**
-     * TODO
      *
-     * @param byteBuffer
      * @return
      */
-    private fun seekSize(byteBuffer: ByteBuffer): Int {
+    private fun seekSize(): Int {
         return -1
     }
 
@@ -135,7 +133,7 @@ class Lyrics3v2 : AbstractLyrics3 {
      * @return The value associated with the identifier
      */
     fun getField(identifier: String?): Lyrics3v2Field? {
-        return fieldMap.get(identifier)
+        return fieldMap[identifier]
     }
 
     fun getFieldCount(): Int {
@@ -252,14 +250,14 @@ class Lyrics3v2 : AbstractLyrics3 {
         var str = "LYRICSBEGIN"
 
         for (i in 0..<str.length) {
-            buffer[i] = str.get(i).code.toByte()
+            buffer[i] = str[i].code.toByte()
         }
 
         file.write(buffer, 0, str.length)
 
         // IND needs to go first. lets createField/update it and write it first.
         updateField("IND")
-        field = fieldMap.get("IND")
+        field = fieldMap["IND"]
         field?.write(file)
 
         val iterator = fieldMap.values.iterator()
@@ -286,7 +284,7 @@ class Lyrics3v2 : AbstractLyrics3 {
         offset += (6 - str.length)
 
         for (i in 0..<str.length) {
-            buffer[i + offset] = str.get(i).code.toByte()
+            buffer[i + offset] = str[i].code.toByte()
         }
 
         offset += str.length
@@ -294,7 +292,7 @@ class Lyrics3v2 : AbstractLyrics3 {
         str = "LYRICS200"
 
         for (i in 0..<str.length) {
-            buffer[i + offset] = str.get(i).code.toByte()
+            buffer[i + offset] = str[i].code.toByte()
         }
 
         offset += str.length
@@ -314,7 +312,7 @@ class Lyrics3v2 : AbstractLyrics3 {
             var timeStampPresent = false
 
             if (lyricsPresent) {
-                lyrField = fieldMap.get("LYR")
+                lyrField = fieldMap["LYR"]
 
                 val lyrBody = lyrField?.frameBody as? FieldFrameBodyLYR
                 timeStampPresent = lyrBody?.hasTimeStamp() == true

@@ -59,7 +59,7 @@ class Lyrics3Line : AbstractDataType {
     }
 
     fun hasTimeStamp(): Boolean {
-        return !timeStamp.isEmpty()
+        return timeStamp.isNotEmpty()
     }
 
     override fun toString(): String {
@@ -71,7 +71,7 @@ class Lyrics3Line : AbstractDataType {
     }
 
     override fun readByteArray(byteArray: ByteArray, offset: Int) {
-        readString(byteArray.toString(), offset)
+        readString(byteArray.contentToString(), offset)
     }
 
     /**
