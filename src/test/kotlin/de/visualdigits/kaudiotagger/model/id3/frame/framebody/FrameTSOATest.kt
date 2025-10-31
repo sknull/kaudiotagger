@@ -100,13 +100,13 @@ class FrameTSOATest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v24Tag()
         tag.setFrame(initialisedFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -123,13 +123,13 @@ class FrameTSOATest : AbstractTestCase() {
         var frame =  ID3v24Frame(ID3v24FrameId.ALBUM_SORT_ORDER.id)
         frame.frameBody = FrameBodyTSOA()
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v24Tag()
         tag.setFrame(frame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         frame = mp3File
             .getID3v2Tag()
@@ -143,19 +143,19 @@ class FrameTSOATest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v24Tag()
         tag.setFrame(initialisedFrame)
 
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert to v23 and save
+        // Reload and convert to v23 and save
         mp3File = MP3File.read(testFile)
         mp3File.setTag(ID3v23Tag(mp3File.getID3v2TagAsv24()))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -170,19 +170,19 @@ class FrameTSOATest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v24Tag()
         tag.setFrame(initialisedFrame)
 
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert to v22 and save
+        // Reload and convert to v22 and save
         mp3File = MP3File.read(testFile)
         mp3File.setTag(ID3v22Tag(mp3File.getID3v2TagAsv24()))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -197,19 +197,19 @@ class FrameTSOATest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v23Tag()
         tag.setFrame(initialisedFrame)
 
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert from v23 to v22 and save
+        // Reload and convert from v23 to v22 and save
         mp3File = MP3File.read(testFile)
         mp3File.getID3v2Tag()?.also { tag -> mp3File.setTag(ID3v22Tag(tag)) }
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -224,19 +224,19 @@ class FrameTSOATest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v23Tag()
         tag.setFrame(v23InitialisedFrame)
 
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert from v23 to v22 and save
+        // Reload and convert from v23 to v22 and save
         mp3File = MP3File.read(testFile)
         mp3File.getID3v2Tag()?.also { tag -> mp3File.setTag(ID3v22Tag(tag)) }
         mp3File.save()
 
-        //Reload will be converted to same TST version for v22
+        // Reload will be converted to same TST version for v22
         mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -251,7 +251,7 @@ class FrameTSOATest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v22Tag()
 
         //..Notes (uses v22Frame but frame body will be the v23/24 version)
@@ -264,12 +264,12 @@ class FrameTSOATest : AbstractTestCase() {
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert from v22 to v24 and save
+        // Reload and convert from v22 to v24 and save
         mp3File = MP3File.read(testFile)
         mp3File.setTag(ID3v24Tag(mp3File.getID3v2Tag()))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()

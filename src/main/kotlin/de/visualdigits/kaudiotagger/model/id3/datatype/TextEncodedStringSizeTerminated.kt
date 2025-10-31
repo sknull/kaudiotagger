@@ -23,7 +23,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
         fun splitByNullSeperator(value: String): MutableList<String> {
             val valuesarray = value.split("\\u0000")
             var values = valuesarray.toMutableList()
-            //Read only list so if empty have to create new list
+            // Read only list so if empty have to create new list
             if (values.isEmpty()) {
                 values = mutableListOf("")
             }
@@ -60,15 +60,15 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * ID3 Text Frames often allow multiple strings seperated by the null char
      * appropriate for the encoding.
      *
-     * @param arr    this is the buffer for the frame
+     * @param byteArray    this is the buffer for the frame
      * @param offset this is where to start reading in the buffer for this field
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
         log.debug("Reading from array from offset:$offset")
 
-        //Decode sliced inBuffer
-        val inBuffer = ByteBuffer.wrap(arr, offset, arr.size - offset).slice()
-        val outBuffer = CharBuffer.allocate(arr.size - offset)
+        // Decode sliced inBuffer
+        val inBuffer = ByteBuffer.wrap(byteArray, offset, byteArray.size - offset).slice()
+        val outBuffer = CharBuffer.allocate(byteArray.size - offset)
         val decoder = getCorrectDecoder(inBuffer)
         val coderResult = decoder?.decode(inBuffer, outBuffer, true)
         if (coderResult?.isError == true) {
@@ -77,15 +77,15 @@ open class TextEncodedStringSizeTerminated : AbstractString {
         decoder?.flush(outBuffer)
         outBuffer.flip()
 
-        //If using UTF16 with BOM we then search through the text removing any BOMs that could exist
-        //for multiple values, BOM could be Big Endian or Little Endian
+        // If using UTF16 with BOM we then search through the text removing any BOMs that could exist
+        // for multiple values, BOM could be Big Endian or Little Endian
         setValue(if (StandardCharsets.UTF_16 == getTextEncodingCharSet()) {
             outBuffer.toString().replace("\ufeff", "").replace("\ufffe", "")
         } else {
             outBuffer.toString()
         })
-        //SetSize, important this is correct for finding the next datatype
-        setSize(arr.size - offset)
+        // SetSize, important this is correct for finding the next datatype
+        setSize(byteArray.size - offset)
         log.debug("Read SizeTerminatedString:{} size:{}", getValue(), getSize())
     }
 
@@ -108,12 +108,12 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      */
     override fun writeByteArray(): ByteArray? {
         val data: ByteArray
-        //Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
+        // Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
         val charset = getTextEncodingCharSet()?:error("No charset found")
         try {
             stripTrailingNull()
 
-            //Special Handling because there is no UTF16 BOM LE charset
+            // Special Handling because there is no UTF16 BOM LE charset
             val stringValue = getValue() as? String
             var actualCharSet: Charset? = null
             if (StandardCharsets.UTF_16 == charset) {
@@ -124,16 +124,16 @@ open class TextEncodedStringSizeTerminated : AbstractString {
                 }
             }
 
-            //Ensure large enough for any encoding
+            // Ensure large enough for any encoding
             val outputBuffer = ByteBuffer.allocate(
                 ((stringValue?.length?:0) + 3) * 3
             )
 
-            //Ensure each string (if multiple values) is written with BOM by writing separately
+            // Ensure each string (if multiple values) is written with BOM by writing separately
             val values = stringValue?.let { s -> splitByNullSeperator(s) }?:mutableListOf()
             checkTrailingNull(values, stringValue)
 
-            //For each value
+            // For each value
             for (i in values.indices) {
                 val next = values[i]
 
@@ -153,7 +153,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
             outputBuffer.rewind()
             outputBuffer.get(data, 0, outputBuffer.limit())
             setSize(data.size)
-        } catch (ce: CharacterCodingException) { //https://bitbucket.org/ijabz/jaudiotagger/issue/1/encoding-metadata-to-utf-16-can-fail-if
+        } catch (ce: CharacterCodingException) { // https:// bitbucket.org/ijabz/jaudiotagger/issue/1/encoding-metadata-to-utf-16-can-fail-if
             log.error("${ce.message}:$charset:${getValue()}")
             throw RuntimeException(ce)
         }
@@ -213,7 +213,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
         encoder.onUnmappableCharacter(CodingErrorAction.IGNORE)
 
         val bb: ByteBuffer
-        //Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
+        // Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
         if ((i + 1) == noOfValues) {
             bb = encoder.encode(CharBuffer.wrap('\ufeff'.toString() + next))
         } else {
@@ -244,7 +244,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
         encoder.onUnmappableCharacter(CodingErrorAction.IGNORE)
 
         val bb: ByteBuffer
-        //Add BOM
+        // Add BOM
         if ((i + 1) == noOfValues) {
             bb = encoder.encode(CharBuffer.wrap('\ufeff'.toString() + next))
         } else {
@@ -308,7 +308,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @return the nth value
      */
     open fun getValueAtIndex(index: Int): String? {
-        //Split String into separate components
+        // Split String into separate components
         val values: MutableList<*> = splitByNullSeperator(getValue() as String)
         return values[index] as String
     }

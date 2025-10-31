@@ -1,6 +1,7 @@
 package de.visualdigits.kaudiotagger.util
 
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MPEGFrameHeader
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -8,7 +9,7 @@ import java.nio.ByteBuffer
 
 object ID3Unsynchronization {
 
-    val log = LoggerFactory.getLogger(javaClass)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
     
     /**
      * Check if a byte array will require unsynchronization before being written as a tag.
@@ -104,7 +105,7 @@ object ID3Unsynchronization {
      * @return a synchronized representation of the source
      */
     fun synchronize(source: ByteBuffer): ByteBuffer {
-        //long start = System.nanoTime();
+        // long start = System.nanoTime();
 
         val len = source.remaining()
         val bytes = ByteArray(len + 1) // an extra byte saves a check later.
@@ -122,8 +123,8 @@ object ID3Unsynchronization {
         }
 
         val bb2 = ByteBuffer.wrap(bytes, 0, to)
-        //long time = System.nanoTime() - start;
-        //System.out.printf("Took %6.3f ms, was %d bytes, now %,d bytes%n", time/1e6, source.limit(), bb2.limit());
+        // long time = System.nanoTime() - start;
+        // System.out.printf("Took %6.3f ms, was %d bytes, now %,d bytes%n", time/1e6, source.limit(), bb2.limit());
         return bb2
     }
 }

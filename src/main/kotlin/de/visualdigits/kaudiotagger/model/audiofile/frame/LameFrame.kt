@@ -10,7 +10,7 @@ class LameFrame(
 
     companion object {
         const val LAME_HEADER_BUFFER_SIZE: Int = 36
-        const val ENCODER_SIZE: Int = 9 //Includes LAME ID
+        const val ENCODER_SIZE: Int = 9 // Includes LAME ID
         const val LAME_ID_SIZE: Int = 4
         const val LAME_ID: String = "LAME"
 

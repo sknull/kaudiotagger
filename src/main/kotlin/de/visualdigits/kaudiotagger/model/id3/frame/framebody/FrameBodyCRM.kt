@@ -87,9 +87,6 @@ class FrameBodyCRM
         setObjectValue(DataTypes.OBJ_OWNER, description)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringNullTerminated(DataTypes.OBJ_OWNER, this))
         objectList.add(StringNullTerminated(DataTypes.OBJ_DESCRIPTION, this))

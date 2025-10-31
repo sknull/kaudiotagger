@@ -53,7 +53,7 @@ class Lyrics3v2 : AbstractLyrics3 {
                     newField = Lyrics3v2Field(frame as AbstractID3v2Frame)
                     fieldMap[newField.getIdentifier()] = newField
                 } catch (ex: TagException) {
-                    //invalid frame to createField lyrics3 field. ignore and keep going
+                    // invalid frame to createField lyrics3 field. ignore and keep going
                 }
             }
         }
@@ -138,9 +138,6 @@ class Lyrics3v2 : AbstractLyrics3 {
         return fieldMap.get(identifier)
     }
 
-    /**
-     * @return
-     */
     fun getFieldCount(): Int {
         return fieldMap.size
     }
@@ -205,9 +202,6 @@ class Lyrics3v2 : AbstractLyrics3 {
         return lyricStart == "LYRICSBEGIN"
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         val iterator = fieldMap.values.iterator()
         var field: Lyrics3v2Field
@@ -221,16 +215,10 @@ class Lyrics3v2 : AbstractLyrics3 {
         return str
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "Lyrics3v2.00"
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         var size = 0
         val iterator = fieldMap.values.iterator()

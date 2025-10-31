@@ -32,44 +32,35 @@ class BooleanByte : AbstractDataType {
         this.bitPosition = copyObject.bitPosition
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         return 1
     }
 
     /**
-     * @param arr
+     * @param byteArray
      * @param offset
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        if ((offset < 0) || (offset >= arr.size)) {
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        if ((offset < 0) || (offset >= byteArray.size)) {
             throw IndexOutOfBoundsException(
                 "Offset to byte array is out of bounds: offset = " +
                         offset +
                         ", array.length = " +
-                        arr.size
+                        byteArray.size
             )
         }
 
-        var newValue = arr[offset]
+        var newValue = byteArray[offset]
 
         newValue = (newValue.toInt() shr bitPosition).toByte()
         newValue = (newValue.toInt() and 0x1).toByte()
         setValue(newValue.toInt() == 1)
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         return getValue().toString()
     }
 
-    /**
-     * @return
-     */
     override fun writeByteArray(): ByteArray? {
         val retValue = ByteArray(1)
         if (getValue() != null) {

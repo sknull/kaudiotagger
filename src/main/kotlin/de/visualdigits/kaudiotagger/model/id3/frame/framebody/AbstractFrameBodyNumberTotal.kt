@@ -1,10 +1,10 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.PartOfSet
 import de.visualdigits.kaudiotagger.model.id3.datatype.PartOfSetValue
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 
 abstract class AbstractFrameBodyNumberTotal: AbstractID3v2FrameBody {
@@ -66,11 +66,11 @@ abstract class AbstractFrameBodyNumberTotal: AbstractID3v2FrameBody {
         return (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.getCount()
     }
 
-    fun setNumber(trackNo: Int) {
+    fun setNumber(trackNo: Int?) {
         (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setCount(trackNo)
     }
 
-    fun setNumber(trackNo: String) {
+    fun setNumber(trackNo: String?) {
         (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setCount(trackNo)
     }
 
@@ -82,12 +82,12 @@ abstract class AbstractFrameBodyNumberTotal: AbstractID3v2FrameBody {
         return (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.getTotal()
     }
 
-    fun setTotal(trackTotal: Int) {
+    fun setTotal(trackTotal: Int?) {
         (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setTotal(trackTotal)
     }
 
-    fun setTotal(trackTotal: String) {
-        (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setTotal(trackTotal.toInt())
+    fun setTotal(trackTotal: String?) {
+        (getObjectValue(DataTypes.OBJ_TEXT) as? PartOfSetValue)?.setTotal(trackTotal?.toInt())
     }
 
     fun getTotalAsText(): String? {

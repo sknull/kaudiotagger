@@ -38,7 +38,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -89,9 +89,6 @@ class FrameBodyENCR
         return ID3v24FrameId.ENCRYPTION.id
     }
 
-    /**
-     * @return
-     */
     fun getOwner(): String? {
         return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
@@ -103,9 +100,6 @@ class FrameBodyENCR
         setObjectValue(DataTypes.OBJ_OWNER, owner)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringNullTerminated(DataTypes.OBJ_OWNER, this))
         objectList.add(NumberFixedLength(DataTypes.OBJ_METHOD_SYMBOL, this, 1))

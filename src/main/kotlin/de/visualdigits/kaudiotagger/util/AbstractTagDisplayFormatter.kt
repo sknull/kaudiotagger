@@ -53,7 +53,7 @@ abstract class AbstractTagDisplayFormatter {
          * @return
          */
         fun displayAsBinary(buffer: Byte): String {
-            //Convert buffer to hex representation
+            // Convert buffer to hex representation
             val hexValue = Integer.toHexString(buffer.toInt())
             var char1 = ""
             var char2 = ""

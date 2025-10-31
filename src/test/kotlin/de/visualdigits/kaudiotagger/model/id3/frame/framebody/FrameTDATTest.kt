@@ -50,7 +50,7 @@ class FrameTDATTest : AbstractTestCase() {
         assertEquals("1200", tag.getFirst("TIME"))
         assertEquals(3, tag.getFieldCount())
 
-        //Create v24tag from v23, all these time frames shouod be merged into one
+        // Create v24tag from v23, all these time frames shouod be merged into one
         var v24tag =  ID3v24Tag(tag)
         assertEquals(1, v24tag.getFieldCount())
         assertNotNull(v24tag.getFirst("TDAT"))
@@ -58,15 +58,15 @@ class FrameTDATTest : AbstractTestCase() {
         assertNotNull(v24tag.getFirst("TYER"))
         assertEquals("1980-06-30T12:00", v24tag.getFirst("TDRC"))
 
-        //Now create v23tag from v24, the tdrc frame should be split up and the values of the individual
-        //values should match the v23 format not simply break up the v24 string
+        // Now create v23tag from v24, the tdrc frame should be split up and the values of the individual
+        // values should match the v23 format not simply break up the v24 string
         tag = ID3v23Tag(v24tag)
         assertEquals(3, tag.getFieldCount())
         assertEquals("3006", tag.getFirst("TDAT"))
         assertEquals("1980", tag.getFirst("TYER"))
         assertEquals("1200", tag.getFirst("TIME"))
 
-        //Do it again to check it works second time around
+        // Do it again to check it works second time around
         v24tag = ID3v24Tag(tag)
         assertEquals(1, v24tag.getFieldCount())
         assertNotNull(v24tag.getFirst("TDAT"))
@@ -92,7 +92,7 @@ class FrameTDATTest : AbstractTestCase() {
         assertEquals("0106", v23tag.getFirst("TDAT"))
 
         tag = ID3v24Tag(v23tag)
-        //But because is MonthOnly flag set dd gets lost when convert back to v24
+        // But because is MonthOnly flag set dd gets lost when convert back to v24
         assertEquals("2006-06", tag.getFirst("TDRC"))
     }
 

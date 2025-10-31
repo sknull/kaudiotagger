@@ -47,7 +47,7 @@ import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor

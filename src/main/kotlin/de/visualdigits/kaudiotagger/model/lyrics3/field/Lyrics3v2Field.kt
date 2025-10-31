@@ -155,16 +155,10 @@ class Lyrics3v2Field: AbstractTagFrame {
         return newBody
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         return (frameBody?.getSize()?:0) + 5 + (getIdentifier()?.length?:0)
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return frameBody?.getIdentifier()?:""
     }
@@ -182,7 +176,7 @@ class Lyrics3v2Field: AbstractTagFrame {
                 str?.get(i)?.code?.toByte()?.also { b -> buffer[i] = b }
             }
             file.write(buffer, 0, (str?.length?:0))
-            //body.write(file);
+            // body.write(file);
         }
     }
 }

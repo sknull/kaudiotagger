@@ -86,7 +86,7 @@ class FrameBodyUFID: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     companion object {
-        const val UFID_MUSICBRAINZ: String = "http://musicbrainz.org"
-        const val UFID_ID3TEST: String = "http://www.id3.org/dummy/ufid.html"
+        const val UFID_MUSICBRAINZ: String = "http:// musicbrainz.org"
+        const val UFID_ID3TEST: String = "http:// www.id3.org/dummy/ufid.html"
     }
 }

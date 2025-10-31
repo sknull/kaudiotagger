@@ -1,12 +1,12 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.field.framebody
 
+import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.id3.datatype.ID3v2LyricLine
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodySYLT
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
 import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3TimeStamp
 import de.visualdigits.kaudiotagger.model.lyrics3.types.Lyrics3v2Fields
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
-import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodySYLT
-import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUSLT
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.nio.ByteBuffer
 
@@ -78,8 +78,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
             currentLine = ID3v2LyricLine(cl as ID3v2LyricLine)
             timeStamp = Lyrics3TimeStamp("Time Stamp", this)
             timeStamp.setTimeStamp(
-                currentLine.timeStamp,
-                sync.getTimeStampFormat() as Byte
+                currentLine.timeStamp
             )
 
             if (lineMap.containsKey(currentLine.text)) {
@@ -105,9 +104,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         lines.add(line)
     }
 
-    /**
-     *
-     */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
             return false
@@ -167,9 +163,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         }
     }
 
-    /**
-     * @return
-     */
     private fun writeString(): String {
         var line: Lyrics3Line
         var str = ""
@@ -181,12 +174,9 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
 
         return str
 
-        //return str.substring(0,str.length()-2); // cut off the last CRLF pair
+        // return str.substring(0,str.length()-2); // cut off the last CRLF pair
     }
 
-    /**
-     * @return
-     */
     fun getLyric(): String {
         return writeString()
     }
@@ -217,9 +207,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         return super.isSubsetOf(obj)
     }
 
-    /**
-     * @return
-     */
     fun hasTimeStamp(): Boolean {
         var present = false
 
@@ -232,16 +219,10 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         return present
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "LYR"
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         var size = 0
         var line: Lyrics3Line
@@ -253,7 +234,7 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
 
         return size
 
-        //return size - 2; // cut off the last crlf pair
+        // return size - 2; // cut off the last crlf pair
     }
 
     /**

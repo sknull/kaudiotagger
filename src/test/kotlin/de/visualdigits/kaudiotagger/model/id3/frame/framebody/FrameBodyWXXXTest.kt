@@ -4,7 +4,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class FrameBodyWXXXTest : AbstractTestCase() {
@@ -24,13 +23,13 @@ class FrameBodyWXXXTest : AbstractTestCase() {
     }
 
     companion object {
-        const val WXXX_TEST_URL: String = "http://test.url.com"
+        const val WXXX_TEST_URL: String = "http:// test.url.com"
 
         const val WXXX_TEST_STRING: String = "simple url"
         const val WXXX_UNICODE_REQUIRED_TEST_STRING: String = "\u01ff\u01ffcomplex url"
 
         fun getInitialisedBody(): FrameBodyWXXX {
-            //Text Encoding doesnt matter until written to file
+            // Text Encoding doesnt matter until written to file
             val fb = FrameBodyWXXX(
                 TextEncoding.ISO_8859_1.id,
                 WXXX_TEST_STRING,
@@ -40,7 +39,7 @@ class FrameBodyWXXXTest : AbstractTestCase() {
         }
 
         fun getUnicodeRequiredInitialisedBody(): FrameBodyWXXX {
-            //Text Encoding doesnt matter until written to file
+            // Text Encoding doesnt matter until written to file
             val fb = FrameBodyWXXX(
                 TextEncoding.ISO_8859_1.id,
                 WXXX_UNICODE_REQUIRED_TEST_STRING,

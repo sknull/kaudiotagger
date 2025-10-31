@@ -1,24 +1,13 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.datatype
 
-import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import java.nio.charset.StandardCharsets
 
 class Lyrics3TimeStamp : AbstractDataType {
-    /**
-     * @return
-     */
-    /**
-     *
-     */
+
     var minute: Long = 0
 
-    /**
-     * @return
-     */
-    /**
-     *
-     */
     var second: Long = 0
 
     /**
@@ -44,40 +33,28 @@ class Lyrics3TimeStamp : AbstractDataType {
     fun readString(s: String) {
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int = 7
 
     /**
      * Creates a new ObjectLyrics3TimeStamp datatype.
      *
      * @param timeStamp
-     * @param timeStampFormat
      */
-    fun setTimeStamp(timeStamp: Long, timeStampFormat: Byte) {
+    fun setTimeStamp(timeStamp: Long) {
         /**
          * @todo convert both types of formats
          */
-        var timeStamp = timeStamp
-        timeStamp = timeStamp / 1000
+        var timeStamp = timeStamp / 1000
         minute = timeStamp / 60
         second = timeStamp % 60
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         return writeString()
     }
 
-    /**
-     * @return
-     */
     fun writeString(): String {
-        var str: String
-        str = "["
+        var str = "["
 
         if (minute < 0) {
             str += "00"
@@ -106,8 +83,8 @@ class Lyrics3TimeStamp : AbstractDataType {
         return str
     }
 
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        readString(arr.toString(), offset)
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        readString(byteArray.toString(), offset)
     }
 
     /**
@@ -116,9 +93,6 @@ class Lyrics3TimeStamp : AbstractDataType {
      */
     fun readString(timeStamp: String, offset: Int) {
         var timeStamp = timeStamp
-        if (timeStamp == null) {
-            throw NullPointerException("Image is null")
-        }
 
         if ((offset < 0) || (offset >= timeStamp.length)) {
             throw IndexOutOfBoundsException(
@@ -140,7 +114,7 @@ class Lyrics3TimeStamp : AbstractDataType {
         }
     }
 
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         return writeString().toByteArray(StandardCharsets.ISO_8859_1)
     }
 }

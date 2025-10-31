@@ -36,13 +36,13 @@ class FrameWOARTest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(initialisedFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -80,19 +80,19 @@ class FrameWOARTest : AbstractTestCase() {
         )
     }
 
-    //This fails beccause cant save Unicode to WOAR fields
+    // This fails beccause cant save Unicode to WOAR fields
     @Test
     fun testSaveUnicodeToFile() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(initialisedUnicodeFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -112,19 +112,19 @@ class FrameWOARTest : AbstractTestCase() {
         )
     }
 
-    //This fails beccause cant save Unicode to WOAR fields
+    // This fails beccause cant save Unicode to WOAR fields
     @Test
     fun testSaveUnicodeToFile2() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(rawUnicodeFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -147,14 +147,14 @@ class FrameWOARTest : AbstractTestCase() {
     companion object {
         const val NORMAL_LINK =  "http:www.btinternet.com/~birdpoo/kots.htm"
 
-        //Note cant put Japanese chars directly into code because the source code is not a UTF8 file
-        const val UNICODE_LINK_START =  "http://ja.wikipedia.org/wiki/"
+        // Note cant put Japanese chars directly into code because the source code is not a UTF8 file
+        const val UNICODE_LINK_START =  "http:// ja.wikipedia.org/wiki/"
         const val UNICODE_LINK_END =  "\u5742\u672c\u4e5d"
-        const val UNICODE_ENCODED =  "http://ja.wikipedia.org/wiki/%E5%9D%82%E6%9C%AC%E4%B9%9D"
-        const val UNICODE_LINK =  "http://ja.wikipedia.org/wiki/\u5742\u672c\u4e5d"
+        const val UNICODE_ENCODED =  "http:// ja.wikipedia.org/wiki/%E5%9D%82%E6%9C%AC%E4%B9%9D"
+        const val UNICODE_LINK =  "http:// ja.wikipedia.org/wiki/\u5742\u672c\u4e5d"
 
         val initialisedFrame: ID3v24Frame
-            //http://ja.wikipedia.org/wiki/%E5%9D%82%E6%9C%AC%E4%B9%9D
+            // http:// ja.wikipedia.org/wiki/%E5%9D%82%E6%9C%AC%E4%B9%9D
             get() {
                 val frame = ID3v24Frame(ID3v24FrameId.URL_ARTIST_WEB.id)
                 val fb =  FrameBodyWOAR()
@@ -175,7 +175,7 @@ class FrameWOARTest : AbstractTestCase() {
                             )
                 )
 
-                //fb.setUrlLink(URLEncoder.encode(UNICODE_LINK_START+UNICODE_LINK_END,"utf8"));
+                // fb.setUrlLink(URLEncoder.encode(UNICODE_LINK_START+UNICODE_LINK_END,"utf8"));
                 frame.frameBody = fb
                 return frame
             }

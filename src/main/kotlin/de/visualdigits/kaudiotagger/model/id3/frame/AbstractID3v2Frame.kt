@@ -5,7 +5,6 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeExcep
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
-import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
@@ -30,10 +29,10 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
 
     }
 
-    //Frame identifier
+    // Frame identifier
     private var identifier: String? = ""
 
-    //Frame Size
+    // Frame Size
     var frameSize: Int = 0
 
     /**
@@ -72,10 +71,9 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      *
      * @param identifier
      */
-    //TODO the identifier checks should be done in the relevent subclasses
-    constructor(
-        identifier: String
-    ) {
+    // TODO the identifier checks should be done in the relevent subclasses
+    @Suppress("UNCHECKED_CAST")
+    constructor(identifier: String) {
         this.identifier = identifier
         log.debug("Creating empty frame of type$identifier")
 
@@ -83,14 +81,14 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         // to keep things up to date.
         try {
             val c = Class.forName("${AbstractID3v2FrameBody.FRAME_BODY_PACKAGE}.FrameBody$identifier") as Class<AbstractID3v2FrameBody>
-            frameBody = c.newInstance()
+            frameBody = c.getDeclaredConstructor().newInstance()
         } catch (cnfe: ClassNotFoundException) {
             log.error(cnfe.message)
             frameBody = FrameBodyUnsupported(identifier)
-        } catch (ie: InstantiationException) { //Instantiate Interface/Abstract should not happen
+        } catch (ie: InstantiationException) { // Instantiate Interface/Abstract should not happen
             log.error("InstantiationException:$identifier", ie)
             throw java.lang.RuntimeException(ie)
-        } catch (iae: IllegalAccessException) { //Private Constructor shouild not happen
+        } catch (iae: IllegalAccessException) { // Private Constructor shouild not happen
             log.error("IllegalAccessException:$identifier", iae)
             throw java.lang.RuntimeException(iae)
         }
@@ -110,10 +108,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         log.debug("Created empty frame of type$identifier")
     }
 
-    //TODO:needs implementing but not sure if this method is required at all
-    override fun copyContent(field: TagField) {
-    }
-
     /**
      * Get the next frame id, throwing an exception if unable to do this and check against just having padded data
      *
@@ -123,7 +117,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
     fun readIdentifier(byteBuffer: ByteBuffer): String? {
         val buffer = ByteArray(getFrameIdSize())
 
-        //Read the Frame Identifier
+        // Read the Frame Identifier
         if (getFrameIdSize() <= byteBuffer.remaining()) {
             byteBuffer.get(buffer, 0, getFrameIdSize())
         }
@@ -203,7 +197,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      * @param body
      * @return newly created framebody for this type
      */
-    fun readBody(
+    @Suppress("UNCHECKED_CAST")    fun readBody(
         identifier: String?,
         body: AbstractID3v2FrameBody
     ): AbstractID3v2FrameBody {
@@ -217,20 +211,20 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
             val constructorParameterValues = arrayOf<Any?>(body)
             val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(*constructorParameterTypes)
             frameBody = (construct.newInstance(*constructorParameterValues))
-        } catch (cex: ClassNotFoundException) {
+        } catch (_: ClassNotFoundException) {
             log.debug("Identifier not recognised:$identifier unable to create framebody")
             throw InvalidFrameException("FrameBody$identifier does not exist")
-        } catch (sme: NoSuchMethodException) { //If suitable constructor does not exist
+        } catch (sme: NoSuchMethodException) { // If suitable constructor does not exist
             log.error("No such method:" + sme.message, sme)
             throw InvalidFrameException("FrameBody$identifier does not have a constructor that takes:${body.javaClass.getName()}")
         } catch (ite: InvocationTargetException) {
             log.error("An error occurred within abstractID3v2FrameBody")
             log.error("Invocation target exception", ite.cause)
             throw InvalidFrameException(ite.cause?.message)
-        } catch (ie: InstantiationException) { //Instantiate Interface/Abstract should not happen
+        } catch (ie: InstantiationException) { // Instantiate Interface/Abstract should not happen
             log.error("Instantiation exception", ie)
             throw RuntimeException(ie.message)
-        } catch (iae: IllegalAccessException) { //Private Constructor shouild not happen
+        } catch (iae: IllegalAccessException) { // Private Constructor shouild not happen
             log.error("Illegal access exception ", iae)
             throw RuntimeException(iae.message)
         }
@@ -267,7 +261,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      * @param b
      */
     override fun isBinary(b: Boolean) {
-        //do nothing because whether or not a field is binary is defined by its id and is immutable
+        // do nothing because whether or not a field is binary is defined by its id and is immutable
     }
 
     override fun isEmpty(): Boolean {
@@ -295,7 +289,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         return TextEncoding.fromId(textEncoding?.toInt()?:0)?.charSet
     }
 
-    override fun setEncoding(enc: Charset) {
+    override fun setEncoding(encoding: Charset) {
         throw java.lang.UnsupportedOperationException("Not Implemented Yet")
     }
 
@@ -332,13 +326,14 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      *
      * @return a newly created FrameBody
      */
+    @Suppress("UNCHECKED_CAST")
     fun readBody(
         identifier: String?,
         byteBuffer: ByteBuffer,
         frameSize: Int
     ): AbstractID3v2FrameBody {
-        //Use reflection to map id to frame body, which makes things much easier
-        //to keep things up to date,although slight performance hit.
+        // Use reflection to map id to frame body, which makes things much easier
+        // to keep things up to date,although slight performance hit.
         log.debug("Creating framebody:start")
 
         var frameBody: AbstractID3v2FrameBody
@@ -349,34 +344,25 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
                 Integer.TYPE,
             )
             val constructorParameterValues = arrayOf<Any>(byteBuffer, frameSize)
-            log.debug("constructorParameterTypes '$identifier': ${constructorParameterTypes.toList()}")
-            log.debug("constructorParameterValues '$identifier': ${constructorParameterValues.toList()}")
+            log.debug("constructorParameterTypes '{}': {}", identifier, constructorParameterTypes.toList())
+            log.debug("constructorParameterValues '{}': {}", identifier, constructorParameterValues.toList())
             val construct: Constructor<AbstractID3v2FrameBody> = c.getConstructor(*constructorParameterTypes)
             frameBody = (construct.newInstance(*constructorParameterValues))
-        } catch (cex: ClassNotFoundException) { //No class defined for this frame type,use FrameUnsupported
+        } catch (_: ClassNotFoundException) { // No class defined for this frame type,use FrameUnsupported
             log.error("Identifier not recognised: '$identifier' using FrameBodyUnsupported")
             try {
                 frameBody = FrameBodyUnsupported(byteBuffer, frameSize)
-            } //read method to declare it can throw InvalidtagException //Should only throw InvalidFrameException but unfortunately legacy hierachy forces
+            } // read method to declare it can throw InvalidtagException // Should only throw InvalidFrameException but unfortunately legacy hierachy forces
             catch (ife: InvalidFrameException) {
                 throw ife
             } catch (te: InvalidTagException) {
                 throw InvalidFrameException(te.message)
             }
-        } //propagate it up otherwise mark this frame as invalid //An error has occurred during frame instantiation, if underlying cause is an unchecked exception or error
-        catch (ite: InvocationTargetException) {
-// todo
-//            log.error("An error occurred within abstractID3v2FrameBody for identifier:$identifier")
-            throw InvalidFrameException(ite.cause?.message)
-        } catch (sme: NoSuchMethodException) { //No Such Method should not happen
-            log.error("No such method", sme)
-            throw RuntimeException(sme.message)
-        } catch (ie: InstantiationException) { //Instantiate Interface/Abstract should not happen
-            log.error("Instantiation exception", ie)
-            throw RuntimeException(ie.message)
-        } catch (iae: IllegalAccessException) { //Private Constructor shouild not happen
-            log.error("Illegal access exception ", iae)
-            throw RuntimeException(iae.message)
+        } // propagate it up otherwise mark this frame as invalid // An error has occurred during frame instantiation, if underlying cause is an unchecked exception or error
+        catch (e: InvocationTargetException) {
+            throw InvalidFrameException("Could not invoke constructor", e)
+        } catch (e: Exception) { // No Such Method should not happen
+            throw IllegalStateException("Could not construct frame", e)
         }
         log.debug("Created framebody:end${frameBody.getIdentifier()}")
         frameBody.header = this

@@ -17,7 +17,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         val formatDateIn = SimpleDateFormat("ddMM", Locale.UK)
         val formatTimeIn = SimpleDateFormat("HHmm", Locale.UK)
 
-        //These are the separate components of the v24 format that the v23 formats map to
+        // These are the separate components of the v24 format that the v23 formats map to
         val formatYearOut = SimpleDateFormat("yyyy", Locale.UK)
         val formatDateOut = SimpleDateFormat("-MM-dd", Locale.UK)
         val formatMonthOut = SimpleDateFormat("-MM", Locale.UK)
@@ -124,22 +124,22 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
     }
 
     fun findMatchingMaskAndExtractV3Values() {
-        //Find the date format of the text
+        // Find the date format of the text
         for (i in formatters.indices) {
             try {
                 val d: Date?
                 synchronized(formatters.get(i)) {
                     d = formatters.get(i).parse(getText())
                 }
-                //If able to parse a date from the text
+                // If able to parse a date from the text
                 if (d != null) {
                     extractID3v23Formats(d, i)
                     break
                 }
-            } catch (e: ParseException) { //Dont display will occur for each failed format
-                //Do nothing;
+            } catch (e: ParseException) { // Dont display will occur for each failed format
+                // Do nothing;
             } catch (nfe: NumberFormatException) {
-                //Do nothing except log warning because not really expecting this to happen
+                // Do nothing except log warning because not really expecting this to happen
                 log.warn(
                     "Date Formatter:" +
                             formatters.get(i).toPattern() +
@@ -226,8 +226,8 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param dateRecord
      * @param precision
      */
-    //TODO currently if user has entered Year and Month, we only store in v23, should we store month with
-    //first day
+    // TODO currently if user has entered Year and Month, we only store in v23, should we store month with
+    // first day
     private fun extractID3v23Formats(
         dateRecord: Date,
         precision: Int
@@ -237,7 +237,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
         )
         val d = dateRecord
 
-        //Precision Year
+        // Precision Year
         if (precision == PRECISION_YEAR) {
             year = formatDateAsYear(d)
         } else if (precision == PRECISION_MONTH) {

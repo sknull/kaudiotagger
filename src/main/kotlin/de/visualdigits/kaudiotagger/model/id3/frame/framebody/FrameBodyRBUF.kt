@@ -57,9 +57,6 @@ class FrameBodyRBUF
         return ID3v24FrameId.RECOMMENDED_BUFFER_SIZE.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(
             NumberFixedLength(DataTypes.OBJ_BUFFER_SIZE, this, BUFFER_FIELD_SIZE)

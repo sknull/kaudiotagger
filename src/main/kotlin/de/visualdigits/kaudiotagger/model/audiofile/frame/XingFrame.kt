@@ -11,7 +11,7 @@ class XingFrame {
 
         val log: Logger = LoggerFactory.getLogger(XingFrame::class.java)
 
-        //The offset into first frame varies based on the MPEG frame properties
+        // The offset into first frame varies based on the MPEG frame properties
         const val MPEG_VERSION_1_MODE_MONO_OFFSET: Int = 21
         const val MPEG_VERSION_1_MODE_STEREO_OFFSET: Int = 36
         const val MPEG_VERSION_2_MODE_MONO_OFFSET: Int = 13
@@ -68,10 +68,10 @@ class XingFrame {
                 return null
             }
 
-            //We store this so can return here after scanning through buffer
+            // We store this so can return here after scanning through buffer
             val startPosition = bb.position()
 
-            //Get to Start of where Xing Frame Should be ( we dont know if it is one at this point)
+            // Get to Start of where Xing Frame Should be ( we dont know if it is one at this point)
             if (mpegFrameHeader.version == MPEGFrameHeader.VERSION_1) {
                 if (mpegFrameHeader.channelMode == MPEGFrameHeader.MODE_MONO) {
                     bb.position(startPosition + MPEG_VERSION_1_MODE_MONO_OFFSET)
@@ -79,7 +79,7 @@ class XingFrame {
                     bb.position(startPosition + MPEG_VERSION_1_MODE_STEREO_OFFSET)
                 }
             }
-            //MPEGVersion 2 and 2.5
+            // MPEGVersion 2 and 2.5
             else {
                 if (mpegFrameHeader.channelMode == MPEGFrameHeader.MODE_MONO) {
                     bb.position(startPosition + MPEG_VERSION_2_MODE_MONO_OFFSET)
@@ -88,13 +88,13 @@ class XingFrame {
                 }
             }
 
-            //Create header from here
+            // Create header from here
             val header = bb.slice()
 
             // Return Buffer to start Point
             bb.position(startPosition)
 
-            //Check Identifier
+            // Check Identifier
             val identifier = ByteArray(XING_IDENTIFIER_BUFFER_SIZE)
             header.get(identifier)
             if (!identifier.contentEquals(XING_VBR_ID) && !identifier.contentEquals(XING_CBR_ID)) {
@@ -117,30 +117,30 @@ class XingFrame {
 
     constructor(header: ByteBuffer) {
         this.header = header
-        //Go to start of Buffer
+        // Go to start of Buffer
         header.rewind()
 
-        //Set Vbr
+        // Set Vbr
         setVbr()
 
-        //Read Flags, only the fourth byte of interest to us
+        // Read Flags, only the fourth byte of interest to us
         val flagBuffer = ByteArray(XING_FLAG_BUFFER_SIZE)
         header.get(flagBuffer)
 
-        //Read FrameCount if flag set
+        // Read FrameCount if flag set
         if ((flagBuffer[BYTE_4].toInt() and (1).toByte().toInt()) != 0) {
             setFrameCount()
         }
 
-        //Read Size if flag set
+        // Read Size if flag set
         if ((flagBuffer[BYTE_4].toInt() and (1 shl 1).toByte().toInt()) != 0) {
             setAudioSize()
         }
 
-        //TODO TOC
-        //TODO VBR Quality
+        // TODO TOC
+        // TODO VBR Quality
 
-        //Look for LAME Header as long as we have enough bytes to do it properly
+        // Look for LAME Header as long as we have enough bytes to do it properly
         if (header.limit() >=
             XING_HEADER_BUFFER_SIZE + LameFrame.LAME_HEADER_BUFFER_SIZE
         ) {
@@ -153,7 +153,7 @@ class XingFrame {
      * Set whether or not VBR, (Xing can also be used for CBR though this is less useful)
      */
     private fun setVbr() {
-        //Is it VBR or CBR
+        // Is it VBR or CBR
         val identifier = ByteArray(XING_IDENTIFIER_BUFFER_SIZE)
         header.get(identifier)
         if (identifier.contentEquals(XING_VBR_ID)) {

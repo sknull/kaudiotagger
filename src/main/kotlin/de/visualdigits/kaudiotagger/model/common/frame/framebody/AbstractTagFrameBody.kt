@@ -1,10 +1,10 @@
 package de.visualdigits.kaudiotagger.model.common.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
-import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
-import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTagItem
 import de.visualdigits.kaudiotagger.model.common.types.ByteRepresentation
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.util.ID3Tags
 
 abstract class AbstractTagFrameBody : AbstractTagItem {
@@ -71,7 +71,7 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      * @param textEncoding to use for this frame body
      */
     open fun setTextEncoding(textEncoding: Byte?) {
-        //Number HashMap actually converts this byte to a long
+        // Number HashMap actually converts this byte to a long
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding)
     }
 

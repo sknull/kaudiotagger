@@ -2,7 +2,6 @@ package de.visualdigits.kaudiotagger.model.id3.datatype
 
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
-import de.visualdigits.kaudiotagger.util.EqualsUtil
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
@@ -54,24 +53,24 @@ class PartOfSet : AbstractString {
      * ID3 Text Frames often allow multiple strings separated by the null char
      * appropriate for the encoding.
      *
-     * @param arr    this is the buffer for the frame
+     * @param byteArray    this is the buffer for the frame
      * @param offset this is where to start reading in the buffer for this field
      * @throws NullPointerException
      * @throws IndexOutOfBoundsException
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
         log.debug("Reading from array from offset:$offset")
 
-        //Get the Specified Decoder
+        // Get the Specified Decoder
         val decoder = getTextEncodingCharSet()?.newDecoder()
 
-        //Decode sliced inBuffer
+        // Decode sliced inBuffer
         val inBuffer = ByteBuffer.wrap(
-            arr,
+            byteArray,
             offset,
-            arr.size - offset
+            byteArray.size - offset
         ).slice()
-        val outBuffer = CharBuffer.allocate(arr.size - offset)
+        val outBuffer = CharBuffer.allocate(byteArray.size - offset)
         decoder?.reset()
         val coderResult = decoder?.decode(inBuffer, outBuffer, true)
         if (coderResult?.isError == true) {
@@ -80,12 +79,12 @@ class PartOfSet : AbstractString {
         decoder?.flush(outBuffer)
         outBuffer.flip()
 
-        //Store value
+        // Store value
         val stringValue = outBuffer.toString()
         setValue(PartOfSetValue(stringValue))
 
-        //SetSize, important this is correct for finding the next datatype
-        setSize(arr.size - offset)
+        // SetSize, important this is correct for finding the next datatype
+        setSize(byteArray.size - offset)
         log.debug("Read SizeTerminatedString:{} size:{}", getValue(), getSize())
     }
 
@@ -117,7 +116,7 @@ class PartOfSet : AbstractString {
     override fun writeByteArray(): ByteArray? {
         var value = getValue().toString()
         val data: ByteArray?
-        //Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
+        // Try and write to buffer using the CharSet defined by getTextEncodingCharSet()
         try {
             if (TagOptionSingleton.removeTrailingTerminatorOnWrite) {
                 if (value.isNotEmpty()) {
@@ -132,7 +131,7 @@ class PartOfSet : AbstractString {
             val encoder: CharsetEncoder?
             if (StandardCharsets.UTF_16 == charset) {
                 encoder = StandardCharsets.UTF_16LE.newEncoder()
-                //Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
+                // Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
                 valueWithBOM = '\ufeff'.toString() + value
             } else {
                 encoder = charset?.newEncoder()
@@ -144,7 +143,7 @@ class PartOfSet : AbstractString {
             val bb = encoder?.encode(CharBuffer.wrap(valueWithBOM))
             data = ByteArray(bb?.limit()?:0)
             bb?.get(data, 0, bb.limit())
-        } catch (ce: CharacterCodingException) { //Should never happen so if does throw a RuntimeException
+        } catch (ce: CharacterCodingException) { // Should never happen so if does throw a RuntimeException
             log.error(ce.message)
             throw RuntimeException(ce)
         }

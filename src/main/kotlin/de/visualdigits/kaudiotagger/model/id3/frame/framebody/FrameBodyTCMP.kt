@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import java.nio.ByteBuffer
 
@@ -59,7 +59,7 @@ class FrameBodyTCMP: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
     }
 
     companion object {
-        //TODO does iTunes have to have null terminator?
+        // TODO does iTunes have to have null terminator?
         var IS_COMPILATION: String = "1"
     }
 }

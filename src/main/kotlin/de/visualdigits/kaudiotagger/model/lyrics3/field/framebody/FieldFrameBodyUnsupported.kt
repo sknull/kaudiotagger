@@ -4,9 +4,6 @@ import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 
 class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
-    /**
-     *
-     */
     var value: ByteArray? = null
 
     /**
@@ -73,16 +70,10 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
         return subset?.let { s -> superset?.contains(s) } == true && super.isSubsetOf(obj)
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         return "${getIdentifier()} : ${value?.let { v -> String(v) }}"
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "ZZZ"
     }

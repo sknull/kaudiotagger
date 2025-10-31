@@ -34,12 +34,9 @@ class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    /**
-     * @return
-     */
     fun getGroupSymbol(): Byte {
         if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
-            return (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as? kotlin.Byte)!!
+            return (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as? Byte)?:0.toByte()
         } else {
             return 0.toByte()
         }
@@ -61,9 +58,6 @@ class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
         return ID3v24FrameId.SIGNATURE.id
     }
 
-    /**
-     * @return
-     */
     fun getSignature(): ByteArray? {
         return getObjectValue(DataTypes.OBJ_SIGNATURE) as? ByteArray
     }
@@ -75,9 +69,6 @@ class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
         setObjectValue(DataTypes.OBJ_SIGNATURE, signature)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(NumberFixedLength(DataTypes.OBJ_GROUP_SYMBOL, this, 1))
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_SIGNATURE, this))

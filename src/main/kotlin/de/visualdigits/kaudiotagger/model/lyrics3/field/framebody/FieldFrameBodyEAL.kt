@@ -31,9 +31,6 @@ class FieldFrameBodyEAL : AbstractLyrics3v2FieldFrameBody {
         read(byteBuffer)
     }
 
-    /**
-     * @return
-     */
     fun getAlbum(): String? {
         return getObjectValue("Album") as? String
     }
@@ -45,16 +42,10 @@ class FieldFrameBodyEAL : AbstractLyrics3v2FieldFrameBody {
         setObjectValue("Album", album)
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "EAL"
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringSizeTerminated("Album", this))
     }

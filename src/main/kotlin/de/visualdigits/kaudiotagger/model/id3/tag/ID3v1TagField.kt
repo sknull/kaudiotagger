@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import java.nio.charset.Charset
@@ -27,7 +26,7 @@ class ID3v1TagField : TagTextField {
      * specified as a common field. <br></br>
      * Example is "ARTIST" which should be interpreted by any application as the
      * artist of the media content. <br></br>
-     * Will be set during construction with [.checkCommon].
+     * Will be set during construction with .checkCommon.
      */
     var common = false
 
@@ -46,15 +45,15 @@ class ID3v1TagField : TagTextField {
 
         val i = field.indexOf('=')
         if (i == -1) {
-            //Beware that ogg ID, must be capitalized and contain no space..
+            // Beware that ogg ID, must be capitalized and contain no space..
             this.id = "ERRONEOUS"
             this.content = field
         } else {
-            this.id = field.substring(0, i).uppercase(Locale.getDefault())
+            this.id = field.take(i).uppercase(Locale.getDefault())
             if (field.length > i) {
                 this.content = field.substring(i + 1)
             } else {
-                //We have "XXXXXX=" with nothing after the "="
+                // We have "XXXXXX=" with nothing after the "="
                 this.content = ""
             }
         }
@@ -63,7 +62,7 @@ class ID3v1TagField : TagTextField {
 
     /**
      * This method examines the ID of the current field and modifies
-     * [.common]in order to reflect if the tag id is a commonly used one.
+     * .commonin order to reflect if the tag id is a commonly used one.
      * <br></br>
      */
     private fun checkCommon() {
@@ -89,12 +88,6 @@ class ID3v1TagField : TagTextField {
         checkCommon()
     }
 
-    override fun copyContent(field: TagField) {
-        if (field is TagTextField) {
-            this.content = field.getContent()
-        }
-    }
-
     override fun getIdentifier(): String {
         return id
     }
@@ -103,8 +96,8 @@ class ID3v1TagField : TagTextField {
         return StandardCharsets.ISO_8859_1
     }
 
-    override fun setEncoding(s: Charset) {
-        //Do nothing, encoding is always ISO-8859-1 for this tag
+    override fun setEncoding(encoding: Charset) {
+        // Do nothing, encoding is always ISO-8859-1 for this tag
     }
 
     override fun getRawContent(): ByteArray {
@@ -149,7 +142,7 @@ class ID3v1TagField : TagTextField {
     }
 
     override fun isBinary(b: Boolean) {
-        //Do nothing, always false
+        // Do nothing, always false
     }
 
     override fun isCommon(): Boolean {
@@ -164,7 +157,7 @@ class ID3v1TagField : TagTextField {
         return content
     }
 
-    override fun setContent(s: String) {
-        this.content = s
+    override fun setContent(content: String) {
+        this.content = content
     }
 }

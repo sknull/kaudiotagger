@@ -42,22 +42,22 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
      * Strings or until reached the end of the array. The offset should be set to byte after the last null terminated
      * String found.
      *
-     * @param arr    to read the Strings from
+     * @param byteArray    to read the Strings from
      * @param offset in the array to start reading from
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
         var offset = offset
         log.debug(
             "Reading PairTextEncodedStringNullTerminated from array from offset:" +
                     offset
         )
-        //Continue until unable to read a null terminated String
+        // Continue until unable to read a null terminated String
         while (true) {
             try {
-                //Read Key
+                // Read Key
                 val key =
                     TextEncodedStringNullTerminated(identifier, getBody() ?: error("No frame body"))
-                key.readByteArray(arr, offset)
+                key.readByteArray(byteArray, offset)
                 addSize(key.getSize())
                 offset += key.getSize()
                 if (key.getSize() == 0) {
@@ -65,35 +65,35 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
                 }
 
                 try {
-                    //Read Value
+                    // Read Value
                     val result =
                         TextEncodedStringNullTerminated(identifier, getBody() ?: error("No frame body"))
-                    result.readByteArray(arr, offset)
+                    result.readByteArray(byteArray, offset)
                     addSize(result.getSize())
                     offset += result.getSize()
                     if (result.getSize() == 0) {
                         break
                     }
-                    //Add to value
+                    // Add to value
                     (getValue() as ValuePairs).add(
                         (key.getValue() as? String) ?: "",
                         (result.getValue() as? String) ?: ""
                     )
                 } catch (idte: InvalidDataTypeException) {
-                    //Value may not be null terminated if it is the last value
-                    //Read Value
-                    if (offset >= arr.size) {
+                    // Value may not be null terminated if it is the last value
+                    // Read Value
+                    if (offset >= byteArray.size) {
                         break
                     }
                     val result =
                         TextEncodedStringSizeTerminated(identifier, getBody() ?: error("No frame body"))
-                    result.readByteArray(arr, offset)
+                    result.readByteArray(byteArray, offset)
                     addSize(result.getSize())
                     offset += result.getSize()
                     if (result.getSize() == 0) {
                         break
                     }
-                    //Add to value
+                    // Add to value
                     (getValue() as ValuePairs).add(
                         (key.getValue() as? String) ?: "",
                         (result.getValue() as? String) ?: ""
@@ -142,7 +142,7 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
                 localSize += next.getSize()
             }
         } catch (ioe: IOException) {
-            //This should never happen because the write is internal with the JVM it is not to a file
+            // This should never happen because the write is internal with the JVM it is not to a file
             log.error(
                 "IOException in MultipleTextEncodedStringNullTerminated when writing byte array",
                 ioe
@@ -150,7 +150,7 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
             throw RuntimeException(ioe)
         }
 
-        //Update size member variable
+        // Update size member variable
         setSize(localSize)
 
         log.debug("Written PairTextEncodedStringNullTerminated")

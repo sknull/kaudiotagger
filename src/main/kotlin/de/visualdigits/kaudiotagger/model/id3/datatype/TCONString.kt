@@ -13,7 +13,7 @@ class TCONString : TextEncodedStringSizeTerminated {
                 .replace("(\\(\\d+\\)|\\(RX\\)|\\(CR\\)\\w*)".toRegex(), "$1\u0000")
                 .split("\u0000")
             var values = valuesarray.toList()
-            //Read only list so if empty have to create new list
+            // Read only list so if empty have to create new list
             if (values.isEmpty()) {
                 values = listOf("")
             }
@@ -42,12 +42,12 @@ class TCONString : TextEncodedStringSizeTerminated {
      * @param value
      */
     override fun addValue(value: String) {
-        //For ID3v24 we separate each value by a null
+        // For ID3v24 we separate each value by a null
         if (isNullSeperateMultipleValues) {
             setValue("${value}\u0000$value")
         } else {
-            //For ID3v23 if they pass a numeric value in brackets this indicates a mapping to an ID3v2 genre and
-            //can be seen as a refinement and therefore do not need the non-standard (for ID3v23) null seperator
+            // For ID3v23 if they pass a numeric value in brackets this indicates a mapping to an ID3v2 genre and
+            // can be seen as a refinement and therefore do not need the non-standard (for ID3v23) null seperator
             if (value.startsWith("(")) {
                 setValue("${value}$value")
             } else {
@@ -86,7 +86,7 @@ class TCONString : TextEncodedStringSizeTerminated {
      * @return the nth value
      */
     override fun getValueAtIndex(index: Int): String? {
-        //Split String into separate components
+        // Split String into separate components
         val values: MutableList<*> = getValues()
         return values[index] as? String
     }

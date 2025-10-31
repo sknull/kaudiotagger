@@ -82,7 +82,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 Chapter Frame specifications:
  *
- *  * [ID3 v2 Chapter Frame Spec](http://www.id3.org/id3v2-chapters-1.0.txt)
+ *  * [ID3 v2 Chapter Frame Spec](http:// www.id3.org/id3v2-chapters-1.0.txt)
  *
  *
  * @author Marc Gimpel, Horizon Wimba S.A.

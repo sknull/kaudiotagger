@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets
 open class ID3v1Tag: AbstractID3v1Tag, Tag {
     
     companion object {
-        //For writing output
+        // For writing output
         const val TYPE_COMMENT: String = "comment"
         const val FIELD_COMMENT_LENGTH: Int = 30
         const val FIELD_COMMENT_POS: Int = 97
@@ -130,7 +130,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         }
         log.debug("Reading v1.1 tag")
 
-        //Do single file read of data to cut down on file reads
+        // Do single file read of data to cut down on file reads
         dataBuffer = ByteArray(TAG_LENGTH)
         byteBuffer.position(0)
         byteBuffer.get(dataBuffer, 0, TAG_LENGTH)
@@ -155,17 +155,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         m = endofStringPattern.matcher(artist)
         if (m.find()) {
             artist = artist.take(m.start())
-        }
-
-        var album = String(
-            dataBuffer,
-            FIELD_ALBUM_POS,
-            FIELD_ALBUM_LENGTH,
-            StandardCharsets.ISO_8859_1
-        ).trim()
-        m = endofStringPattern.matcher(album)
-        if (m.find()) {
-            album = album.take(m.start())
         }
 
         year = String(
@@ -219,7 +208,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         var str: String?
         delete(file)
         file.seek(file.length())
-        //Copy the TAGID into new buffer
+        // Copy the TAGID into new buffer
         System.arraycopy(
             TAG_ID,
             FIELD_TAGID_POS,
@@ -288,10 +277,10 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     fun getFirstGenre(): String {
         val genreId = (genre and BYTE_TO_UNSIGNED).toInt()
         val genreValue = GenreTypes.fromId(genreId)
-        if (genreValue == null) {
-            return ""
+        return if (genreValue == null) {
+            ""
         } else {
-            return genreValue.friendlyName
+            genreValue.friendlyName
         }
     }
 
@@ -310,14 +299,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         return ID3v1TagField(idv1FieldKey?.name?:error("No id"), value)
     }
 
-    fun setField(artwork: Artwork) {
-        throw java.lang.UnsupportedOperationException(
-            ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
-        )
-    }
-
-    override fun addField(field: TagField) {
-        //TODO
+    override fun addField(tagField: TagField) {
     }
 
     override fun addField(artwork: Artwork) {
@@ -326,12 +308,12 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         )
     }
 
-    override fun addField(genericKey: GenericFieldKey, vararg value: String) {
-        setField(genericKey, *value)
+    override fun addField(genericKey: GenericFieldKey, vararg values: String) {
+        setField(genericKey, *values)
     }
 
-    override fun setField(genericKey: GenericFieldKey, vararg value: String) {
-        val tagfield = createField(genericKey, *value)
+    override fun setField(genericKey: GenericFieldKey, vararg values: String) {
+        val tagfield = createField(genericKey, *values)
         setField(tagfield)
     }
 
@@ -518,15 +500,15 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     /**
      * Maps the generic key to the ogg key and return the list of values for this field as strings
      *
-     * @param id
+     * @param genericKey
      * @return
      */
-    override fun getAll(id: GenericFieldKey): List<String> {
-        return getFirst(id)?.let { f -> listOf(f) }?:listOf()
+    override fun getAll(genericKey: GenericFieldKey): List<String> {
+        return getFirst(genericKey)?.let { f -> listOf(f) }?:listOf()
     }
 
-    override fun getFirst(identifier: String): String? {
-        return getFirst(GenericFieldKey.valueOf(identifier))
+    override fun getFirst(id: String): String? {
+        return getFirst(GenericFieldKey.valueOf(id))
     }
 
     /**
@@ -548,8 +530,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     override fun getFirstField(genericKey: GenericFieldKey): TagField? {
-        val l = getFields(genericKey)
-        return if (l.size != 0) l.get(0) else null
+        return getFields(genericKey)[0]
     }
 
     override fun getFirstField(id: String?): TagField? {
@@ -572,9 +553,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         )
     }
 
-    override fun deleteField(id: String) {
-        val key = GenericFieldKey.valueOf(id.uppercase())
-        deleteField(key)
+    override fun deleteField(key: String) {
+        deleteField(GenericFieldKey.valueOf(key.uppercase()))
     }
 
     /**
@@ -595,7 +575,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     override fun hasCommonFields(): Boolean {
-        //TODO
         return true
     }
 
@@ -657,7 +636,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             TYPE_TAG,
             getIdentifier()?:""
         )
-        //Header
+        // Header
         MP3File.tagFormatter?.addElement(TYPE_TITLE, this.title)
         MP3File.tagFormatter?.addElement(TYPE_ARTIST, this.artist)
         MP3File.tagFormatter?.addElement(TYPE_ALBUM, this.album)

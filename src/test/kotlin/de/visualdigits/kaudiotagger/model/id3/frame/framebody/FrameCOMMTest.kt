@@ -87,7 +87,7 @@ class FrameCOMMTest : AbstractTestCase() {
         val SAFE_SHORTER_LANG_CODE = "aaa"
         var e: Exception? = null
         try {
-            //Read tag
+            // Read tag
             val testFile =  prependAudioToTmp(
                 "Issue108.id3",
                 "testV1.mp3"
@@ -98,7 +98,7 @@ class FrameCOMMTest : AbstractTestCase() {
                 ?.getFrame("COMM") as ID3v24Frame
             var frameBody =  commFrame.frameBody as FrameBodyCOMM
 
-            //Set language to null, this is common problem for new frames might null lang codes
+            // Set language to null, this is common problem for new frames might null lang codes
             frameBody.setLanguage(null)
             mp3File.save()
             mp3File = MP3File.read(testFile)
@@ -106,7 +106,7 @@ class FrameCOMMTest : AbstractTestCase() {
             frameBody = commFrame.frameBody as FrameBodyCOMM
             assertEquals(SAFE_LANG_CODE, frameBody.getLanguage())
 
-            //Set language to too short a value
+            // Set language to too short a value
             frameBody.setLanguage("aa")
             mp3File.save()
             mp3File = MP3File.read(testFile)
@@ -114,7 +114,7 @@ class FrameCOMMTest : AbstractTestCase() {
             frameBody = commFrame.frameBody as FrameBodyCOMM
             assertEquals(SAFE_LONGER_LANG_CODE, frameBody.getLanguage())
 
-            //Set language to too long a value
+            // Set language to too long a value
             frameBody.setLanguage("aaaaaaa")
             mp3File.save()
             mp3File = MP3File.read(testFile)

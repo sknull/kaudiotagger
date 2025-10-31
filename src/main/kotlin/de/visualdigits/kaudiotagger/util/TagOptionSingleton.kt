@@ -31,9 +31,6 @@ object TagOptionSingleton {
      */
     var language: String = "eng"
 
-    /**
-     *
-     */
     var filenameTagSave = false
 
     /**
@@ -120,9 +117,6 @@ object TagOptionSingleton {
      */
     var lyrics3SaveEmptyField = false
 
-    /**
-     *
-     */
     var originalSavedAfterAdjustingID3v2Padding = true
 
     /**
@@ -215,7 +209,7 @@ object TagOptionSingleton {
      * When this is set and using the generic interface jaudiotagger will make some adjustments
      * when saving field so they work best with the specified Tagger
      */
-    //TODO Not Actually Used yet, originally intended for dealing with ratings and genres
+    // TODO Not Actually Used yet, originally intended for dealing with ratings and genres
     var playerCompatability = -1
 
     /**
@@ -248,7 +242,6 @@ object TagOptionSingleton {
             ID3v2Version.ID3_V24 -> ID3v24Tag()
             ID3v2Version.ID3_V23 -> ID3v23Tag()
             ID3v2Version.ID3_V22 -> ID3v22Tag()
-            else -> ID3v23Tag()
         }
     }
 }

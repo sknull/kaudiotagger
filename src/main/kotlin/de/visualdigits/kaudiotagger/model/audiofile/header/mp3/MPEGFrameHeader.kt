@@ -144,7 +144,7 @@ class MPEGFrameHeader {
      *
      */
     private fun setVersion() {
-        //MPEG Version
+        // MPEG Version
         version = ((mpegBytes[BYTE_2].toInt() and MASK_MP3_VERSION) shr 3).toByte().toInt()
         versionAsString = mpegVersionMap.get(version)
         if (versionAsString == null) {
@@ -257,7 +257,7 @@ class MPEGFrameHeader {
      *
      */
     private fun setSamplingRate() {
-        //Frequency
+        // Frequency
         val index = (mpegBytes[BYTE_3].toInt() and MASK_MP3_FREQUENCY) ushr 2
         val samplingRateMapForVersion = samplingRateMap[version] ?: throw InvalidAudioFrameException("Invalid version")
         samplingRate = samplingRateMapForVersion.get(index)

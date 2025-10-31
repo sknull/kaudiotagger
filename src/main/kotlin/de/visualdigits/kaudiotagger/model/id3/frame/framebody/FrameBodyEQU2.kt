@@ -81,9 +81,6 @@ class FrameBodyEQU2
         return ID3v24FrameId.EQUALISATION2.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }

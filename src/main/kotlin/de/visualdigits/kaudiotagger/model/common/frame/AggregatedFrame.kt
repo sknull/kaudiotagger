@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.common.frame
 
-import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
@@ -9,7 +8,7 @@ import java.nio.charset.Charset
 
 abstract class AggregatedFrame() : TagTextField {
 
-    //TODO rather than just maintaining insertion order we want to define a preset order
+    // TODO rather than just maintaining insertion order we want to define a preset order
     private var frames: MutableSet<AbstractID3v2Frame> = mutableSetOf()
 
     fun addFrame(frame: AbstractID3v2Frame) {
@@ -62,9 +61,6 @@ abstract class AggregatedFrame() : TagTextField {
      * @param encoding charset.
      */
     override fun setEncoding(encoding: Charset) {
-    }
-
-    override fun copyContent(field: TagField) {
     }
 
     override fun getIdentifier(): String? {

@@ -37,26 +37,26 @@ open class NumberFixedLength: AbstractDataType {
     /**
      * Read the number from the byte array
      *
-     * @param arr
+     * @param byteArray
      * @param offset
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        if ((offset < 0) || (offset >= arr.size)) {
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        if ((offset < 0) || (offset >= byteArray.size)) {
             throw InvalidDataTypeException(
-                "Offset to byte array is out of bounds: offset = $offset, array.length = ${arr.size}"
+                "Offset to byte array is out of bounds: offset = $offset, array.length = ${byteArray.size}"
             )
         }
 
-        if (offset + getSize() > arr.size) {
+        if (offset + getSize() > byteArray.size) {
             throw InvalidDataTypeException(
-                "Offset plus size to byte array is out of bounds: offset = $offset, size = ${getSize()}() + arr.length ${arr.size}"
+                "Offset plus size to byte array is out of bounds: offset = $offset, size = ${getSize()}() + arr.length ${byteArray.size}"
             )
         }
 
         var lvalue: Long = 0
         for (i in offset..<(offset + getSize())) {
             lvalue = lvalue shl 8
-            lvalue += (arr[i].toInt() and 0xff).toLong()
+            lvalue += (byteArray[i].toInt() and 0xff).toLong()
         }
         setValue(lvalue)
         log.debug("Read NumberFixedlength:${getValue()}")
@@ -70,7 +70,7 @@ open class NumberFixedLength: AbstractDataType {
     override fun writeByteArray(): ByteArray? {
         val arr = ByteArray(getSize())
         if (getValue() != null) {
-            //Convert value to long
+            // Convert value to long
             val temp = ID3Tags.getWholeNumber(getValue())
             (getSize() - 1 downTo 0 ).forEach { i ->
                 arr[i] =  (temp and 0xFF).toByte()

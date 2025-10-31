@@ -30,7 +30,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -73,9 +73,6 @@ class FrameBodyMCDI: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24FrameId.MUSIC_CD_ID.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }

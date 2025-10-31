@@ -39,9 +39,6 @@ class FrameBodySEEK: AbstractID3v2FrameBody, ID3v24FrameBody {
         return ID3v24FrameId.AUDIO_SEEK_POINT_INDEX.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(NumberFixedLength(DataTypes.OBJ_OFFSET, this, 4))
     }

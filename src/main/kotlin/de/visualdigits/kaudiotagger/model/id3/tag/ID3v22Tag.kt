@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
@@ -12,6 +11,7 @@ import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
+import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyTextInfo
@@ -38,20 +38,20 @@ class ID3v22Tag : AbstractID3v2Tag {
     companion object {
 
         /**
-         * Bit mask to indicate tag is Unsychronization
+         * Bit mask to indicate tag is Synchronization
          */
-        val MASK_V22_UNSYNCHRONIZATION: Int = FileConstants.BIT7
+        const val MASK_V22_UNSYNCHRONIZATION: Int = FileConstants.BIT7
         /**
          * Bit mask to indicate tag is compressed, although compression is not
          * actually defined in v22 so just ignored
          */
-        val MASK_V22_COMPRESSION: Int = FileConstants.BIT6
+        const val MASK_V22_COMPRESSION: Int = FileConstants.BIT6
 
         const val RELEASE: Int = 2
         const val MAJOR_VERSION: Int = 2
         const val REVISION: Int = 0
         const val TYPE_COMPRESSION: String = "compression"
-        const val TYPE_UNSYNCHRONISATION: String = "unsyncronisation"
+        const val TYPE_SYNCHRONIZATION: String = "unsyncronisation"
 
 
         fun read(byteBuffer: ByteBuffer?): ID3v22Tag? {
@@ -72,7 +72,7 @@ class ID3v22Tag : AbstractID3v2Tag {
      * @param copyObject
      */
     constructor(copyObject: ID3v22Tag) : super(copyObject) {
-        //This doesnt do anything.
+        // This doesnt do anything.
         log.debug("Creating tag from another tag of same type")
         copyPrimitives(copyObject)
         copyFrames(copyObject)
@@ -85,22 +85,20 @@ class ID3v22Tag : AbstractID3v2Tag {
      */
     constructor(mp3tag: AbstractTag?) {
         log.debug("Creating tag from a tag of a different version")
-        //Default Superclass constructor does nothing
+        // Default Superclass constructor does nothing
         if (mp3tag != null) {
             val convertedTag: ID3v24Tag?
-            //Should use the copy constructor instead
+            // Should use the copy constructor instead
             if ((mp3tag !is ID3v23Tag) && (mp3tag is ID3v22Tag)) {
-                throw UnsupportedOperationException(
-                    "Copy Constructor not called. Please type cast the argument"
-                )
+                throw UnsupportedOperationException("Copy Constructor not called. Please type cast the argument")
             } else if (mp3tag is ID3v24Tag) {
                 convertedTag = mp3tag
             } else {
                 convertedTag = ID3v24Tag(mp3tag)
             }
-            //Set the primitive types specific to v2_2.
+            // Set the primitive types specific to v2_2.
             copyPrimitives(convertedTag)
-            //Set v2.2 Frames
+            // Set v2.2 Frames
             copyFrames(convertedTag)
             log.debug("Created tag from a tag of a different version")
         }
@@ -111,20 +109,20 @@ class ID3v22Tag : AbstractID3v2Tag {
     /**
      * Copy primitives applicable to v2.2
      */
-    override fun copyPrimitives(copyObj: AbstractID3v2Tag) {
+    override fun copyPrimitives(copyObject: AbstractID3v2Tag) {
         log.debug("Copying primitives")
-        super.copyPrimitives(copyObj)
+        super.copyPrimitives(copyObject)
 
-        //Set the primitive types specific to v2_2.
-        if (copyObj is ID3v22Tag) {
-            this.isCompression = copyObj.isCompression
-            this.isUnsynchronization = copyObj.isUnsynchronization
-        } else if (copyObj is ID3v23Tag) {
-            this.isCompression = copyObj.isCompression
-            this.isUnsynchronization = copyObj.isUnsynchronization
-        } else if (copyObj is ID3v24Tag) {
+        // Set the primitive types specific to v2_2.
+        if (copyObject is ID3v22Tag) {
+            this.isCompression = copyObject.isCompression
+            this.isUnsynchronization = copyObject.isUnsynchronization
+        } else if (copyObject is ID3v23Tag) {
+            this.isCompression = copyObject.isCompression
+            this.isUnsynchronization = copyObject.isUnsynchronization
+        } else if (copyObject is ID3v24Tag) {
             this.isCompression = false
-            this.isUnsynchronization = copyObj.isUnsynchronization
+            this.isUnsynchronization = copyObject.isUnsynchronization
         }
     }
 
@@ -185,16 +183,16 @@ class ID3v22Tag : AbstractID3v2Tag {
         }
         log.debug("Reading tag from file")
 
-        //Read the flags
+        // Read the flags
         readHeaderFlags(byteBuffer)
 
         // Read the size
         val size: Int = ID3SyncSafeInteger.bufferToValue(byteBuffer)
 
-        //Slice Buffer, so position markers tally with size (i.e do not include tagheader)
+        // Slice Buffer, so position markers tally with size (i.e do not include tagheader)
         var bufferWithoutHeader = byteBuffer.slice()
 
-        //We need to synchronize the buffer
+        // We need to synchronize the buffer
         if (this.isUnsynchronization) {
             bufferWithoutHeader = ID3Unsynchronization.synchronize(
                 bufferWithoutHeader
@@ -226,12 +224,12 @@ class ID3v22Tag : AbstractID3v2Tag {
         if (!(tagIdentifier.contentEquals(TAG_ID))) {
             return false
         }
-        //Major Version
+        // Major Version
         val major = byteBuffer.get().toInt()
         if (major != getMajorVersion()) {
             return false
         }
-        //Minor Version
+        // Minor Version
         val minor = byteBuffer.get().toInt()
         return minor == getRevision()
     }
@@ -242,7 +240,7 @@ class ID3v22Tag : AbstractID3v2Tag {
      * @param byteBuffer
      */
     private fun readHeaderFlags(byteBuffer: ByteBuffer) {
-        //Flags
+        // Flags
         val flags = byteBuffer.get().toInt()
         isUnsynchronization = (flags and MASK_V22_UNSYNCHRONIZATION) != 0
         isCompression = (flags and MASK_V22_COMPRESSION) != 0
@@ -259,7 +257,7 @@ class ID3v22Tag : AbstractID3v2Tag {
             )
         }
 
-        //Not allowable/Unknown Flags
+        // Not allowable/Unknown Flags
         if ((flags and FileConstants.BIT5) != 0) {
             log.warn(
                 ErrorMessage.ID3_INVALID_OR_UNKNOWN_FLAG_SET.getMsg(
@@ -311,12 +309,12 @@ class ID3v22Tag : AbstractID3v2Tag {
      * @param size
      */
     fun readFrames(byteBuffer: ByteBuffer, size: Int) {
-        //Now start looking for frames
+        // Now start looking for frames
         var next: ID3v22Frame?
         frameMap.clear()
         encryptedFrameMap.clear()
 
-        //Read the size from the Tag Header
+        // Read the size from the Tag Header
         this.fileReadBytes = size
         log.debug(
             "Start of frame body at:" +
@@ -331,45 +329,30 @@ class ID3v22Tag : AbstractID3v2Tag {
         // Read the frames until got to upto the size as specified in header
         while (byteBuffer.position() < size) {
             try {
-                //Read Frame
-                log.debug(
-                    "looking for next frame at:" +
-                            byteBuffer.position()
-                )
+                // Read Frame
+                log.debug("looking for next frame at:${byteBuffer.position()}")
                 next = ID3v22Frame(byteBuffer)
                 val id = next.getIdentifier()
                 loadFrameIntoMap(id, next)
-            } catch (ex: PaddingException) { //Found Padding, no more frames
-                log.debug(
-                    "Found padding starting at:" +
-                            byteBuffer.position()
-                )
+            } catch (ex: PaddingException) { // Found Padding, no more frames
+                log.debug("Found padding starting at:${byteBuffer.position()}")
                 break
-            } catch (ex: EmptyFrameException) { //Found Empty Frame
-                log.warn(
-                    "Empty Frame:" + ex.message
-                )
+            } catch (ex: EmptyFrameException) { // Found Empty Frame
+                log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += ID3v22Frame.FRAME_HEADER_SIZE
             } catch (ifie: InvalidFrameIdentifierException) {
-                log.debug(
-                    "Invalid Frame Identifier:" +
-                            ifie.message
-                )
+                log.debug("Invalid Frame Identifier:${ifie.message}")
                 this.invalidFrames++
-                //Dont try and find any more frames
+                // Dont try and find any more frames
                 break
-            } catch (ife: InvalidFrameException) { //Problem trying to find frame
-                log.warn(
-                    "Invalid Frame:" + ife.message
-                )
+            } catch (ife: InvalidFrameException) { // Problem trying to find frame
+                log.warn("Invalid Frame:${ife.message}")
                 this.invalidFrames++
-                //Dont try and find any more frames
+                // Dont try and find any more frames
                 break
-            } //in case we can read the next frame //Failed reading frame but may just have invalid data but correct length so lets carry on
+            } // in case we can read the next frame // Failed reading frame but may just have invalid data but correct length so lets carry on
             catch (idete: InvalidDataTypeException) {
-                log.warn(
-                    "Corrupt Frame:" + idete.message
-                )
+                log.warn("Corrupt Frame:${idete.message}")
                 this.invalidFrames++
                 continue
             }
@@ -391,8 +374,8 @@ class ID3v22Tag : AbstractID3v2Tag {
                     copyFrameIntoMap(next.getIdentifier(), next)
                 }
             }
-        } catch (ife: InvalidFrameException) {
-            log.error("Unable to convert frame:" + frame.getIdentifier())
+        } catch (_: InvalidFrameException) {
+            log.error("Unable to convert frame:${frame.getIdentifier()}")
         }
     }
 
@@ -402,13 +385,13 @@ class ID3v22Tag : AbstractID3v2Tag {
         if ((frame.getIdentifier() == ID3v24FrameId.YEAR.id) && (tmpBody is FrameBodyTDRC)) {
             var newFrame: ID3v22Frame
             if (tmpBody.year?.isNotEmpty() == true) {
-                //Create Year frame (v2.2 id,but uses v2.3 body)
+                // Create Year frame (v2.2 id,but uses v2.3 body)
                 newFrame = ID3v22Frame(ID3v22FrameId.TYER.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.year)
                 frames.add(newFrame)
             }
             if (tmpBody.time?.isNotEmpty() == true) {
-                //Create Time frame (v2.2 id,but uses v2.3 body)
+                // Create Time frame (v2.2 id,but uses v2.3 body)
                 newFrame = ID3v22Frame(ID3v22FrameId.TIME.id)
                 (newFrame.frameBody as AbstractFrameBodyTextInfo).setText(tmpBody.time)
                 frames.add(newFrame)
@@ -442,10 +425,7 @@ class ID3v22Tag : AbstractID3v2Tag {
                     ID3Unsynchronization.requiresUnsynchronization(bodyByteBuffer)
         if (isUnsynchronization) {
             bodyByteBuffer = ID3Unsynchronization.unsynchronize(bodyByteBuffer)
-            log.debug(
-                "bodybytebuffer:sizeafterunsynchronisation:" +
-                        bodyByteBuffer.size
-            )
+            log.debug("bodybytebuffer:sizeafterunsynchronisation:${bodyByteBuffer.size}")
         }
 
         val sizeIncPadding = calculateTagSize(
@@ -453,13 +433,9 @@ class ID3v22Tag : AbstractID3v2Tag {
             audioStartByte.toInt()
         )
         val padding = sizeIncPadding - (bodyByteBuffer.size + TAG_HEADER_LENGTH)
-        log.debug(
-            "Current audiostart:" + audioStartByte
-        )
-        log.debug(
-            "Size including padding:" + sizeIncPadding
-        )
-        log.debug("Padding:" + padding)
+        log.debug("Current audiostart:$audioStartByte")
+        log.debug("Size including padding:$sizeIncPadding")
+        log.debug("Padding:$padding")
 
         val headerBuffer: ByteBuffer = writeHeaderToBuffer(
             padding,
@@ -486,17 +462,17 @@ class ID3v22Tag : AbstractID3v2Tag {
     private fun writeHeaderToBuffer(padding: Int, size: Int): ByteBuffer {
         isCompression = false
 
-        //Create Header Buffer
+        // Create Header Buffer
         val headerBuffer = ByteBuffer.allocate(TAG_HEADER_LENGTH)
 
-        //TAGID
+        // TAGID
         headerBuffer.put(TAG_ID)
-        //Major Version
+        // Major Version
         headerBuffer.put(getMajorVersion().toByte())
-        //Minor Version
+        // Minor Version
         headerBuffer.put(getRevision().toByte())
 
-        //Flags
+        // Flags
         var flags = 0
         if (isUnsynchronization) {
             flags = flags or MASK_V22_UNSYNCHRONIZATION
@@ -507,7 +483,7 @@ class ID3v22Tag : AbstractID3v2Tag {
 
         headerBuffer.put(flags.toByte())
 
-        //Size As Recorded in Header, don't include the main header length
+        // Size As Recorded in Header, don't include the main header length
         headerBuffer.put(ID3SyncSafeInteger.valueToBuffer(padding + size))
         headerBuffer.flip()
 
@@ -516,18 +492,18 @@ class ID3v22Tag : AbstractID3v2Tag {
     /**
      * Maps the generic key to the id3 key and return the list of values for this field as strings
      *
-     * @param id
+     * @param genericKey
      * @return
      */
-    override fun getAll(id: GenericFieldKey): List<String> {
-        return if (id == GenericFieldKey.GENRE) {
-            getFields(id).firstOrNull()?.let { f ->
+    override fun getAll(genericKey: GenericFieldKey): List<String> {
+        return if (genericKey == GenericFieldKey.GENRE) {
+            getFields(genericKey).firstOrNull()?.let { f ->
                 ((f as AbstractID3v2Frame).frameBody as FrameBodyTCON)
                     .getValues()
                     .mapNotNull { next -> FrameBodyTCON.convertID3v22GenreToGeneric(next) }
             }?:listOf()
         } else {
-            super.getAll(id)
+            super.getAll(genericKey)
         }
     }
 
@@ -615,32 +591,32 @@ class ID3v22Tag : AbstractID3v2Tag {
     /**
      * Delete fields with this (frame) id
      *
-     * @param id
+     * @param key
      */
-    override fun deleteField(id: String) {
-        super.doDeleteTagField(FrameAndSubId(null, id, null))
+    override fun deleteField(key: String) {
+        super.doDeleteTagField(FrameAndSubId(null, key, null))
     }
 
     override fun createStructure() {
         MP3File.tagFormatter?.openHeadingElement(
             TYPE_TAG,
-            getIdentifier()?:""
+            getIdentifier()
         )
 
         super.createStructureHeader()
 
-        //Header
+        // Header
         MP3File.tagFormatter?.openHeadingElement(TYPE_HEADER, "")
         MP3File.tagFormatter?.addElement(
             TYPE_COMPRESSION,
             this.isCompression
         )
         MP3File.tagFormatter?.addElement(
-            TYPE_UNSYNCHRONISATION,
+            TYPE_SYNCHRONIZATION,
             this.isUnsynchronization
         )
         MP3File.tagFormatter?.closeHeadingElement(TYPE_HEADER)
-        //Body
+        // Body
         super.createStructureBody()
 
         MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)

@@ -12,32 +12,28 @@ class ByteArraySizeTerminated: TextEncodedStringSizeTerminated  {
     constructor(copyObject: ByteArraySizeTerminated) : super(copyObject)
 
     /**
-     * @param arr
+     * @param byteArray
      * @param offset
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        if (arr == null) {
-            throw NullPointerException("Byte array is null")
-        }
-
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
         if (offset < 0) {
             throw IndexOutOfBoundsException(
                 "Offset to byte array is out of bounds: offset = " +
                         offset +
                         ", array.length = " +
-                        arr.size
+                        byteArray.size
             )
         }
 
-        //Empty Byte Array
-        if (offset >= arr.size) {
+        // Empty Byte Array
+        if (offset >= byteArray.size) {
             setValue(null)
             return
         }
 
-        val len = arr.size - offset
+        val len = byteArray.size - offset
         val value = ByteArray(len)
-        System.arraycopy(arr, offset, value, 0, len)
+        System.arraycopy(byteArray, offset, value, 0, len)
         setValue(value)
     }
 

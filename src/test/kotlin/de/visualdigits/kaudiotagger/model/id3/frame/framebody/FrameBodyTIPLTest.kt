@@ -4,7 +4,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class FrameBodyTIPLTest : AbstractTestCase() {
@@ -36,8 +35,8 @@ class FrameBodyTIPLTest : AbstractTestCase() {
         assertEquals(ID3v24FrameId.INVOLVED_PEOPLE.id, fb!!.getIdentifier())
         assertEquals(TextEncoding.ISO_8859_1.id, fb.getTextEncoding())
         assertEquals(INVOLVED_PEOPLE, fb.getText())
-        //assertEquals(2,fb.getNumberOfValues());
-        //assertEquals("producer",fb.getNumberOfPairs());
+        // assertEquals(2,fb.getNumberOfValues());
+        // assertEquals("producer",fb.getNumberOfPairs());
         assertEquals("producer", fb.getKeyAtIndex(0))
         assertEquals("eno,lanois", fb.getValueAtIndex(0))
     }
@@ -51,8 +50,8 @@ class FrameBodyTIPLTest : AbstractTestCase() {
         assertEquals(ID3v24FrameId.INVOLVED_PEOPLE.id, fb!!.getIdentifier())
         assertEquals(TextEncoding.ISO_8859_1.id, fb.getTextEncoding())
         assertEquals(INVOLVED_PEOPLE, fb.getText())
-        //assertEquals(2,fb.getNumberOfValues());
-        //assertEquals("producer",fb.getNumberOfPairs());
+        // assertEquals(2,fb.getNumberOfValues());
+        // assertEquals("producer",fb.getNumberOfPairs());
         assertEquals("producer", fb.getKeyAtIndex(0))
         assertEquals("eno,lanois", fb.getValueAtIndex(0))
     }

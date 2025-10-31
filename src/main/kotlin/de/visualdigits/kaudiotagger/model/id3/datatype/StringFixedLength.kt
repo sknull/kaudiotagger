@@ -36,27 +36,27 @@ open class StringFixedLength : AbstractString {
     /**
      * Read a string from buffer of fixed size(size has already been set in constructor)
      *
-     * @param arr    this is the buffer for the frame
+     * @param byteArray    this is the buffer for the frame
      * @param offset this is where to start reading in the buffer for this field
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
         log.debug("Reading from array from offset:$offset")
         try {
             val decoder = getTextEncodingCharSet()?.newDecoder()
 
-            //Decode buffer if runs into problems should through exception which we
-            //catch and then set value to empty string.
+            // Decode buffer if runs into problems should through exception which we
+            // catch and then set value to empty string.
             log.debug(
-                "Array length is:${arr.size}offset is:${offset}Size is:${getSize()}()"
+                "Array length is:${byteArray.size}offset is:${offset}Size is:${getSize()}()"
             )
 
-            if (arr.size - offset < getSize()) {
+            if (byteArray.size - offset < getSize()) {
                 throw InvalidDataTypeException(
                     "byte array is to small to retrieve string of declared length:${getSize()}"
                 )
             }
             val str = decoder
-                ?.decode(ByteBuffer.wrap(arr, offset, getSize()))
+                ?.decode(ByteBuffer.wrap(byteArray, offset, getSize()))
                 ?.toString()
             if (str == null) {
                 throw NullPointerException("String is null")
@@ -95,7 +95,7 @@ open class StringFixedLength : AbstractString {
         val dataBuffer: ByteBuffer?
         val data: ByteArray
 
-        //Create with a series of empty of spaces to try and ensure integrity of field
+        // Create with a series of empty of spaces to try and ensure integrity of field
         val size = getSize()
         if (getValue() == null) {
             log.warn(
@@ -112,7 +112,7 @@ open class StringFixedLength : AbstractString {
             val charset = getTextEncodingCharSet()
             val encoder: CharsetEncoder?
             if (StandardCharsets.UTF_16 == charset) {
-                //Note remember LE BOM is ff fe but tis is handled by encoder Unicode char is fe ff
+                // Note remember LE BOM is ff fe but tis is handled by encoder Unicode char is fe ff
                 encoder = StandardCharsets.UTF_16LE.newEncoder()
                 dataBuffer = encoder.encode(CharBuffer.wrap("\uFEFF${getValue() as? String}"))
             } else {
@@ -131,7 +131,7 @@ open class StringFixedLength : AbstractString {
         // We must return the defined size.
         // To check now because size is in bytes not chars
         if (dataBuffer != null) {
-            //Everything ok
+            // Everything ok
             val limit = dataBuffer.limit()
             if (limit == size) {
                 data = ByteArray(limit)

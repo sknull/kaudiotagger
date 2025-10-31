@@ -3,9 +3,12 @@ package de.visualdigits.kaudiotagger.model.id3.datatype
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.ID3Tags.copyValue
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 abstract class AbstractDataType {
+
+    val log: Logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
 
@@ -15,8 +18,6 @@ abstract class AbstractDataType {
     var identifier: String?
     private var frameBody: AbstractTagFrameBody? = null
     private var value: Any? = null
-
-    val log = LoggerFactory.getLogger(javaClass)
 
     /**
      * Holds the size of the data in file when read/written
@@ -43,7 +44,7 @@ abstract class AbstractDataType {
     constructor(copyObject: AbstractDataType): this(copyObject.identifier) {
         this.value = copyObject.value?.let { v -> copyValue(v) }
 
-        log.debug("Set value '$identifier' to '${value}'")
+        log.debug("Set value '{}' to '{}'", identifier, value)
     }
 
     /**
@@ -51,10 +52,10 @@ abstract class AbstractDataType {
      * Used for reading Strings, this class should be overridden
      * for non String Objects
      *
-     * @param arr
+     * @param byteArray
      */
-    fun readByteArray(arr: ByteArray) {
-        readByteArray(arr, 0)
+    fun readByteArray(byteArray: ByteArray) {
+        readByteArray(byteArray, 0)
     }
 
     /**
@@ -62,10 +63,10 @@ abstract class AbstractDataType {
      * starting at offset.
      * This class must be overridden
      *
-     * @param arr
+     * @param byteArray
      * @param offset
      */
-    abstract fun readByteArray(arr: ByteArray, offset: Int)
+    abstract fun readByteArray(byteArray: ByteArray, offset: Int)
 
     /**
      * This defines the size in bytes of the datatype being
@@ -114,7 +115,7 @@ abstract class AbstractDataType {
     open fun setValue(value: Any?) {
         this.value = value
         when (value) {
-            is String -> this.value = (value as? String)?.trimEnd { c -> c.code == 0 } // trim trailing null byte
+            is String -> this.value = value.trimEnd { c -> c.code == 0 } // trim trailing null byte
             else ->
                 this.value = value
         }

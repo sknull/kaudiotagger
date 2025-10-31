@@ -47,9 +47,9 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
      *
      * @param byteBuffer file to read
      */
-    //TODO why don't we just slice byteBuffer, set limit to size and convert readByteArray to take a ByteBuffer
-    //then we wouldn't have to temporary allocate space for the buffer, using lots of needless memory
-    //and providing extra work for the garbage collector.
+    // TODO why don't we just slice byteBuffer, set limit to size and convert readByteArray to take a ByteBuffer
+    // then we wouldn't have to temporary allocate space for the buffer, using lots of needless memory
+    // and providing extra work for the garbage collector.
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
             return false
@@ -57,28 +57,28 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         val sizeValue = getSize()
         log.debug("Reading body for${this.getIdentifier()}:$sizeValue")
 
-        //Allocate a buffer to the size of the Frame Body and read from file
+        // Allocate a buffer to the size of the Frame Body and read from file
         val buffer = ByteArray(sizeValue)
         byteBuffer.get(buffer)
 
-        //Offset into buffer, incremented by length of previous dataType
-        //this offset is only used internally to decide where to look for the next
-        //dataType within a frameBody, it does not decide where to look for the next frame body
+        // Offset into buffer, incremented by length of previous dataType
+        // this offset is only used internally to decide where to look for the next
+        // dataType within a frameBody, it does not decide where to look for the next frame body
         var offset = 0
 
-        //Go through the ObjectList of the Frame reading the data into the
+        // Go through the ObjectList of the Frame reading the data into the
         objectList.forEach { o ->
-            //correct dataType.
+            // correct dataType.
             log.debug("offset:$offset")
 
-            //The read has extended further than the defined frame size (ok to extend upto
-            //size because the next datatype may be of length 0.)
+            // The read has extended further than the defined frame size (ok to extend upto
+            // size because the next datatype may be of length 0.)
             if (offset > sizeValue) {
                 log.warn("Invalid Size for FrameBody")
             }
 
-            //Try and load it with data from the Buffer
-            //if it fails frame is invalid
+            // Try and load it with data from the Buffer
+            // if it fails frame is invalid
             try {
                 o.readByteArray(buffer, offset)
             } catch (e: InvalidDataTypeException) {
@@ -87,7 +87,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
                 )
                 throw e
             }
-            //Increment Offset to start of next datatype.
+            // Increment Offset to start of next datatype.
             val size = o.getSize()
             offset += size
         }
@@ -134,14 +134,14 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
         log.debug(
             "Writing frame body for${this.getIdentifier()}:Est Size:${getSize()}"
         )
-        //Write the various fields to file in order
+        // Write the various fields to file in order
         objectList.forEach { o ->
             val objectData = o.writeByteArray()
             if (objectData != null) {
                 try {
                     tagBuffer.write(objectData)
                 } catch (ioe: IOException) {
-                    //This could never happen coz not writing to file, so convert to RuntimeException
+                    // This could never happen coz not writing to file, so convert to RuntimeException
                     throw RuntimeException(ioe)
                 }
             }

@@ -5,6 +5,7 @@ import de.visualdigits.kaudiotagger.model.audiofile.frame.XingFrame
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
 import de.visualdigits.kaudiotagger.util.ErrorMessage
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.EOFException
 import java.io.File
@@ -43,7 +44,7 @@ import java.util.Locale
  */
 open class MP3AudioHeader : AudioHeader {
 
-    val log = LoggerFactory.getLogger(javaClass)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
     
     var mp3FrameHeader: MPEGFrameHeader? = null
     var mp3XingFrame: XingFrame? = null
@@ -142,18 +143,18 @@ open class MP3AudioHeader : AudioHeader {
     fun seek(seekFile: File, startByte: Long): Boolean {
         return FileInputStream(seekFile).use { fis ->
             fis.getChannel().use { fc ->
-                //Read into Byte Buffer in Chunks
+                // Read into Byte Buffer in Chunks
                 val bb = ByteBuffer.allocateDirect(FILE_BUFFER_SIZE)
 
-                //Move FileChannel to the starting position (skipping over tag if any)
+                // Move FileChannel to the starting position (skipping over tag if any)
                 fc.position(startByte)
 
-                //Update filePointerCount
+                // Update filePointerCount
 
-                //This is substantially faster than updating the filechannels position
+                // This is substantially faster than updating the filechannels position
                 var filePointerCount: Long = startByte
 
-                //Read from here into the byte buffer , doesn't move location of filepointer
+                // Read from here into the byte buffer , doesn't move location of filepointer
                 fc.read(bb, startByte)
                 bb.flip()
 
@@ -166,11 +167,11 @@ open class MP3AudioHeader : AudioHeader {
                             fc.read(bb, fc.position())
                             bb.flip()
                             if (bb.limit() <= MIN_BUFFER_REMAINING_REQUIRED) {
-                                //No mp3 exists
+                                // No mp3 exists
                                 syncFound = false
                             }
                         }
-                        //log.debug("fc:"+fc.position() + "bb"+bb.position());
+                        // log.debug("fc:"+fc.position() + "bb"+bb.position())
                         if (MPEGFrameHeader.isMPEGFrame(bb)) {
                             try {
                                 log.debug("Found Possible header at:" + filePointerCount)
@@ -178,27 +179,27 @@ open class MP3AudioHeader : AudioHeader {
                                 mp3FrameHeader = MPEGFrameHeader.parseMPEGHeader(bb)
                                 syncFound = true
 
-                                //if(2==1) use this line when you want to test getting the next frame without using xing
+                                // if(2==1) use this line when you want to test getting the next frame without using xing
                                 var header: ByteBuffer? = null
                                 if ((XingFrame.isXingFrame(bb, mp3FrameHeader)?.also { header = it }) != null) {
                                     log.debug("Found Possible XingHeader")
                                     try {
-                                        //Parses Xing frame without modifying position of main buffer
+                                        // Parses Xing frame without modifying position of main buffer
                                         mp3XingFrame = XingFrame.parseXingFrame(header)
                                     } catch (ex: InvalidAudioFrameException) {
                                         // We Ignore because even if Xing Header is corrupted
-                                        //doesn't mean file is corrupted
+                                        // doesn't mean file is corrupted
                                     }
                                     break
                                 } else if ((VbriFrame.isVbriFrame(bb)?.also { header = it }) != null
                                 ) {
                                     log.debug("Found Possible VbriHeader")
                                     try {
-                                        //Parses Vbri frame without modifying position of main buffer
+                                        // Parses Vbri frame without modifying position of main buffer
                                         mp3VbriFrame = VbriFrame.parseVBRIFrame(header)
                                     } catch (ex: InvalidAudioFrameException) {
                                         // We Ignore because even if Vbri Header is corrupted
-                                        //doesn't mean file is corrupted
+                                        // doesn't mean file is corrupted
                                     }
                                     break
                                 } else {
@@ -224,7 +225,7 @@ open class MP3AudioHeader : AudioHeader {
                     throw e
                 }
 
-                //Return to start of audio header
+                // Return to start of audio header
                 log.debug("Return found matching mp3 header starting at$filePointerCount")
                 fileSize = seekFile.length()
                 this.mp3StartByte = filePointerCount
@@ -261,9 +262,9 @@ open class MP3AudioHeader : AudioHeader {
 
         var currentPosition = bb.position()
 
-        //Our buffer is not large enough to fit in the whole of this frame, something must
-        //have gone wrong because frames are not this large, so just return false
-        //bad frame header
+        // Our buffer is not large enough to fit in the whole of this frame, something must
+        // have gone wrong because frames are not this large, so just return false
+        // bad frame header
         if ((mp3FrameHeader?.getFrameLength()?:0) >
             (FILE_BUFFER_SIZE - MIN_BUFFER_REMAINING_REQUIRED)
         ) {
@@ -273,7 +274,7 @@ open class MP3AudioHeader : AudioHeader {
             return false
         }
 
-        //Check for end of buffer if not enough room get some more
+        // Check for end of buffer if not enough room get some more
         if (bb.remaining() <=
             MIN_BUFFER_REMAINING_REQUIRED + (mp3FrameHeader?.getFrameLength()?:0)
         ) {
@@ -284,20 +285,20 @@ open class MP3AudioHeader : AudioHeader {
             fc.position(filePointerCount)
             fc.read(bb, fc.position())
             bb.flip()
-            //So now original buffer has been replaced, so set current position to start of buffer
+            // So now original buffer has been replaced, so set current position to start of buffer
             currentPosition = 0
-            //Not enough left
+            // Not enough left
             if (bb.limit() <= MIN_BUFFER_REMAINING_REQUIRED) {
-                //No mp3 exists
+                // No mp3 exists
                 log.debug("Nearly at end of file, no header found:")
                 return false
             }
 
-            //Still Not enough left for next alleged frame size so giving up
+            // Still Not enough left for next alleged frame size so giving up
             if (bb.limit() <=
                 MIN_BUFFER_REMAINING_REQUIRED + (mp3FrameHeader?.getFrameLength()?:0)
             ) {
-                //No mp3 exists
+                // No mp3 exists
                 log.debug(
                     "Nearly at end of file, no room for next frame, no header found:"
                 )
@@ -305,7 +306,7 @@ open class MP3AudioHeader : AudioHeader {
             }
         }
 
-        //Position bb to the start of the alleged next frame
+        // Position bb to the start of the alleged next frame
         bb.position(bb.position() + (mp3FrameHeader?.getFrameLength()?:0))
         if (MPEGFrameHeader.isMPEGFrame(bb)) {
             try {
@@ -319,7 +320,7 @@ open class MP3AudioHeader : AudioHeader {
         } else {
             log.debug("isMPEGFrame has identified this is not an audio header")
         }
-        //Set back to the start of the previous frame
+        // Set back to the start of the previous frame
         bb.position(currentPosition)
         return result
     }
@@ -350,8 +351,8 @@ open class MP3AudioHeader : AudioHeader {
             (mp3FrameHeader?.getNoOfSamples()?:0) /
                     (mp3FrameHeader?.samplingRate?.toDouble()?:1.0)
 
-        //Because when calculating framelength we may have altered the calculation slightly for MPEGVersion2
-        //to account for mono/stereo we seem to have to make a corresponding modification to get the correct time
+        // Because when calculating framelength we may have altered the calculation slightly for MPEGVersion2
+        // to account for mono/stereo we seem to have to make a corresponding modification to get the correct time
         if ((mp3FrameHeader?.version == MPEGFrameHeader.VERSION_2) ||
             (mp3FrameHeader?.version == MPEGFrameHeader.VERSION_2_5)
         ) {

@@ -58,11 +58,6 @@ abstract class AbstractFrameBodyUrlLink : AbstractID3v2FrameBody {
      * @param urlLink
      */
     fun setUrlLink(urlLink: String) {
-        if (urlLink == null) {
-            throw IllegalArgumentException(
-                ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg()
-            )
-        }
         setObjectValue(DataTypes.OBJ_URLLINK, urlLink)
     }
 
@@ -73,11 +68,11 @@ abstract class AbstractFrameBodyUrlLink : AbstractID3v2FrameBody {
         val encoder = StandardCharsets.ISO_8859_1.newEncoder()
         val origUrl = this.getUrlLink()
         if (!encoder.canEncode(origUrl)) {
-            //ALL W Frames only support ISO-8859-1 for the url itself, if unable to encode let us assume
-            //the link just needs url encoding
+            // ALL W Frames only support ISO-8859-1 for the url itself, if unable to encode let us assume
+            // the link just needs url encoding
             this.setUrlLink(encodeURL(origUrl))
 
-            //We still cant convert so just set log error and set to blank to allow save to continue
+            // We still cant convert so just set log error and set to blank to allow save to continue
             if (!encoder.canEncode(this.getUrlLink())) {
                 log.warn(ErrorMessage.MP3_UNABLE_TO_ENCODE_URL.getMsg(origUrl))
                 this.setUrlLink("")
@@ -107,9 +102,6 @@ abstract class AbstractFrameBodyUrlLink : AbstractID3v2FrameBody {
         return sb.toString()
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringSizeTerminated(DataTypes.OBJ_URLLINK, this))
     }

@@ -39,7 +39,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -77,9 +77,6 @@ class FrameBodyGRID
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    /**
-     * @return
-     */
     fun getGroupSymbol(): Byte {
         if (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) != null) {
             return (getObjectValue(DataTypes.OBJ_GROUP_SYMBOL) as Long).toByte()
@@ -104,9 +101,6 @@ class FrameBodyGRID
         return ID3v24FrameId.GROUP_ID_REG.id
     }
 
-    /**
-     * @return
-     */
     fun getOwner(): String? {
         return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
@@ -118,9 +112,6 @@ class FrameBodyGRID
         setObjectValue(DataTypes.OBJ_OWNER, owner)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringNullTerminated(DataTypes.OBJ_OWNER, this))
         objectList.add(NumberFixedLength(DataTypes.OBJ_GROUP_SYMBOL, this, 1))

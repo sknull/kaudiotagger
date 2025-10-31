@@ -5,17 +5,8 @@ import java.nio.charset.StandardCharsets
 
 class ID3v2LyricLine : AbstractDataType {
 
-    /**
-     *
-     */
     var text: String = ""
 
-    /**
-     * @return
-     */
-    /**
-     *
-     */
     var timeStamp: Long = 0
 
     constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody)
@@ -26,51 +17,42 @@ class ID3v2LyricLine : AbstractDataType {
     }
 
     /**
-     * @param arr
+     * @param byteArray
      * @param offset
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        if (arr == null) {
-            throw NullPointerException("Byte array is null")
-        }
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
 
-        if ((offset < 0) || (offset >= arr.size)) {
+        if ((offset < 0) || (offset >= byteArray.size)) {
             throw IndexOutOfBoundsException(
                 "Offset to byte array is out of bounds: offset = " +
                         offset +
                         ", array.length = " +
-                        arr.size
+                        byteArray.size
             )
         }
 
-        //offset += ();
+        // offset += ();
         text = String(
-            arr,
+            byteArray,
             offset,
-            arr.size - offset - 4,
+            byteArray.size - offset - 4,
             StandardCharsets.ISO_8859_1
         )
 
-        //text = text.substring(0, text.length() - 5);
+        // text = text.substring(0, text.length() - 5);
         timeStamp = 0
 
-        for (i in arr.size - 4..<arr.size) {
+        for (i in byteArray.size - 4..<byteArray.size) {
             timeStamp = timeStamp shl 8
-            timeStamp += arr[i].toLong()
+            timeStamp += byteArray[i].toLong()
         }
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
-        return timeStamp.toString() + " " + text
+        return "$timeStamp $text"
     }
 
-    /**
-     * @return
-     */
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         val arr = ByteArray(getSize())
         (0 until text.length).forEach { i ->
             arr[i] = text[i].code.toByte()
@@ -81,13 +63,10 @@ class ID3v2LyricLine : AbstractDataType {
         arr[i++] = ((timeStamp and 0xFF000000L) shr 24).toByte()
         arr[i++] = ((timeStamp and 0x00FF0000L) shr 16).toByte()
         arr[i++] = ((timeStamp and 0x0000FF00L) shr 8).toByte()
-        arr[i++] = (timeStamp and 0x000000FFL).toByte()
+        arr[i] = (timeStamp and 0x000000FFL).toByte()
 
         return arr
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int = text.length + 1 + 4
 }

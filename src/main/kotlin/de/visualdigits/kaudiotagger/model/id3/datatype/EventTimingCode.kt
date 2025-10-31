@@ -5,8 +5,8 @@ import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFram
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
 
 /**
- * A single event timing code. Part of a list of timing codes ([EventTimingCodeList]), that are contained in
- * [org.jaudiotagger.tag.id3.framebody.FrameBodyETCO].
+ * A single event timing code. Part of a list of timing codes (EventTimingCodeList), that are contained in
+ * FrameBodyETCO.
  *
  * @author [Hendrik Schreiber](mailto:hs@tagtraum.com)
  * @version $Id:$
@@ -51,30 +51,29 @@ class EventTimingCode : AbstractDataType, Cloneable {
         this.timestamp.setBody(frameBody)
     }
 
-    override fun readByteArray(buffer: ByteArray, originalOffset: Int) {
-        var localOffset = originalOffset
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        var localOffset = offset
         val size = getSize()
 
-        log.debug("offset:" + localOffset)
+        log.debug("offset:$localOffset")
 
-        //The read has extended further than the defined frame size (ok to extend upto
-        //size because the next datatype may be of length 0.)
-        if (originalOffset > buffer.size - size) {
+        // The read has extended further than the defined frame size (ok to extend upto
+        // size because the next datatype may be of length 0.)
+        if (offset > byteArray.size - size) {
             log.warn("Invalid size for FrameBody")
             throw InvalidDataTypeException("Invalid size for FrameBody")
         }
 
-        this.type.readByteArray(buffer, localOffset)
+        this.type.readByteArray(byteArray, localOffset)
         localOffset += this.type.getSize()
-        this.timestamp.readByteArray(buffer, localOffset)
-        localOffset += this.timestamp.getSize()
+        this.timestamp.readByteArray(byteArray, localOffset)
     }
 
     override fun getSize(): Int {
         return SIZE
     }
 
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         val typeData = this.type.writeByteArray()?:error("Coulkd not write data")
         val timeData = this.timestamp.writeByteArray()?:error("Coulkd not write data")
         val objectData = ByteArray(typeData.size + timeData.size)
@@ -98,12 +97,6 @@ class EventTimingCode : AbstractDataType, Cloneable {
 
     fun setType(type: Int) {
         this.type.setValue(type)
-    }
-
-    override fun hashCode(): Int {
-        var result = if (type != null) type.hashCode() else 0
-        result = 31 * result + (if (timestamp != null) timestamp.hashCode() else 0)
-        return result
     }
 
     override fun toString(): String {

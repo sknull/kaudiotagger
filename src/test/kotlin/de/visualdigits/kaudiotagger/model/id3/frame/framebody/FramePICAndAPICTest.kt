@@ -75,13 +75,13 @@ class FramePICAndAPICTest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(v24InitialisedFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -97,19 +97,19 @@ class FramePICAndAPICTest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(v24InitialisedFrame)
 
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert to v23 and save
+        // Reload and convert to v23 and save
         mp3File = MP3File.Companion.read(testFile)
         mp3File.setTag(ID3v23Tag(mp3File.getID3v2TagAsv24()))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -125,19 +125,19 @@ class FramePICAndAPICTest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(v24InitialisedFrame)
 
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert to v22 and save
+        // Reload and convert to v22 and save
         mp3File = MP3File.Companion.read(testFile)
         mp3File.setTag(ID3v22Tag(mp3File.getID3v2TagAsv24()))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -153,7 +153,7 @@ class FramePICAndAPICTest : AbstractTestCase() {
         val testFile =  copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v22Tag()
 
         //..Notes (uses v22Frame but frame body will be the v23/24 version)
@@ -162,12 +162,12 @@ class FramePICAndAPICTest : AbstractTestCase() {
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert from v22 to v24 and save
+        // Reload and convert from v22 to v24 and save
         mp3File = MP3File.Companion.read(testFile)
         mp3File.setTag(ID3v24Tag(mp3File.getID3v2Tag()))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()

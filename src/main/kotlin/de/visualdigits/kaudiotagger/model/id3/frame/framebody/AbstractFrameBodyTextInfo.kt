@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -146,12 +146,12 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      * encoding.
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {
-        //Ensure valid for type
+        // Ensure valid for type
         setTextEncoding(
             ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding())
         )
 
-        //Ensure valid for data
+        // Ensure valid for data
         val terminated = getObject(DataTypes.OBJ_TEXT) as? TextEncodedStringSizeTerminated
         val bool = terminated?.canBeEncoded() == false
         if (bool) {

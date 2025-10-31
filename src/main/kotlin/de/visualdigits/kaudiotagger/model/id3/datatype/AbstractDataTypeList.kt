@@ -3,7 +3,7 @@ package de.visualdigits.kaudiotagger.model.id3.datatype
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 
 /**
- * Represents a list of [Cloneable](!!) [AbstractDataType]s, continuing until the end of the buffer.
+ * Represents a list of Cloneable AbstractDataTypes, continuing until the end of the buffer.
  *
  * @author [Hendrik Schreiber](mailto:hs@tagtraum.com)
  * @version $Id:$
@@ -20,44 +20,45 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
     /**
      * Copy constructor.
      * By convention, subclasses *must* implement a constructor, accepting an argument of their own class type
-     * and call this constructor for [org.jaudiotagger.tag.id3.ID3Tags.copyObject] to work.
+     * and call this constructor for tag.id3.ID3Tags.copyObject to work.
      * A parametrized `AbstractDataTypeList` is not sufficient.
      *
-     * @param copy instance
+     * @param copyObject instance
      */
     constructor(copyObject: AbstractDataTypeList<T>): super(copyObject)
 
     /**
      * Reads list of [EventTimingCode]s from buffer starting at the given offset.
      *
-     * @param buffer buffer
+     * @param byteArray buffer
      * @param offset initial offset into the buffer
      */
-    override fun readByteArray(buffer: ByteArray, offset: Int) {
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
         if (offset < 0) {
             throw IndexOutOfBoundsException(
                 "Offset to byte array is out of bounds: offset = " +
                         offset +
                         ", array.length = " +
-                        buffer.size
+                        byteArray.size
             )
         }
 
         // no events
-        if (offset >= buffer.size) {
+        if (offset >= byteArray.size) {
             getValue()?.clear()
             return
         }
         var currentOffset = offset
-        while (currentOffset < buffer.size) {
+        while (currentOffset < byteArray.size) {
             val data = createListElement()
-            data!!.readByteArray(buffer, currentOffset)
-            data.setBody(getBody())
-            getValue()!!.add(data)
-            currentOffset += data.getSize()
+            data?.readByteArray(byteArray, currentOffset)
+            data?.setBody(getBody())
+            data?.also { d -> getValue()?.add(d) }
+            currentOffset += data?.getSize()?:0
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun getValue(): MutableList<T>? {
         return super.getValue() as? MutableList<T>
     }
@@ -107,15 +108,7 @@ abstract class AbstractDataTypeList<T : AbstractDataType>: AbstractDataType {
      * @return the size in bytes
      */
     override fun getSize(): Int {
-        var size = 0
-        for (t in getValue()!!) {
-            size += t.getSize()
-        }
-        return size
-    }
-
-    override fun hashCode(): Int {
-        return if (getValue() != null) getValue().hashCode() else 0
+        return getValue()?.sumOf { t -> t.getSize() }?:0
     }
 
     override fun toString(): String {

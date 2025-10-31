@@ -14,13 +14,10 @@ class StringDate : StringFixedLength {
      * @param identifier
      * @param frameBody
      */
-    constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier!!, frameBody, 8)
+    constructor(identifier: String?, frameBody: AbstractTagFrameBody) : super(identifier, frameBody, 8)
 
     constructor(copyObject: StringDate) : super(copyObject)
 
-    /**
-     * @return
-     */
     override fun getValue(): Any? {
         if (getValue() != null) {
             return ID3Tags.stripChar(getValue().toString(), '-')

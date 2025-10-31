@@ -49,11 +49,11 @@ import java.util.TreeSet
 abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
     companion object {
-        //Tag ID as held in file
+        // Tag ID as held in file
         val TAG_ID: ByteArray = byteArrayOf('I'.code.toByte(), 'D'.code.toByte(), '3'.code.toByte())
         const val TAGID: String = "ID3"
 
-        //The tag header is the same for ID3v2 versions
+        // The tag header is the same for ID3v2 versions
         const val TAG_HEADER_LENGTH: Int = 10
         const val FIELD_TAGID_LENGTH: Int = 3
         const val FIELD_TAG_MAJOR_VERSION_LENGTH: Int = 1
@@ -94,7 +94,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
          */
         const val TYPE_INVALIDFRAMES: String = "invalidFrames"
 
-        //The max size we try to write in one go to avoid out of memory errors (10mb)
+        // The max size we try to write in one go to avoid out of memory errors (10mb)
         const val MAXIMUM_WRITABLE_CHUNK_SIZE: Long = 10000000
 
         /**
@@ -111,7 +111,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             if (!isID3V2Header(raf)) {
                 return false
             }
-            //So we have a tag
+            // So we have a tag
             val tagHeader = ByteArray(FIELD_TAG_SIZE_LENGTH)
             raf.seek(
                 raf.filePointer +
@@ -134,7 +134,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
          *
          * @param raf
          * @return
-             */
+         */
         fun isID3V2Header(raf: RandomAccessFile): Boolean {
             val start = raf.filePointer
             val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
@@ -163,7 +163,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
          *
          * @param file
          * @return the end of the tag in the file or zero if no tag exists.
-             */
+         */
         fun getV2TagSizeIfExists(file: File?): Long {
             if (file == null) {
                 return 0
@@ -180,14 +180,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 }
             }
 
-            //ID3 identifier
+            // ID3 identifier
             val tagIdentifier = ByteArray(FIELD_TAGID_LENGTH)
             bb.get(tagIdentifier, 0, FIELD_TAGID_LENGTH)
             if (!(tagIdentifier.contentEquals(TAG_ID))) {
                 return 0
             }
 
-            //Is it valid Major Version
+            // Is it valid Major Version
             val majorVersion = bb.get().toInt()
             if ((majorVersion != ID3v22Tag.MAJOR_VERSION) &&
                 (majorVersion != ID3v23Tag.MAJOR_VERSION) &&
@@ -196,13 +196,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 return 0
             }
 
-            //Skip Minor Version
+            // Skip Minor Version
             bb.get()
 
-            //Skip Flags
+            // Skip Flags
             bb.get()
 
-            //Get size as recorded in frame header
+            // Get size as recorded in frame header
             return (TAG_HEADER_LENGTH + ID3SyncSafeInteger.bufferToValue(bb)).toLong()
         }
     }
@@ -242,6 +242,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @return size of the tag
      */
+    @Suppress("UNCHECKED_CAST")
     override fun getSize(): Int {
         var sum = 0
         frameMap.values.forEach { frame ->
@@ -277,7 +278,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     open fun copyPrimitives(copyObject: AbstractID3v2Tag) {
         log.debug("Copying Primitives")
-        //Primitives type variables common to all IDv2 Tags
+        // Primitives type variables common to all IDv2 Tags
         this.duplicateFrameId = copyObject.duplicateFrameId
         this.duplicateBytes = copyObject.duplicateBytes
         this.emptyFrameBytes = copyObject.emptyFrameBytes
@@ -341,23 +342,26 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @param copyObject
      */
-    //TODO Copy Encrypted frames needs implementing
+    // TODO Copy Encrypted frames needs implementing
+    @Suppress("UNCHECKED_CAST")
     fun copyFrames(copyObject: AbstractID3v2Tag) {
         frameMap.clear()
         encryptedFrameMap.clear()
 
-        //Copy Frames that are a valid 2.4 type
+        // Copy Frames that are a valid 2.4 type
         copyObject.frameMap.forEach { (id, value) ->
-            //SingleFrames
+            // SingleFrames
             when (value) {
                 is AbstractID3v2Frame -> {
                     addFrame(value)
                 }
+
                 is TyerTdatAggregatedFrame -> {
                     value.getFrames().forEach { frame ->
                         addFrame(frame)
                     }
                 }
+
                 is List<*> -> {
                     (value as List<AbstractID3v2Frame>).forEach { frame ->
                         addFrame(frame)
@@ -399,10 +403,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param identifier is an ID3Frame identifier
      * @return matching frame, or list of matching frames
      */
-    //TODO:This method is problematic because sometimes it returns a list and sometimes a frame, we need to
-    //replace with two separate methods as in the tag interface.
-    fun getFrame(identifier: String): Any? {
-        return frameMap.get(identifier)
+    // TODO:This method is problematic because sometimes it returns a list and sometimes a frame, we need to
+    // replace with two separate methods as in the tag interface.
+    fun getFrame(identifier: String?): Any? {
+        return frameMap[identifier]
     }
 
     /**
@@ -447,7 +451,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             (ID3v22FrameId.isMultipleAllowed(frameId)) ||
             (ID3v22FrameId.isMultipleAllowed(frameId))
         ) {
-            //If a frame already exists of this type
+            // If a frame already exists of this type
             if (map.containsKey(frameId)) {
                 val o = map[frameId]
                 if (o is MutableList<*>) {
@@ -467,7 +471,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
         } else if (map.containsKey(frameId)) {
             log.warn("Ignoring Duplicate Frame:$frameId")
-            //If we have multiple duplicate frames in a tag separate them with semicolons
+            // If we have multiple duplicate frames in a tag separate them with semicolons
             if (this.duplicateFrameId.isNotEmpty()) {
                 this.duplicateFrameId += ";"
             }
@@ -502,11 +506,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param map
      * @param bodyBuffer
      */
+    @Suppress("UNCHECKED_CAST")
     private fun writeFramesToBufferStream(
         map: MutableMap<String, Any>,
         bodyBuffer: ByteArrayOutputStream
     ) {
-        //Sort keys into Preferred Order
+        // Sort keys into Preferred Order
         val sortedWriteOrder = TreeSet(
             getPreferredFrameOrderComparator()
         )
@@ -589,7 +594,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             return
         }
 
-        //We need to adjust location of audio file if true
+        // We need to adjust location of audio file if true
         if (sizeIncPadding > audioStartLocation) {
             log.debug("Adjusting Padding")
             adjustPadding(file, sizeIncPadding, audioStartLocation)
@@ -638,12 +643,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         if (!(tagIdentifier.contentEquals(TAG_ID))) {
             return false
         }
-        //Major Version
+        // Major Version
         val major = byteBuffer.get().toInt()
         if (major != getMajorVersion()) {
             return false
         }
-        //Minor Version
+        // Minor Version
         val minor = byteBuffer.get().toInt()
         return minor == getRevision()
     }
@@ -663,12 +668,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @param file to delete the tag from
      */
-    //TODO should clear all data and preferably recover lost space and go upto end of mp3s
+    // TODO should clear all data and preferably recover lost space and go upto end of mp3s
     override fun delete(file: RandomAccessFile) {
         // this works by just erasing the "ID3" tag at the beginning
         // of the file
         val buffer = ByteArray(FIELD_TAGID_LENGTH)
-        //Read into Int Buffer
+        // Read into Int Buffer
         val fc = file.getChannel()
         fc.position()
         val byteBuffer = ByteBuffer.allocate(TAG_HEADER_LENGTH)
@@ -688,8 +693,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     override fun write(file: RandomAccessFile) {
     }
 
-    override fun addField(genericKey: GenericFieldKey, vararg value: String) {
-        val tagfield: TagField = createField(genericKey, *value)
+    override fun addField(genericKey: GenericFieldKey, vararg values: String) {
+        val tagfield: TagField = createField(genericKey, *values)
         addField(tagfield)
     }
 
@@ -709,32 +714,33 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * There is a special handling if adding another text field of the same type, in this case the value will
      * be appended to the existing field, separated by the null character.
      *
-     * @param field
+     * @param tagField
      */
-    override fun addField(field: TagField) {
-        if ((field !is AbstractID3v2Frame) &&
-            (field !is AggregatedFrame)
+    @Suppress("UNCHECKED_CAST")
+    override fun addField(tagField: TagField) {
+        if ((tagField !is AbstractID3v2Frame) &&
+            (tagField !is AggregatedFrame)
         ) {
-            error("Field $field is not of type AbstractID3v2Frame or AggregatedFrame")
+            error("Field $tagField is not of type AbstractID3v2Frame or AggregatedFrame")
         }
 
-        val fieldId = field.getIdentifier() ?: error("No id")
-        if (field is AbstractID3v2Frame) {
+        val fieldId = tagField.getIdentifier() ?: error("No id")
+        if (tagField is AbstractID3v2Frame) {
             val o = frameMap[fieldId]
 
-            //No frame of this type
+            // No frame of this type
             if (o == null) {
-                frameMap[fieldId] = field
+                frameMap[fieldId] = tagField
             } else if (o is MutableList<*>) {
                 val list = o as MutableList<TagField>
-                addNewFrameOrAddField(list, frameMap, null, field)
+                addNewFrameOrAddField(list, frameMap, null, tagField)
             } else {
                 val existingFrame = o as AbstractID3v2Frame
                 val list = mutableListOf<TagField>()
-                addNewFrameOrAddField(list, frameMap, existingFrame, field)
+                addNewFrameOrAddField(list, frameMap, existingFrame, tagField)
             }
         } else {
-            frameMap[fieldId] = field
+            frameMap[fieldId] = tagField
         }
     }
 
@@ -884,10 +890,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             (frame.frameBody as FrameBodyWXXX).setDescription(formatKey.subId)
             (frame.frameBody as FrameBodyWXXX).setUrlLink(value)
         } else if (frame.frameBody is FrameBodyCOMM) {
-            //Set description if set
+            // Set description if set
             if (formatKey.subId != null) {
                 (frame.frameBody as FrameBodyCOMM).setDescription(formatKey.subId)
-                //Special Handling for Media Monkey Compatability
+                // Special Handling for Media Monkey Compatability
                 if ((frame.frameBody as FrameBodyCOMM).isMediaMonkeyFrame()) {
                     (frame.frameBody as FrameBodyCOMM).setLanguage(
                         Languages.MEDIA_MONKEY_ID
@@ -939,31 +945,31 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
     abstract fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId
 
-    //TODO
+    // TODO
     /**
      * Maps the generic key to the id3 key and return the list of values for this field as strings
      *
-     * @param id
+     * @param genericKey
      * @return
      */
-    override fun getAll(id: GenericFieldKey): List<String> {
-        //Special case here because the generic key to frameid/subid mapping is identical for trackno versus tracktotal
-        //and discno versus disctotal so we have to handle here, also want to ignore index parameter.
-        val fields = getFields(id)
+    override fun getAll(genericKey: GenericFieldKey): List<String> {
+        // Special case here because the generic key to frameid/subid mapping is identical for trackno versus tracktotal
+        // and discno versus disctotal so we have to handle here, also want to ignore index parameter.
+        val fields = getFields(genericKey)
         val values = mutableListOf<String>()
-        if (ID3NumberTotalFields.isNumber(id)) {
+        if (ID3NumberTotalFields.isNumber(genericKey)) {
             if (fields.isNotEmpty()) {
                 val frame = fields.get(0) as AbstractID3v2Frame
                 (frame.frameBody as? AbstractFrameBodyNumberTotal)?.getNumberAsText()?.also { v -> values.add(v) }
             }
             return values
-        } else if (ID3NumberTotalFields.isTotal(id)) {
+        } else if (ID3NumberTotalFields.isTotal(genericKey)) {
             if (fields.isNotEmpty()) {
                 val frame = fields.get(0) as AbstractID3v2Frame
                 (frame.frameBody as? AbstractFrameBodyNumberTotal)?.getTotalAsText()?.also { t -> values.add(t) }
             }
             return values
-        } else if (id == GenericFieldKey.RATING) {
+        } else if (genericKey == GenericFieldKey.RATING) {
             if (fields.isNotEmpty()) {
                 val frame = fields.get(0) as AbstractID3v2Frame
                 values.add(
@@ -972,7 +978,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
             return values
         } else {
-            return this.doGetValues(getFrameAndSubIdFromGenericKey(id))
+            return this.doGetValues(getFrameAndSubIdFromGenericKey(genericKey))
         }
     }
 
@@ -992,11 +998,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * If the value is a String it returns that, otherwise returns a summary of the fields information
      *
-     * @param identifier
+     * @param id
      * @return
      */
-    override fun getFirst(identifier: String): String? {
-        return getFirstField(identifier)?.let { id -> getTextValueForFrame(id) }?:""
+    override fun getFirst(id: String): String? {
+        return getFirstField(id)?.let { id -> getTextValueForFrame(id) } ?: ""
     }
 
     fun setFrame(frame: AbstractID3v2Frame) {
@@ -1014,15 +1020,15 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return
      */
     open fun getValue(genericKey: GenericFieldKey, index: Int): String? {
-        //Special case here because the generic key to frameid/subid mapping is identical for trackno versus tracktotal
-        //and discno versus disctotal so we have to handle here, also want to ignore index parameter.
+        // Special case here because the generic key to frameid/subid mapping is identical for trackno versus tracktotal
+        // and discno versus disctotal so we have to handle here, also want to ignore index parameter.
         if (ID3NumberTotalFields.isNumber(genericKey) ||
             ID3NumberTotalFields.isTotal(genericKey)
         ) {
             val fields = getFields(genericKey)
             if (fields.isNotEmpty()) {
-                //Should only be one frame so ignore index value, and we ignore multiple values within the frame
-                //it would make no sense if it existed.
+                // Should only be one frame so ignore index value, and we ignore multiple values within the frame
+                // it would make no sense if it existed.
                 val frame = fields.get(0) as AbstractID3v2Frame
                 if (ID3NumberTotalFields.isNumber(genericKey)) {
                     return (frame.frameBody as AbstractFrameBodyNumberTotal
@@ -1098,7 +1104,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     fun doGetValues(formatKey: FrameAndSubId): List<String> {
         val values = mutableListOf<String>()
         if (formatKey.subId != null) {
-            //Get list of frames that this uses
+            // Get list of frames that this uses
             getFields(formatKey.frameId).forEach { field ->
                 val next = (field as AbstractID3v2Frame).frameBody
                 if (next is FrameBodyTXXX) {
@@ -1244,7 +1250,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     ) {
         if (deleteNumberFieldKey) {
             val total = this.getFirst(totalFieldKey)
-            if (total?.length == 0) {
+            if (isEmpty()) {
                 doDeleteTagField(formatKey)
             } else {
                 val frame = this.getFrame(
@@ -1255,8 +1261,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 frameBody.setNumber(0)
             }
         } else {
-            val number = this.getFirst(numberFieldKey)
-            if (number?.length == 0) {
+            if (isEmpty()) {
                 doDeleteTagField(formatKey)
             } else {
                 val frame = this.getFrame(
@@ -1275,15 +1280,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * If generic key maps to multiple frames then do special processing here rather doDeleteField()
      *
-     * @param fieldKey
+     * @param genericKey
      */
-    override fun deleteField(fieldKey: GenericFieldKey) {
-        val formatKey = getFrameAndSubIdFromGenericKey(fieldKey)
-        if (fieldKey == null) {
-            throw KeyNotFoundException()
-        }
+    override fun deleteField(genericKey: GenericFieldKey) {
+        val formatKey = getFrameAndSubIdFromGenericKey(genericKey)
 
-        when (fieldKey) {
+        when (genericKey) {
             GenericFieldKey.TRACK -> deleteNumberTotalFrame(
                 formatKey,
                 GenericFieldKey.TRACK,
@@ -1336,7 +1338,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param formatKey
      */
     fun doDeleteTagField(formatKey: FrameAndSubId) {
-        //Get list of frames that this uses
+        // Get list of frames that this uses
         val list = getFields(formatKey.frameId)
         list.forEach { field ->
             val next = (field as AbstractID3v2Frame).frameBody
@@ -1401,12 +1403,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * Does this tag contain a field with the specified key
      *
-     * @param key The field id to look for.
+     * @param genericKey The field id to look for.
      * @return true if has field , false if does not or if no mapping for key exists
      */
-    override fun hasField(key: GenericFieldKey): Boolean {
+    override fun hasField(genericKey: GenericFieldKey): Boolean {
         try {
-            return getFirstField(key) != null
+            return getFirstField(genericKey) != null
         } catch (knfe: KeyNotFoundException) {
             log.error(knfe.message, knfe)
             return false
@@ -1420,18 +1422,16 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * Retrieve the first tag field that exists for this identifier
      *
-     * @param identifier
+     * @param id
      * @return tag field or null if doesn't exist
      */
-    override fun getFirstField(identifier: String?): AbstractID3v2Frame? {
-        val `object` = getFrame(identifier!!)
-        if (`object` == null) {
-            return null
-        }
-        if (`object` is MutableList<*>) {
-            return (`object` as? MutableList<AbstractID3v2Frame>)?.get(0)
+    @Suppress("UNCHECKED_CAST")
+    override fun getFirstField(id: String?): AbstractID3v2Frame? {
+        val obj = getFrame(id) ?: return null
+        return if (obj is MutableList<*>) {
+            (obj as? MutableList<AbstractID3v2Frame>)?.get(0)
         } else {
-            return `object` as AbstractID3v2Frame
+            obj as AbstractID3v2Frame
         }
     }
 
@@ -1439,7 +1439,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         return true
     }
 
-    //TODO is this a special field?
+    // TODO is this a special field?
     /**
      * Is this tag empty
      *
@@ -1460,17 +1460,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return
      */
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
-        if (genericKey == null) {
-            throw KeyNotFoundException()
-        }
-
-        require(!(values == null || values[0] == null)) { ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg() }
-
         val value: String = values[0]
         val formatKey = getFrameAndSubIdFromGenericKey(genericKey)
 
-        //FrameAndSubId does not contain enough info for these fields to be able to work out what to update
-        //that is why we need the extra processing here instead of doCreateTagField()
+        // FrameAndSubId does not contain enough info for these fields to be able to work out what to update
+        // that is why we need the extra processing here instead of doCreateTagField()
         if (ID3NumberTotalFields.isNumber(genericKey)) {
             val frame = createFrame(formatKey.frameId)
             val framebody =
@@ -1506,6 +1500,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     imageUrl = coverArt.getImageUrl(),
                     pictureType = coverArt.getPictureType(),
                 )
+
                 is FrameBodyAPIC -> Artwork(
                     binaryData = coverArt.getImageData(),
                     mimeType = coverArt.getMimeType(),
@@ -1513,6 +1508,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     imageUrl = coverArt.getImageUrl(),
                     pictureType = coverArt.getPictureType(),
                 )
+
                 else -> null
             }
 
@@ -1547,6 +1543,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         )
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun createStructureBody() {
         MP3File.tagFormatter?.openHeadingElement(TYPE_BODY, "")
 
@@ -1569,42 +1566,43 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return iterator of all fields, multiple values for the same Id (e.g multiple TXXX frames) count as separate
      * fields
      */
+    @Suppress("UNCHECKED_CAST")
     override fun getFields(): MutableIterator<TagField?> {
-        //Iterator of each different frameId in this tag
+        // Iterator of each different frameId in this tag
         val it = this.frameMap.entries.iterator()
 
-        //Iterator used by hasNext() so doesn't effect next()
+        // Iterator used by hasNext() so doesn't effect next()
         val itHasNext = this.frameMap.entries.iterator()
 
         return object : MutableIterator<TagField?> {
             var latestEntry: MutableMap.MutableEntry<String, Any>? = null
 
-            //this iterates through frames through for a particular frameId
+            // this iterates through frames through for a particular frameId
             private var fieldsIt: MutableIterator<TagField?>? = null
 
-            //TODO assumes if have entry its valid, but what if empty list but very different to check this
-            //without causing a side effect on next() so leaving for now
+            // TODO assumes if have entry its valid, but what if empty list but very different to check this
+            // without causing a side effect on next() so leaving for now
             override fun hasNext(): Boolean {
-                //Check Current frameId, does it contain more values
+                // Check Current frameId, does it contain more values
                 if (fieldsIt != null) {
                     if (fieldsIt?.hasNext() == true) {
                         return true
                     }
                 }
 
-                //No remaining entries return false
+                // No remaining entries return false
                 if (!itHasNext.hasNext()) {
                     return false
                 }
 
-                //Issue #236
-                //TODO assumes if have entry its valid, but what if empty list but very different to check this
-                //without causing a side effect on next() so leaving for now
+                // Issue #236
+                // TODO assumes if have entry its valid, but what if empty list but very different to check this
+                // without causing a side effect on next() so leaving for now
                 return itHasNext.hasNext()
             }
 
             override fun next(): TagField? {
-                //Hasn't been initialized yet
+                // Hasn't been initialized yet
                 if (fieldsIt == null) {
                     changeIt()
                 }
@@ -1631,7 +1629,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     latestEntry = itHasNext.next()
                     if (e.value is MutableList<*>) {
                         val l = e.value as MutableList<TagField>
-                        //If list is empty (which it shouldn't be) we skip over this entry
+                        // If list is empty (which it shouldn't be) we skip over this entry
                         if (l.size == 0) {
                             continue
                         } else {
@@ -1639,7 +1637,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                             break
                         }
                     } else {
-                        //TODO must be a better way
+                        // TODO must be a better way
                         val l: MutableList<TagField> = mutableListOf<TagField>()
                         l.add(e.value as TagField)
                         fieldsIt = l.iterator()
@@ -1664,16 +1662,17 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param field
      * @throws FieldDataInvalidException
      */
+    @Suppress("UNCHECKED_CAST")
     override fun setField(field: TagField) {
         if ((field !is AbstractID3v2Frame) && (field !is AggregatedFrame)) {
             error("Field $field is not of type AbstractID3v2Frame nor AggregatedFrame")
         }
 
-        val identifier = field.getIdentifier()?:error("No identifier")
+        val identifier = field.getIdentifier() ?: error("No identifier")
         if (field is AbstractID3v2Frame) {
             val obj = frameMap[identifier]
 
-            //If no frame of this type exist or if multiples are not allowed
+            // If no frame of this type exist or if multiples are not allowed
             if (obj == null) {
                 frameMap[identifier] = field
             } else if (obj is AbstractID3v2Frame) {
@@ -1699,11 +1698,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         frames: MutableList<AbstractID3v2Frame>
     ) {
         val li = frames.listIterator()
-        val identifier = newFrame.getIdentifier()?:error("No identifier")
+        val identifier = newFrame.getIdentifier() ?: error("No identifier")
         while (li.hasNext()) {
             val nextFrame = li.next()
             if (newFrame.frameBody is FrameBodyTXXX) {
-                //Value with matching key exists so replace
+                // Value with matching key exists so replace
                 if ((newFrame.frameBody as FrameBodyTXXX).getDescription().equals(
                         (nextFrame.frameBody as FrameBodyTXXX).getDescription()
                     )
@@ -1713,7 +1712,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     return
                 }
             } else if (newFrame.frameBody is FrameBodyWXXX) {
-                //Value with matching key exists so replace
+                // Value with matching key exists so replace
                 if ((newFrame.frameBody as FrameBodyWXXX).getDescription().equals(
                         (nextFrame.frameBody as FrameBodyWXXX).getDescription()
                     )
@@ -1772,7 +1771,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         if (!isMultipleAllowed(identifier)) {
             frameMap[identifier] = newFrame
         } else {
-            //No match found so addField new one
+            // No match found so addField new one
             frames.add(newFrame)
             frameMap[identifier] = frames
         }
@@ -1795,12 +1794,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         val oldBody =
             nextFrame.frameBody as AbstractFrameBodyNumberTotal
 
-        if (newBody.getNumber() != null && newBody.getNumber()!! > 0) {
-            oldBody.setNumber(newBody.getNumberAsText()!!)
+        if (newBody.getNumber() != null && (newBody.getNumber()?:0) > 0) {
+            oldBody.setNumber(newBody.getNumberAsText())
         }
 
-        if (newBody.getTotal() != null && newBody.getTotal()!! > 0) {
-            oldBody.setTotal(newBody.getTotalAsText()!!)
+        if (newBody.getTotal() != null && (newBody.getTotal()?:0) > 0) {
+            oldBody.setTotal(newBody.getTotalAsText())
         }
     }
 
@@ -1815,6 +1814,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     }
 
     override fun toString(): String {
-        return "Tag content [${this::class.simpleName}]:\n${getFields().asSequence().joinToString("\n") { field -> "\t${field?.getIdentifier()?:"UNSET"}:$field" }}"
+        return "Tag content [${this::class.simpleName}]:\n${
+            getFields().asSequence().joinToString("\n") { field -> "\t${field?.getIdentifier() ?: "UNSET"}:$field" }
+        }"
     }
 }

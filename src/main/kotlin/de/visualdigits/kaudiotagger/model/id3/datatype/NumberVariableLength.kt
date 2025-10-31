@@ -38,7 +38,7 @@ class NumberVariableLength : AbstractDataType {
         frameBody: AbstractTagFrameBody,
         minimumSize: Int
     ) : super(identifier, frameBody) {
-        //Set minimum length, which can be zero if optional
+        // Set minimum length, which can be zero if optional
         this.minimumLength = minimumSize
     }
 
@@ -49,37 +49,37 @@ class NumberVariableLength : AbstractDataType {
     /**
      * Read from Byte Array
      *
-     * @param arr
+     * @param byteArray
      * @param offset
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        //Coding error, should never happen
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        // Coding error, should never happen
 
-        //Coding error, should never happen as far as I can see
+        // Coding error, should never happen as far as I can see
         require(offset >= 0) { "negativer offset into an array offset:$offset" }
 
-        //If optional then set value to zero, this will mean that if this frame is written back to file it will be created
-        //with this additional datatype wheras it didnt exist but I think this is probably an advantage the frame is
-        //more likely to be parsed by other applications if it contains optional fields.
-        //if not optional problem with this frame
-        if (offset >= arr.size) {
+        // If optional then set value to zero, this will mean that if this frame is written back to file it will be created
+        // with this additional datatype wheras it didnt exist but I think this is probably an advantage the frame is
+        // more likely to be parsed by other applications if it contains optional fields.
+        // if not optional problem with this frame
+        if (offset >= byteArray.size) {
             if (this.minimumLength == 0) {
                 setValue(0L)
                 return
             } else {
                 throw InvalidDataTypeException(
-                    "Offset to byte array is out of bounds: offset = $offset, array.length = ${arr.size}"
+                    "Offset to byte array is out of bounds: offset = $offset, array.length = ${byteArray.size}"
                 )
             }
         }
 
         var lvalue: Long = 0
 
-        //Read the bytes (starting from offset), the most significant byte of the number being constructed is read first,
-        //we then shift the resulting long one byte over to make room for the next byte
-        for (i in offset..<arr.size) {
+        // Read the bytes (starting from offset), the most significant byte of the number being constructed is read first,
+        // we then shift the resulting long one byte over to make room for the next byte
+        for (i in offset..<byteArray.size) {
             lvalue = lvalue shl 8
-            lvalue += (arr[i].toInt() and 0xff).toLong()
+            lvalue += (byteArray[i].toInt() and 0xff).toLong()
         }
 
         setValue(lvalue)
@@ -111,8 +111,8 @@ class NumberVariableLength : AbstractDataType {
             var temp = ID3Tags.getWholeNumber(getValue())
             arr = ByteArray(size)
 
-            //keeps shifting the number downwards and masking the last 8 bist to get the value for the next byte
-            //to be written
+            // keeps shifting the number downwards and masking the last 8 bist to get the value for the next byte
+            // to be written
             (size - 1 downTo 0).forEach { i ->
                 arr[i] = (temp and 0xFFL).toByte()
                 temp = temp shr 8

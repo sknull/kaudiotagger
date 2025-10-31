@@ -5,7 +5,7 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodySYTC
 
 /**
- * List of [org.jaudiotagger.tag.datatype.SynchronisedTempoCode]s.
+ * List of tag.datatype.SynchronisedTempoCodes.
  *
  * @author [Hendrik Schreiber](mailto:hs@tagtraum.com)
  * @version $Id:$
@@ -13,7 +13,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodySYTC
 class SynchronisedTempoCodeList: AbstractDataTypeList<SynchronisedTempoCode> {
     /**
      * Mandatory, concretely-typed copy constructor, as required by
-     * [org.jaudiotagger.tag.datatype.AbstractDataTypeList.AbstractDataTypeList].
+     * tag.datatype.AbstractDataTypeList.AbstractDataTypeList.
      *
      * @param copy instance to copy
      */

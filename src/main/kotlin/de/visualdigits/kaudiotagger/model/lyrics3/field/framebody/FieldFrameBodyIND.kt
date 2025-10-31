@@ -32,9 +32,6 @@ class FieldFrameBodyIND : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    /**
-     * @return
-     */
     fun getAuthor(): String? {
         return getObjectValue("Author") as? String
     }
@@ -46,16 +43,10 @@ class FieldFrameBodyIND : AbstractLyrics3v2FieldFrameBody {
         setObjectValue("Author", author)
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "IND"
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(BooleanString("Lyrics Present", this))
         objectList.add(BooleanString("Timestamp Present", this))

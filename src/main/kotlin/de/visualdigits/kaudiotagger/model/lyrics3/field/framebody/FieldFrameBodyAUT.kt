@@ -31,9 +31,6 @@ class FieldFrameBodyAUT : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    /**
-     * @return
-     */
     fun getAuthor(): String? {
         return getObjectValue("Author") as? String
     }
@@ -45,16 +42,10 @@ class FieldFrameBodyAUT : AbstractLyrics3v2FieldFrameBody {
         setObjectValue("Author", author)
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "AUT"
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringSizeTerminated("Author", this))
     }

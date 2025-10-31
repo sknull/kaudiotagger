@@ -1,12 +1,6 @@
 package de.visualdigits.kaudiotagger.model.common.field
 
 interface TagField {
-    /**
-     * This method copies the data of the given field to the current data.<br></br>
-     *
-     * @param field The field containing the data to be taken.
-     */
-    fun copyContent(field: TagField)
 
     /**
      * Returns the Id of the represented tag field.<br></br>

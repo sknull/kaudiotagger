@@ -31,9 +31,6 @@ class FieldFrameBodyINF : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    /**
-     * @return
-     */
     fun getAdditionalInformation(): String? {
         return getObjectValue("Additional Information") as? String
     }
@@ -45,16 +42,10 @@ class FieldFrameBodyINF : AbstractLyrics3v2FieldFrameBody {
         setObjectValue("Additional Information", additionalInformation)
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "INF"
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringSizeTerminated("Additional Information", this))
     }

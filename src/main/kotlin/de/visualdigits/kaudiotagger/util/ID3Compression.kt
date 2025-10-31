@@ -32,8 +32,8 @@ object ID3Compression {
         val result = ByteArray(decompressedFrameSize)
         val input = ByteArray(realFrameSize)
 
-        //Store position ( just after frame header and any extra bits)
-        //Read frame data into array, and then put buffer back to where it was
+        // Store position ( just after frame header and any extra bits)
+        // Read frame data into array, and then put buffer back to where it was
         val position = byteBuffer.position()
         byteBuffer.get(input, 0, realFrameSize)
         byteBuffer.position(position)
@@ -46,7 +46,7 @@ object ID3Compression {
         } catch (dfe: DataFormatException) {
             log.debug("Unable to decompress this frame:$identifier", dfe)
 
-            //Update position of main buffer, so no attempt is made to reread these bytes
+            // Update position of main buffer, so no attempt is made to reread these bytes
             byteBuffer.position(byteBuffer.position() + realFrameSize)
             throw InvalidFrameException(
                 ErrorMessage.ID3_UNABLE_TO_DECOMPRESS_FRAME.getMsg(

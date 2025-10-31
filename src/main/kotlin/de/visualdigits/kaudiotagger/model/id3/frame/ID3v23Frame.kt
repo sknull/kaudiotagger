@@ -14,11 +14,9 @@ import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23StatusFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
-import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.ID3Compression
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
-import de.visualdigits.kaudiotagger.util.StatusFlags
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -119,7 +117,7 @@ class ID3v23Frame: AbstractID3v2Frame {
         }
 
         if (frame is ID3v24Frame) {
-            //Unknown Frame e.g NCON, also protects when known id but has unsupported frame body
+            // Unknown Frame e.g NCON, also protects when known id but has unsupported frame body
             if (frame.frameBody is FrameBodyUnsupported) {
                 frameBody = FrameBodyUnsupported(frame.frameBody as FrameBodyUnsupported)
                 frameBody?.header = this
@@ -128,7 +126,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                 
                 return
             } else if (frame.frameBody is FrameBodyDeprecated) {
-                //Was it valid for this tag version, if so try and reconstruct
+                // Was it valid for this tag version, if so try and reconstruct
                 if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
                     frameBody = (frame.frameBody as FrameBodyDeprecated).originalFrameBody
                     frameBody?.header = this
@@ -147,7 +145,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                 }
             } else if (ID3Tags.isID3v24FrameIdentifier(frame.getIdentifier())) {
                 log.debug("isID3v24FrameIdentifier")
-                //Version between v4 and v3
+                // Version between v4 and v3
                 setIdentifier(ID3Tags.convertFrameID24To23(frame.getIdentifier()))
                 if (getIdentifier() != null) {
                     log.debug("V4:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
@@ -157,7 +155,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                     
                     return
                 } else {
-                    //Is it a known v4 frame which needs forcing to v3 frame e.g. TDRC - TYER,TDAT
+                    // Is it a known v4 frame which needs forcing to v3 frame e.g. TDRC - TYER,TDAT
                     setIdentifier(ID3Tags.forceFrameID24To23(frame.getIdentifier()))
                     if (getIdentifier() != null) {
                         log.debug("V4:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
@@ -192,7 +190,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                     
                     return
                 } else if (ID3Tags.isID3v22FrameIdentifier(frame.getIdentifier())) {
-                    //Force v2 to v3
+                    // Force v2 to v3
                     setIdentifier(ID3Tags.forceFrameID22To23(frame.getIdentifier()))
                     if (getIdentifier() != null) {
                         log.debug("V22Orig id is:${frame.getIdentifier()}New id is:${getIdentifier()}")
@@ -246,15 +244,15 @@ class ID3v23Frame: AbstractID3v2Frame {
             byteBuffer.position(byteBuffer.position() - (getFrameIdSize() - 1))
             throw InvalidFrameIdentifierException("$identifier:is not a valid ID3v2.30 frame")
         }
-        //Read the size field (as Big Endian Int - byte buffers always initialised to Big Endian order)
+        // Read the size field (as Big Endian Int - byte buffers always initialised to Big Endian order)
         frameSize = byteBuffer.getInt()
         if (frameSize < 0) {
             log.warn("Invalid Frame Size:$frameSize:$identifier")
             throw InvalidFrameException("$identifier is invalid frame:$frameSize")
         } else if (frameSize == 0) {
             log.warn("Empty Frame Size:$identifier")
-            //We don't process this frame or add to frameMap because contains no useful information
-            //Skip the two flag bytes so in correct position for subsequent frames
+            // We don't process this frame or add to frameMap because contains no useful information
+            // Skip the two flag bytes so in correct position for subsequent frames
             byteBuffer.get()
             byteBuffer.get()
             throw EmptyFrameException("$identifier is empty frame")
@@ -263,12 +261,12 @@ class ID3v23Frame: AbstractID3v2Frame {
             throw InvalidFrameException("$identifier is invalid frame:$frameSize larger than size of${byteBuffer.remaining()} before mp3 audio:$identifier")
         }
 
-        //Read the flag bytes
+        // Read the flag bytes
         statusFlags = ID3v23StatusFlags(this, byteBuffer.get().toInt())
         encodingFlags = ID3v23EncodingFlags(this, byteBuffer.get().toInt())
         var id: String?
 
-        //If this identifier is a valid v24 identifier or easily converted to v24
+        // If this identifier is a valid v24 identifier or easily converted to v24
         id = ID3Tags.convertFrameID23To24(identifier)
 
         // Cant easily be converted to v24 but is it a valid v23 identifier
@@ -283,14 +281,14 @@ class ID3v23Frame: AbstractID3v2Frame {
         }
         log.debug("Identifier was:$identifier reading using:${id}with frame size:$frameSize")
 
-        //Read extra bits appended to frame header for various encodings
-        //These are not included in header size but are included in frame size but won't be read when we actually
-        //try to read the frame body data
+        // Read extra bits appended to frame header for various encodings
+        // These are not included in header size but are included in frame size but won't be read when we actually
+        // try to read the frame body data
         var extraHeaderBytesCount = 0
         var decompressedFrameSize = -1
 
         if ((encodingFlags as ID3v23EncodingFlags).isCompression()) {
-            //Read the Decompressed Size
+            // Read the Decompressed Size
             decompressedFrameSize = byteBuffer.getInt()
             extraHeaderBytesCount = FRAME_COMPRESSION_UNCOMPRESSED_SIZE
             log.debug(
@@ -299,19 +297,19 @@ class ID3v23Frame: AbstractID3v2Frame {
         }
 
         if ((encodingFlags as ID3v23EncodingFlags).isEncryption()) {
-            //Consume the encryption byte
+            // Consume the encryption byte
             extraHeaderBytesCount += FRAME_ENCRYPTION_INDICATOR_SIZE
             encryptionMethod = byteBuffer.get().toInt()
         }
 
         if ((encodingFlags as ID3v23EncodingFlags).isGrouping()) {
-            //Read the Grouping byte, but do nothing with it
+            // Read the Grouping byte, but do nothing with it
             extraHeaderBytesCount += FRAME_GROUPING_INDICATOR_SIZE
             groupIdentifier = byteBuffer.get().toInt()
         }
 
         if ((encodingFlags as ID3v23EncodingFlags).isNonStandardFlags()) {
-            //Probably corrupt so treat as a standard frame
+            // Probably corrupt so treat as a standard frame
             log.error(
                 "InvalidEncodingFlags:${encodingFlags?.flags?.toHexString()}"
             )
@@ -323,7 +321,7 @@ class ID3v23Frame: AbstractID3v2Frame {
             }
         }
 
-        //Work out the real size of the frameBody data
+        // Work out the real size of the frameBody data
         val realFrameSize = frameSize - extraHeaderBytesCount
 
         if (realFrameSize <= 0) {
@@ -331,7 +329,7 @@ class ID3v23Frame: AbstractID3v2Frame {
         }
 
         val frameBodyBuffer: ByteBuffer
-        //Read the body data
+        // Read the body data
         try {
             if ((encodingFlags as ID3v23EncodingFlags).isCompression()) {
                 frameBodyBuffer = ID3Compression.uncompress(
@@ -354,20 +352,20 @@ class ID3v23Frame: AbstractID3v2Frame {
                 frameBodyBuffer.limit(frameSize)
                 frameBody = readEncryptedBody(identifier, frameBodyBuffer, frameSize)
             } else {
-                //Create Buffer that only contains the body of this frame rather than the remainder of tag
+                // Create Buffer that only contains the body of this frame rather than the remainder of tag
                 frameBodyBuffer = byteBuffer.slice()
                 frameBodyBuffer.limit(realFrameSize)
                 frameBody = readBody(id, frameBodyBuffer, realFrameSize)
             }
-            //TODO code seems to assume that if the frame created is not a v23FrameBody
-            //it should be deprecated, but what about if somehow a V24Frame has been put into a V23 Tag, shouldn't
-            //it then be created as FrameBodyUnsupported
+            // TODO code seems to assume that if the frame created is not a v23FrameBody
+            // it should be deprecated, but what about if somehow a V24Frame has been put into a V23 Tag, shouldn't
+            // it then be created as FrameBodyUnsupported
             if (frameBody !is ID3v23FrameBody) {
                 log.debug("Converted frameBody with:$identifier to deprecated frameBody")
                 this.frameBody = frameBody?.let { fb -> FrameBodyDeprecated(fb as FrameBodyDeprecated) } 
             }
         } finally {
-            //Update position of main buffer, so no attempt is made to reread these bytes
+            // Update position of main buffer, so no attempt is made to reread these bytes
             byteBuffer.position(byteBuffer.position() + realFrameSize)
         }
 
@@ -412,14 +410,14 @@ class ID3v23Frame: AbstractID3v2Frame {
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {
         log.debug("Writing frame to buffer:" + getIdentifier())
-        //This is where we will write header, move position to where we can
-        //write body
+        // This is where we will write header, move position to where we can
+        // write body
         val headerBuffer = ByteBuffer.allocate(FRAME_HEADER_SIZE)
 
-        //Write Frame Body Data
+        // Write Frame Body Data
         val bodyOutputStream = ByteArrayOutputStream()
         (frameBody as AbstractID3v2FrameBody).write(bodyOutputStream)
-        //Write Frame Header write Frame ID
+        // Write Frame Header write Frame ID
         if (getIdentifier()?.length == 3) {
             setIdentifier(getIdentifier() + ' ')
         }
@@ -428,24 +426,24 @@ class ID3v23Frame: AbstractID3v2Frame {
             0,
             FRAME_ID_SIZE
         )
-        //Write Frame Size
+        // Write Frame Size
         val size = frameBody?.getSize()
         log.debug("Frame Size Is:" + size)
         headerBuffer.putInt(frameBody?.getSize()?:0)
 
-        //Write the Flags
-        //Status Flags:leave as they were when we read
+        // Write the Flags
+        // Status Flags:leave as they were when we read
         headerBuffer.put((statusFlags?.writeFlags?:0).toByte())
 
-        //Remove any non standard flags
+        // Remove any non standard flags
         (encodingFlags as ID3v23EncodingFlags).unsetNonStandardFlags()
 
-        //Unset Compression flag if previously set because we uncompress previously compressed frames on write.
+        // Unset Compression flag if previously set because we uncompress previously compressed frames on write.
         (encodingFlags as ID3v23EncodingFlags).unsetCompression()
         headerBuffer.put((encodingFlags?.flags?:0).toByte())
 
         try {
-            //Add header to the Byte Array Output Stream
+            // Add header to the Byte Array Output Stream
             tagBuffer.write(headerBuffer.array())
 
             if ((encodingFlags as ID3v23EncodingFlags).isEncryption()) {
@@ -456,10 +454,10 @@ class ID3v23Frame: AbstractID3v2Frame {
                 tagBuffer.write(groupIdentifier)
             }
 
-            //Add body to the Byte Array Output Stream
+            // Add body to the Byte Array Output Stream
             tagBuffer.write(bodyOutputStream.toByteArray())
         } catch (ioe: IOException) {
-            //This could never happen coz not writing to file, so convert to RuntimeException
+            // This could never happen coz not writing to file, so convert to RuntimeException
             throw RuntimeException(ioe)
         }
     }

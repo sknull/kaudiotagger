@@ -23,13 +23,13 @@ class FrameULSTTest : AbstractTestCase() {
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.UNSYNC_LYRICS.id) as ID3v24Frame
 
-        //Old method
+        // Old method
         val lyricsBody =  v24frame.frameBody as FrameBodyUSLT
         assertEquals(589, lyricsBody.getFirstTextValue()?.length)
         assertEquals("", lyricsBody.getDescription())
         assertEquals("   ", lyricsBody.getLanguage())
 
-        //New Method should be same length
+        // New Method should be same length
         val file = MP3File.read(testFile)
         assertEquals(589, file.getTag()?.getFirst(GenericFieldKey.LYRICS)?.length)
     }
@@ -43,7 +43,7 @@ class FrameULSTTest : AbstractTestCase() {
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.UNSYNC_LYRICS.id) as ID3v24Frame
 
-        //Get lyrics frame and modify
+        // Get lyrics frame and modify
         var lyricsBody =  v24frame.frameBody as FrameBodyUSLT
         assertEquals(589, lyricsBody.getFirstTextValue()?.length)
         assertEquals(1, lyricsBody.getTextEncoding())
@@ -52,7 +52,7 @@ class FrameULSTTest : AbstractTestCase() {
         lyricsBody.setLyric("lyric1")
         mp3File.save()
 
-        //Check normal values
+        // Check normal values
         mp3File = MP3File.read(testFile)
         v24frame = mp3File
             .getID3v2Tag()
@@ -63,7 +63,7 @@ class FrameULSTTest : AbstractTestCase() {
         assertEquals("lyric1", lyricsBody.getLyric())
         assertEquals(1, lyricsBody.getTextEncoding())
 
-        //Now force to UTF-16
+        // Now force to UTF-16
         lyricsBody.setLyric("lyric\u111F")
         mp3File.save()
         mp3File = MP3File.read(testFile)
@@ -76,7 +76,7 @@ class FrameULSTTest : AbstractTestCase() {
         assertEquals("lyric\u111F", lyricsBody.getLyric())
         assertEquals(1, lyricsBody.getTextEncoding())
 
-        //Now check UTf16 with empty description
+        // Now check UTf16 with empty description
         lyricsBody.setDescription("")
         mp3File.save()
         mp3File = MP3File.read(testFile)
@@ -97,7 +97,7 @@ class FrameULSTTest : AbstractTestCase() {
         val tag =  ID3v23Tag()
         mp3File.setTag(tag)
 
-        //Create lyrics frame and modify
+        // Create lyrics frame and modify
         var lyricsBody =  FrameBodyUSLT()
         lyricsBody.setLanguage(Languages.DEFAULT_ID)
         lyricsBody.setDescription("description")
@@ -107,7 +107,7 @@ class FrameULSTTest : AbstractTestCase() {
         tag.setFrame(v23frame)
         mp3File.save()
 
-        //Check normal values
+        // Check normal values
         mp3File = MP3File.read(testFile)
         v23frame = mp3File
             .getID3v2Tag()
@@ -118,7 +118,7 @@ class FrameULSTTest : AbstractTestCase() {
         assertEquals("lyric1", lyricsBody.getLyric())
         assertEquals(0, lyricsBody.getTextEncoding())
 
-        //Change to another ISO8859value
+        // Change to another ISO8859value
         lyricsBody.setLyric("lyric")
         mp3File.save()
         mp3File = MP3File.read(testFile)
@@ -129,7 +129,7 @@ class FrameULSTTest : AbstractTestCase() {
         assertEquals("lyric", lyricsBody.getLyric())
         assertEquals(0, lyricsBody.getTextEncoding())
 
-        //Now force to UTF-16
+        // Now force to UTF-16
         lyricsBody.setLyric("lyric\u111F")
         mp3File.save()
         mp3File = MP3File.read(testFile)
@@ -142,7 +142,7 @@ class FrameULSTTest : AbstractTestCase() {
         assertEquals("lyric\u111F", lyricsBody.getLyric())
         assertEquals(1, lyricsBody.getTextEncoding())
 
-        //Now check UTf16 with empty description
+        // Now check UTf16 with empty description
         lyricsBody.setDescription("")
         mp3File.save()
         mp3File = MP3File.read(testFile)
@@ -163,7 +163,7 @@ class FrameULSTTest : AbstractTestCase() {
         val tag =  ID3v23Tag()
         mp3File.setTag(tag)
 
-        //Create lyrics frame and modify
+        // Create lyrics frame and modify
         var lyricsBody =  FrameBodyUSLT()
         lyricsBody.setLanguage(Languages.DEFAULT_ID)
         lyricsBody.setDescription("")
@@ -173,7 +173,7 @@ class FrameULSTTest : AbstractTestCase() {
         tag.setFrame(v23frame)
         mp3File.save()
 
-        //Check normal values
+        // Check normal values
         mp3File = MP3File.read(testFile)
         v23frame = mp3File
             .getID3v2Tag()
@@ -198,7 +198,7 @@ class FrameULSTTest : AbstractTestCase() {
         val tag =  ID3v23Tag()
         mp3File.setTag(tag)
 
-        //Create lyrics frame and modify
+        // Create lyrics frame and modify
         var lyricsBody =  FrameBodyUSLT()
         lyricsBody.setLanguage(Languages.DEFAULT_ID)
         lyricsBody.setDescription("")
@@ -208,7 +208,7 @@ class FrameULSTTest : AbstractTestCase() {
         tag.setFrame(v24frame)
         mp3File.save()
 
-        //Check normal values
+        // Check normal values
         mp3File = MP3File.read(testFile)
         val v23frame =  mp3File
             .getID3v2Tag()
@@ -233,7 +233,7 @@ class FrameULSTTest : AbstractTestCase() {
         val tag =  ID3v23Tag()
         mp3File.setTag(tag)
 
-        //Create lyrics frame and modify
+        // Create lyrics frame and modify
         var lyricsBody =  FrameBodyUSLT()
         lyricsBody.setLanguage(Languages.DEFAULT_ID)
         lyricsBody.setDescription("")
@@ -243,7 +243,7 @@ class FrameULSTTest : AbstractTestCase() {
         tag.setFrame(v24frame)
         mp3File.save()
 
-        //Check normal values
+        // Check normal values
         mp3File = MP3File.read(testFile)
         var v23frame =  mp3File
             .getID3v2Tag()
@@ -254,7 +254,7 @@ class FrameULSTTest : AbstractTestCase() {
         assertEquals("lyric1", lyricsBody.getLyric())
         assertEquals(0, lyricsBody.getTextEncoding())
 
-        //Change Encoding
+        // Change Encoding
         lyricsBody.setTextEncoding(1.toByte())
         mp3File.save()
 

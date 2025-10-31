@@ -31,7 +31,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -68,9 +68,6 @@ class FrameBodyPRIV: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    /**
-     * @return
-     */
     fun getData(): ByteArray? {
         return getObjectValue(DataTypes.OBJ_DATA) as? ByteArray
     }
@@ -91,9 +88,6 @@ class FrameBodyPRIV: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24FrameId.PRIVATE.id
     }
 
-    /**
-     * @return
-     */
     fun getOwner(): String? {
         return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
@@ -105,9 +99,6 @@ class FrameBodyPRIV: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         setObjectValue(DataTypes.OBJ_OWNER, owner)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringNullTerminated(DataTypes.OBJ_OWNER, this))
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))

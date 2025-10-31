@@ -8,7 +8,7 @@ enum class TextEncoding(
     val charSet: Charset
 ): ByteRepresentation {
 
-    //Supported ID3 charset ids
+    // Supported ID3 charset ids
     ISO_8859_1(0, StandardCharsets.ISO_8859_1),
     UTF_16(1, StandardCharsets.UTF_16), // We use UTF-16 with LE byte-ordering and byte
                                                      // order mark by default also use BOM with BE byte ordering.

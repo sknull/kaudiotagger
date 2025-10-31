@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractString
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
@@ -8,8 +9,6 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerm
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
-import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -18,10 +17,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
     
     companion object {
 
-        //Most players only read comment with description of blank
-        const val DEFAULT: String = ""
-
-        //used by iTunes for volume normalization, although uses the COMMENT field not usually displayed as a comment
+        // used by iTunes for volume normalization, although uses the COMMENT field not usually displayed as a comment
         const val ITUNES_NORMALIZATION: String = "iTunNORM"
         const val MM_CUSTOM1: String = "Songs-DB_Custom1"
         const val MM_CUSTOM2: String = "Songs-DB_Custom2"
@@ -31,7 +27,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         const val MM_OCCASION: String = "Songs-DB_Occasion"
         const val MM_QUALITY: String = "Songs-DB_Preference"
         const val MM_TEMPO: String = "Songs-DB_Tempo"
-        //Various descriptions used by MediaMonkey, (note Media Monkey uses non-standard language field XXX)
+        // Various descriptions used by MediaMonkey, (note Media Monkey uses non-standard language field XXX)
         const val MM_PREFIX: String = "Songs-DB"
     }
 
@@ -74,7 +70,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
 
     fun isMediaMonkeyFrame(): Boolean {
         val desc = getDescription()
-        if (desc != null && desc.length != 0) {
+        if (desc != null && desc.isNotEmpty()) {
             return desc.startsWith(MM_PREFIX)
         }
         return false
@@ -95,17 +91,12 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @param description
      */
     fun setDescription(description: String) {
-        if (description == null) {
-            throw IllegalArgumentException(
-                ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg()
-            )
-        }
         setObjectValue(DataTypes.OBJ_DESCRIPTION, description)
     }
 
     fun isItunesFrame(): Boolean {
         val desc = getDescription()
-        if (desc != null && desc.length != 0) {
+        if (desc != null && desc.isNotEmpty()) {
             return desc == ITUNES_NORMALIZATION
         }
         return false
@@ -135,7 +126,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @param language
      */
     fun setLanguage(language: String?) {
-        //TODO not sure if this might break existing code
+        // TODO not sure if this might break existing code
         /*if(language==null)
         {
              throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
@@ -163,17 +154,9 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @param text
      */
     fun setText(text: String) {
-        if (text == null) {
-            throw IllegalArgumentException(
-                ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg()
-            )
-        }
         setObjectValue(DataTypes.OBJ_TEXT, text)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(
             NumberHashMap(
@@ -203,12 +186,12 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * we write data. If there are we change the encoding.
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {
-        //Ensure valid for type
+        // Ensure valid for type
         setTextEncoding(
             ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding())
         )
 
-        //Ensure valid for data
+        // Ensure valid for data
         if (!(getObject(DataTypes.OBJ_TEXT) as AbstractString).canBeEncoded()) {
             this.setTextEncoding(
                 ID3TextEncodingConversion.getUnicodeTextEncoding(header)

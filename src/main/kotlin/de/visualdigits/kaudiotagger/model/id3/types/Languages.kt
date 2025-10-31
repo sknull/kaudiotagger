@@ -467,8 +467,8 @@ enum class Languages(
         znd("Zande"),
         zul("Zulu"),
         zun("Zuni"),
-        winamp("Winamp Format"), //Not Part of Spec but commonly used by some applications
-        mediamonkey("Media Monkey Format"), //Not Part of Spec but commonly used by some applications
+        winamp("Winamp Format"), // Not Part of Spec but commonly used by some applications
+        mediamonkey("Media Monkey Format"), // Not Part of Spec but commonly used by some applications
     ;
 
     companion object {
@@ -479,7 +479,7 @@ enum class Languages(
 
         const val DEFAULT_VALUE: String = "English"
 
-        //The number of bytes used to hold the language field size
+        // The number of bytes used to hold the language field size
         const val LANGUAGE_FIELD_SIZE: Int = 3
 
         fun fromDescription(description: String?): Languages? = entries.find { e -> e.description == description }

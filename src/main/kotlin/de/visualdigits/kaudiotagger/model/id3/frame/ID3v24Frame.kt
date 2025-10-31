@@ -25,7 +25,6 @@ import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.lyrics3.field.Lyrics3v2Field
-import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
 import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyAUT
 import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyEAL
 import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyEAR
@@ -122,7 +121,7 @@ class ID3v24Frame: AbstractID3v2Frame {
      * @param frame to construct a frame from
      */
     constructor(frame: AbstractID3v2Frame?) {
-        //Should not be called
+        // Should not be called
         if ((frame is ID3v24Frame)) {
             throw UnsupportedOperationException("Copy Constructor not called. Please type cast the argument")
         } else if (frame is ID3v23Frame) {
@@ -169,25 +168,20 @@ class ID3v24Frame: AbstractID3v2Frame {
             )
         } else if (id == "LYR") {
             val lyric = field.frameBody as FieldFrameBodyLYR
-            var line: Lyrics3Line
-            val sync: FrameBodySYLT?
-            val unsync: FrameBodyUSLT?
             val hasTimeStamp = lyric.hasTimeStamp()
             // we'll create only one frame here.
             // if there is any timestamp at all, we will create a sync'ed frame.
-            sync = FrameBodySYLT(
-                0.toInt(),
+            val sync = FrameBodySYLT(
+                0,
                 "ENG",
                 2.toByte().toInt(),
                 1.toByte().toInt(),
                 "",
                 ByteArray(0)
             )
-            unsync = FrameBodyUSLT(0, "ENG", "", "")
+            val unsync = FrameBodyUSLT(0, "ENG", "", "")
             lyric.lines.forEach { line ->
-                if (hasTimeStamp) {
-                    // sync.addLyric(line);
-                } else {
+                if (!hasTimeStamp) {
                     unsync.addLyric(line)
                 }
             }
@@ -219,35 +213,27 @@ class ID3v24Frame: AbstractID3v2Frame {
             this.frameBody = FrameBodyTIT2(0, value)
             frameBody?.header = this
         } else if (id == "IMG") {
-            throw InvalidTagException(
-                "Cannot create ID3v2.40 frame from Lyrics3 image field."
-            )
+            throw InvalidTagException("Cannot create ID3v2.40 frame from Lyrics3 image field.")
         } else {
-            throw InvalidTagException(
-                "Cannot caret ID3v2.40 frame from " + id + " Lyrics3 field"
-            )
+            throw InvalidTagException("Cannot caret ID3v2.40 frame from $id Lyrics3 field")
         }
     }
 
     private fun createV24FrameFromV23Frame(frame: ID3v23Frame) {
         // Is it a straight conversion e.g TALB - TALB
         setIdentifier(ID3Tags.convertFrameID23To24(frame.getIdentifier()))
-        log.debug(
-            "Creating V24frame from v23:" + frame.getIdentifier() + ":" + getIdentifier()
-        )
+        log.debug("Creating V24frame from v23:" + frame.getIdentifier() + ":" + getIdentifier())
 
-        //We cant convert unsupported bodies properly
+        // We cant convert unsupported bodies properly
         if (frame.frameBody is FrameBodyUnsupported) {
             this.frameBody = FrameBodyUnsupported(
                 frame.frameBody as FrameBodyUnsupported
             )
             this.frameBody?.header = this
             setIdentifier(frame.getIdentifier())
-            log.debug(
-                "V3:UnsupportedBody:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-            )
+            log.debug("V3:UnsupportedBody:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
         } else if (getIdentifier() != null) {
-            //Special Case
+            // Special Case
             if ((frame.getIdentifier() == ID3v23FrameId.USER_DEFINED_INFO.id) &&
                 ((frame.frameBody as FrameBodyTXXX).getDescription() == FrameBodyTXXX.MOOD)
             ) {
@@ -255,9 +241,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                 this.frameBody?.header = this
                 setIdentifier(frameBody?.getIdentifier())
             } else {
-                log.debug(
-                    "V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-                )
+                log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                 this.frameBody = ID3Tags.copyObject(
                     frame.frameBody
                 ) as? AbstractTagFrameBody
@@ -266,9 +250,7 @@ class ID3v24Frame: AbstractID3v2Frame {
         } else if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
             setIdentifier(ID3Tags.forceFrameID23To24(frame.getIdentifier()))
             if (getIdentifier() != null) {
-                log.debug(
-                    "V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-                )
+                log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                 this.frameBody = this.readBody(
                     getIdentifier(),
                     frame.frameBody as AbstractID3v2FrameBody
@@ -280,9 +262,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                 )
                 this.frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
-                log.debug(
-                    "V3:Deprecated:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-                )
+                log.debug("V3:Deprecated:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
             }
         } else {
             this.frameBody = FrameBodyUnsupported(
@@ -290,9 +270,7 @@ class ID3v24Frame: AbstractID3v2Frame {
             )
             this.frameBody?.header = this
             setIdentifier(frame.getIdentifier())
-            log.debug(
-                "V3:Unknown:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-            )
+            log.debug("V3:Unknown:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
         }
     }
 
@@ -308,29 +286,25 @@ class ID3v24Frame: AbstractID3v2Frame {
         }
         val identifier = readIdentifier(byteBuffer)
 
-        //Is this a valid identifier?
+        // Is this a valid identifier?
         if (!isValidID3v2FrameIdentifier(identifier)) {
-            //If not valid move file pointer back to one byte after
-            //the original check so can try again.
-            log.debug(
-                "Invalid identifier:${getIdentifier()}"
-            )
+            // If not valid move file pointer back to one byte after
+            // the original check so can try again.
+            log.debug("Invalid identifier:${getIdentifier()}")
             byteBuffer.position(byteBuffer.position() - (getFrameIdSize() - 1))
-            throw InvalidFrameIdentifierException(
-                "${getIdentifier()}:is not a valid ID3v2.30 frame"
-            )
+            throw InvalidFrameIdentifierException("${getIdentifier()}:is not a valid ID3v2.30 frame")
         }
 
-        //Get the frame size, adjusted as necessary
+        // Get the frame size, adjusted as necessary
         getFrameSize(byteBuffer)
 
-        //Read the flag bytes
+        // Read the flag bytes
         statusFlags = ID3v24StatusFlags(this, byteBuffer.get().toInt())
         encodingFlags = ID3v24EncodingFlags(this, byteBuffer.get().toInt())
 
-        //Read extra bits appended to frame header for various encodings
-        //These are not included in header size but are included in frame size but wont be read when we actually
-        //try to read the frame body data
+        // Read extra bits appended to frame header for various encodings
+        // These are not included in header size but are included in frame size but wont be read when we actually
+        // try to read the frame body data
         var extraHeaderBytesCount = 0
         var dataLengthSize = -1
         if ((encodingFlags as ID3v24EncodingFlags).isGrouping()) {
@@ -339,13 +313,13 @@ class ID3v24Frame: AbstractID3v2Frame {
         }
 
         if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
-            //Read the Encryption byte, but do nothing with it
+            // Read the Encryption byte, but do nothing with it
             extraHeaderBytesCount += FRAME_ENCRYPTION_INDICATOR_SIZE
             encryptionMethod = byteBuffer.get().toInt()
         }
 
         if ((encodingFlags as ID3v24EncodingFlags).isDataLengthIndicator()) {
-            //Read the sync safe size field
+            // Read the sync safe size field
             dataLengthSize = ID3SyncSafeInteger.bufferToValue(byteBuffer)
             extraHeaderBytesCount += FRAME_DATA_LENGTH_SIZE
             log.debug(
@@ -353,29 +327,27 @@ class ID3v24Frame: AbstractID3v2Frame {
             )
         }
 
-        //Work out the real size of the frameBody data
+        // Work out the real size of the frameBody data
         val realFrameSize = frameSize - extraHeaderBytesCount
 
-        //Create Buffer that only contains the body of this frame rather than the remainder of tag
+        // Create Buffer that only contains the body of this frame rather than the remainder of tag
         var frameBodyBuffer = byteBuffer.slice()
         frameBodyBuffer.limit(realFrameSize)
 
-        //Do we need to synchronize the frame body
+        // Do we need to synchronize the frame body
         var syncSize = realFrameSize
         if ((encodingFlags as ID3v24EncodingFlags).isUnsynchronised()) {
-            //We only want to synchronize the buffer up to the end of this frame (remember this
-            //buffer contains the remainder of this tag not just this frame), and we cannot just
-            //create a buffer because when this method returns the position of the buffer is used
-            //to look for the next frame, so we need to modify the buffer. The action of synchronizing causes
-            //bytes to be dropped so the existing buffer is large enough to hold the modifications
+            // We only want to synchronize the buffer up to the end of this frame (remember this
+            // buffer contains the remainder of this tag not just this frame), and we cannot just
+            // create a buffer because when this method returns the position of the buffer is used
+            // to look for the next frame, so we need to modify the buffer. The action of synchronizing causes
+            // bytes to be dropped so the existing buffer is large enough to hold the modifications
             frameBodyBuffer = ID3Unsynchronization.synchronize(frameBodyBuffer)
             syncSize = frameBodyBuffer.limit()
-            log.debug(
-                "Frame Size After Syncing is:$syncSize"
-            )
+            log.debug("Frame Size After Syncing is:$syncSize")
         }
 
-        //Read the body data
+        // Read the body data
         try {
             if ((encodingFlags as ID3v24EncodingFlags).isCompression()) {
                 frameBodyBuffer = ID3Compression.uncompress(
@@ -384,14 +356,14 @@ class ID3v24Frame: AbstractID3v2Frame {
                     dataLengthSize,
                     realFrameSize
                 )
-                if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
-                    frameBody = readEncryptedBody(
+                frameBody = if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
+                    readEncryptedBody(
                         identifier,
                         frameBodyBuffer,
                         dataLengthSize
                     )
                 } else {
-                    frameBody = readBody(identifier, frameBodyBuffer, dataLengthSize)
+                    readBody(identifier, frameBodyBuffer, dataLengthSize)
                 }
             } else if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
                 frameBodyBuffer = byteBuffer.slice()
@@ -407,7 +379,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                 frameBody = FrameBodyDeprecated((frameBody as AbstractID3v2FrameBody))
             }
         } finally {
-            //Update position of main buffer, so no attempt is made to reread these bytes
+            // Update position of main buffer, so no attempt is made to reread these bytes
             byteBuffer.position(byteBuffer.position() + realFrameSize)
         }
 
@@ -457,25 +429,21 @@ class ID3v24Frame: AbstractID3v2Frame {
      * @param byteBuffer
      */
     private fun getFrameSize(byteBuffer: ByteBuffer) {
-        //Read frame size as syncsafe integer
+        // Read frame size as syncsafe integer
         frameSize = ID3SyncSafeInteger.bufferToValue(byteBuffer)
 
         if (frameSize < 0) {
-            log.warn(
-                "Invalid Frame size:${getIdentifier()}"
-            )
+            log.warn("Invalid Frame size:${getIdentifier()}")
             throw InvalidFrameException("${getIdentifier()} is invalid frame")
         } else if (frameSize == 0) {
             log.warn("Empty Frame:${getIdentifier()}")
-            //We dont process this frame or add to framemap becuase contains no useful information
-            //Skip the two flag bytes so in correct position for subsequent frames
+            // We dont process this frame or add to framemap becuase contains no useful information
+            // Skip the two flag bytes so in correct position for subsequent frames
             byteBuffer.get()
             byteBuffer.get()
             throw EmptyFrameException("${getIdentifier()} is empty frame")
         } else if (frameSize > (byteBuffer.remaining() - FRAME_FLAGS_SIZE)) {
-            log.warn(
-                "Invalid Frame size larger than size before mp3 audio:${getIdentifier()}"
-            )
+            log.warn("Invalid Frame size larger than size before mp3 audio:${getIdentifier()}")
             throw InvalidFrameException("${getIdentifier()} is invalid frame")
         }
 
@@ -491,33 +459,27 @@ class ID3v24Frame: AbstractID3v2Frame {
      */
     private fun checkIfFrameSizeThatIsNotSyncSafe(byteBuffer: ByteBuffer) {
         if (frameSize > ID3SyncSafeInteger.MAX_SAFE_SIZE) {
-            //Set Just after size field this is where we want to be when we leave this if statement
+            // Set Just after size field this is where we want to be when we leave this if statement
             val currentPosition = byteBuffer.position()
 
-            //Read as nonsync safe integer
+            // Read as nonsync safe integer
             byteBuffer.position(currentPosition - getFrameIdSize())
             val nonSyncSafeFrameSize = byteBuffer.getInt()
 
-            //Is the frame size syncsafe, should always be BUT some encoders such as Itunes do not do it properly
-            //so do an easy check now.
+            // Is the frame size syncsafe, should always be BUT some encoders such as Itunes do not do it properly
+            // so do an easy check now.
             byteBuffer.position(currentPosition - getFrameIdSize())
-            val isNotSyncSafe = ID3SyncSafeInteger.isBufferNotSyncSafe(
-                    byteBuffer
-            )
+            val isNotSyncSafe = ID3SyncSafeInteger.isBufferNotSyncSafe(byteBuffer)
 
-            //not relative so need to move position
+            // not relative so need to move position
             byteBuffer.position(currentPosition)
 
             if (isNotSyncSafe) {
-                log.warn(
-                    "Frame size is NOT stored as a sync safe integer:${getIdentifier()}"
-                )
+                log.warn("Frame size is NOT stored as a sync safe integer:${getIdentifier()}")
 
-                //This will return a larger frame size so need to check against buffer size if too large then we are
-                //buggered , give up
-                if (
-                        nonSyncSafeFrameSize > (byteBuffer.remaining() - -getFrameFlagsSize())
-                ) {
+                // This will return a larger frame size so need to check against buffer size if too large then we are
+                // buggered , give up
+                if (nonSyncSafeFrameSize > (byteBuffer.remaining() - -getFrameFlagsSize())) {
                     log.warn(
                         "Invalid Frame size larger than size before mp3 audio:${getIdentifier()}"
                     )
@@ -526,40 +488,39 @@ class ID3v24Frame: AbstractID3v2Frame {
                     frameSize = nonSyncSafeFrameSize
                 }
             } else {
-                //appears to be sync safe but lets look at the bytes just after the reported end of this
-                //frame to see if find a valid frame header
+                // appears to be sync safe but lets look at the bytes just after the reported end of this
+                // frame to see if find a valid frame header
 
-                //Read the Frame Identifier
+                // Read the Frame Identifier
                 var readAheadbuffer = ByteArray(getFrameIdSize())
                 byteBuffer.position(currentPosition + frameSize + getFrameFlagsSize())
 
                 if (byteBuffer.remaining() < getFrameIdSize()) {
-                    //There is no padding or framedata we are at end so assume syncsafe
-                    //reset position to just after framesize
+                    // There is no padding or framedata we are at end so assume syncsafe
+                    // reset position to just after framesize
                     byteBuffer.position(currentPosition)
                 } else {
                     byteBuffer.get(readAheadbuffer, 0, getFrameIdSize())
 
-                    //reset position to just after framesize
+                    // reset position to just after framesize
                     byteBuffer.position(currentPosition)
 
                     var readAheadIdentifier = String(readAheadbuffer)
                     if (isValidID3v2FrameIdentifier(readAheadIdentifier)) {
-                        //Everything ok, so continue
+                        // Everything ok, so continue
                     } else if (ID3SyncSafeInteger.isBufferEmpty(readAheadbuffer)) {
-                        //no data found so assume entered padding in which case assume it is last
-                        //frame and we are ok
+                        // no data found so assume entered padding in which case assume it is last
+                        // frame and we are ok
                     }
-                    //haven't found identifier so maybe not syncsafe or maybe there are no more frames, just padding
+                    // haven't found identifier so maybe not syncsafe or maybe there are no more frames, just padding
                     else {
-                        //Ok lets try using a non-syncsafe integer
-
-                        //size returned will be larger so is it valid
+                        // Ok lets try using a non-syncsafe integer
+                        // size returned will be larger so is it valid
                         if (
                                 nonSyncSafeFrameSize >
                                         byteBuffer.remaining() - getFrameFlagsSize()
                         ) {
-                            //invalid so assume syncsafe
+                            // invalid so assume syncsafe
                             byteBuffer.position(currentPosition)
                         } else {
                             readAheadbuffer = ByteArray(getFrameIdSize())
@@ -571,42 +532,34 @@ class ID3v24Frame: AbstractID3v2Frame {
                                 byteBuffer.get(readAheadbuffer, 0, getFrameIdSize())
                                 readAheadIdentifier = String(readAheadbuffer)
 
-                                //reset position to just after framesize
+                                // reset position to just after framesize
                                 byteBuffer.position(currentPosition)
 
-                                //ok found a valid identifier using non-syncsafe so assume non-syncsafe size
-                                //and continue
+                                // ok found a valid identifier using non-syncsafe so assume non-syncsafe size
+                                // and continue
                                 if (isValidID3v2FrameIdentifier(readAheadIdentifier)) {
                                     frameSize = nonSyncSafeFrameSize
-                                    log.warn(
-                                        "Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}"
-                                    )
+                                    log.warn("Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}")
                                 }
-                                //no data found so assume entered padding in which case assume it is last
-                                //frame and we are ok whereas we didn't hit padding when using syncsafe integer
-                                //or we wouldn't have got to this point. So assume syncsafe integer ended within
-                                //the frame data whereas this has reached end of frames.
+                                // no data found so assume entered padding in which case assume it is last
+                                // frame and we are ok whereas we didn't hit padding when using syncsafe integer
+                                // or we wouldn't have got to this point. So assume syncsafe integer ended within
+                                // the frame data whereas this has reached end of frames.
                                 else if (ID3SyncSafeInteger.isBufferEmpty(readAheadbuffer)) {
                                     frameSize = nonSyncSafeFrameSize
-                                    log.warn(
-                                        "Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}"
-                                    )
+                                    log.warn("Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}")
                                 }
-                                //invalid so assume syncsafe as that is is the standard
-                                else {
-                                }
+                                // invalid so assume syncsafe as that is is the standard
                             } else {
-                                //reset position to just after framesize
+                                // reset position to just after framesize
                                 byteBuffer.position(currentPosition)
 
-                                //If the unsync framesize matches exactly the remaining bytes then assume it has the
-                                //correct size for the last frame
+                                // If the unsync framesize matches exactly the remaining bytes then assume it has the
+                                // correct size for the last frame
                                 if (byteBuffer.remaining() == 0) {
                                     frameSize = nonSyncSafeFrameSize
                                 }
-                                //Inconclusive stick with syncsafe
-                                else {
-                                }
+                                // Inconclusive stick with syncsafe
                             }
                         }
                     }
@@ -624,15 +577,15 @@ class ID3v24Frame: AbstractID3v2Frame {
 
         log.debug("Writing frame to file:" + getIdentifier())
 
-        //This is where we will write header, move position to where we can
-        //write bodybuffer
+        // This is where we will write header, move position to where we can
+        // write bodybuffer
         val headerBuffer = ByteBuffer.allocate(FRAME_HEADER_SIZE)
 
-        //Write Frame Body Data to a stream
+        // Write Frame Body Data to a stream
         val bodyOutputStream = ByteArrayOutputStream()
         (frameBody as AbstractID3v2FrameBody).write(bodyOutputStream)
 
-        //Does it need unsynchronizing, and are we allowing unsychronizing
+        // Does it need unsynchronizing, and are we allowing unsychronizing
         var bodyBuffer = bodyOutputStream.toByteArray()
         unsynchronization =
             TagOptionSingleton.unsyncTags &&
@@ -644,9 +597,9 @@ class ID3v24Frame: AbstractID3v2Frame {
             )
         }
 
-        //Write Frame Header
-        //Write Frame ID, the identifier must be 4 bytes bytes long it may not be
-        //because converted an unknown v2.2 id (only 3 bytes long)
+        // Write Frame Header
+        // Write Frame ID, the identifier must be 4 bytes bytes long it may not be
+        // because converted an unknown v2.2 id (only 3 bytes long)
         if (getIdentifier()?.length == 3) {
             setIdentifier(getIdentifier() + ' ')
         }
@@ -656,32 +609,32 @@ class ID3v24Frame: AbstractID3v2Frame {
             FRAME_ID_SIZE
         )
 
-        //Write Frame Size based on size of body buffer (if it has been unsynced then it size
-        //will have increased accordingly
+        // Write Frame Size based on size of body buffer (if it has been unsynced then it size
+        // will have increased accordingly
         val size = bodyBuffer.size
-        log.debug("Frame Size Is:" + size)
+        log.debug("Frame Size Is:$size")
         headerBuffer.put(ID3SyncSafeInteger.valueToBuffer(size))
 
-        //Write the Flags
-        //Status Flags:leave as they were when we read
+        // Write the Flags
+        // Status Flags:leave as they were when we read
         headerBuffer.put((statusFlags?.writeFlags?:0).toByte())
 
-        //Remove any non standard flags
+        // Remove any non standard flags
         (encodingFlags as ID3v24EncodingFlags).unsetNonStandardFlags()
 
-        //Encoding we only support unsynchronization
+        // Encoding we only support unsynchronization
         if (unsynchronization) {
             (encodingFlags as ID3v24EncodingFlags).setUnsynchronised()
         } else {
             (encodingFlags as ID3v24EncodingFlags).unsetUnsynchronised()
         }
-        //These are not currently supported on write
+        // These are not currently supported on write
         (encodingFlags as ID3v24EncodingFlags).unsetCompression()
         (encodingFlags as ID3v24EncodingFlags).unsetDataLengthIndicator()
         headerBuffer.put((encodingFlags?.flags?:0).toByte())
 
         try {
-            //Add header to the Byte Array Output Stream
+            // Add header to the Byte Array Output Stream
             tagBuffer.write(headerBuffer.array())
 
             if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
@@ -692,10 +645,10 @@ class ID3v24Frame: AbstractID3v2Frame {
                 tagBuffer.write(groupIdentifier)
             }
 
-            //Add bodybuffer to the Byte Array Output Stream
+            // Add bodybuffer to the Byte Array Output Stream
             tagBuffer.write(bodyBuffer)
         } catch (ioe: IOException) {
-            //This could never happen coz not writing to file, so convert to RuntimeException
+            // This could never happen coz not writing to file, so convert to RuntimeException
             throw RuntimeException(ioe)
         }
     }
@@ -723,7 +676,7 @@ class ID3v24Frame: AbstractID3v2Frame {
         val encodingId = TextEncoding.fromCharset(encoding)?.id
         if (encodingId != null) {
             if (encodingId < 4) {
-                this.frameBody?.setTextEncoding(encodingId.toByte())
+                this.frameBody?.setTextEncoding(encodingId)
             }
         }
     }

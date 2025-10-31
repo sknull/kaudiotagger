@@ -5,6 +5,7 @@ import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.util.Utils
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -43,7 +44,7 @@ import java.nio.charset.StandardCharsets
  */
 class MetadataBlockDataPicture : MetadataBlockData, TagField {
     
-    val log = LoggerFactory.getLogger(javaClass)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
 
     var pictureType: Int = 0
     var mimeType: String? = ""
@@ -65,7 +66,7 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
     }
 
     private fun initFromByteBuffer(rawdata: ByteBuffer) {
-        //Picture Type
+        // Picture Type
         pictureType = rawdata.getInt()
         if (pictureType >= PictureTypes.getSize()) {
             throw InvalidFrameException(
@@ -76,7 +77,7 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
             )
         }
 
-        //MimeType
+        // MimeType
         val mimeTypeSize = rawdata.getInt()
         mimeType = getString(
             rawdata,
@@ -84,7 +85,7 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
             StandardCharsets.ISO_8859_1.name()
         )
 
-        //Description
+        // Description
         val descriptionSize = rawdata.getInt()
         description = getString(
             rawdata,
@@ -92,20 +93,20 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
             StandardCharsets.UTF_8.name()
         )
 
-        //Image width
+        // Image width
         width = rawdata.getInt()
 
-        //Image height
+        // Image height
         height = rawdata.getInt()
 
-        //Colour Depth
+        // Colour Depth
         colourDepth = rawdata.getInt()
 
-        //Indexed Colour Count
+        // Indexed Colour Count
         this.indexedColourCount = rawdata.getInt()
 
         lengthOfPictureInBytes = rawdata.getInt()
-        //ImageData
+        // ImageData
         imageData = ByteArray(lengthOfPictureInBytes)
         rawdata.get(imageData)
 
@@ -124,7 +125,7 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
      * @param header
      * @param fc
      */
-    //TODO check for buffer underflows see http://research.eeye.com/html/advisories/published/AD20071115.html
+    // TODO check for buffer underflows see http:// research.eeye.com/html/advisories/published/AD20071115.html
     constructor(header: MetadataBlockHeader, fc: FileChannel) {
         val rawdata = ByteBuffer.allocate(header.dataLength)
         val bytesRead = fc.read(rawdata)
@@ -162,15 +163,15 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
         colourDepth: Int,
         indexedColouredCount: Int
     ) {
-        //Picture Type
+        // Picture Type
         this.pictureType = pictureType
 
-        //MimeType
+        // MimeType
         if (mimeType != null) {
             this.mimeType = mimeType
         }
 
-        //Description
+        // Description
         this.description = description
 
         this.width = width
@@ -180,7 +181,7 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
         this.colourDepth = colourDepth
 
         this.indexedColourCount = indexedColouredCount
-        //ImageData
+        // ImageData
         this.imageData = imageData
     }
 
@@ -231,18 +232,9 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
     }
 
     /**
-     * This method copies the data of the given field to the current data.<br></br>
-     *
-     * @param field The field containing the data to be taken.
-     */
-    override fun copyContent(field: TagField) {
-        throw UnsupportedOperationException()
-    }
-
-    /**
      * Returns the Id of the represented tag field.<br></br>
      * This value should uniquely identify a kind of tag data, like title.
-     * [org.jaudiotagger.audio.generic.AbstractTag] will use the &quot;id&quot; to summarize multiple
+     * audio.generic.AbstractTag will use the &quot;id&quot; to summarize multiple
      * fields.
      *
      * @return Unique identifier for the fields type. (title, artist...)
@@ -292,7 +284,7 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
       way of setting this property."""
     )
     override fun isBinary(b: Boolean) {
-        //Do nothing, always true
+        // Do nothing, always true
     }
 
     /**

@@ -1,8 +1,8 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.field.framebody
 
-import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
@@ -47,26 +47,26 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
             return false
         }
         val size = getSize()
-        //Allocate a buffer to the size of the Frame Body and read from file
+        // Allocate a buffer to the size of the Frame Body and read from file
         val buffer = ByteArray(size)
         byteBuffer.get(buffer)
-        //Offset into buffer, incremented by length of previous MP3Object
+        // Offset into buffer, incremented by length of previous MP3Object
         var offset = 0
 
-        //Go through the ObjectList of the Frame reading the data into the
-        //correct datatype.
+        // Go through the ObjectList of the Frame reading the data into the
+        // correct datatype.
         var `object`: AbstractDataType
         val iterator: MutableIterator<AbstractDataType> = objectList.listIterator()
         while (iterator.hasNext()) {
-            //The read has extended further than the defined frame size
+            // The read has extended further than the defined frame size
             if (offset > (size - 1)) {
                 throw InvalidTagException("Invalid size for Frame Body")
             }
 
-            //Get next Object and load it with data from the Buffer
+            // Get next Object and load it with data from the Buffer
             `object` = iterator.next()
             `object`.readByteArray(buffer, offset)
-            //Increment Offset to start of next datatype.
+            // Increment Offset to start of next datatype.
             offset += `object`.getSize()
         }
 
@@ -80,7 +80,7 @@ abstract class AbstractLyrics3v2FieldFrameBody: AbstractTagFrameBody {
      * @param file destination file
      */
     open fun write(file: RandomAccessFile) {
-        //Write the various fields to file in order
+        // Write the various fields to file in order
         var buffer: ByteArray?
         var `object`: AbstractDataType
         val iterator: MutableIterator<AbstractDataType> = objectList.listIterator()

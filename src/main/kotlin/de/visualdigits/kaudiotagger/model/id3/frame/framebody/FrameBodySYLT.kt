@@ -1,5 +1,7 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.SynchronisedLyricsContentType
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
@@ -8,8 +10,6 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTimestampTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
-import de.visualdigits.kaudiotagger.model.common.types.SynchronisedLyricsContentType
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.nio.ByteBuffer
 
 /**
@@ -112,7 +112,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -257,7 +257,7 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         )
         objectList.add(StringNullTerminated(DataTypes.OBJ_DESCRIPTION, this))
 
-        //TODO:This hold the actual lyrics3
+        // TODO:This hold the actual lyrics3
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }
 }

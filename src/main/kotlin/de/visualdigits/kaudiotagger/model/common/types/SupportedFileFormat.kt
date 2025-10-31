@@ -1,8 +1,5 @@
 package de.visualdigits.kaudiotagger.model.common.types
 
-import de.visualdigits.kaudiotagger.model.common.tag.Tag
-import de.visualdigits.kaudiotagger.util.TagOptionSingleton
-
 /**
  * Files formats currently supported by Library.
  * Each enum value is associated with a file suffix (extension).

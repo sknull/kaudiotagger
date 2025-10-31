@@ -47,7 +47,7 @@ class FrameETCOTest : AbstractTestCase() {
         val testFile = copyAudioToTmp("testV1.mp3")
         var mp3File =  MP3File.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v24Tag()
         val referenceFrame =  getInitialisedFrame()
         val referenceBody = 
@@ -56,7 +56,7 @@ class FrameETCOTest : AbstractTestCase() {
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -93,13 +93,13 @@ class FrameETCOTest : AbstractTestCase() {
         val referenceBody =  FrameBodyETCO()
         frame.frameBody = referenceBody
 
-        //Create and Save
+        // Create and Save
         val tag =  ID3v24Tag()
         tag.setFrame(frame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.read(testFile)
         frame = mp3File
             .getID3v2Tag()

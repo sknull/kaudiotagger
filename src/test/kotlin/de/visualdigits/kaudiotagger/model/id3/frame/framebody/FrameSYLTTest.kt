@@ -17,7 +17,7 @@ class FrameSYLTTest : AbstractTestCase() {
 
         val id3 = ID3v24Tag()
 
-        //Create some data (lyric,teminator,size)
+        // Create some data (lyric,teminator,size)
         val data = ByteArray(5)
         data[0] = 'A'.code.toByte()
         data[1] = 'B'.code.toByte()
@@ -25,7 +25,7 @@ class FrameSYLTTest : AbstractTestCase() {
         data[3] = 25
         data[4] = 45
 
-        //Create USLT frame
+        // Create USLT frame
         var frameBody =  FrameBodySYLT(
             TEXT_ENCODING_KEY,
             LANG_CODE,
@@ -39,7 +39,7 @@ class FrameSYLTTest : AbstractTestCase() {
         frame.frameBody = frameBody
         id3.setFrame(frame)
 
-        //Create TPE1 frame (just so we can see where SYLT framebody ends)
+        // Create TPE1 frame (just so we can see where SYLT framebody ends)
         val frameBody2 =  FrameBodyTPE1()
         frameBody2.setText("TESTINGFRAME")
         val frame2 = ID3v24Frame(ID3v24FrameId.ARTIST.id)

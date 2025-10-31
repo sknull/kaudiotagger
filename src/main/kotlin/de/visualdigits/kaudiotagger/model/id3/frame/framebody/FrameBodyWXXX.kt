@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractString
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
@@ -7,7 +8,6 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.StringSizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 

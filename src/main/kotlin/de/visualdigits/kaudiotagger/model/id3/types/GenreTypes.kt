@@ -154,7 +154,7 @@ enum class GenreTypes(
     JPOP(146, "JPop"),
     SYNTHPOP(147, "SynthPop"),
 
-    // additional Winamp 5.6 values taken from http://en.wikipedia.org/wiki/ID3#Winamp_Extensions
+    // additional Winamp 5.6 values taken from http:// en.wikipedia.org/wiki/ID3#Winamp_Extensions
     ABSTRACT(148, "Abstract"),
     ART_ROCK(149, "Art Rock"),
     BAROQUE(150, "Baroque"),

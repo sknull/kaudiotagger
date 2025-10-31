@@ -2,6 +2,7 @@ package de.visualdigits.kaudiotagger.model.images
 
 import de.visualdigits.kaudiotagger.model.common.types.BlockType
 import de.visualdigits.kaudiotagger.util.ErrorMessage
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -13,7 +14,7 @@ import java.nio.channels.FileChannel
  */
 class MetadataBlockHeader {
 
-    val log = LoggerFactory.getLogger(javaClass)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
 
     val isLastBlock: Boolean
     val dataLength: Int
@@ -72,7 +73,7 @@ class MetadataBlockHeader {
         }
         rawdata.put(type)
 
-        //Size is 3Byte BigEndian int
+        // Size is 3Byte BigEndian int
         rawdata.put(((dataLength and 0xFF0000) ushr 16).toByte())
         rawdata.put(((dataLength and 0xFF00) ushr 8).toByte())
         rawdata.put((dataLength and 0xFF).toByte())

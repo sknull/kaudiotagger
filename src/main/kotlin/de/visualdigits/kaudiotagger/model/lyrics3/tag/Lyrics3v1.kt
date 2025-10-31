@@ -139,16 +139,10 @@ class Lyrics3v1: AbstractLyrics3 {
                 )
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "Lyrics3v1.00"
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         return "LYRICSBEGIN".length + lyric.length + "LYRICSEND".length
     }

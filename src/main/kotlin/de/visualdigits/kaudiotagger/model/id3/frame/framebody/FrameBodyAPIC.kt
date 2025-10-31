@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractString
 import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
@@ -9,7 +10,6 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerm
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -75,7 +75,7 @@ import java.nio.charset.StandardCharsets
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -88,7 +88,7 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * Creates a new FrameBodyAPIC datatype.
      */
     constructor() {
-        //Initilise default text encoding
+        // Initilise default text encoding
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
     }
 
@@ -262,9 +262,6 @@ class FrameBodyAPIC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         super.write(tagBuffer)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(
             NumberHashMap(

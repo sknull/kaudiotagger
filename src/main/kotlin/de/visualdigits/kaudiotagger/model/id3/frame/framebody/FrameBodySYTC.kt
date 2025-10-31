@@ -55,7 +55,7 @@ import java.util.Collections
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -129,6 +129,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      *
      * @return map of tempi
      */
+    @Suppress("UNCHECKED_CAST")
     fun getTempi(): MutableMap<Long, Int> {
         val map: MutableMap<Long, Int> = LinkedHashMap<Long, Int>()
         val codes: MutableList<SynchronisedTempoCode> =
@@ -136,7 +137,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         for (code in codes) {
             map[code.getTimestamp()] = code.getTempo()
         }
-        return Collections.unmodifiableMap<Long, Int>(map)
+        return Collections.unmodifiableMap(map)
     }
 
     /**
@@ -144,14 +145,15 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      *
      * @return list of timestamps
      */
+    @Suppress("UNCHECKED_CAST")
     fun getTimestamps(): MutableList<Long> {
-        val list: MutableList<Long> = mutableListOf<Long>()
+        val list: MutableList<Long> = mutableListOf()
         val codes: MutableList<SynchronisedTempoCode> =
             getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
         for (code in codes) {
             list.add(code.getTimestamp())
         }
-        return Collections.unmodifiableList<Long>(list)
+        return Collections.unmodifiableList(list)
     }
 
     /**
@@ -160,6 +162,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @param timestamp timestamp
      * @param tempo     tempo
      */
+    @Suppress("UNCHECKED_CAST")
     fun addTempo(timestamp: Long, tempo: Int) {
         // make sure we don't have two tempi at the same time
         removeTempo(timestamp)
@@ -191,6 +194,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @param timestamp timestamp
      * @return `true`, if any timestamps were removed
      */
+    @Suppress("UNCHECKED_CAST")
     fun removeTempo(timestamp: Long): Boolean {
         val codes = getObjectValue(DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST) as MutableList<SynchronisedTempoCode>
         return codes.find { code -> timestamp == code.getTimestamp() }
@@ -203,6 +207,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     /**
      * Remove all timing codes.
      */
+    @Suppress("UNCHECKED_CAST")
     fun clearTempi() {
         (getObjectValue(
             DataTypes.OBJ_SYNCHRONISED_TEMPO_LIST
@@ -213,6 +218,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24FrameId.SYNC_TEMPO.id
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         super.read(byteBuffer)
 
@@ -248,7 +254,6 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     companion object {
-        const val MPEG_FRAMES: Int = 1
         const val MILLISECONDS: Int = 2
     }
 }

@@ -25,7 +25,7 @@ object ID3TextEncodingConversion {
         header: AbstractTagFrame?,
         textEncoding: Byte
     ): Byte {
-        //Should not happen, assume v23 and provide a warning
+        // Should not happen, assume v23 and provide a warning
         if (header == null) {
             log.warn("Header has not yet been set for this framebody")
 
@@ -38,19 +38,19 @@ object ID3TextEncodingConversion {
         } else if (header is ID3v24Frame) {
             if (TagOptionSingleton.resetTextEncodingForExistingFrames
             ) {
-                //Replace with default
+                // Replace with default
                 return TagOptionSingleton.id3v24DefaultTextEncoding.id
             } else {
-                //All text encodings supported nothing to do
+                // All text encodings supported nothing to do
                 return textEncoding
             }
         } else {
             if (TagOptionSingleton.resetTextEncodingForExistingFrames
             ) {
-                //Replace with default
+                // Replace with default
                 return TagOptionSingleton.id3v23DefaultTextEncoding.id
             } else {
-                //If text encoding is an unsupported v24 one we use unicode v23 equivalent
+                // If text encoding is an unsupported v24 one we use unicode v23 equivalent
                 return convertV24textEncodingToV23textEncoding(textEncoding)
             }
         }
@@ -65,7 +65,7 @@ object ID3TextEncodingConversion {
     private fun convertV24textEncodingToV23textEncoding(
         textEncoding: Byte
     ): Byte {
-        //Convert to equivalent UTF16 format
+        // Convert to equivalent UTF16 format
         if (textEncoding == TextEncoding.UTF_16BE.id) {
             return TextEncoding.UTF_16.id
         } else if (textEncoding == TextEncoding.UTF_8.id) {

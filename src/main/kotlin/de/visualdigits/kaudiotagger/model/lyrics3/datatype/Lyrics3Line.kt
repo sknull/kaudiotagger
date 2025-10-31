@@ -1,23 +1,15 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.datatype
 
-import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.id3.datatype.ID3v2LyricLine
 import java.nio.charset.StandardCharsets
 import java.util.LinkedList
 
 class Lyrics3Line : AbstractDataType {
-    /**
-     *
-     */
+    
     var timeStamp = LinkedList<Lyrics3TimeStamp>()
 
-    /**
-     * @return
-     */
-    /**
-     *
-     */
     var lyric: String? = ""
 
     /**
@@ -32,19 +24,13 @@ class Lyrics3Line : AbstractDataType {
         this.lyric = copyObject.lyric
         var newTimeStamp: Lyrics3TimeStamp
         for (i in copyObject.timeStamp.indices) {
-            newTimeStamp = Lyrics3TimeStamp(copyObject.timeStamp.get(i))
+            newTimeStamp = Lyrics3TimeStamp(copyObject.timeStamp[i])
             this.timeStamp.add(newTimeStamp)
         }
     }
 
-    /**
-     * @return
-     */
-    override fun getSize(): Int = timeStamp.sumOf<Lyrics3TimeStamp> { aTimeStamp -> aTimeStamp.getSize() } + (lyric?.length ?: 0)
+    override fun getSize(): Int = timeStamp.sumOf { aTimeStamp -> aTimeStamp.getSize() } + (lyric?.length ?: 0)
 
-    /**
-     * @return
-     */
     fun getTimeStamp(): MutableIterator<Lyrics3TimeStamp> {
         return timeStamp.iterator()
     }
@@ -72,26 +58,20 @@ class Lyrics3Line : AbstractDataType {
         timeStamp.add(time)
     }
 
-    /**
-     * @return
-     */
     fun hasTimeStamp(): Boolean {
         return !timeStamp.isEmpty()
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         var str = ""
         for (aTimeStamp in timeStamp) {
             str += aTimeStamp.toString()
         }
-        return "timeStamp = " + str + ", lyric = " + lyric + "\n"
+        return "timeStamp = $str, lyric = $lyric\n"
     }
 
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        readString(arr.toString(), offset)
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        readString(byteArray.toString(), offset)
     }
 
     /**
@@ -100,16 +80,8 @@ class Lyrics3Line : AbstractDataType {
      */
     fun readString(lineString: String, offset: Int) {
         var offset = offset
-        if (lineString == null) {
-            throw NullPointerException("Image is null")
-        }
         if ((offset < 0) || (offset >= lineString.length)) {
-            throw IndexOutOfBoundsException(
-                "Offset to line is out of bounds: offset = " +
-                        offset +
-                        ", line.length()" +
-                        lineString.length
-            )
+            throw IndexOutOfBoundsException("Offset to line is out of bounds: offset = $offset, line.length()${lineString.length}")
         }
         var delim: Int
         var time: Lyrics3TimeStamp
@@ -125,15 +97,12 @@ class Lyrics3Line : AbstractDataType {
         lyric = lineString.substring(offset)
     }
 
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         return writeString().toByteArray(StandardCharsets.ISO_8859_1)
     }
 
-    /**
-     * @return
-     */
     fun writeString(): String {
-        var str: String = ""
+        var str = ""
         var time: Lyrics3TimeStamp
         for (aTimeStamp in timeStamp) {
             time = aTimeStamp

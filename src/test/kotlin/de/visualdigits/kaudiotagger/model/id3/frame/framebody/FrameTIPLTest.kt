@@ -59,13 +59,13 @@ class FrameTIPLTest : AbstractTestCase() {
         )
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(initialisedFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -82,13 +82,13 @@ class FrameTIPLTest : AbstractTestCase() {
         )
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(initialisedFrameOdd)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -108,13 +108,13 @@ class FrameTIPLTest : AbstractTestCase() {
         var frame = ID3v24Frame(ID3v24FrameId.INVOLVED_PEOPLE.id)
         frame.frameBody = FrameBodyTIPL()
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(frame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         frame = mp3File
             .getID3v2Tag()
@@ -131,14 +131,14 @@ class FrameTIPLTest : AbstractTestCase() {
         )
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(initialisedFrame)
 
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert to v23 and save
+        // Reload and convert to v23 and save
         mp3File = MP3File.Companion.read(testFile)
         val v23Tag = ID3v23Tag(mp3File.getID3v2TagAsv24())
         mp3File.setTag(v23Tag)
@@ -146,7 +146,7 @@ class FrameTIPLTest : AbstractTestCase() {
         Assertions.assertTrue(v23Tag.hasFrame("IPLS"))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()

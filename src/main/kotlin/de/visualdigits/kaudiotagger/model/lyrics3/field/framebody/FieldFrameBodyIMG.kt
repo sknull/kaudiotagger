@@ -1,17 +1,14 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.field.framebody
 
+import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Image
 import de.visualdigits.kaudiotagger.model.lyrics3.types.Lyrics3v2Fields
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 
 
 class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
-    /**
-     *
-     */
     var images = mutableListOf<Lyrics3Image>()
 
     /**
@@ -132,9 +129,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return super.isSubsetOf(obj)
     }
 
-    /**
-     * @return
-     */
     fun getValue(): String {
         return writeString()
     }
@@ -146,9 +140,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         readString(value)
     }
 
-    /**
-     * @return
-     */
     private fun writeString(): String {
         var str = ""
         var image: Lyrics3Image
@@ -172,9 +163,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         images.add(image)
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         var str = getIdentifier() + " : "
 
@@ -185,9 +173,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return str
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "IMG"
     }
@@ -230,9 +215,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         }
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         var size = 0
         var image: Lyrics3Image

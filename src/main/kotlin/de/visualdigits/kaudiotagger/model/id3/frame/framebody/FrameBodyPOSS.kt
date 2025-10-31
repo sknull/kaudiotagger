@@ -39,7 +39,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -82,9 +82,6 @@ class FrameBodyPOSS: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24FrameId.POSITION_SYNC.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(
             NumberHashMap(

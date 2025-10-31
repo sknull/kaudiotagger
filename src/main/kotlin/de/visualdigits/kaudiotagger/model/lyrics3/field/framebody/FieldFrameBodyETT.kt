@@ -31,16 +31,10 @@ class FieldFrameBodyETT : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "ETT"
     }
 
-    /**
-     * @return
-     */
     fun getTitle(): String? {
         return getObjectValue("Title") as? String
     }
@@ -52,9 +46,6 @@ class FieldFrameBodyETT : AbstractLyrics3v2FieldFrameBody {
         setObjectValue("Title", title)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringSizeTerminated("Title", this))
     }

@@ -81,13 +81,13 @@ class FrameTCMPTest : AbstractTestCase() {
         )
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(initialisedFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -107,13 +107,13 @@ class FrameTCMPTest : AbstractTestCase() {
         var frame = ID3v24Frame(ID3v24FrameId.IS_COMPILATION.id)
         frame.frameBody = FrameBodyTCMP()
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(frame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         frame = mp3File
             .getID3v2Tag()
@@ -130,18 +130,18 @@ class FrameTCMPTest : AbstractTestCase() {
         )
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v24Tag()
         tag.setFrame(initialisedFrame)
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert to v23 and save
+        // Reload and convert to v23 and save
         mp3File = MP3File.Companion.read(testFile)
         mp3File.setTag(ID3v23Tag(mp3File.getID3v2TagAsv24()))
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
@@ -169,7 +169,7 @@ class FrameTCMPTest : AbstractTestCase() {
         )
         var mp3File =  MP3File.Companion.read(testFile)
 
-        //Create and Save
+        // Create and Save
         val tag = ID3v22Tag()
         val id3v22frame = ID3v22Frame(
             ID3v22FrameId.IS_COMPILATION.id
@@ -178,13 +178,13 @@ class FrameTCMPTest : AbstractTestCase() {
         mp3File.setTag(tag)
         mp3File.save()
 
-        //Reload and convert to v23 and save
+        // Reload and convert to v23 and save
         mp3File = MP3File.Companion.read(testFile)
         val iD3v24Tag = ID3v24Tag(mp3File.getID3v2Tag())
         mp3File.setTag(iD3v24Tag)
         mp3File.save()
 
-        //Reload
+        // Reload
         mp3File = MP3File.Companion.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()

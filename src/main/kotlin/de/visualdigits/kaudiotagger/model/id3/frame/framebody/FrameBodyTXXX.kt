@@ -1,11 +1,11 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -14,7 +14,7 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
     
     companion object {
 
-        //Used by Picard and Jaikoz
+        // Used by Picard and Jaikoz
         const val ACOUSTID_FINGERPRINT: String = "Acoustid Fingerprint"
         const val ACOUSTID_ID: String = "Acoustid Id"
         const val AMAZON_ASIN: String = "ASIN"
@@ -36,7 +36,7 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
         const val FBPM: String = "FBPM"
         const val IS_CLASSICAL: String = "IS_CLASSICAL"
         const val IS_SOUNDTRACK: String = "IS_SOUNDTRACK"
-        const val MOOD: String = "MOOD" //ID3 v23 only
+        const val MOOD: String = "MOOD" // ID3 v23 only
         const val MOOD_ACOUSTIC: String = "MOOD_ACOUSTIC"
         const val MOOD_AGGRESSIVE: String = "MOOD_AGGRESSIVE"
         const val MOOD_AROUSAL: String = "MOOD_AROUSAL"
@@ -100,7 +100,7 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
         const val WORK: String = "WORK"
         const val WORK_TYPE: String = "WORK_TYPE"
 
-        //used by Foobar 20000
+        // used by Foobar 20000
         const val ALBUM_ARTIST: String = "ALBUM ARTIST"
     }
 
@@ -174,12 +174,12 @@ class FrameBodyTXXX: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      * Because TXXX frames also have a text encoded description we need to check this as well.     *
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {
-        //Ensure valid for type
+        // Ensure valid for type
         setTextEncoding(
             ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding())
         )
 
-        //Ensure valid for description
+        // Ensure valid for description
         if (!(getObject(
                 DataTypes.OBJ_DESCRIPTION
             ) as TextEncodedStringNullTerminated).canBeEncoded()

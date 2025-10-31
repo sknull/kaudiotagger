@@ -42,11 +42,11 @@ interface Tag {
      * Returns a [list][List] of [TagField] objects whose &quot;[id][TagField.getId]&quot;
      * is the specified one.<br></br>
      *
-     * @param id The field id.
+     * @param genericKey The field id.
      * @return A list of [TagField] objects with the given &quot;id&quot;.
      * @throws KeyNotFoundException
      */
-    fun getFields(id: GenericFieldKey?): List<TagField>
+    fun getFields(genericKey: GenericFieldKey?): List<TagField>
 
     /**
      * Create the field based on the generic key and add it to the tag
@@ -55,9 +55,9 @@ interface Tag {
      * This is handled differently by different formats
      *
      * @param genericKey
-     * @param value
+     * @param values
      */
-    fun addField(genericKey: GenericFieldKey, vararg value: String)
+    fun addField(genericKey: GenericFieldKey, vararg values: String)
 
     /**
      * Delete any fields with this key
@@ -77,11 +77,11 @@ interface Tag {
      * Create the field based on the generic key and set it in the tag
      *
      * @param genericKey
-     * @param value
+     * @param values
      * @throws KeyNotFoundException
      * @throws FieldDataInvalidException
      */
-    fun setField(genericKey: GenericFieldKey, vararg value: String)
+    fun setField(genericKey: GenericFieldKey, vararg values: String)
 
     /**
      * Sets a field in the structure, used internally by the library<br></br>
@@ -106,7 +106,7 @@ interface Tag {
      * @param GenericFieldKey
      * @return
      */
-    fun hasField(fieldKey: GenericFieldKey): Boolean
+    fun hasField(genericKey: GenericFieldKey): Boolean
 
     fun getFirstField(genericKey: GenericFieldKey): TagField?
 
@@ -130,10 +130,10 @@ interface Tag {
     /**
      * Retrieve all String values that exist for this generic key
      *
-     * @param id
+     * @param genericKey
      * @return
      */
-    fun getAll(id: GenericFieldKey): List<String>
+    fun getAll(genericKey: GenericFieldKey): List<String>
 
     fun getFirst(genericKey: GenericFieldKey?): String?
 
@@ -178,9 +178,9 @@ interface Tag {
     /**
      * Adds a field to the structure, used internally by the library<br></br>
      *
-     * @param field The field to add.
+     * @param tagField The field to add.
      */
-    fun addField(field: TagField)
+    fun addField(tagField: TagField)
 
     /**
      * Create a new field based on generic key, used internally by the library
@@ -195,10 +195,10 @@ interface Tag {
      * performer name
      *
      * @param genericKey is the generic key
-     * @param value      to store
+     * @param values      to store
      * @return
      */
-    fun createField(genericKey: GenericFieldKey, vararg value: String): TagField
+    fun createField(genericKey: GenericFieldKey, vararg values: String): TagField
 
     /**
      * Creates isCompilation field

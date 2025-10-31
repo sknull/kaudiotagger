@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.ValuePairs
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
-import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
 import java.nio.ByteBuffer
 
 
@@ -11,7 +11,7 @@ class FrameBodyTIPL: AbstractFrameBodyPairs, ID3v24FrameBody {
     
     companion object {
 
-        //Standard function names, code now uses StandardIPLSKey but kept for backwards compatability
+        // Standard function names, code now uses StandardIPLSKey but kept for backwards compatability
         val ENGINEER: String = StandardIPLSKey.ENGINEER.key
         val MIXER: String = StandardIPLSKey.MIXER.key
         val DJMIXER: String = StandardIPLSKey.DJMIXER.key

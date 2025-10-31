@@ -11,9 +11,6 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
 
     var valueToKeyMap: Map<String, String> = mapOf()
 
-    /**
-     *
-     */
     var hasEmptyValue: Boolean = false
 
     /**
@@ -49,7 +46,7 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
      */
     override fun setValue(value: Any?) {
         if (value is String) {
-            //Issue #273 temporary hack for MM
+            // Issue #273 temporary hack for MM
             if (value.equals("XXX")) {
                 super.setValue(value)
             } else {
@@ -60,16 +57,10 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
         }
     }
 
-    /**
-     * @return
-     */
     override fun getKeyToValue(): Map<String, String> {
         return Languages.getIdToValueMap()
     }
 
-    /**
-     * @return
-     */
     override fun getValueToKey(): Map<String, String> {
         return Languages.getValueToIdMap()
     }
@@ -81,9 +72,6 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
         return StandardCharsets.ISO_8859_1
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         val keyToValue = getKeyToValue()
         val value = getValue()

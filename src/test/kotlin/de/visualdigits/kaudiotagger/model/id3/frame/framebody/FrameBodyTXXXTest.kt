@@ -4,7 +4,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class FrameBodyTXXXTest : AbstractTestCase() {
@@ -29,7 +28,7 @@ class FrameBodyTXXXTest : AbstractTestCase() {
         const val TXXX_TEST_STRING: String = "0123456789"
 
         fun getInitialisedBody(): FrameBodyTXXX {
-            //Text Encoding doesnt matter until written to file
+            // Text Encoding doesnt matter until written to file
             val fb = FrameBodyTXXX(
                 TextEncoding.ISO_8859_1.id,
                 TXXX_TEST_STRING,

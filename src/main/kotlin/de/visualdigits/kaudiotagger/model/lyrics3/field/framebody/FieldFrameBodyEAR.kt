@@ -31,9 +31,6 @@ class FieldFrameBodyEAR : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    /**
-     * @return
-     */
     fun getArtist(): String? {
         return getObjectValue("Artist") as? String
     }
@@ -45,16 +42,10 @@ class FieldFrameBodyEAR : AbstractLyrics3v2FieldFrameBody {
         setObjectValue("Artist", artist)
     }
 
-    /**
-     * @return
-     */
     override fun getIdentifier(): String {
         return "EAR"
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringSizeTerminated("Artist", this))
     }

@@ -9,14 +9,14 @@ import java.util.regex.Pattern
 abstract class AbstractID3v1Tag: AbstractID3Tag {
     
     companion object {
-        //Tag ID as held in file
+        // Tag ID as held in file
         const val TAG: String = "TAG"
 
-        //If field is less than maximum field length this is how it is terminated
+        // If field is less than maximum field length this is how it is terminated
         val END_OF_FIELD: Byte = 0
         val TAG_ID: ByteArray = byteArrayOf('T'.code.toByte(), 'A'.code.toByte(), 'G'.code.toByte())
 
-        //Fields Lengths common to v1 and v1.1 tags
+        // Fields Lengths common to v1 and v1.1 tags
         const val TAG_LENGTH: Int = 128
         const val TAG_DATA_LENGTH: Int = 125
         const val FIELD_TAGID_LENGTH: Int = 3
@@ -26,7 +26,7 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
         const val FIELD_YEAR_LENGTH: Int = 4
         const val FIELD_GENRE_LENGTH: Int = 1
 
-        //Field Positions, starting from zero so fits in with Java Terminology
+        // Field Positions, starting from zero so fits in with Java Terminology
         const val FIELD_TAGID_POS: Int = 0
         const val FIELD_TITLE_POS: Int = 3
         const val FIELD_ARTIST_POS: Int = 33
@@ -34,14 +34,14 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
         const val FIELD_YEAR_POS: Int = 93
         const val FIELD_GENRE_POS: Int = 127
 
-        //For writing output
+        // For writing output
         const val TYPE_TITLE: String = "title"
         const val TYPE_ARTIST: String = "artist"
         const val TYPE_ALBUM: String = "album"
         const val TYPE_YEAR: String = "year"
         const val TYPE_GENRE: String = "genre"
 
-        //Used to detect end of field in String constructed from Data
+        // Used to detect end of field in String constructed from Data
         var endofStringPattern: Pattern = Pattern.compile("\\x00")
     }
 
@@ -65,7 +65,7 @@ abstract class AbstractID3v1Tag: AbstractID3Tag {
      * @param file to delete the tag from
      */
     override fun delete(file: RandomAccessFile) {
-        //Read into Byte Buffer
+        // Read into Byte Buffer
         log.debug("Deleting ID3v1 from file if exists")
         val fc: FileChannel = file.getChannel()
         if (file.length() < TAG_LENGTH) {

@@ -87,7 +87,7 @@ import java.util.Collections
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -125,8 +125,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @see .MPEG_FRAMES
      */
     fun getTimestampFormat(): Int {
-        return (getObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT) as Number
-                ).toInt()
+        return (getObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT) as Number).toInt()
     }
 
     /**
@@ -148,6 +147,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @param timestamp timestamp
      * @param types     types
      */
+    @Suppress("UNCHECKED_CAST")
     fun addTimingCode(timestamp: Long, vararg types: Int) {
         val codes = getObjectValue(
             DataTypes.OBJ_TIMED_EVENT_LIST
@@ -183,6 +183,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * @param types     types
      * @return `true`, if any timestamps were removed
      */
+    @Suppress("UNCHECKED_CAST")
     fun removeTimingCode(timestamp: Long, vararg types: Int): Boolean {
         // before we can remove anything, we have to resolve relative 0-timestamps
         // otherwise we might remove the anchor a relative timestamp relies on
@@ -210,6 +211,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     /**
      * Resolve any relative timestamp (zero timestamp after a non-zero timestamp) to absolute timestamp.
      */
+    @Suppress("UNCHECKED_CAST")
     private fun resolveRelativeTimestamps() {
         val codes = getObjectValue(
             DataTypes.OBJ_TIMED_EVENT_LIST
@@ -230,6 +232,7 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      *
      * @return map of timing codes
      */
+    @Suppress("UNCHECKED_CAST")
     fun getTimingCodes(): MutableMap<Long, IntArray> {
         val map = mutableMapOf<Long, IntArray>()
         val codes = getObjectValue(
@@ -243,27 +246,29 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
                 code.getTimestamp()
             val types = map.get(translatedTimestamp)
             if (types == null) {
-                map.put(translatedTimestamp, intArrayOf(code.getType()))
+                map[translatedTimestamp] = intArrayOf(code.getType())
             } else {
                 val newTypes = IntArray(types.size + 1)
                 System.arraycopy(types, 0, newTypes, 0, types.size)
                 newTypes[newTypes.size - 1] = code.getType()
-                map.put(translatedTimestamp, newTypes)
+                map[translatedTimestamp] = newTypes
             }
             lastTimestamp = translatedTimestamp
         }
-        return Collections.unmodifiableMap<Long?, IntArray?>(map)
+        return Collections.unmodifiableMap(map)
     }
 
     /**
      * Remove all timing codes.
      */
+    @Suppress("UNCHECKED_CAST")
     fun clearTimingCodes() {
         (getObjectValue(
             DataTypes.OBJ_TIMED_EVENT_LIST
         ) as? MutableList<EventTimingCode>)?.clear()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         super.read(byteBuffer)
 
@@ -315,11 +320,10 @@ class FrameBodyETCO: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
     }
 
     companion object {
-        const val MPEG_FRAMES: Int = 1
         const val MILLISECONDS: Int = 2
 
         private fun toSet(vararg types: Int): MutableSet<Int?> {
-            val typeSet: MutableSet<Int?> = HashSet<Int?>()
+            val typeSet: MutableSet<Int?> = HashSet()
             for (type in types) {
                 typeSet.add(type)
             }

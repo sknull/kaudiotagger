@@ -20,7 +20,7 @@ class FrameTOPETest : AbstractTestCase() {
         var mp3File =  MP3File.read(testFile)
         val v24Tag =  mp3File.getID3v2Tag() as ID3v24Tag
 
-        //Save as V23
+        // Save as V23
         var v23Tag = ID3v23Tag(v24Tag)
         mp3File.setTag(v23Tag)
         mp3File.save()

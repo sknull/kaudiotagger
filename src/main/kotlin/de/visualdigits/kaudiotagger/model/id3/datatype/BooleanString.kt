@@ -15,9 +15,6 @@ class BooleanString : AbstractDataType {
 
     constructor(copyObject: BooleanString) : super(copyObject)
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         return 1
     }
@@ -25,21 +22,15 @@ class BooleanString : AbstractDataType {
     /**
      * @param offset
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        val b = arr[offset]
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        val b = byteArray[offset]
         setValue(b != '0'.code.toByte())
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         return getValue()?.toString()?:""
     }
 
-    /**
-     * @return
-     */
     override fun writeByteArray(): ByteArray? {
         val booleanValue = ByteArray(1)
         if (getValue() == null) {

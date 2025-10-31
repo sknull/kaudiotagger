@@ -9,7 +9,6 @@ import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class FrameTIMETest : AbstractTestCase() {
@@ -60,7 +59,7 @@ class FrameTIMETest : AbstractTestCase() {
             assertEquals("3006", v23tag.getFirst("TDAT"))
 
             tag = ID3v24Tag(v23tag)
-            //But because is MonthOnly flag set dd gets lost when convert back to v24
+            // But because is MonthOnly flag set dd gets lost when convert back to v24
             assertEquals("2006-06-30T07", tag.getFirst("TDRC"))
         } catch (ex: java.lang.Exception) {
             e = ex

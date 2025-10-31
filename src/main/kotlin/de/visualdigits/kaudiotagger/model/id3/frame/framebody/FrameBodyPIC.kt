@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractString
 import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
@@ -9,7 +10,6 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.StringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ImageFormats
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -233,9 +233,6 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
         return getObjectValue(DataTypes.OBJ_IMAGE_FORMAT) as? String
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(
             NumberHashMap(

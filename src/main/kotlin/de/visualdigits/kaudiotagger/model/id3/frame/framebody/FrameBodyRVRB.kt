@@ -47,7 +47,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -129,9 +129,6 @@ class FrameBodyRVRB: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24FrameId.REVERB.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(NumberFixedLength(DataTypes.OBJ_REVERB_LEFT, this, 2))
         objectList.add(NumberFixedLength(DataTypes.OBJ_REVERB_RIGHT, this, 2))

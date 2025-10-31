@@ -1,12 +1,13 @@
 package de.visualdigits.kaudiotagger.util
 
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 open class EncodingFlags(
     var flags: Int = 0
 ) {
 
-    val log = LoggerFactory.getLogger(javaClass)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
 

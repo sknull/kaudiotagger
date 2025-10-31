@@ -1,12 +1,12 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.TCONString
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
-import de.visualdigits.kaudiotagger.model.id3.types.ID3v2ExtendedGenreTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v2ExtendedGenreTypes
 import java.nio.ByteBuffer
 
 /**
@@ -34,7 +34,7 @@ import java.nio.ByteBuffer
  *
  * <p>For more details, please refer to the ID3 specifications:
  * <ul>
- * <li><a href="http://www.id3.org/id3v2.3.0.txt">ID3 v2.3.0 Spec</a>
+ * <li><a href="http:// www.id3.org/id3v2.3.0.txt">ID3 v2.3.0 Spec</a>
  * </ul>
  * <p>
  * ID3V24:The 'Content type', which ID3v1 was stored as a one byte numeric
@@ -69,7 +69,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
          */
         fun convertGenericToID3v24Genre(value: String): String {
             try {
-                //If passed id and known value use it
+                // If passed id and known value use it
                 val genreId = Integer.parseInt(value)
                 if (genreId <= GenreTypes.MAX_GENRE_ID) {
                     return genreId.toString()
@@ -104,7 +104,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
          */
         fun convertGenericToID3v23Genre(value: String): String {
             try {
-                //If passed integer and in list use numeric form else use original value
+                // If passed integer and in list use numeric form else use original value
                 val genreId = value.toInt()
                 if (genreId <= GenreTypes.MAX_GENRE_ID) {
                     return bracketWrap(genreId.toString())
@@ -112,7 +112,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                     return value
                 }
             } catch (nfe: NumberFormatException) {
-                //if passed text try and find integral value otherwise use text
+                // if passed text try and find integral value otherwise use text
                 val genreId = GenreTypes.fromName(value)
                 // to preserve iTunes compatibility, don't write genre ids higher than getMaxStandardGenreId, rather use string
                 return if (genreId != null && genreId.id <= GenreTypes.MAX_GENRE_ID) {

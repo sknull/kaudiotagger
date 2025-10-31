@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.datatype
 
-import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import java.nio.charset.StandardCharsets
 
 
@@ -27,9 +27,6 @@ class Lyrics3Image : AbstractDataType {
         this.filename = copyObject.filename
     }
 
-    /**
-     * @return
-     */
     override fun getSize(): Int {
         var size: Int = (filename?.length?:0) + 2 + (description?.length?:0) + 2
         if (this.timeStamp != null) {
@@ -39,12 +36,8 @@ class Lyrics3Image : AbstractDataType {
         return size
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
-        var str: String?
-        str = "filename = " + filename + ", description = " + description
+        var str = "filename = $filename, description = $description"
 
         if (this.timeStamp != null) {
             str += (", timestamp = " + this.timeStamp)
@@ -53,8 +46,8 @@ class Lyrics3Image : AbstractDataType {
         return str + "\n"
     }
 
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        readString(arr.toString(), offset)
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        readString(byteArray.toString(), offset)
     }
 
     /**
@@ -63,9 +56,6 @@ class Lyrics3Image : AbstractDataType {
      */
     fun readString(imageString: String, offset: Int) {
         var offset = offset
-        if (imageString == null) {
-            throw NullPointerException("Image string is null")
-        }
 
         if ((offset < 0) || (offset >= imageString.length)) {
             throw IndexOutOfBoundsException(
@@ -76,10 +66,7 @@ class Lyrics3Image : AbstractDataType {
             )
         }
 
-        val timestamp: String?
-        var delim: Int
-
-        delim = imageString.indexOf("||", offset)
+        var delim: Int = imageString.indexOf("||", offset)
         filename = imageString.substring(offset, delim)
 
         offset = delim + 2
@@ -87,7 +74,7 @@ class Lyrics3Image : AbstractDataType {
         description = imageString.substring(offset, delim)
 
         offset = delim + 2
-        timestamp = imageString.substring(offset)
+        val timestamp = imageString.substring(offset)
 
         if (timestamp.length == 7) {
             this.timeStamp = Lyrics3TimeStamp("Time Stamp")
@@ -99,22 +86,19 @@ class Lyrics3Image : AbstractDataType {
         return writeString().toByteArray(StandardCharsets.ISO_8859_1)
     }
 
-    /**
-     * @return
-     */
     fun writeString(): String {
         var str: String
 
         if (filename == null) {
             str = "||"
         } else {
-            str = filename + "||"
+            str = "$filename||"
         }
 
         if (description == null) {
             str += "||"
         } else {
-            str += (description + "||")
+            str += ("$description||")
         }
 
         if (this.timeStamp != null) {

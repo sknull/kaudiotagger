@@ -12,7 +12,6 @@ import de.visualdigits.kaudiotagger.model.id3.types.EventTimingTypes
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.id3.types.PictureTypes
 import de.visualdigits.kaudiotagger.util.ErrorMessage
-import kotlin.collections.get
 
 class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
 
@@ -26,9 +25,6 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
      */
     var valueToKeyMap: Map<String, Long> = mapOf()
 
-    /**
-     *
-     */
     var hasEmptyValue = false
 
     constructor(
@@ -53,7 +49,7 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
             valueToKeyMap = GenreTypes.getValueToIdMap()
             keyToValueMap = GenreTypes.getIdToValueMap()
 
-            //genres can be an id or literal value
+            // genres can be an id or literal value
             hasEmptyValue = true
         } else if (identifier == DataTypes.OBJ_TEXT_ENCODING) {
             valueToKeyMap = TextEncoding.getValueToIdMap()
@@ -65,7 +61,7 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
             valueToKeyMap = PictureTypes.getValueToIdMap()
             keyToValueMap = PictureTypes.getIdToValueMap()
 
-            //Issue #224 Values should map, but have examples where they dont, this is a workaround
+            // Issue #224 Values should map, but have examples where they dont, this is a workaround
             hasEmptyValue = true
         } else if (identifier == DataTypes.OBJ_TYPE_OF_EVENT) {
             valueToKeyMap = EventTimingTypes.getValueToIdMap()
@@ -102,11 +98,11 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
     /**
      * Read the key from the buffer.
      *
-     * @param arr
+     * @param byteArray
      * @param offset
      */
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        super.readByteArray(arr, offset)
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
+        super.readByteArray(byteArray, offset)
 
         val value = (getValue() as Long)
         if (!keyToValueMap.containsKey(value)) {
@@ -128,9 +124,6 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
         return valueToKeyMap
     }
 
-    /**
-     * @return
-     */
     override fun toString(): String {
         return getValue()?.let { v -> keyToValueMap[v]}?:""
     }

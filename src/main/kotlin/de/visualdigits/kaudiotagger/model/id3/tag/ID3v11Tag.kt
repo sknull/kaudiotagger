@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets
 class ID3v11Tag: ID3v1Tag {
     
     companion object {
-        //For writing output
+        // For writing output
         const val TYPE_TRACK: String = "track"
         const val TRACK_UNDEFINED: Int = 0
         const val TRACK_MAX_VALUE: Int = 255
@@ -184,7 +184,7 @@ class ID3v11Tag: ID3v1Tag {
         }
         log.debug("Reading v1.1 tag")
 
-        //Do single file read of data to cut down on file reads
+        // Do single file read of data to cut down on file reads
         val dataBuffer = ByteArray(TAG_LENGTH)
         byteBuffer.position(0)
         byteBuffer.get(dataBuffer, 0, TAG_LENGTH)
@@ -259,9 +259,9 @@ class ID3v11Tag: ID3v1Tag {
         if (byteBuffer.get() != END_OF_FIELD) {
             return false
         }
-        //Now check for TRACK if the next byte is also null byte then not v1.1
-        //tag, however this means cannot have v1_1 tag with track setField to zero/undefined
-        //because on next read will be v1 tag.
+        // Now check for TRACK if the next byte is also null byte then not v1.1
+        // tag, however this means cannot have v1_1 tag with track setField to zero/undefined
+        // because on next read will be v1 tag.
         return byteBuffer.get() != END_OF_FIELD
     }
 
@@ -346,12 +346,12 @@ class ID3v11Tag: ID3v1Tag {
         )
     }
 
-    override fun addField(genericKey: GenericFieldKey, vararg value: String) {
-        setField(genericKey, *value)
+    override fun addField(genericKey: GenericFieldKey, vararg values: String) {
+        setField(genericKey, *values)
     }
 
-    override fun setField(genericKey: GenericFieldKey, vararg value: String) {
-        val tagfield = createField(genericKey, *value)
+    override fun setField(genericKey: GenericFieldKey, vararg values: String) {
+        val tagfield = createField(genericKey, *values)
         setField(tagfield)
     }
 
@@ -454,7 +454,7 @@ class ID3v11Tag: ID3v1Tag {
             TYPE_TAG,
             getIdentifier()?:""
         )
-        //Header
+        // Header
         MP3File.tagFormatter?.addElement(TYPE_TITLE, this.getTitle())
         MP3File.tagFormatter?.addElement(TYPE_ARTIST, this.getArtist())
         MP3File.tagFormatter?.addElement(TYPE_ALBUM, this.getAlbum())

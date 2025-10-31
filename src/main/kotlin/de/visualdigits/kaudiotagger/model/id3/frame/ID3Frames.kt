@@ -106,11 +106,11 @@ abstract class ID3Frames {
             // v23 to v22 The translation is both way
             convertv22Tov23.keys.forEach { key -> convertv22Tov23[key]?.also { v -> convertv23Tov22[v] = key }  }
 
-            //This one way translation allows us to convert XSOT to TST, but in the other direction gets converted to TSOT
+            // This one way translation allows us to convert XSOT to TST, but in the other direction gets converted to TSOT
             convertv23Tov22[ID3v23FrameId.TITLE_SORT_ORDER_MUSICBRAINZ] = ID3v22FrameId.TITLE_SORT_ORDER_ITUNES
             convertv23Tov22[ID3v23FrameId.ARTIST_SORT_ORDER_MUSICBRAINZ] = ID3v22FrameId.ARTIST_SORT_ORDER_ITUNES
             convertv23Tov22[ID3v23FrameId.ALBUM_SORT_ORDER_MUSICBRAINZ] = ID3v22FrameId.ALBUM_SORT_ORDER_ITUNES
-            //TODO What does CRM Map to
+            // TODO What does CRM Map to
             // Force v22 to v23,  Extra fields in v23 version
             forcev22Tov23[ID3v22FrameId.ATTACHED_PICTURE] = ID3v23FrameId.ATTACHED_PICTURE
             // Force v23 to v22
@@ -119,7 +119,7 @@ abstract class ID3Frames {
             // Define the mapping from v23 to v24 only maps values where
             // the v23 ID is not a v24 ID and where the translation from v23 to v24
             // ID does not affect the framebody.
-            //This one way allows us to convert XSOT to TSOT,XSOP to TSOP and XSOA - TSOA but in the other direction gets converted to TSOT,TSOP,TSOA
+            // This one way allows us to convert XSOT to TSOT,XSOP to TSOP and XSOA - TSOA but in the other direction gets converted to TSOT,TSOP,TSOA
             convertv23Tov24[ID3v23FrameId.TITLE_SORT_ORDER_MUSICBRAINZ] = ID3v24FrameId.TITLE_SORT_ORDER
             convertv23Tov24[ID3v23FrameId.ARTIST_SORT_ORDER_MUSICBRAINZ] = ID3v24FrameId.ARTIST_SORT_ORDER
             convertv23Tov24[ID3v23FrameId.ALBUM_SORT_ORDER_MUSICBRAINZ] = ID3v24FrameId.ALBUM_SORT_ORDER
@@ -136,14 +136,14 @@ abstract class ID3Frames {
             forcev23Tov24[ID3v23FrameId.TRDA] = ID3v24FrameId.YEAR
             forcev23Tov24[ID3v23FrameId.TYER] = ID3v24FrameId.YEAR
 
-            //Note Force v24 to v23, TDRC is a 1M relationship handled specially.
+            // Note Force v24 to v23, TDRC is a 1M relationship handled specially.
             // @TODO EQUALISATION
             forcev24Tov23[ID3v24FrameId.RELATIVE_VOLUME_ADJUSTMENT2] = ID3v23FrameId.RELATIVE_VOLUME_ADJUSTMENT
-            //Used to be a special frame now a text frame
+            // Used to be a special frame now a text frame
             forcev24Tov23[ID3v24FrameId.INVOLVED_PEOPLE] = ID3v23FrameId.INVOLVED_PEOPLE
-            //No Mood frame in v23 so use a TXXX frame
+            // No Mood frame in v23 so use a TXXX frame
             forcev24Tov23[ID3v24FrameId.MOOD] = ID3v23FrameId.USER_DEFINED_INFO
-            //Release time can be mapped to release year (but can only hold year)
+            // Release time can be mapped to release year (but can only hold year)
             forcev24Tov23[ID3v24FrameId.ORIGINAL_RELEASE_TIME] = ID3v23FrameId.TORY
         }
     }

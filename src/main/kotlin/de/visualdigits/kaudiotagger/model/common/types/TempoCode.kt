@@ -1,12 +1,12 @@
 package de.visualdigits.kaudiotagger.model.common.types
 
-import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
+import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractDataType
 import de.visualdigits.kaudiotagger.util.ID3Tags
 
 /**
- * Represents a [org.jaudiotagger.tag.id3.framebody.FrameBodySYTC] tempo code.
+ * Represents a [FrameBodySYTC] tempo code.
  *
  *
  * The tempo is in BPM described with one or two bytes. If the
@@ -34,24 +34,21 @@ class TempoCode : AbstractDataType {
         value: Any?
     ) : super(identifier, frameBody, value)
 
-    override fun readByteArray(arr: ByteArray, offset: Int) {
-        if (arr == null) {
-            throw NullPointerException("Byte array is null")
-        }
+    override fun readByteArray(byteArray: ByteArray, offset: Int) {
         require(offset >= 0) { "negative offset into an array offset:$offset" }
-        if (offset >= arr.size) {
-            throw InvalidDataTypeException("Offset to byte array is out of bounds: offset = $offset, array.length = ${arr.size}")
+        if (offset >= byteArray.size) {
+            throw InvalidDataTypeException("Offset to byte array is out of bounds: offset = $offset, array.length = ${byteArray.size}")
         }
 
         var lvalue: Long = 0
-        lvalue += (arr[offset].toInt() and 0xff).toLong()
+        lvalue += (byteArray[offset].toInt() and 0xff).toLong()
         if (lvalue == 0xFFL) {
-            lvalue += (arr[offset + 1].toInt() and 0xff).toLong()
+            lvalue += (byteArray[offset + 1].toInt() and 0xff).toLong()
         }
         setValue(lvalue)
     }
 
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         val size = getSize()
         val arr = ByteArray(size)
         var temp = ID3Tags.getWholeNumber(getValue())
@@ -67,10 +64,10 @@ class TempoCode : AbstractDataType {
     }
 
     override fun getSize(): Int {
-        if (getValue() == null) {
-            return 0
+        return if (getValue() == null) {
+            0
         } else {
-            return if (ID3Tags.getWholeNumber(getValue()) < 0xFF)
+            if (ID3Tags.getWholeNumber(getValue()) < 0xFF)
                 MINIMUM_NO_OF_DIGITS
             else
                 MAXIMUM_NO_OF_DIGITS

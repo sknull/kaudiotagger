@@ -2,7 +2,6 @@ package de.visualdigits.kaudiotagger.model.audiofile
 
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
-import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
@@ -11,11 +10,11 @@ import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v2Version
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.RandomAccessFile
-import java.util.Locale
 
 /**
  *
@@ -28,16 +27,10 @@ import java.util.Locale
  * To get the meta-data contained in this file you have to get the `Tag` of this `AudioFile`
  *
  * @author Raphael Slinckx
- * @version $Id$
- * @see AudioFileIO
- *
- * @see Tag
- *
- * @since v0.01
  */
 open class AudioFile {
     
-    val log = LoggerFactory.getLogger(javaClass)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
 
     /**
      * The physical file that this instance represents.
@@ -49,60 +42,14 @@ open class AudioFile {
      */
     var audioHeader: AudioHeader? = null
 
-    /**
-     *
-     * Returns the tag contained in this AudioFile, the `Tag` contains any useful meta-data, like
-     * artist, album, title, etc. If the file does not contain any tag the null is returned. Some audio formats do
-     * not allow there to be no tag so in this case the reader would return an empty tag whereas for others such
-     * as mp3 it is purely optional.
-     *
-     * @return Returns the tag contained in this AudioFile, or null if no tag exists.
-     */
-    /**
-     * Assign a tag to this audio file
-     *
-     * @param tag Tag to be assigned
-     */
-    /**
-     * The tag
-     */
     val tags: MutableMap<SupportedTag, AbstractTag> = mutableMapOf()
-
-    /**
-     * Retrieve the file extension
-     *
-     * @return
-     */
-    /**
-     * Set the file extension
-     *
-     * @param ext
-     */
-    /**
-     * The tag
-     */
-    var ext: String? = null
 
     constructor()
 
-    /**
-     *
-     * Returns a multi-line string with the file path, the encoding audioHeader, and the tag contents.
-     *
-     * @return A multi-line string with the file path, the encoding audioHeader, and the tag contents.
-     * TODO Maybe this can be changed ?
-     */
     override fun toString(): String {
         return ("AudioFile ${file?.name}  --------\n$audioHeader\n${tags.map { (k, v) -> "${k.name}:\n$v\n-------------------"}}\n=============")
     }
 
-    /**
-     * Checks the file is accessible with the correct permissions, otherwise exception occurs
-     *
-     * @param file
-     * @param readOnly
-     * @return
-     */
     fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
         val newFile: RandomAccessFile
 
@@ -126,11 +73,6 @@ open class AudioFile {
         return newFile
     }
 
-    /**
-     * Check does file exist
-     *
-     * @param file
-     */
     fun checkFileExists(file: File) {
         log.debug("Reading file:path${file.path}:abs:${file.absolutePath}")
         if (!file.exists()) {
@@ -141,20 +83,10 @@ open class AudioFile {
         }
     }
 
-    /**
-     * Optional debugging method. Must override to do anything interesting.
-     *
-     * @return Empty string.
-     */
     open fun displayStructureAsXML(): String? {
         return ""
     }
 
-    /**
-     * Optional debugging method. Must override to do anything interesting.
-     *
-     * @return
-     */
     open fun displayStructureAsPlainText(): String? {
         return ""
     }
@@ -174,7 +106,6 @@ open class AudioFile {
                     ID3v2Version.ID3_V22 -> ID3v22Tag(tag)
                     ID3v2Version.ID3_V23 -> ID3v23Tag(tag)
                     ID3v2Version.ID3_V24 -> tag
-                    else -> null
                 }
             }
 
@@ -183,7 +114,6 @@ open class AudioFile {
                     ID3v2Version.ID3_V22 -> ID3v22Tag(tag)
                     ID3v2Version.ID3_V23 -> tag
                     ID3v2Version.ID3_V24 -> ID3v24Tag(tag)
-                    else -> null
                 }
             }
 
@@ -192,26 +122,10 @@ open class AudioFile {
                     ID3v2Version.ID3_V22 -> tag
                     ID3v2Version.ID3_V23 -> ID3v23Tag(tag)
                     ID3v2Version.ID3_V24 -> ID3v24Tag(tag)
-                    else -> null
                 }
             }
 
             else -> null
-        }
-    }
-
-    companion object {
-        /**
-         * @param file
-         * @return filename with audioFormat separator stripped off.
-         */
-        @JvmStatic
-        fun getBaseFilename(file: File): String {
-            val index = file.getName().lowercase(Locale.getDefault()).lastIndexOf(".")
-            if (index > 0) {
-                return file.getName().substring(0, index)
-            }
-            return file.getName()
         }
     }
 }

@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.datatype
 
-import de.visualdigits.kaudiotagger.model.id3.datatype.StringFixedLength
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.util.regex.Pattern
 
@@ -15,9 +14,9 @@ class PartOfSetValue {
 
     private var count: Int? = null
     private var total: Int? = null
-    var extra: String? = null //Any extraneous info such as null chars
-    var rawCount: String? = null //count value as provided
-    var rawTotal: String? = null //total value as provided
+    var extra: String? = null // Any extraneous info such as null chars
+    var rawCount: String? = null // count value as provided
+    var rawTotal: String? = null // total value as provided
     var rawText: String? = null // raw text representation used to actually save the data IF !TagOptionSingleton.isPadNumbers()
 
     constructor()
@@ -118,7 +117,7 @@ class PartOfSetValue {
      * @return
      */
     fun getTotalAsText(): String {
-        //Don't Pad
+        // Don't Pad
         return if (!TagOptionSingleton.padNumbers) {
             rawTotal?.substringBefore(0.toChar()) ?: "0"
         } else {
@@ -128,34 +127,34 @@ class PartOfSetValue {
 
     fun getCount(): Int? = count
 
-    fun setCount(count: Int) {
+    fun setCount(count: Int?) {
         this.count = count;
         this.rawCount = count.toString();
         resetValueFromCounts();
     }
 
-    fun setCount(count: String) {
-        this.count = count.toInt()
+    fun setCount(count: String?) {
+        this.count = count?.toInt()
         this.rawCount = count;
         resetValueFromCounts();
     }
 
     fun getTotal(): Int? = total
 
-    fun setTotal(total: Int) {
+    fun setTotal(total: Int?) {
         this.total = total;
         this.rawTotal = total.toString();
         resetValueFromCounts();
     }
 
-    fun setTotal(total: String) {
-        this.total = total.toInt()
+    fun setTotal(total: String?) {
+        this.total = total?.toInt()
         this.rawTotal = total;
         resetValueFromCounts();
     }
 
     override fun toString(): String {
-        //Don't Pad
+        // Don't Pad
         val sb = StringBuilder()
         if (!TagOptionSingleton.padNumbers) {
             rawText?.substringBefore(0.toChar())?.also { t -> sb.append(t) }

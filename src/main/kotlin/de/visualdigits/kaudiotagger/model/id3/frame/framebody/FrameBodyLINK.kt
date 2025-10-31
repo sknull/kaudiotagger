@@ -53,7 +53,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -95,9 +95,6 @@ class FrameBodyLINK
      */
     constructor(byteBuffer: ByteBuffer?, frameSize: Int) : super(byteBuffer, frameSize)
 
-    /**
-     * @return
-     */
     fun getAdditionalData(): String? {
         return getObjectValue(DataTypes.OBJ_ID) as? String
     }
@@ -109,9 +106,6 @@ class FrameBodyLINK
         setObjectValue(DataTypes.OBJ_ID, additionalData)
     }
 
-    /**
-     * @return
-     */
     fun getFrameIdentifier(): String? {
         return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
@@ -132,9 +126,6 @@ class FrameBodyLINK
         return ID3v24FrameId.LINKED_INFO.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringFixedLength(DataTypes.OBJ_DESCRIPTION, this, 4))
         objectList.add(StringNullTerminated(DataTypes.OBJ_URL, this))

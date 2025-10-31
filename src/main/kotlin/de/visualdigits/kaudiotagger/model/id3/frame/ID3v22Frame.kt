@@ -23,7 +23,7 @@ class ID3v22Frame: AbstractID3v2Frame {
     companion object {
         const val FRAME_ID_SIZE: Int = 3
         const val FRAME_SIZE_SIZE: Int = 3
-        val FRAME_HEADER_SIZE: Int = FRAME_ID_SIZE + FRAME_SIZE_SIZE
+        const val FRAME_HEADER_SIZE: Int = FRAME_ID_SIZE + FRAME_SIZE_SIZE
         val validFrameIdentifier: Pattern = Pattern.compile("[A-Z][0-9A-Z]{2}")
     }
 
@@ -49,19 +49,20 @@ class ID3v22Frame: AbstractID3v2Frame {
      *
      * @param identifier
      */
+    @Suppress("UNCHECKED_CAST")
     constructor(identifier: String) {
         log.debug("Creating empty frame of type$identifier")
         this.setIdentifier(identifier)
         var bodyIdentifier = identifier
 
-        //If dealing with v22 identifier (Note this constructor is used by all three tag versions)
+        // If dealing with v22 identifier (Note this constructor is used by all three tag versions)
         if (ID3Tags.isID3v22FrameIdentifier(bodyIdentifier)) {
-            //Does it have its own framebody (PIC,CRM) or are we using v23/v24 body (the normal case)
+            // Does it have its own framebody (PIC,CRM) or are we using v23/v24 body (the normal case)
             if (ID3Tags.forceFrameID22To23(bodyIdentifier) != null) {
-                //Do not convert
+                // Do not convert
             } else if (bodyIdentifier == "CRM") {
-                //Do not convert.
-                //TODO we don't have a way of converting this to v23 which is why its not in the ForceMap
+                // Do not convert.
+                // we don't have a way of converting this to v23 which is why its not in the ForceMap
             } else if ((bodyIdentifier == ID3v22FrameId.TYER.id) ||
                 (bodyIdentifier == ID3v22FrameId.TIME.id)
             ) {
@@ -75,14 +76,14 @@ class ID3v22Frame: AbstractID3v2Frame {
         // to keep things up to date.
         try {
             val c = Class.forName("${AbstractID3v2FrameBody.FRAME_BODY_PACKAGE}.FrameBody$bodyIdentifier") as Class<AbstractID3v2FrameBody>
-            frameBody = c.newInstance()
+            frameBody = c.getDeclaredConstructor().newInstance()
         } catch (cnfe: ClassNotFoundException) {
             log.error(cnfe.message, cnfe)
             frameBody = FrameBodyUnsupported(identifier)
-        } catch (ie: InstantiationException) { //Instantiate Interface/Abstract should not happen
+        } catch (ie: InstantiationException) { // Instantiate Interface/Abstract should not happen
             log.error(ie.message, ie)
             throw java.lang.RuntimeException(ie)
-        } catch (iae: IllegalAccessException) { //Private Constructor shouild not happen
+        } catch (iae: IllegalAccessException) { // Private Constructor shouild not happen
             log.error(iae.message, iae)
             throw java.lang.RuntimeException(iae)
         }
@@ -137,30 +138,24 @@ class ID3v22Frame: AbstractID3v2Frame {
                 )
             }
         } else if (frame.frameBody is FrameBodyDeprecated) {
-            //Was it valid for this tag version, if so try and reconstruct
+            // Was it valid for this tag version, if so try and reconstruct
             if (ID3Tags.isID3v22FrameIdentifier(frame.getIdentifier())) {
                 this.frameBody = frame.frameBody
                 setIdentifier(frame.getIdentifier())
-                log.debug(
-                    "DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-                )
+                log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
             } else {
                 this.frameBody = FrameBodyDeprecated(
                     frame.frameBody as FrameBodyDeprecated
                 )
                 setIdentifier(frame.getIdentifier())
-                log.debug(
-                    "DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-                )
+                log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
             }
         } else {
             this.frameBody = FrameBodyUnsupported(
                 frame.frameBody as FrameBodyUnsupported
             )
             setIdentifier(frame.getIdentifier())
-            log.debug(
-                "v2:UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-            )
+            log.debug("v2:UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
         }
     }
 
@@ -209,7 +204,7 @@ class ID3v22Frame: AbstractID3v2Frame {
                 "$identifier:is not a valid ID3v2.20 frame"
             )
         }
-        //Read Frame Size (same size as Frame Id so reuse buffer)
+        // Read Frame Size (same size as Frame Id so reuse buffer)
         byteBuffer.get(buffer, 0, getFrameSizeSize())
         frameSize = decodeSize(buffer)
         if (frameSize < 0) {
@@ -217,41 +212,41 @@ class ID3v22Frame: AbstractID3v2Frame {
                 "$identifier has invalid size of:$frameSize"
             )
         } else if (frameSize == 0) {
-            //We dont process this frame or add to framemap becuase contains no useful information
+            // We dont process this frame or add to framemap becuase contains no useful information
             log.warn("Empty Frame:$identifier")
-            throw EmptyFrameException(identifier + " is empty frame")
+            throw EmptyFrameException("$identifier is empty frame")
         } else if (frameSize > byteBuffer.remaining()) {
             log.warn(
                 "Invalid Frame size larger than size before mp3 audio:$identifier"
             )
-            throw InvalidFrameException(identifier + " is invalid frame")
+            throw InvalidFrameException("$identifier is invalid frame")
         } else {
             log.debug("Frame Size Is:$frameSize")
-            //Convert v2.2 to v2.4 id just for reading the data
+            // Convert v2.2 to v2.4 id just for reading the data
             var id: FrameId? = ID3Tags.convertFrameID22To24(identifier)
             if (id == null) {
-                //OK,it may be convertable to a v.3 id even though not valid v.4
+                // OK,it may be convertable to a v.3 id even though not valid v.4
                 id = ID3Tags.convertFrameID22To23(identifier)
                 if (id == null) {
                     // Is it a valid v22 identifier so should be able to find a
                     // frame body for it.
-                    if (ID3Tags.isID3v22FrameIdentifier(identifier)) {
-                        id = ID3v22FrameId.fromId(identifier)
+                    id = if (ID3Tags.isID3v22FrameIdentifier(identifier)) {
+                        ID3v22FrameId.fromId(identifier)
                     } else {
-                        id = null
+                        null
                     }
                 }
             }
             log.debug("Identifier was:{} reading using:{}", identifier, id)
 
-            //Create Buffer that only contains the body of this frame rather than the remainder of tag
+            // Create Buffer that only contains the body of this frame rather than the remainder of tag
             val frameBodyBuffer = byteBuffer.slice()
             frameBodyBuffer.limit(frameSize)
 
             try {
                 frameBody = readBody(id?.id?:UNSUPPORTED_ID, frameBodyBuffer, frameSize)
             } finally {
-                //Update position of main buffer, so no attempt is made to reread these bytes
+                // Update position of main buffer, so no attempt is made to reread these bytes
                 byteBuffer.position(byteBuffer.position() + frameSize)
             }
         }
@@ -286,16 +281,16 @@ class ID3v22Frame: AbstractID3v2Frame {
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {
         log.debug("Write Frame to Buffer" + getIdentifier())
-        //This is where we will write header, move position to where we can
-        //write body
+        // This is where we will write header, move position to where we can
+        // write body
         val headerBuffer = ByteBuffer.allocate(getFrameHeaderSize())
 
-        //Write Frame Body Data
+        // Write Frame Body Data
         val bodyOutputStream = ByteArrayOutputStream()
         (frameBody as AbstractID3v2FrameBody).write(bodyOutputStream)
 
-        //Write Frame Header
-        //Write Frame ID must adjust can only be 3 bytes long
+        // Write Frame Header
+        // Write Frame ID must adjust can only be 3 bytes long
         headerBuffer.put(
             getIdentifier()?.toByteArray(StandardCharsets.ISO_8859_1),
             0,
@@ -303,14 +298,14 @@ class ID3v22Frame: AbstractID3v2Frame {
         )
         encodeSize(headerBuffer, frameBody?.getSize()?:0)
 
-        //Add header to the Byte Array Output Stream
+        // Add header to the Byte Array Output Stream
         try {
             tagBuffer.write(headerBuffer.array())
 
-            //Add body to the Byte Array Output Stream
+            // Add body to the Byte Array Output Stream
             tagBuffer.write(bodyOutputStream.toByteArray())
         } catch (ioe: IOException) {
-            //This could never happen coz not writing to file, so convert to RuntimeException
+            // This could never happen coz not writing to file, so convert to RuntimeException
             throw RuntimeException(ioe)
         }
     }

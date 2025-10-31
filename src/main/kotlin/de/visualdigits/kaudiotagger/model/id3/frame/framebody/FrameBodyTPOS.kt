@@ -15,7 +15,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -62,15 +62,15 @@ class FrameBodyTPOS: AbstractFrameBodyNumberTotal, ID3v23FrameBody, ID3v24FrameB
     }
 
     fun setDiscNo(discNo: Int?) {
-        setNumber(discNo!!)
+        setNumber(discNo)
     }
 
     fun setDiscNo(discNo: String?) {
-        setNumber(discNo!!)
+        setNumber(discNo)
     }
 
-    fun getDiscNoAsText(): String {
-        return getNumberAsText()!!
+    fun getDiscNoAsText(): String? {
+        return getNumberAsText()
     }
 
     fun getDiscTotal(): Int? {
@@ -78,11 +78,11 @@ class FrameBodyTPOS: AbstractFrameBodyNumberTotal, ID3v23FrameBody, ID3v24FrameB
     }
 
     fun setDiscTotal(discTotal: Int?) {
-        setTotal(discTotal!!)
+        setTotal(discTotal)
     }
 
     fun setDiscTotal(discTotal: String?) {
-        setTotal(discTotal!!)
+        setTotal(discTotal)
     }
 
     fun getDiscTotalAsText(): String? {

@@ -27,12 +27,13 @@ import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.util.ID3Tags.copyObject
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.LinkedList
 
 object ID3Tags {
 
-    val log = LoggerFactory.getLogger(javaClass)
+    val log: Logger = LoggerFactory.getLogger(javaClass)
 
     /**
      * Returns true if the identifier is a valid ID3v2.2 frame identifier
@@ -41,7 +42,7 @@ object ID3Tags {
      * @return true if the identifier is a valid ID3v2.2 frame identifier
      */
     fun isID3v22FrameIdentifier(identifier: String?): Boolean {
-        //If less than 3 cant be an identifier
+        // If less than 3 cant be an identifier
         if ((identifier?.length?:0) < 3) {
             return false
         } else {
@@ -89,18 +90,18 @@ object ID3Tags {
      * @return
      */
     fun convertFrameID22To24(identifier: String?): ID3v24FrameId? {
-        //Idv22 identifiers are only of length 3 times
+        // Idv22 identifiers are only of length 3 times
         if ((identifier?.length?:0) < 3) {
             return null
         }
-        //Has idv22 been mapped to v23
+        // Has idv22 been mapped to v23
         val v23id = ID3Frames.convertv22Tov23[ID3v22FrameId.fromId(identifier?.take(3))]
         if (v23id != null) {
-            //has v2.3 been mapped to v2.4
+            // has v2.3 been mapped to v2.4
             val v24id = ID3Frames.convertv23Tov24[v23id]
             if (v24id == null) {
-                //if not it may be because v2.3 and and v2.4 are same so wont be
-                //in mapping
+                // if not it may be because v2.3 and and v2.4 are same so wont be
+                // in mapping
                 if (ID3v24FrameId.contains(v23id.id)) {
                     return ID3v24FrameId.fromId(v23id.id)
                 } else {
@@ -125,9 +126,9 @@ object ID3Tags {
             return null
         }
 
-        //If it is a v23 identifier
+        // If it is a v23 identifier
         if (ID3v23FrameId.contains(identifier)) {
-            //If only name has changed  v22 and modified in v23 return result of.
+            // If only name has changed  v22 and modified in v23 return result of.
             return ID3Frames.convertv23Tov22[ID3v23FrameId.fromId(identifier?.take(4))]?.id
         }
         return null
@@ -144,9 +145,9 @@ object ID3Tags {
             return null
         }
 
-        //If it is a ID3v23 identifier
+        // If it is a ID3v23 identifier
         if (ID3v23FrameId.contains(identifier)) {
-            //If no change between ID3v23 and ID3v24 should be in ID3v24 list.
+            // If no change between ID3v23 and ID3v24 should be in ID3v24 list.
             if (ID3v24FrameId.contains(identifier)) {
                 return ID3v24FrameId.fromId(identifier)?.id
             } else {

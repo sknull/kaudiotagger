@@ -242,7 +242,7 @@ object Utils {
      * @return
      */
     fun readPascalString(bb: ByteBuffer): String {
-        val len = u(bb.get()) //Read as unsigned value
+        val len = u(bb.get()) // Read as unsigned value
         val buf = ByteArray(len)
         bb.get(buf)
         return String(buf, 0, len, StandardCharsets.ISO_8859_1)
@@ -390,7 +390,7 @@ object Utils {
             return false
         }
 
-        //Rename File, could fail because being  used or because trying to rename over filesystems
+        // Rename File, could fail because being  used or because trying to rename over filesystems
         val result: Boolean
         try {
             result =
@@ -406,8 +406,8 @@ object Utils {
         if (!result) {
             // Might be trying to rename over filesystem, so try copy and delete instead
             if (copy(fromFile, toFile)) {
-                //If copy works but deletion of original file fails then it is because the file is being used
-                //so we need to delete the file we have just created
+                // If copy works but deletion of original file fails then it is because the file is being used
+                // so we need to delete the file we have just created
                 val deleteResult = fromFile.delete()
                 if (!deleteResult) {
                     log.error("Unable to delete File:" + fromFile)

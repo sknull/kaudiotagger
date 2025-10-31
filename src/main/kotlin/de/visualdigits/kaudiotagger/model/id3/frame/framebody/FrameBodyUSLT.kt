@@ -1,15 +1,15 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
+import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.datatype.AbstractString
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
-import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
 import de.visualdigits.kaudiotagger.model.id3.datatype.NumberHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.StringHashMap
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.Languages
-import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.lyrics3.datatype.Lyrics3Line
 import de.visualdigits.kaudiotagger.util.ID3TextEncodingConversion
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
@@ -41,7 +41,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 specifications:
  *
- *  * [ID3 v2.3.0 Spec](http://www.id3.org/id3v2.3.0.txt)
+ *  * [ID3 v2.3.0 Spec](http:// www.id3.org/id3v2.3.0.txt)
  *
  *
  * @author : Paul Taylor
@@ -185,10 +185,10 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
     }
 
     override fun write(tagBuffer: ByteArrayOutputStream) {
-        //Ensure valid for type
+        // Ensure valid for type
         this.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding()))
 
-        //Ensure valid for data
+        // Ensure valid for data
         if (!(getObject(DataTypes.OBJ_DESCRIPTION) as AbstractString).canBeEncoded()
         ) {
             this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(header))
@@ -199,9 +199,6 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         super.write(tagBuffer)
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(
             NumberHashMap(

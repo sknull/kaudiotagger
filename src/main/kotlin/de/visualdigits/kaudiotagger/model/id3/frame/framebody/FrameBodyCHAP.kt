@@ -63,7 +63,7 @@ import java.nio.ByteBuffer
  *
  * For more details, please refer to the ID3 Chapter Frame specifications:
  *
- *  * [ID3 v2 Chapter Frame Spec](http://www.id3.org/id3v2-chapters-1.0.txt)
+ *  * [ID3 v2 Chapter Frame Spec](http:// www.id3.org/id3v2-chapters-1.0.txt)
  *
  *
  * @author Marc Gimpel, Horizon Wimba S.A.
@@ -123,9 +123,6 @@ class FrameBodyCHAP: AbstractID3v2FrameBody, ID3v2ChapterFrameBody {
         return ID3v2ChapterFrameId.CHAPTER.id
     }
 
-    /**
-     *
-     */
     override fun setupObjectList() {
         objectList.add(StringNullTerminated(DataTypes.OBJ_ELEMENT_ID, this))
         objectList.add(NumberFixedLength(DataTypes.OBJ_START_TIME, this, 4))

@@ -54,8 +54,8 @@ object ID3SyncSafeInteger {
      * @return decoded int
      */
     fun bufferToValue(buffer: ByteArray): Int {
-        //Note Need to && with 0xff otherwise if value is greater than 128 we get a negative number
-        //when cast byte to int
+        // Note Need to && with 0xff otherwise if value is greater than 128 we get a negative number
+        // when cast byte to int
         return (((buffer[0].toInt() and 0xff) shl 21) +
                 ((buffer[1].toInt() and 0xff) shl 14) +
                 ((buffer[2].toInt() and 0xff) shl 7) +
@@ -83,7 +83,7 @@ object ID3SyncSafeInteger {
     fun isBufferNotSyncSafe(buffer: ByteBuffer): Boolean {
         val position = buffer.position()
 
-        //Check Bit7 not set
+        // Check Bit7 not set
         for (i in 0..<INTEGRAL_SIZE) {
             val nextByte = buffer.get(position + i)
             if ((nextByte.toInt() and 0x80) > 0) {
