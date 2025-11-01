@@ -3,7 +3,6 @@ package de.visualdigits.kaudiotagger.model.id3.frame
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
@@ -123,7 +122,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         }
 
         if (isPadding(buffer)) {
-            throw InvalidFrameIdentifierException("only padding found")
+            log.debug("invalid frame '$identifier' - only padding found")
         }
 
         if ((getFrameHeaderSize() - getFrameIdSize()) > byteBuffer.remaining()) {

@@ -4,7 +4,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
@@ -346,10 +345,6 @@ class ID3v22Tag : AbstractID3v2Tag {
             } catch (ex: EmptyFrameException) { // Found Empty Frame
                 log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += ID3v22Frame.FRAME_HEADER_SIZE
-            } catch (ifie: InvalidFrameIdentifierException) {
-                log.debug("Invalid Frame Identifier:${ifie.message}")
-                // Dont try and find any more frames
-                break
             } catch (ife: InvalidFrameException) { // Problem trying to find frame
                 log.warn("Invalid Frame:${ife.message}")
                 // Dont try and find any more frames

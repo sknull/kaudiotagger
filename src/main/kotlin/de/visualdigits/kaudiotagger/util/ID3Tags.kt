@@ -26,6 +26,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.ID3Frames
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
+import de.visualdigits.kaudiotagger.util.ID3Tags.copyObject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.LinkedList

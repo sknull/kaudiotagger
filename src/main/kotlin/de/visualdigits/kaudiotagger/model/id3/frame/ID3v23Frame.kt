@@ -3,7 +3,6 @@ package de.visualdigits.kaudiotagger.model.id3.frame
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
@@ -280,7 +279,6 @@ class ID3v23Frame: AbstractID3v2Frame {
         if (!isValidID3v2FrameIdentifier(identifier)) {
             log.debug("Invalid identifier:$identifier")
             byteBuffer.position(byteBuffer.position() - (getFrameIdSize() - 1))
-            throw InvalidFrameIdentifierException("$identifier:is not a valid ID3v2.30 frame")
         }
         // Read the size field (as Big Endian Int - byte buffers always initialised to Big Endian order)
         frameSize = byteBuffer.getInt()// Update position of main buffer, so no attempt is made to reread these bytes

@@ -3,7 +3,6 @@ package de.visualdigits.kaudiotagger.model.id3.frame
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameIdentifierException
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
@@ -208,9 +207,6 @@ class ID3v22Frame: AbstractID3v2Frame {
         if (!isValidID3v2FrameIdentifier(identifier)) {
             log.debug("Invalid identifier:$identifier")
             byteBuffer.position(byteBuffer.position() - (getFrameIdSize() - 1))
-            throw InvalidFrameIdentifierException(
-                "$identifier:is not a valid ID3v2.20 frame"
-            )
         }
         // Read Frame Size (same size as Frame Id so reuse buffer)
         byteBuffer[buffer, 0, getFrameSizeSize()]
