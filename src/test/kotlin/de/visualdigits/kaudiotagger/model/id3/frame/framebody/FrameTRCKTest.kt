@@ -90,11 +90,13 @@ class FrameTRCKTest : AbstractTestCase() {
     @Test
     fun testMergingMultipleTrackFrames() {
         val tag = ID3v24Tag()
-        tag.setField(tag.createField(GenericFieldKey.TRACK, "1"))
-        tag.setField(tag.createField(GenericFieldKey.TRACK_TOTAL, "10"))
+        val field1 = tag.createField(GenericFieldKey.TRACK, "1")
+        tag.setField(field1)
+        val field2 = tag.createField(GenericFieldKey.TRACK_TOTAL, "10")
+        tag.setField(field2)
         Assertions.assertEquals("1", tag.getFirst(GenericFieldKey.TRACK))
         Assertions.assertEquals("10", tag.getFirst(GenericFieldKey.TRACK_TOTAL))
-        Assertions.assertInstanceOf(AbstractID3v2Frame::class.java, tag?.getFrame("TRCK"))
+        Assertions.assertInstanceOf(AbstractID3v2Frame::class.java, tag.getFrame("TRCK"))
     }
 
     companion object {

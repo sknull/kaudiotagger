@@ -57,7 +57,7 @@ open class StringFixedLength : AbstractString {
             }
             setValue(str)
         } catch (ce: CharacterCodingException) {
-            log.error(ce.message)
+            log.error("Could not encode", ce)
             setValue("")
         }
         log.debug("Read StringFixedLength:{}", getValue())

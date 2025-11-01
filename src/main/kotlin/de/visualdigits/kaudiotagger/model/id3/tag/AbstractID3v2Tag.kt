@@ -2,8 +2,7 @@ package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.field.TagField
-import de.visualdigits.kaudiotagger.model.common.frame.AggregatedFrame
-import de.visualdigits.kaudiotagger.model.common.frame.TyerTdatAggregatedFrame
+import de.visualdigits.kaudiotagger.model.common.frame.MultiFrame
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
@@ -211,12 +210,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * Map of all frames for this tag
      */
-    val frameMap: MutableMap<String, Any> = mutableMapOf()
+    val frameMap: MutableMap<String, AbstractID3v2Frame> = mutableMapOf()
 
     /**
      * Map of all encrypted frames, these cannot be unencrypted by jaudiotagger
      */
-    val encryptedFrameMap: MutableMap<String, Any> = mutableMapOf()
+    val encryptedFrameMap: MutableMap<String, AbstractID3v2Frame> = mutableMapOf()
     var duplicateFrameId: String = ""
     var duplicateBytes: Int = 0
     var emptyFrameBytes: Int = 0
@@ -248,7 +247,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         frameMap.values.forEach { frame ->
             when (frame) {
                 is AbstractID3v2Frame -> frame.getSize()
-                is AggregatedFrame -> frame.getFrames().sumOf { f -> f.getSize() }
                 is MutableList<*> -> (frame as? List<AbstractID3v2Frame>)?.let { f -> f.sumOf { e -> e.getSize() } }
                 else -> 0
             }
@@ -289,35 +287,22 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * Copy frame into map, whilst accounting for multiple frame of same type which can occur even if there were
      * not frames of the same type in the original tag
      *
-     * @param id
-     * @param newFrame
+     * @param frame
      */
     @Suppress("UNCHECKED_CAST")
-    fun copyFrameIntoMap(
-        id: String?,
-        newFrame: AbstractID3v2Frame
-    ) {
-        val identifier = newFrame.getIdentifier()
+    fun copyFrameIntoMap(frame: AbstractID3v2Frame) {
+        val identifier = frame.getIdentifier()
         if (frameMap.containsKey(identifier)) {
-            when (val o = frameMap[identifier]) {
+            when (val existingFrame = frameMap[identifier]) {
                 is AbstractID3v2Frame -> {
-                    processDuplicateFrame(newFrame, o)
+                    processDuplicateFrame(existingFrame, frame)
                 }
-
-                is AggregatedFrame -> {
-                    log.error("Duplicated Aggregate Frame, ignoring:$id")
-                }
-
-                is MutableList<*> -> {
-                    (o as? MutableList<Any>)?.add(newFrame)
-                }
-
                 else -> {
-                    log.error("Unknown frame class:discarding:${o?.javaClass}")
+                    log.error("Unknown frame class:discarding:${existingFrame?.javaClass}")
                 }
             }
         } else {
-            frameMap[identifier ?: ""] = newFrame
+            frameMap[identifier ?: ""] = frame
         }
     }
 
@@ -329,11 +314,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param existingFrame
      */
     open fun processDuplicateFrame(
-        newFrame: AbstractID3v2Frame,
-        existingFrame: AbstractID3v2Frame
+        existingFrame: AbstractID3v2Frame,
+        newFrame: AbstractID3v2Frame
     ) {
-        val list = mutableListOf(existingFrame, newFrame)
-        frameMap[newFrame.getIdentifier() ?: ""] = list
+        frameMap[newFrame.getIdentifier() ?: error("No identifier")] = MultiFrame(newFrame.getIdentifier(), existingFrame, newFrame)
     }
 
     /**
@@ -351,20 +335,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         copyObject.frameMap.values.forEach { value ->
             // SingleFrames
             when (value) {
+                is MultiFrame -> {
+                    value.frames.forEach { frame ->
+                        addFrame(frame)
+                    }
+                }
                 is AbstractID3v2Frame -> {
                     addFrame(value)
-                }
-
-                is TyerTdatAggregatedFrame -> {
-                    value.getFrames().forEach { frame ->
-                        addFrame(frame)
-                    }
-                }
-
-                is List<*> -> {
-                    (value as List<AbstractID3v2Frame>).forEach { frame ->
-                        addFrame(frame)
-                    }
                 }
             }
         }
@@ -404,7 +381,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     // TODO:This method is problematic because sometimes it returns a list and sometimes a frame, we need to
     // replace with two separate methods as in the tag interface.
-    fun getFrame(identifier: String?): Any? {
+    fun getFrame(identifier: String?): AbstractID3v2Frame? {
         return frameMap[identifier]
     }
 
@@ -421,13 +398,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param identifier
      * @return an iterator of all the frames starting with a particular identifier
      */
-    fun getFrameOfType(identifier: String): Set<Any?> {
-        return frameMap.keys.mapNotNull { key ->
-            if (key.startsWith(identifier)) {
-                val o = frameMap[key]
-                o as? List<*> ?: listOf(o)
-            } else null
-        }.flatten().toSet()
+    fun getFrameOfType(identifier: String): Set<AbstractID3v2Frame> {
+        return frameMap[identifier]?.let { frame ->
+            when (frame) {
+                is MultiFrame -> frame.frames
+                else -> setOf(frame)
+            }
+        }?:setOf()
     }
 
     /**
@@ -437,48 +414,46 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * to be duplicate we store the number of bytes in the duplicateBytes variable and discard
      * the frame itself.
      *
-     * @param frameId
-     * @param next
+     * @param identifier
+     * @param newFrame
      */
     @Suppress("UNCHECKED_CAST")
     open fun loadFrameIntoSpecifiedMap(
-        map: MutableMap<String, Any>,
-        frameId: String?,
-        next: AbstractID3v2Frame
+        map: MutableMap<String, AbstractID3v2Frame>,
+        identifier: String?,
+        newFrame: AbstractID3v2Frame
     ) {
-        if ((ID3v22FrameId.isMultipleAllowed(frameId)) ||
-            (ID3v23FrameId.isMultipleAllowed(frameId)) ||
-            (ID3v24FrameId.isMultipleAllowed(frameId))
+        requireNotNull(identifier) { "No identifier" }
+
+        val existingFrame = map[identifier]
+        if ((ID3v22FrameId.isMultipleAllowed(identifier)) ||
+            (ID3v23FrameId.isMultipleAllowed(identifier)) ||
+            (ID3v24FrameId.isMultipleAllowed(identifier))
         ) {
             // If a frame already exists of this type
-            if (map.containsKey(frameId)) {
-                val o = map[frameId]
-                if (o is MutableList<*>) {
-                    val multiValues = o as MutableList<AbstractID3v2Frame>
-                    multiValues.add(next)
-                    log.debug("Adding Multi Frame(1)$frameId")
+            if (existingFrame != null) {
+                if (existingFrame is MultiFrame) {
+                    existingFrame.addFrame(newFrame)
+                    log.debug("Adding Multi Frame(1)$identifier")
                 } else {
-                    val multiValues = mutableListOf<AbstractID3v2Frame>()
-                    multiValues.add(o as AbstractID3v2Frame)
-                    multiValues.add(next)
-                    frameId?.also { fid -> map[fid] = multiValues }
-                    log.debug("Adding Multi Frame(2)$frameId")
+                    map[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                    log.debug("Adding Multi Frame(2)$identifier")
                 }
             } else {
-                log.debug("Adding Multi FrameList(3)$frameId")
-                frameId?.also { fid -> map[fid] = next }
+                log.debug("Adding Multi FrameList(3)$identifier")
+                map[identifier] = newFrame
             }
-        } else if (map.containsKey(frameId)) {
-            log.warn("Ignoring Duplicate Frame:$frameId")
+        } else if (existingFrame != null) {
+            log.warn("Ignoring Duplicate Frame:$identifier")
             // If we have multiple duplicate frames in a tag separate them with semicolons
             if (this.duplicateFrameId.isNotEmpty()) {
                 this.duplicateFrameId += ";"
             }
-            this.duplicateFrameId += frameId
-            this.duplicateBytes += (frameMap[frameId] as AbstractID3v2Frame).frameSize
+            this.duplicateFrameId += identifier
+            this.duplicateBytes += (frameMap[identifier] as AbstractID3v2Frame).frameSize
         } else {
-            log.debug("Adding Frame$frameId")
-            frameId?.also { fid -> map[fid] = next }
+            log.debug("Adding Frame$identifier")
+            map[identifier] = newFrame
         }
     }
 
@@ -507,7 +482,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     @Suppress("UNCHECKED_CAST")
     private fun writeFramesToBufferStream(
-        map: MutableMap<String, Any>,
+        map: MutableMap<String, AbstractID3v2Frame>,
         bodyBuffer: ByteArrayOutputStream
     ) {
         // Sort keys into Preferred Order
@@ -516,25 +491,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
         var frame: AbstractID3v2Frame
         sortedWriteOrder.forEach { id ->
-            when (val o = map[id]) {
-                is AbstractID3v2Frame -> {
-                    frame = o
-                    frame.write(bodyBuffer)
-                }
-
-                is AggregatedFrame -> {
-                    o.getFrames().forEach { next ->
-                        next.write(bodyBuffer)
-                    }
-                }
-
-                else -> {
-                    val multiFrames = o as List<AbstractID3v2Frame>
-                    multiFrames.forEach { nextFrame ->
-                        nextFrame.write(bodyBuffer)
-                    }
-                }
-            }
+            map[id]?.write(bodyBuffer)
         }
     }
 
@@ -696,7 +653,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param artwork
      */
     override fun addField(artwork: Artwork) {
-        this.addField(createField(artwork))
+        addField(createField(artwork))
     }
 
     /**
@@ -706,33 +663,22 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * There is a special handling if adding another text field of the same type, in this case the value will
      * be appended to the existing field, separated by the null character.
      *
-     * @param tagField
+     * @param newFrame
      */
     @Suppress("UNCHECKED_CAST")
-    override fun addField(tagField: TagField?) {
-        if ((tagField !is AbstractID3v2Frame) &&
-            (tagField !is AggregatedFrame)
-        ) {
-            error("Field $tagField is not of type AbstractID3v2Frame or AggregatedFrame")
+    override fun addField(newFrame: TagField?) {
+        if (newFrame !is AbstractID3v2Frame) {
+            error("Field $newFrame is not of type AbstractID3v2Frame or AggregatedFrame")
         }
 
-        val fieldId = tagField.getIdentifier() ?: error("No id")
-        if (tagField is AbstractID3v2Frame) {
-            val o = frameMap[fieldId]
+        val identifier = newFrame.getIdentifier() ?: error("No id")
+        val existingFrame = frameMap[identifier]
 
-            // No frame of this type
-            if (o == null) {
-                frameMap[fieldId] = tagField
-            } else if (o is MutableList<*>) {
-                val list = o as MutableList<TagField>
-                addNewFrameOrAddField(list, frameMap, null, tagField)
-            } else {
-                val existingFrame = o as AbstractID3v2Frame
-                val list = mutableListOf<TagField>()
-                addNewFrameOrAddField(list, frameMap, existingFrame, tagField)
-            }
+        // No frame of this type
+        if (existingFrame == null) {
+            frameMap[identifier] = newFrame
         } else {
-            frameMap[fieldId] = tagField
+            addNewFrameOrAddField(identifier, existingFrame, newFrame)
         }
     }
 
@@ -743,108 +689,59 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param list
      * @param frameMap
      * @param existingFrame
-     * @param frame
+     * @param newFrame
      */
     private fun addNewFrameOrAddField(
-        list: MutableList<TagField>,
-        frameMap: MutableMap<String, Any>,
-        existingFrame: AbstractID3v2Frame?,
-        frame: AbstractID3v2Frame
+        identifier: String,
+        existingFrame: AbstractID3v2Frame,
+        newFrame: AbstractID3v2Frame
     ) {
-        val mergedList = mutableListOf<TagField?>()
-        mergedList.add(existingFrame)
-
-        /**
-         * If the frame is a TXXX frame then we add an extra string to the existing frame
-         * if same description otherwise we create a new frame
-         */
-        val frameBody = frame.frameBody
-        when (frameBody) {
-            is FrameBodyTXXX -> {
-                var match = false
-                val i: MutableIterator<TagField?> = mergedList.listIterator()
-                while (i.hasNext()) {
-                    val existingFrameBody = (i.next() as AbstractID3v2Frame).frameBody as FrameBodyTXXX
-                    if (frameBody.getDescription() == existingFrameBody.getDescription()) {
-                        frameBody.getText()?.also { t -> existingFrameBody.addTextValue(t) }
-                        match = true
-                        break
-                    }
-                }
-                if (!match) {
-                    addNewFrameToMap(list, frameMap, existingFrame, frame)
-                }
-            }
-
-            is FrameBodyWXXX -> {
-                var match = false
-                val i: MutableIterator<TagField?> = mergedList.listIterator()
-                while (i.hasNext()) {
-                    val existingFrameBody =
-                        (i.next() as AbstractID3v2Frame).frameBody as FrameBodyWXXX
-                    if (frameBody.getDescription() == existingFrameBody.getDescription()) {
-                        existingFrameBody.addUrlLink(frameBody.getUrlLink())
-                        match = true
-                        break
-                    }
-                }
-                if (!match) {
-                    addNewFrameToMap(list, frameMap, existingFrame, frame)
-                }
-            }
-
-            is AbstractFrameBodyTextInfo -> {
-                val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyTextInfo
-                frameBody.getText()?.also { t -> existingFrameBody?.addTextValue(t) }
-            }
-
-            is AbstractFrameBodyPairs -> {
-                val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyPairs
-                existingFrameBody?.addPair(frameBody.getText())
-            }
-
-            is AbstractFrameBodyNumberTotal -> {
-                val existingFrameBody = existingFrame?.frameBody as? AbstractFrameBodyNumberTotal
-
-                frameBody.getNumber()?.let {
-                    if (it > 0) {
-                        existingFrameBody?.setNumber(frameBody.getNumberAsText() ?: "0")
-                    }
-                }
-
-                frameBody.getTotal()?.let {
-                    if (it > 0) {
-                        frameBody.getTotalAsText()?.also { t -> existingFrameBody?.setTotal(t) }
-                    }
-                }
-            }
-
+        when (existingFrame) {
+            is MultiFrame -> existingFrame.addFrame(newFrame)
             else -> {
-                addNewFrameToMap(list, frameMap, existingFrame, frame)
+                when (val newFrameBody = newFrame.frameBody) {
+                    is FrameBodyTXXX -> {
+                        val existingFrameBody = existingFrame.frameBody as? FrameBodyTXXX
+                        if (newFrameBody.getDescription() == existingFrameBody?.getDescription()) {
+                            newFrameBody.getText()?.also { t -> existingFrameBody?.addTextValue(t) }
+                        } else {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        }
+                    }
+                    is FrameBodyWXXX -> {
+                        val existingFrameBody = existingFrame.frameBody as? FrameBodyWXXX
+                        if (newFrameBody.getDescription() == existingFrameBody?.getDescription()) {
+                            existingFrameBody?.addUrlLink(newFrameBody.getUrlLink())
+                        } else {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        }
+                    }
+                    is AbstractFrameBodyTextInfo -> {
+                        val existingFrameBody = existingFrame.frameBody as? AbstractFrameBodyTextInfo
+                        newFrameBody.getText()?.also { t -> existingFrameBody?.addTextValue(t) }
+                    }
+                    is AbstractFrameBodyPairs -> {
+                        val existingFrameBody = existingFrame.frameBody as? AbstractFrameBodyPairs
+                        existingFrameBody?.addPair(newFrameBody.getText())
+                    }
+                    is AbstractFrameBodyNumberTotal -> {
+                        val existingFrameBody = existingFrame.frameBody as? AbstractFrameBodyNumberTotal
+                        newFrameBody.getNumber()?.let {
+                            if (it > 0) {
+                                existingFrameBody?.setNumber(newFrameBody.getNumberAsText() ?: "0")
+                            }
+                        }
+                        newFrameBody.getTotal()?.let {
+                            if (it > 0) {
+                                newFrameBody.getTotalAsText()?.also { t -> existingFrameBody?.setTotal(t) }
+                            }
+                        }
+                    }
+                    else -> {
+                        frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                    }
+                }
             }
-        }
-    }
-
-    /**
-     * Add another frame to the map
-     *
-     * @param list
-     * @param frameMap
-     * @param existingFrame
-     * @param frame
-     */
-    private fun addNewFrameToMap(
-        list: MutableList<TagField>,
-        frameMap: MutableMap<String, Any>,
-        existingFrame: AbstractID3v2Frame?,
-        frame: AbstractID3v2Frame
-    ) {
-        if (list.isEmpty()) {
-            existingFrame?.also { ef -> list.add(ef) }
-            list.add(frame)
-            frameMap[frame.getIdentifier() ?: error("No id")] = list
-        } else {
-            list.add(frame)
         }
     }
 
@@ -1055,9 +952,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     open fun getValue(genericKey: GenericFieldKey, index: Int): String? {
         // Special case here because the generic key to frameid/subid mapping is identical for trackno versus tracktotal
         // and discno versus disctotal so we have to handle here, also want to ignore index parameter.
-        if (ID3NumberTotalFields.isNumber(genericKey) ||
-            ID3NumberTotalFields.isTotal(genericKey)
-        ) {
+        if (ID3NumberTotalFields.isNumber(genericKey) || ID3NumberTotalFields.isTotal(genericKey)) {
             val fields = getFields(genericKey)
             if (fields.isNotEmpty()) {
                 // Should only be one frame so ignore index value, and we ignore multiple values within the frame
@@ -1484,16 +1379,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         return when {
             ID3NumberTotalFields.isNumber(genericKey) -> {
                 val frame = createFrame(formatKey?.frameId)
-                val framebody =
-                    frame.frameBody as AbstractFrameBodyNumberTotal
-                framebody.setNumber(value)
+                val framebody = frame.frameBody as? AbstractFrameBodyNumberTotal
+                framebody?.setNumber(value)
                 frame
             }
             ID3NumberTotalFields.isTotal(genericKey) -> {
                 val frame = createFrame(formatKey?.frameId)
-                val framebody =
-                    frame.frameBody as AbstractFrameBodyNumberTotal
-                framebody.setTotal(value)
+                val framebody = frame.frameBody as? AbstractFrameBodyNumberTotal
+                framebody?.setTotal(value)
                 frame
             }
             else -> {
@@ -1590,136 +1483,106 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     @Suppress("UNCHECKED_CAST")
     override fun setField(field: TagField?) {
-        if ((field !is AbstractID3v2Frame) && (field !is AggregatedFrame)) {
+        if (field !is AbstractID3v2Frame) {
             error("Field $field is not of type AbstractID3v2Frame nor AggregatedFrame")
         }
 
         val identifier = field.getIdentifier() ?: error("No identifier")
-        if (field is AbstractID3v2Frame) {
-            // If no frame of this type exist or if multiples are not allowed
-            when (val obj = frameMap[identifier]) {
-                null -> {
-                    frameMap[identifier] = field
-                }
-
-                is AbstractID3v2Frame -> {
-                    val frames = mutableListOf<AbstractID3v2Frame>()
-                    frames.add(obj)
-                    mergeDuplicateFrames(field, frames)
-                }
-
-                is MutableList<*> -> {
-                    mergeDuplicateFrames(field, obj as MutableList<AbstractID3v2Frame>)
-                }
-            }
-        } else {
+        // If no frame of this type exist or if multiples are not allowed
+        val existingFrame = frameMap[identifier]
+        if (existingFrame == null) {
             frameMap[identifier] = field
+        } else {
+            mergeDuplicateFrames(existingFrame, field)
         }
     }
 
     /**
      * Add frame taking into account existing frames of the same type
      *
+     * @param existingFrame
      * @param newFrame
-     * @param frames
      */
     fun mergeDuplicateFrames(
-        newFrame: AbstractID3v2Frame,
-        frames: MutableList<AbstractID3v2Frame>
+        existingFrame: AbstractID3v2Frame,
+        newFrame: AbstractID3v2Frame
     ) {
-        val li = frames.listIterator()
         val identifier = newFrame.getIdentifier() ?: error("No identifier")
-        while (li.hasNext()) {
-            val nextFrame = li.next()
-            when (newFrame.frameBody) {
-                is FrameBodyTXXX -> {
-                    // Value with matching key exists so replace
-                    if ((newFrame.frameBody as FrameBodyTXXX).getDescription().equals(
-                            (nextFrame.frameBody as FrameBodyTXXX).getDescription()
-                        )
-                    ) {
-                        li.set(newFrame)
-                        frameMap[identifier] = frames
-                        return
+        when (existingFrame) {
+            is MultiFrame -> {
+                existingFrame.addFrame(newFrame)
+            }
+            is AbstractID3v2Frame -> {
+                when (newFrame.frameBody) {
+                    is FrameBodyTXXX -> {
+                        // Value with matching key exists so replace
+                        if ((newFrame.frameBody as FrameBodyTXXX).getDescription().equals((newFrame.frameBody as FrameBodyTXXX).getDescription())) {
+                            frameMap[identifier] = existingFrame
+                        } else if (isMultipleAllowed(identifier)) {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        } else {
+                            frameMap[identifier] = newFrame
+                        }
+                    }
+                    is FrameBodyWXXX -> {
+                        // Value with matching key exists so replace
+                        if ((newFrame.frameBody as FrameBodyWXXX).getDescription().equals((newFrame.frameBody as FrameBodyWXXX).getDescription())) {
+                            frameMap[identifier] = existingFrame
+                        } else if (isMultipleAllowed(identifier)) {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        } else {
+                            frameMap[identifier] = newFrame
+                        }
+                    }
+                    is FrameBodyCOMM -> {
+                        if ((newFrame.frameBody as FrameBodyCOMM).getDescription().equals((newFrame.frameBody as FrameBodyCOMM).getDescription())) {
+                            frameMap[identifier] = existingFrame
+                        } else if (isMultipleAllowed(identifier)) {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        } else {
+                            frameMap[identifier] = newFrame
+                        }
+                    }
+                    is FrameBodyUFID -> {
+                        if ((newFrame.frameBody as FrameBodyUFID).getOwner().equals((newFrame.frameBody as FrameBodyUFID).getOwner())) {
+                            frameMap[identifier] = existingFrame
+                        } else if (isMultipleAllowed(identifier)) {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        } else {
+                            frameMap[identifier] = newFrame
+                        }
+                    }
+                    is FrameBodyUSLT -> {
+                        if ((newFrame.frameBody as FrameBodyUSLT).getDescription().equals((newFrame.frameBody as FrameBodyUSLT).getDescription())) {
+                            frameMap[identifier] = existingFrame
+                        } else if (isMultipleAllowed(identifier)) {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        } else {
+                            frameMap[identifier] = newFrame
+                        }
+                    }
+                    is FrameBodyPOPM -> {
+                        if ((newFrame.frameBody as FrameBodyPOPM).getEmailToUser().equals((newFrame.frameBody as FrameBodyPOPM).getEmailToUser())) {
+                            frameMap[identifier] = existingFrame
+                        } else if (isMultipleAllowed(identifier)) {
+                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        } else {
+                            frameMap[identifier] = newFrame
+                        }
+                    }
+                    is AbstractFrameBodyNumberTotal -> {
+                        mergeNumberTotalFrames(existingFrame, newFrame)
+                    }
+                    is AbstractFrameBodyPairs -> {
+                        val frameBody = newFrame.frameBody as AbstractFrameBodyPairs
+                        val existingFrameBody = newFrame.frameBody as AbstractFrameBodyPairs
+                        existingFrameBody.addPair(frameBody.getText())
                     }
                 }
-
-                is FrameBodyWXXX -> {
-                    // Value with matching key exists so replace
-                    if ((newFrame.frameBody as FrameBodyWXXX).getDescription().equals(
-                            (nextFrame.frameBody as FrameBodyWXXX).getDescription()
-                        )
-                    ) {
-                        li.set(newFrame)
-                        frameMap[identifier] = frames
-                        return
-                    }
-                }
-
-                is FrameBodyCOMM -> {
-                    if ((newFrame.frameBody as FrameBodyCOMM).getDescription().equals(
-                            (nextFrame.frameBody as FrameBodyCOMM).getDescription()
-                        )
-                    ) {
-                        li.set(newFrame)
-                        frameMap[identifier] = frames
-                        return
-                    }
-                }
-
-                is FrameBodyUFID -> {
-                    if ((newFrame.frameBody as FrameBodyUFID).getOwner().equals(
-                            (nextFrame.frameBody as FrameBodyUFID).getOwner()
-                        )
-                    ) {
-                        li.set(newFrame)
-                        frameMap[identifier] = frames
-                        return
-                    }
-                }
-
-                is FrameBodyUSLT -> {
-                    if ((newFrame.frameBody as FrameBodyUSLT).getDescription().equals(
-                            (nextFrame.frameBody as FrameBodyUSLT).getDescription()
-                        )
-                    ) {
-                        li.set(newFrame)
-                        frameMap[identifier] = frames
-                        return
-                    }
-                }
-
-                is FrameBodyPOPM -> {
-                    if ((newFrame.frameBody as FrameBodyPOPM).getEmailToUser().equals(
-                            (nextFrame.frameBody as FrameBodyPOPM).getEmailToUser()
-                        )
-                    ) {
-                        li.set(newFrame)
-                        frameMap[identifier] = frames
-                        return
-                    }
-                }
-
-                is AbstractFrameBodyNumberTotal -> {
-                    mergeNumberTotalFrames(newFrame, nextFrame)
-                    return
-                }
-
-                is AbstractFrameBodyPairs -> {
-                    val frameBody = newFrame.frameBody as AbstractFrameBodyPairs
-                    val existingFrameBody = nextFrame.frameBody as AbstractFrameBodyPairs
-                    existingFrameBody.addPair(frameBody.getText())
-                    return
+                if (isMultipleAllowed(identifier)) {
+                    frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
                 }
             }
-        }
-
-        if (!isMultipleAllowed(identifier)) {
-            frameMap[identifier] = newFrame
-        } else {
-            // No match found so addField new one
-            frames.add(newFrame)
-            frameMap[identifier] = frames
         }
     }
 
@@ -1728,24 +1591,24 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * All Number/Count frames  are treated the same (TCK, TPOS, MVNM)
      *
+     * @param existingFrame
      * @param newFrame
-     * @param nextFrame
      */
     fun mergeNumberTotalFrames(
-        newFrame: AbstractID3v2Frame,
-        nextFrame: AbstractID3v2Frame
+        existingFrame: AbstractID3v2Frame,
+        newFrame: AbstractID3v2Frame
     ) {
-        val newBody =
-            newFrame.frameBody as AbstractFrameBodyNumberTotal
-        val oldBody =
-            nextFrame.frameBody as AbstractFrameBodyNumberTotal
-
-        if (newBody.getNumber() != null && (newBody.getNumber() ?: 0) > 0) {
-            oldBody.setNumber(newBody.getNumberAsText())
+        val existingBody = existingFrame.frameBody as AbstractFrameBodyNumberTotal
+        val newBody = newFrame.frameBody as AbstractFrameBodyNumberTotal
+        val existingNumber = existingBody.getNumber()
+        val existingTotal = existingBody.getTotal()
+        val newNumber = newBody.getNumber()
+        val newTotal = newBody.getTotal()
+        if (existingNumber == null && newNumber != null) {
+            existingBody.setNumber(newBody.getNumberAsText())
         }
-
-        if (newBody.getTotal() != null && (newBody.getTotal() ?: 0) > 0) {
-            oldBody.setTotal(newBody.getTotalAsText())
+        if (existingTotal == null && newTotal  != null) {
+            existingBody.setTotal(newBody.getTotalAsText())
         }
     }
 
@@ -1760,13 +1623,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
 
     @Suppress("UNCHECKED_CAST")
     override fun toString(): String {
-        return frameMap.values.mapNotNull { v ->
+        return frameMap.values.map { v ->
             when (v) {
-                is TagField -> listOf(v)
-                is List<*> -> v as List<TagField>
-                else -> null
+                is MultiFrame -> v.frames
+                is AbstractID3v2Frame -> listOf(v)
             }
         }.flatten()
-            .joinToString("\n") { field -> "\t${field.getIdentifier() ?: "UNSET"}:$field" }
+            .joinToString("\n") { frame -> "\t${frame.getIdentifier() ?: "UNSET"}:$frame" }
     }
 }

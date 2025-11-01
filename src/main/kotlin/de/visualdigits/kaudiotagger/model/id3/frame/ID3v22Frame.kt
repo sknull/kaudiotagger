@@ -121,25 +121,19 @@ class ID3v22Frame: AbstractID3v2Frame {
         setIdentifier(ID3Tags.convertFrameID23To22(frame.getIdentifier()))
         when {
             getIdentifier() != null -> {
-                log.debug(
-                    "V2:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-                )
+                log.debug("V2:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                 this.frameBody = ID3Tags.copyObject(frame.frameBody) as AbstractID3v2FrameBody
             }
             ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier()) -> {
                 setIdentifier(ID3Tags.forceFrameID23To22(frame.getIdentifier()))
                 if (getIdentifier() != null) {
-                    log.debug(
-                        "V2:Force:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}"
-                    )
+                    log.debug("V2:Force:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                     this.frameBody = readBody(
                         getIdentifier(),
                         (frame.frameBody as? AbstractID3v2FrameBody) ?: error("No body")
                     )
                 } else {
-                    throw InvalidFrameException(
-                        "Unable to convert v23 frame:${frame.getIdentifier()} to a v22 frame"
-                    )
+                    throw InvalidFrameException("Unable to convert v23 frame:${frame.getIdentifier()} to a v22 frame")
                 }
             }
             frame.frameBody is FrameBodyDeprecated -> {

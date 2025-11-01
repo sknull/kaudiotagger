@@ -44,10 +44,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      */
     var encodingFlags: EncodingFlags? = null
 
-    constructor() {
-        frameBody?.header = this
-    }
-
     /**
      * Create a frame based on another frame
      *
@@ -72,8 +68,10 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      */
     // TODO the identifier checks should be done in the relevent subclasses
     @Suppress("UNCHECKED_CAST")
-    constructor(identifier: String?) {
+    constructor(identifier: String? = null) {
         this.identifier = identifier
+        frameBody?.header = this
+
         log.debug("Creating empty frame of type$identifier")
 
         // Use reflection to map id to frame body, which makes things much easier
@@ -283,9 +281,8 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      *
      * @return Charset encoding.
      */
-    override fun getEncoding(): Charset? {
-        val textEncoding = frameBody?.getTextEncoding()
-        return TextEncoding.fromId(textEncoding?.toInt()?:0)?.charSet
+    override fun getEncoding(): Charset {
+        return TextEncoding.fromId(frameBody?.getTextEncoding()?.toInt())?.charSet?: TextEncoding.ISO_8859_1.charSet
     }
 
     override fun setEncoding(encoding: Charset) {

@@ -23,7 +23,7 @@ interface TagTextField : TagField {
      *
      * @return Charset encoding.
      */
-    fun getEncoding(): Charset?
+    fun getEncoding(): Charset
 
     /**
      * Sets the charset encoding used by the field.

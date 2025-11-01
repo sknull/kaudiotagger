@@ -299,7 +299,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         return ID3v1TagField(idv1FieldKey?.name?:error("No id"), value)
     }
 
-    override fun addField(tagField: TagField?) {
+    override fun addField(newFrame: TagField?) {
         // to be implemented
     }
 

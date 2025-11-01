@@ -171,9 +171,9 @@ interface Tag {
     /**
      * Adds a field to the structure, used internally by the library<br></br>
      *
-     * @param tagField The field to add.
+     * @param newFrame The field to add.
      */
-    fun addField(tagField: TagField?)
+    fun addField(newFrame: TagField?)
 
     /**
      * Create a new field based on generic key, used internally by the library

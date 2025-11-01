@@ -140,7 +140,7 @@ class PartOfSet : AbstractString {
             data = ByteArray(bb?.limit()?:0)
             bb?.get(data, 0, bb.limit())
         } catch (ce: CharacterCodingException) { // Should never happen so if does throw a RuntimeException
-            log.error(ce.message)
+            log.error(ce.message, ce)
             throw RuntimeException(ce)
         }
         setSize(data.size)

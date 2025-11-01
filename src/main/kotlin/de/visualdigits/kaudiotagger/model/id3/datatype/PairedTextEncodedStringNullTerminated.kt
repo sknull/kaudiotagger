@@ -122,7 +122,7 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
         log.debug("Writing PairTextEncodedStringNullTerminated")
 
         var localSize = 0
-        var buffer = ByteArrayOutputStream()
+        val buffer = ByteArrayOutputStream()
         try {
             (getValue() as ValuePairs).mapping.forEach { pair ->
                 var next = TextEncodedStringNullTerminated(
@@ -130,22 +130,19 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
                     getBody(),
                     pair.first
                 )
-                buffer.write(next.writeByteArray())
+                next.writeByteArray()?.also { ba -> buffer.write(ba) }
                 localSize += next.getSize()
                 next = TextEncodedStringNullTerminated(
                     identifier,
                     getBody(),
                     pair.second
                 )
-                buffer.write(next.writeByteArray())
+                next.writeByteArray()?.also { ba -> buffer.write(ba) }
                 localSize += next.getSize()
             }
         } catch (ioe: IOException) {
             // This should never happen because the write is internal with the JVM it is not to a file
-            log.error(
-                "IOException in MultipleTextEncodedStringNullTerminated when writing byte array",
-                ioe
-            )
+            log.error("IOException in MultipleTextEncodedStringNullTerminated when writing byte array", ioe)
             throw RuntimeException(ioe)
         }
 

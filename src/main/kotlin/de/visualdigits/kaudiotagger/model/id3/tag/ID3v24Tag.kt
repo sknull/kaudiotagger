@@ -661,10 +661,10 @@ class ID3v24Tag : AbstractID3v2Tag {
      */
     override fun addFrame(frame: AbstractID3v2Frame) {
         if (frame is ID3v24Frame) {
-            copyFrameIntoMap(frame.getIdentifier(), frame)
+            copyFrameIntoMap(frame)
         } else {
             convertFrame(frame).forEach { next ->
-                copyFrameIntoMap(next.getIdentifier(), next)
+                copyFrameIntoMap(next)
             }
         }
     }
@@ -736,8 +736,8 @@ class ID3v24Tag : AbstractID3v2Tag {
      * @param existingFrame
      */
     override fun processDuplicateFrame(
-        newFrame: AbstractID3v2Frame,
-        existingFrame: AbstractID3v2Frame
+        existingFrame: AbstractID3v2Frame,
+        newFrame: AbstractID3v2Frame
     ) {
         // We dont add this new frame we just add the contents to existing frame
         //
@@ -765,8 +765,7 @@ class ID3v24Tag : AbstractID3v2Tag {
                             body.hoursOnly = newBody.hoursOnly
                         }
                     }
-                    val formattedText = body.getFormattedText()
-                    body.setObjectValue(DataTypes.OBJ_TEXT, formattedText)
+                    body.setObjectValue(DataTypes.OBJ_TEXT, body.getFormattedText())
                 }
 
                 is FrameBodyUnsupported -> {
@@ -775,14 +774,11 @@ class ID3v24Tag : AbstractID3v2Tag {
 
                 else -> {
                     // we just lose this frame, we have already got one with the correct id.
-                    log.warn("Found duplicate TDRC frame in invalid situation,discarding:${newFrame.getIdentifier()}")
+                    log.warn("Found duplicate TDRC frame in invalid situation, discarding:${newFrame.getIdentifier()}")
                 }
             }
         } else {
-            val list: MutableList<AbstractID3v2Frame?> = ArrayList()
-            list.add(existingFrame)
-            list.add(newFrame)
-            newFrame.getIdentifier()?.also { id -> frameMap[id] = list }
+            super.processDuplicateFrame(existingFrame, newFrame)
         }
     }
 

@@ -197,11 +197,11 @@ class ID3v23Tag : AbstractID3v2Tag {
     override fun addFrame(frame: AbstractID3v2Frame) {
         try {
             if (frame is ID3v23Frame) {
-                copyFrameIntoMap(frame.getIdentifier(), frame)
+                copyFrameIntoMap(frame)
             } else {
                 val frames: MutableList<AbstractID3v2Frame> = convertFrame(frame)
                 for (next in frames) {
-                    copyFrameIntoMap(next.getIdentifier(), next)
+                    copyFrameIntoMap(next)
                 }
             }
         } catch (_: InvalidFrameException) {
@@ -741,22 +741,18 @@ class ID3v23Tag : AbstractID3v2Tag {
      * @param existingFrame
      */
     override fun processDuplicateFrame(
-        newFrame: AbstractID3v2Frame,
-        existingFrame: AbstractID3v2Frame
+        existingFrame: AbstractID3v2Frame,
+        newFrame: AbstractID3v2Frame
     ) {
         // We dont add this new frame we just add the contents to existing frame
-        if (newFrame.getIdentifier().equals(ID3v23FrameId.INVOLVED_PEOPLE.id)
-        ) {
+        if (newFrame.getIdentifier() == ID3v23FrameId.INVOLVED_PEOPLE.id) {
             val oldVps = ((existingFrame).frameBody as? FrameBodyIPLS)?.getPairing()
             val newVps = (newFrame.frameBody as? FrameBodyIPLS)?.getPairing()
             newVps?.mapping?.forEach { next ->
                 oldVps?.add(next)
             }
         } else {
-            val list = mutableListOf<AbstractID3v2Frame>()
-            list.add(existingFrame)
-            list.add(newFrame)
-            frameMap[newFrame.getIdentifier()?:error("No identifier")] = list
+            super.processDuplicateFrame(existingFrame, newFrame)
         }
     }
 

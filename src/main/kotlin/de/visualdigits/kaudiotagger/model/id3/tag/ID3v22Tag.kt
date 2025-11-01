@@ -359,11 +359,11 @@ class ID3v22Tag : AbstractID3v2Tag {
     override fun addFrame(frame: AbstractID3v2Frame) {
         try {
             if (frame is ID3v22Frame) {
-                copyFrameIntoMap(frame.getIdentifier(), frame)
+                copyFrameIntoMap(frame)
             } else {
                 val frames: MutableList<AbstractID3v2Frame> = convertFrame(frame)
                 for (next in frames) {
-                    copyFrameIntoMap(next.getIdentifier(), next)
+                    copyFrameIntoMap(next)
                 }
             }
         } catch (_: InvalidFrameException) {
