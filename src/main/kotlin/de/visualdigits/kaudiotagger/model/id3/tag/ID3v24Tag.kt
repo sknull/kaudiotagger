@@ -6,7 +6,6 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeExcep
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
-import de.visualdigits.kaudiotagger.model.common.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
@@ -488,9 +487,6 @@ class ID3v24Tag : AbstractID3v2Tag {
                 next = ID3v24Frame(byteBuffer)
                 id = next.getIdentifier()
                 loadFrameIntoMap(id, next)
-            } catch (_: PaddingException) { // Found Padding, no more frames
-                log.debug("Found padding starting at:${byteBuffer.position()}")
-                break
             } catch (ex: EmptyFrameException) { // Found Empty Frame
                 log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += TAG_HEADER_LENGTH

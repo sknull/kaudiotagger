@@ -5,7 +5,6 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
-import de.visualdigits.kaudiotagger.model.common.exceptions.PaddingException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
@@ -339,9 +338,6 @@ class ID3v22Tag : AbstractID3v2Tag {
                 next = ID3v22Frame(byteBuffer)
                 val id = next.getIdentifier()
                 loadFrameIntoMap(id, next)
-            } catch (ex: PaddingException) { // Found Padding, no more frames
-                log.debug("Found padding starting at:${byteBuffer.position()}")
-                break
             } catch (ex: EmptyFrameException) { // Found Empty Frame
                 log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += ID3v22Frame.FRAME_HEADER_SIZE
