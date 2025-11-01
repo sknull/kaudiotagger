@@ -33,9 +33,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    /**
-     * @param byteBuffer
-     */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
             return false
@@ -55,10 +52,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
         return false
     }
 
-    /**
-     * @param obj
-     * @return
-     */
     override fun isSubsetOf(obj: Any?): Boolean {
         if (obj !is FieldFrameBodyUnsupported) {
             return false
@@ -78,9 +71,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
         return "ZZZ"
     }
 
-    /**
-     * @param file
-     */
     override fun write(file: RandomAccessFile) {
         var offset = 0
         val buffer = ByteArray(5)
@@ -102,9 +92,6 @@ class FieldFrameBodyUnsupported : AbstractLyrics3v2FieldFrameBody {
         file.write(value)
     }
 
-    /**
-     * TODO
-     */
     override fun setupObjectList() {
         // to be implemented
     }

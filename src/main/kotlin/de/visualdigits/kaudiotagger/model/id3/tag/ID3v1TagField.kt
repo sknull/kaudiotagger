@@ -137,14 +137,6 @@ class ID3v1TagField : TagTextField {
         src?.also { s -> System.arraycopy(s, 0, dst, dstOffset, src.size) }
     }
 
-    override fun isBinary(): Boolean {
-        return false
-    }
-
-    override fun isBinary(b: Boolean) {
-        // Do nothing, always false
-    }
-
     override fun isCommon(): Boolean {
         return common
     }

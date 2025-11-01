@@ -199,26 +199,10 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24FrameId.SYNC_LYRIC.id
     }
 
-    /**
-     * Get lyrics
-     *
-     *
-     * TODO:better format
-     *
-     * @return lyrics
-     */
     fun getLyrics(): ByteArray? {
         return this.getObjectValue(DataTypes.OBJ_DATA) as? ByteArray
     }
 
-    /**
-     * Set lyrics
-     *
-     *
-     * TODO:provide a more user friendly way of adding lyrics
-     *
-     * @param data
-     */
     fun setLyrics(data: ByteArray?) {
         this.setObjectValue(DataTypes.OBJ_DATA, data)
     }
@@ -227,37 +211,11 @@ class FrameBodySYLT: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      * Setup Object List
      */
     override fun setupObjectList() {
-        objectList.add(
-            NumberHashMap(
-                DataTypes.OBJ_TEXT_ENCODING,
-                this,
-                TextEncoding.TEXT_ENCODING_FIELD_SIZE
-            )
-        )
-        objectList.add(
-            StringHashMap(
-                DataTypes.OBJ_LANGUAGE,
-                this,
-                Languages.LANGUAGE_FIELD_SIZE
-            )
-        )
-        objectList.add(
-            NumberHashMap(
-                DataTypes.OBJ_TIME_STAMP_FORMAT,
-                this,
-                EventTimingTimestampTypes.TIMESTAMP_KEY_FIELD_SIZE
-            )
-        )
-        objectList.add(
-            NumberHashMap(
-                DataTypes.OBJ_CONTENT_TYPE,
-                this,
-                SynchronisedLyricsContentType.CONTENT_KEY_FIELD_SIZE
-            )
-        )
+        objectList.add(NumberHashMap(DataTypes.OBJ_TEXT_ENCODING, this, TextEncoding.TEXT_ENCODING_FIELD_SIZE))
+        objectList.add(StringHashMap(DataTypes.OBJ_LANGUAGE, this, Languages.LANGUAGE_FIELD_SIZE))
+        objectList.add(NumberHashMap(DataTypes.OBJ_TIME_STAMP_FORMAT, this, EventTimingTimestampTypes.TIMESTAMP_KEY_FIELD_SIZE))
+        objectList.add(NumberHashMap(DataTypes.OBJ_CONTENT_TYPE, this, SynchronisedLyricsContentType.CONTENT_KEY_FIELD_SIZE))
         objectList.add(StringNullTerminated(DataTypes.OBJ_DESCRIPTION, this))
-
-        // TODO:This hold the actual lyrics3
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }
 }

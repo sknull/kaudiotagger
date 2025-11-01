@@ -35,9 +35,6 @@ class Lyrics3Line : AbstractDataType {
         return timeStamp.iterator()
     }
 
-    /**
-     * @param time
-     */
     fun setTimeStamp(time: Lyrics3TimeStamp) {
         timeStamp.clear()
         timeStamp.add(time)
@@ -51,9 +48,6 @@ class Lyrics3Line : AbstractDataType {
         this.lyric += line.text
     }
 
-    /**
-     * @param time
-     */
     fun addTimeStamp(time: Lyrics3TimeStamp) {
         timeStamp.add(time)
     }

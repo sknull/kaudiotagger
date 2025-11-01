@@ -101,9 +101,6 @@ class FrameBodyAENC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return ID3v24FrameId.AUDIO_ENCRYPTION.id
     }
 
-    /**
-     * @param description
-     */
     fun getOwner(description: String?) {
         setObjectValue(DataTypes.OBJ_OWNER, description)
     }

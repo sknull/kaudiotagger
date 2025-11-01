@@ -22,7 +22,7 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
         1
     )
 
-    private val timestamp: NumberFixedLength? = NumberFixedLength(
+    private val timestamp: NumberFixedLength = NumberFixedLength(
         DataTypes.OBJ_DATETIME,
         null,
         4
@@ -30,7 +30,7 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
 
     constructor(copyObject: SynchronisedTempoCode): super(copyObject) {
         this.tempo.setValue(copyObject.tempo.getValue())
-        this.timestamp?.setValue(copyObject.timestamp?.getValue())
+        this.timestamp.setValue(copyObject.timestamp.getValue())
     }
 
     constructor(
@@ -41,13 +41,13 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
     ) : super(identifier, frameBody) {
         setBody(frameBody)
         this.tempo.setValue(tempo)
-        this.timestamp?.setValue(timestamp)
+        this.timestamp.setValue(timestamp)
     }
 
     override fun setBody(frameBody: AbstractTagFrameBody?) {
         super.setBody(frameBody)
         this.tempo.setBody(frameBody)
-        this.timestamp?.setBody(frameBody)
+        this.timestamp.setBody(frameBody)
     }
 
     override fun readByteArray(byteArray: ByteArray, offset: Int) {
@@ -65,16 +65,16 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
 
         this.tempo.readByteArray(byteArray, localOffset)
         localOffset += this.tempo.getSize()
-        this.timestamp?.readByteArray(byteArray, localOffset)
+        this.timestamp.readByteArray(byteArray, localOffset)
     }
 
     override fun getSize(): Int {
-        return this.tempo.getSize() + (this.timestamp?.getSize()?:0)
+        return this.tempo.getSize() + (this.timestamp.getSize()?:0)
     }
 
     override fun writeByteArray(): ByteArray {
         val typeData = this.tempo.writeByteArray()
-        val timeData = this.timestamp?.writeByteArray()?:error("Coulkd not write timedata")
+        val timeData = this.timestamp.writeByteArray()?:error("Coulkd not write timedata")
 
         val objectData = ByteArray(typeData.size + timeData.size)
         System.arraycopy(typeData, 0, objectData, 0, typeData.size)
@@ -84,11 +84,11 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
     }
 
     fun getTimestamp(): Long {
-        return (timestamp?.getValue() as Number).toLong()
+        return (timestamp.getValue() as Number).toLong()
     }
 
     fun setTimestamp(timestamp: Long) {
-        this.timestamp?.setValue(timestamp)
+        this.timestamp.setValue(timestamp)
     }
 
     fun getTempo(): Int {

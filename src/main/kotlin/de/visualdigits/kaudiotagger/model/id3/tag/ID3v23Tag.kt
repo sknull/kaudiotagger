@@ -194,18 +194,18 @@ class ID3v23Tag : AbstractID3v2Tag {
         return REVISION
     }
 
-    override fun addFrame(frame: AbstractID3v2Frame) {
+    override fun addFrame(newFrame: AbstractID3v2Frame) {
         try {
-            if (frame is ID3v23Frame) {
-                copyFrameIntoMap(frame)
+            if (newFrame is ID3v23Frame) {
+                copyFrameIntoMap(newFrame)
             } else {
-                val frames: MutableList<AbstractID3v2Frame> = convertFrame(frame)
+                val frames: MutableList<AbstractID3v2Frame> = convertFrame(newFrame)
                 for (next in frames) {
                     copyFrameIntoMap(next)
                 }
             }
         } catch (_: InvalidFrameException) {
-            log.error("Unable to convert frame:" + frame.getIdentifier())
+            log.error("Unable to convert frame:" + newFrame.getIdentifier())
         }
     }
 
@@ -216,7 +216,6 @@ class ID3v23Tag : AbstractID3v2Tag {
                     (frame.frameBody is FrameBodyTDRC)
                 -> {
                 val tmpBody = frame.frameBody as FrameBodyTDRC
-                // TODO will overwrite any existing TYER or TIME frame, do we ever want multiples of these
                 tmpBody.findMatchingMaskAndExtractV3Values()
                 var newFrame: ID3v23Frame
                 if (tmpBody.year != "") {
@@ -282,8 +281,6 @@ class ID3v23Tag : AbstractID3v2Tag {
      * no of bytes between start of ID3Tag and start of Audio Data.
      *
      *
-     * TODO this is incorrect, because of subclasses
-     *
      * @return size of tag
      */
     override fun getSize(): Int {
@@ -302,8 +299,6 @@ class ID3v23Tag : AbstractID3v2Tag {
      * Write tag to file
      *
      *
-     * TODO:we currently never write the Extended header , but if we did the size calculation in this
-     * method would be slightly incorrect
      *
      * @param file The file to write to
      */
@@ -349,10 +344,6 @@ class ID3v23Tag : AbstractID3v2Tag {
 
     /**
      * Write the ID3 header to the ByteBuffer.
-     *
-     *
-     * TODO Calculate the CYC Data Check
-     * TODO Reintroduce Extended Header
      *
      * @param padding is the size of the padding portion of the tag
      * @param size    is the size of the body data
@@ -646,7 +637,7 @@ class ID3v23Tag : AbstractID3v2Tag {
                 val posBeforeRead = byteBuffer.position()
                 log.debug("Looking for next frame at:$posBeforeRead")
                 val newFrame = ID3v23Frame(byteBuffer)
-                val identifier = newFrame?.getIdentifier()
+                val identifier = newFrame.getIdentifier()
                 log.debug("Found $identifier at frame at:$posBeforeRead")
                 loadFrameIntoMap(identifier, newFrame)
             } catch (ex: EmptyFrameException) { // Found Empty Frame, log it - empty frames should not exist
@@ -688,24 +679,22 @@ class ID3v23Tag : AbstractID3v2Tag {
     override fun createField(artwork: Artwork): TagField {
         val frame: AbstractID3v2Frame = createFrame(getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART)?.frameId)
         val body = frame.frameBody as FrameBodyAPIC
-        when {
-            !artwork.isLinked -> {
-                body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
-                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-                body.setObjectValue(DataTypes.OBJ_MIME_TYPE, artwork.mimeType)
-                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-                return frame
-            }
-            else -> {
-                body.setObjectValue(
-                    DataTypes.OBJ_PICTURE_DATA,
-                    artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
-                )
-                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-                body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
-                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-                return frame
-            }
+        return if (!artwork.isLinked) {
+            body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, artwork.mimeType)
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            frame
+        }
+        else {
+            body.setObjectValue(
+                DataTypes.OBJ_PICTURE_DATA,
+                artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
+            )
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            frame
         }
     }
 

@@ -59,7 +59,6 @@ class FrameBodyTCMP: AbstractFrameBodyTextInfo, ID3v24FrameBody, ID3v23FrameBody
     }
 
     companion object {
-        // TODO does iTunes have to have null terminator?
         var IS_COMPILATION: String = "1"
     }
 }

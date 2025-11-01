@@ -31,7 +31,7 @@ class MultiFrame : AbstractID3v2Frame {
      *
      * @return Content
      */
-    override fun getContent(): String? {
+    override fun getContent(): String {
         return frames.joinToString("") { f -> f.getContent()?:"" }
     }
 
@@ -84,20 +84,12 @@ class MultiFrame : AbstractID3v2Frame {
         return false
     }
 
-    override fun isBinary(): Boolean {
-        return false
-    }
-
-    override fun isBinary(b: Boolean) {
-        // to be implemented
-    }
-
     override fun isEmpty(): Boolean {
         return frames.isEmpty() && frames.all { frame -> frame.isEmpty() }
     }
 
-    override fun getRawContent(): ByteArray? {
-        return getContent()?.toByteArray(getEncoding())
+    override fun getRawContent(): ByteArray {
+        return getContent().toByteArray(getEncoding())
     }
 
     override fun write(tagBuffer: ByteArrayOutputStream) {
@@ -110,5 +102,9 @@ class MultiFrame : AbstractID3v2Frame {
 
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         return false
+    }
+
+    override fun createStructure() {
+        frames.forEach { frame -> frame.createStructure() }
     }
 }

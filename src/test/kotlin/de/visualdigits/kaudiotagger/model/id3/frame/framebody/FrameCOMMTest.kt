@@ -22,7 +22,7 @@ class FrameCOMMTest : AbstractTestCase() {
                 "Issue77.id3",
                 "testV1.mp3"
             )
-            val mp3File =  MP3File.read(testFile)
+            MP3File.read(testFile)
         } catch (ie: java.lang.Exception) {
             e = ie
         }
@@ -41,7 +41,7 @@ class FrameCOMMTest : AbstractTestCase() {
                 "Issue80.id3",
                 "testV1.mp3"
             )
-            val mp3File =  MP3File.read(testFile)
+            MP3File.read(testFile)
         } catch (ie: java.lang.Exception) {
             e = ie
         }

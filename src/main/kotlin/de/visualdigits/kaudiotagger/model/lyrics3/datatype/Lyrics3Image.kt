@@ -82,7 +82,7 @@ class Lyrics3Image : AbstractDataType {
         }
     }
 
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         return writeString().toByteArray(StandardCharsets.ISO_8859_1)
     }
 

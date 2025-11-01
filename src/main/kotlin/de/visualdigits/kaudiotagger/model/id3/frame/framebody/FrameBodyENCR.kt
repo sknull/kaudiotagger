@@ -93,9 +93,6 @@ class FrameBodyENCR
         return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
 
-    /**
-     * @param owner
-     */
     fun setOwner(owner: String?) {
         setObjectValue(DataTypes.OBJ_OWNER, owner)
     }

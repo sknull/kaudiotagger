@@ -77,9 +77,6 @@ class FrameBodyMLLT
         return ID3v24FrameId.MPEG_LOCATION_LOOKUP_TABLE.id
     }
 
-    /**
-     * TODO:proper mapping
-     */
     override fun setupObjectList() {
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }

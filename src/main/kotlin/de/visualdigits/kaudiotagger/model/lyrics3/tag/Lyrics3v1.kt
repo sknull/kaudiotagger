@@ -48,9 +48,6 @@ class Lyrics3v1: AbstractLyrics3 {
 
     override fun supportedTag(): SupportedTag = SupportedTag.Lyrics3V1Tag
 
-    /**
-     * @param byteBuffer
-     */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null || !seek(byteBuffer)) {
             return false
@@ -65,20 +62,10 @@ class Lyrics3v1: AbstractLyrics3 {
         return true
     }
 
-    /**
-     * TODO implement
-     *
-     * @param byteBuffer
-     * @return
-     */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
         return false
     }
 
-    /**
-     * @param file
-     * @return
-     */
     fun seek(file: RandomAccessFile): Boolean {
         val buffer = ByteArray(5100 + 9 + 11)
         var lyricsEnd: String
@@ -122,10 +109,6 @@ class Lyrics3v1: AbstractLyrics3 {
         return true
     }
 
-    /**
-     * @param obj
-     * @return
-     */
     override fun isSubsetOf(obj: Any?): Boolean {
         return ((obj is Lyrics3v1) &&
                 (obj.lyric.contains(this.lyric))
@@ -140,9 +123,6 @@ class Lyrics3v1: AbstractLyrics3 {
         return "LYRICSBEGIN".length + lyric.length + "LYRICSEND".length
     }
 
-    /**
-     * @param file
-     */
     override fun write(file: RandomAccessFile) {
         var str: String
         var offset: Int

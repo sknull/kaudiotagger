@@ -80,9 +80,6 @@ class FrameBodyCRM
         return ID3v22FrameId.ENCRYPTED_FRAME.id
     }
 
-    /**
-     * @param description
-     */
     fun getOwner(description: String?) {
         setObjectValue(DataTypes.OBJ_OWNER, description)
     }

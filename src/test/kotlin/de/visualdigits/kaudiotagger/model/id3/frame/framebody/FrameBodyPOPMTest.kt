@@ -57,7 +57,7 @@ class FrameBodyPOPMTest : AbstractTestCase() {
 
         fun getInitialisedFrame(): ID3v24Frame {
             val frame: ID3v24Frame = ID3v24Frame(ID3v24FrameId.POPULARIMETER.id)
-            val fb: FrameBodyPOPM? = FrameBodyPOPMTest.getInitialisedBody()
+            val fb: FrameBodyPOPM = getInitialisedBody()
             frame.frameBody = fb
             return frame
         }

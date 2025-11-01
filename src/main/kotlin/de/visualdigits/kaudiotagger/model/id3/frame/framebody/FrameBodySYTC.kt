@@ -119,7 +119,7 @@ class FrameBodySYTC: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
      */
     fun setTimestampFormat(timestampFormat: Int) {
         requireNotNull(EventTimingTimestampTypes.fromId(timestampFormat)) { "Timestamp format must be 1 or 2 (ID3v2.4, 4.7): $timestampFormat" }
-        setObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT, timestampFormat);
+        setObjectValue(DataTypes.OBJ_TIME_STAMP_FORMAT, timestampFormat)
     }
 
     /**

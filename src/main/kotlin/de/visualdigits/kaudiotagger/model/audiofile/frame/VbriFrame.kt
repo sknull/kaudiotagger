@@ -14,7 +14,7 @@ class VbriFrame {
         // The offset into frame
         val VBRI_OFFSET: Int = MPEGFrameHeader.HEADER_SIZE + 32
 
-        const val VBRI_HEADER_BUFFER_SIZE: Int = 120 // TODO this is just a guess, not right
+        const val VBRI_HEADER_BUFFER_SIZE: Int = 120 // this is just a guess, not right
         val MAX_BUFFER_SIZE_NEEDED_TO_READ_VBRI: Int = VBRI_OFFSET + VBRI_HEADER_BUFFER_SIZE
         const val VBRI_IDENTIFIER_BUFFER_SIZE: Int = 4
         const val VBRI_DELAY_BUFFER_SIZE: Int = 2

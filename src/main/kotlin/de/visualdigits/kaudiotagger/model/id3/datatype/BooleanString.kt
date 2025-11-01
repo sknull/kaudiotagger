@@ -19,9 +19,6 @@ class BooleanString : AbstractDataType {
         return 1
     }
 
-    /**
-     * @param offset
-     */
     override fun readByteArray(byteArray: ByteArray, offset: Int) {
         val b = byteArray[offset]
         setValue(b != '0'.code.toByte())
@@ -31,7 +28,7 @@ class BooleanString : AbstractDataType {
         return getValue()?.toString()?:""
     }
 
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         val booleanValue = ByteArray(1)
         if (getValue() == null) {
             booleanValue[0] = '0'.code.toByte()

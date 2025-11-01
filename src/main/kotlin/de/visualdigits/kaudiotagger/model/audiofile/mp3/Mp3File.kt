@@ -96,8 +96,6 @@ class MP3File : AudioFile {
      * Read V2tag if exists
      *
      *
-     * TODO:shouldn't we be handing TagExceptions:when will they be thrown
-     *
      * @param file
      * @param loadOptions
      */
@@ -212,37 +210,30 @@ class MP3File : AudioFile {
 
             // It matches the header we found when doing the original search from after the ID3Tag therefore it
             // seems that newAudioHeader was a false match and the original header was correct
-            if (headerTwo.mp3StartByte == firstHeaderAfterTag.mp3StartByte) {
+            return if (headerTwo.mp3StartByte == firstHeaderAfterTag.mp3StartByte) {
                 log.warn(
                     (ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(
                         file?.path,
                         firstHeaderAfterTag.mp3StartByte.toHexString()
                     ))
                 )
-                return firstHeaderAfterTag
-            }
-
-            // It matches the frameCount the header we just found so lends weight to the fact that the audio does indeed start at new header
-            // however it maybe that neither are really headers and just contain the same data being misrepresented as headers.
-            when (headerTwo.numberOfFrames) {
-                headerOne.numberOfFrames -> {
-                    log.warn(
-                        (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                            file?.path,
-                            headerOne.mp3StartByte.toHexString()
-                        ))
-                    )
-                    return headerOne
-                }
-                else -> {
-                    log.warn(
-                        (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                            file?.path,
-                            firstHeaderAfterTag.mp3StartByte.toHexString()
-                        ))
-                    )
-                    return firstHeaderAfterTag
-                }
+                firstHeaderAfterTag
+            }else if (headerTwo.numberOfFrames == headerOne.numberOfFrames) {
+                log.warn(
+                    (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
+                        file?.path,
+                        headerOne.mp3StartByte.toHexString()
+                    ))
+                )
+                headerOne
+            } else {
+                log.warn(
+                    (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
+                        file?.path,
+                        firstHeaderAfterTag.mp3StartByte.toHexString()
+                    ))
+                )
+                firstHeaderAfterTag
             }
         }
     }
@@ -358,7 +349,7 @@ class MP3File : AudioFile {
         // Ensure we are dealing with absolute filepaths not relative ones
         val file = fileToSave.getAbsoluteFile()
 
-        log.debug("Saving  : " + file.getPath())
+        log.debug("Saving  : " + file.path)
 
         // Checks before starting write
         precheck(file)
@@ -457,8 +448,7 @@ class MP3File : AudioFile {
     fun getLyrics3Tag(): AbstractLyrics3? = (tags[SupportedTag.Lyrics3V2Tag]?:tags[SupportedTag.Lyrics3V1Tag]) as? AbstractLyrics3
 
     fun getID3v2TagAsv24(): ID3v24Tag {
-        val tag = getID3v2Tag()
-        return when (tag) {
+        return when (val tag = getID3v2Tag()) {
             is ID3v24Tag -> tag
             else -> ID3v24Tag(tag)
         }

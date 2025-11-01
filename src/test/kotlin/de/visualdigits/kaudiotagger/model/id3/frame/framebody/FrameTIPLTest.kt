@@ -23,10 +23,10 @@ class FrameTIPLTest : AbstractTestCase() {
         Assertions.assertEquals(ID3v24FrameId.INVOLVED_PEOPLE.id, frame.getIdentifier())
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, fb.getTextEncoding())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(FrameBodyTIPLTest.INVOLVED_PEOPLE, fb.getText())
     }
@@ -43,10 +43,10 @@ class FrameTIPLTest : AbstractTestCase() {
         )
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, fb.getTextEncoding())
         Assertions.assertFalse(
-            ID3v23FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v23FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v23FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v23FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(FrameBodyTIPLTest.INVOLVED_PEOPLE, fb.getText())
     }
@@ -57,7 +57,7 @@ class FrameTIPLTest : AbstractTestCase() {
             "testV1.mp3",
             "test1016.mp3"
         )
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -66,7 +66,7 @@ class FrameTIPLTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.INVOLVED_PEOPLE.id) as ID3v24Frame
@@ -80,7 +80,7 @@ class FrameTIPLTest : AbstractTestCase() {
             "testV1.mp3",
             "test1016.mp3"
         )
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -89,7 +89,7 @@ class FrameTIPLTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.INVOLVED_PEOPLE.id) as ID3v24Frame
@@ -103,7 +103,7 @@ class FrameTIPLTest : AbstractTestCase() {
             "testV1.mp3",
             "test1004.mp3"
         )
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         var frame = ID3v24Frame(ID3v24FrameId.INVOLVED_PEOPLE.id)
         frame.frameBody = FrameBodyTIPL()
@@ -115,7 +115,7 @@ class FrameTIPLTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         frame = mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.INVOLVED_PEOPLE.id) as ID3v24Frame
@@ -129,7 +129,7 @@ class FrameTIPLTest : AbstractTestCase() {
             "testV1.mp3",
             "test1005.mp3"
         )
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -139,7 +139,7 @@ class FrameTIPLTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload and convert to v23 and save
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val v23Tag = ID3v23Tag(mp3File.getID3v2TagAsv24())
         mp3File.setTag(v23Tag)
 
@@ -147,7 +147,7 @@ class FrameTIPLTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v23FrameId.INVOLVED_PEOPLE.id) as ID3v23Frame

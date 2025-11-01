@@ -177,9 +177,6 @@ class FrameBodyUSLT: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         setObjectValue(DataTypes.OBJ_LYRICS, lyric)
     }
 
-    /**
-     * @param line
-     */
     fun addLyric(line: Lyrics3Line) {
         this.setLyric(this.getLyric() + line.writeString())
     }

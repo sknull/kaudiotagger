@@ -163,9 +163,6 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
     /**
      * Setup the Object List. All text frames contain a text encoding
      * and then a text string.
-     *
-     *
-     * TODO:would like to make final but cannot because overridden by FrameBodyTXXX
      */
     override fun setupObjectList() {
         objectList.add(

@@ -9,16 +9,16 @@ class ID3v24FrameBodyTest {
     @Test
     fun testBodyImplementationsAreComplete() {
         var success = true
-        for (field in ID3v24FrameId::class.java.getDeclaredFields()) {
-            if (String::class.java == field.getType() &&
-                java.lang.reflect.Modifier.isPublic(field.getModifiers()) &&
-                java.lang.reflect.Modifier.isStatic(field.getModifiers()) &&
-                java.lang.reflect.Modifier.isFinal(field.getModifiers()) &&
-                field.getName().startsWith("FRAME_ID")
+        for (field in ID3v24FrameId::class.java.declaredFields) {
+            if (String::class.java == field.type &&
+                java.lang.reflect.Modifier.isPublic(field.modifiers) &&
+                java.lang.reflect.Modifier.isStatic(field.modifiers) &&
+                java.lang.reflect.Modifier.isFinal(field.modifiers) &&
+                field.name.startsWith("FRAME_ID")
             ) {
                 val frameID = field.get(null) as? String
-                val packageName = ID3v24FrameBody::class.java.getPackage().getName()
-                val bodyClass = java.lang.Class.forName(
+                val packageName = ID3v24FrameBody::class.java.getPackage().name
+                val bodyClass = Class.forName(
                     packageName + ".FrameBody" + frameID
                 )
                 success = success and isCompatible(ID3v24FrameBody::class.java, bodyClass)
@@ -31,7 +31,7 @@ class ID3v24FrameBodyTest {
         }
     }
 
-    private fun isCompatible(superType: java.lang.Class<*>, subType: java.lang.Class<*>): Boolean {
+    private fun isCompatible(superType: Class<*>, subType: Class<*>): Boolean {
         var compatible = true
         if (!superType.isAssignableFrom(subType)) {
             compatible = false

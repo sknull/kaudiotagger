@@ -101,9 +101,6 @@ class Lyrics3v2Field: AbstractTagFrame {
         this.read(byteBuffer)
     }
 
-    /**
-     * @param byteBuffer
-     */
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
             return false
@@ -119,7 +116,7 @@ class Lyrics3v2Field: AbstractTagFrame {
         byteBuffer[buffer, 0, 3]
         val identifier = String(buffer, 0, 3)
         // is this a valid identifier?
-        if (!Lyrics3v2Fields.Companion.isLyrics3v2FieldIdentifier(identifier)) {
+        if (!Lyrics3v2Fields.isLyrics3v2FieldIdentifier(identifier)) {
             throw InvalidTagException("$identifier is not a valid ID3v2.4 frame")
         }
         frameBody = readBody(identifier, byteBuffer)
@@ -179,9 +176,6 @@ class Lyrics3v2Field: AbstractTagFrame {
         return frameBody?.getIdentifier()?:""
     }
 
-    /**
-     * @param file
-     */
     fun write(file: RandomAccessFile) {
         if (((frameBody?.getSize()?:0) > 0) ||
             TagOptionSingleton.lyrics3SaveEmptyField

@@ -99,9 +99,6 @@ class FrameBodyLINK
         return getObjectValue(DataTypes.OBJ_ID) as? String
     }
 
-    /**
-     * @param additionalData
-     */
     fun getAdditionalData(additionalData: String?) {
         setObjectValue(DataTypes.OBJ_ID, additionalData)
     }
@@ -110,9 +107,6 @@ class FrameBodyLINK
         return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
-    /**
-     * @param frameIdentifier
-     */
     fun getFrameIdentifier(frameIdentifier: String?) {
         setObjectValue(DataTypes.OBJ_DESCRIPTION, frameIdentifier)
     }

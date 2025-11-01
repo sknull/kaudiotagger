@@ -6,7 +6,6 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameExceptio
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
-import de.visualdigits.kaudiotagger.model.common.frame.MultiFrame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyEncrypted
@@ -14,8 +13,6 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupport
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.StatusFlags
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.lang.reflect.Constructor
 import java.lang.reflect.InvocationTargetException
@@ -262,13 +259,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      */
     override fun getContent(): String? {
         return frameBody?.getUserFriendlyValue()
-    }
-
-    /**
-     * @param b
-     */
-    override fun isBinary(b: Boolean) {
-        // do nothing because whether or not a field is binary is defined by its id and is immutable
     }
 
     override fun isEmpty(): Boolean {

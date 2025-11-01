@@ -126,11 +126,6 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
      * @param language
      */
     fun setLanguage(language: String?) {
-        // TODO not sure if this might break existing code
-        /*if(language==null)
-        {
-             throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        } */
         setObjectValue(DataTypes.OBJ_LANGUAGE, language)
     }
 
@@ -148,9 +143,6 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         return (getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated).getValueAtIndex(0)
     }
 
-    /**
-     * @param text
-     */
     fun setText(text: String) {
         setObjectValue(DataTypes.OBJ_TEXT, text)
     }

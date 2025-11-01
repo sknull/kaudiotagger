@@ -3,8 +3,6 @@ package de.visualdigits.kaudiotagger.model.id3.frame
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
-import de.visualdigits.kaudiotagger.model.common.frame.MultiFrame
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
@@ -156,13 +154,6 @@ class ID3v22Frame: AbstractID3v2Frame {
                 log.debug("v2:UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
             }
         }
-    }
-
-    /**
-     * @return true if considered a common frame
-     */
-    override fun isBinary(): Boolean {
-        return ID3v22FrameId.isBinary(getIdentifier())
     }
 
     /**

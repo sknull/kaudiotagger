@@ -73,9 +73,6 @@ class FrameBodyEQUA
         return ID3v23FrameId.EQUALISATION.id
     }
 
-    /**
-     * TODO:proper mapping
-     */
     override fun setupObjectList() {
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }

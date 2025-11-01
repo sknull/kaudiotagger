@@ -124,46 +124,38 @@ open class StringFixedLength : AbstractString {
 
         // We must return the defined size.
         // To check now because size is in bytes not chars
-        if (dataBuffer != null) {
+        return if (dataBuffer != null) {
             // Everything ok
             val limit = dataBuffer.limit()
             when {
                 limit == size -> {
                     data = ByteArray(limit)
                     dataBuffer[data, 0, limit]
-                    return data
+                    data
                 }
                 limit > size -> {
-                    log.warn(
-                        "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too long so stripping extra length"
-                    )
+                    log.warn("There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too long so stripping extra length")
                     data = ByteArray(size)
                     dataBuffer[data, 0, size]
-                    return data
+                    data
                 }
                 else -> {
-                    log.warn(
-                        "There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too short so padding with spaces to make up extra length"
-                    )
-
+                    log.warn("There was a problem writing the following StringFixedlength Field:${getValue()} when converted to bytes has length of:${limit} but field was defined with length of:$size too short so padding with spaces to make up extra length")
                     data = ByteArray(size)
                     dataBuffer[data, 0, limit]
-
                     (limit..<size).forEach { i ->
                         data[i] = ' '.code.toByte()
                     }
-                    return data
+                    data
                 }
             }
         } else {
-            log.warn(
-                "There was a serious problem writing the following StringFixedlength Field:${getValue()}:using default value instead"
-            )
+            log.warn("There was a serious problem writing the following StringFixedlength Field:${getValue()}:using default value instead")
             data = ByteArray(size)
             (0..<size).forEach { i ->
                 data[i] = ' '.code.toByte()
             }
-            return data
+            data
         }
     }
 }

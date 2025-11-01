@@ -319,17 +319,13 @@ class ID3v22Tag : AbstractID3v2Tag {
         // Read the size from the Tag Header
         this.fileReadBytes = size
         log.debug("Start of frame body at:${byteBuffer.position()},frames sizes and padding is:$size")
-        /* todo not done yet. Read the first Frame, there seems to be quite a
-         ** common case of extra data being between the tag header and the first
-         ** frame so should we allow for this when reading first frame, but not subsequent frames
-         */
         // Read the frames until got to upto the size as specified in header
         while (byteBuffer.position() < size) {
             try {
                 // Read Frame
                 log.debug("looking for next frame at:${byteBuffer.position()}")
                 val newFrame = ID3v22Frame(byteBuffer)
-                val identifier = newFrame?.getIdentifier()
+                val identifier = newFrame.getIdentifier()
                 loadFrameIntoMap(identifier, newFrame)
             } catch (ex: EmptyFrameException) { // Found Empty Frame
                 log.warn("Empty Frame:${ex.message}")
@@ -350,18 +346,18 @@ class ID3v22Tag : AbstractID3v2Tag {
         super.loadFrameIntoMap(frameId, newFrame)
     }
 
-    override fun addFrame(frame: AbstractID3v2Frame) {
+    override fun addFrame(newFrame: AbstractID3v2Frame) {
         try {
-            if (frame is ID3v22Frame) {
-                copyFrameIntoMap(frame)
+            if (newFrame is ID3v22Frame) {
+                copyFrameIntoMap(newFrame)
             } else {
-                val frames: MutableList<AbstractID3v2Frame> = convertFrame(frame)
+                val frames: MutableList<AbstractID3v2Frame> = convertFrame(newFrame)
                 for (next in frames) {
                     copyFrameIntoMap(next)
                 }
             }
         } catch (_: InvalidFrameException) {
-            log.error("Unable to convert frame:${frame.getIdentifier()}")
+            log.error("Unable to convert frame:${newFrame.getIdentifier()}")
         }
     }
 
@@ -534,30 +530,28 @@ class ID3v22Tag : AbstractID3v2Tag {
     override fun createField(artwork: Artwork): TagField {
         val frame = createFrame(getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART)?.frameId)
         val body = frame.frameBody as FrameBodyPIC
-        when {
-            !artwork.isLinked -> {
-                body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
-                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-                body.setObjectValue(
-                    DataTypes.OBJ_IMAGE_FORMAT,
-                    ImageFormats.fromMimeType(artwork.mimeType)
-                )
-                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-                return frame
-            }
-            else -> {
-                body.setObjectValue(
-                    DataTypes.OBJ_PICTURE_DATA,
-                    artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
-                )
-                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-                body.setObjectValue(
-                    DataTypes.OBJ_IMAGE_FORMAT,
-                    FrameBodyAPIC.IMAGE_IS_URL
-                )
-                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-                return frame
-            }
+        return if (!artwork.isLinked) {
+            body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(
+                DataTypes.OBJ_IMAGE_FORMAT,
+                ImageFormats.fromMimeType(artwork.mimeType)
+            )
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            frame
+        }
+        else {
+            body.setObjectValue(
+                DataTypes.OBJ_PICTURE_DATA,
+                artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
+            )
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(
+                DataTypes.OBJ_IMAGE_FORMAT,
+                FrameBodyAPIC.IMAGE_IS_URL
+            )
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            frame
         }
     }
 

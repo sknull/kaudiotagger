@@ -84,9 +84,6 @@ class FrameBodyUSER: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return getObjectValue(DataTypes.OBJ_LANGUAGE) as? String
     }
 
-    /**
-     * @param language
-     */
     fun setOwner(language: String?) {
         setObjectValue(DataTypes.OBJ_LANGUAGE, language)
     }

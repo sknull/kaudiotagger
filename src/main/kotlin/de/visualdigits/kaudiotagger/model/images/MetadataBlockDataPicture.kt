@@ -125,17 +125,11 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
      * @param header
      * @param fc
      */
-    // TODO check for buffer underflows see http:// research.eeye.com/html/advisories/published/AD20071115.html
     constructor(header: MetadataBlockHeader, fc: FileChannel) {
         val rawdata = ByteBuffer.allocate(header.dataLength)
         val bytesRead = fc.read(rawdata)
         if (bytesRead < header.dataLength) {
-            throw IOException(
-                "Unable to read required number of databytes read:" +
-                        bytesRead +
-                        ":required:" +
-                        header.dataLength
-            )
+            throw IOException("Unable to read required number of databytes read:$bytesRead:required:${header.dataLength}")
         }
         rawdata.rewind()
         initFromByteBuffer(rawdata)
@@ -254,37 +248,6 @@ class MetadataBlockDataPicture : MetadataBlockData, TagField {
      */
     override fun getRawContent(): ByteArray? {
         return getBytes().array()
-    }
-
-    /**
-     * Determines whether the represented field contains (is made up of) binary
-     * data, instead of text data.<br></br>
-     * Software can identify fields to be displayed because they are human
-     * readable if this method returns `false`.
-     *
-     * @return `true` if field represents binary data (not human
-     * readable).
-     */
-    override fun isBinary(): Boolean {
-        return true
-    }
-
-    /**
-     * This method will set the field to represent binary data.<br></br>
-     *
-     *
-     * Some implementations may support conversions.<br></br>
-     * As of now (Octobre 2005) there is no implementation really using this
-     * method to perform useful operations.
-     *
-     * @param b `true`, if the field contains binary data.
-     */
-    @Deprecated(
-        """As for now is of no use. Implementations should use another
-      way of setting this property."""
-    )
-    override fun isBinary(b: Boolean) {
-        // Do nothing, always true
     }
 
     /**

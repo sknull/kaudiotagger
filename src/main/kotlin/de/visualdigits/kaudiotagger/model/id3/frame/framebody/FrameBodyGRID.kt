@@ -85,9 +85,6 @@ class FrameBodyGRID
         }
     }
 
-    /**
-     * @param textEncoding
-     */
     fun setGroupSymbol(textEncoding: Byte) {
         setObjectValue(DataTypes.OBJ_GROUP_SYMBOL, textEncoding)
     }
@@ -105,9 +102,6 @@ class FrameBodyGRID
         return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
 
-    /**
-     * @param owner
-     */
     fun setOwner(owner: String?) {
         setObjectValue(DataTypes.OBJ_OWNER, owner)
     }

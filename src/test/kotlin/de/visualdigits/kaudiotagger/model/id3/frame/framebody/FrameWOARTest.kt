@@ -20,10 +20,10 @@ class FrameWOARTest : AbstractTestCase() {
         Assertions.assertEquals(ID3v24FrameId.URL_ARTIST_WEB.id, frame.getIdentifier())
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, frame.frameBody?.getTextEncoding())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(
             NORMAL_LINK,
@@ -34,7 +34,7 @@ class FrameWOARTest : AbstractTestCase() {
     @Test
     fun testSaveToFile() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -43,7 +43,7 @@ class FrameWOARTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.URL_ARTIST_WEB.id) as ID3v24Frame
@@ -51,10 +51,10 @@ class FrameWOARTest : AbstractTestCase() {
         Assertions.assertEquals(ID3v24FrameId.URL_ARTIST_WEB.id, frame.getIdentifier())
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, frame.frameBody?.getTextEncoding())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(
             NORMAL_LINK,
@@ -69,10 +69,10 @@ class FrameWOARTest : AbstractTestCase() {
         Assertions.assertEquals(ID3v24FrameId.URL_ARTIST_WEB.id, frame.getIdentifier())
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, frame.frameBody?.getTextEncoding())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(
             UNICODE_ENCODED,
@@ -84,7 +84,7 @@ class FrameWOARTest : AbstractTestCase() {
     @Test
     fun testSaveUnicodeToFile() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -93,7 +93,7 @@ class FrameWOARTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.URL_ARTIST_WEB.id) as ID3v24Frame
@@ -101,10 +101,10 @@ class FrameWOARTest : AbstractTestCase() {
         Assertions.assertEquals(ID3v24FrameId.URL_ARTIST_WEB.id, frame.getIdentifier())
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, frame.frameBody?.getTextEncoding())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(
             UNICODE_ENCODED,
@@ -116,7 +116,7 @@ class FrameWOARTest : AbstractTestCase() {
     @Test
     fun testSaveUnicodeToFile2() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -125,7 +125,7 @@ class FrameWOARTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.URL_ARTIST_WEB.id) as ID3v24Frame
@@ -133,10 +133,10 @@ class FrameWOARTest : AbstractTestCase() {
         Assertions.assertEquals(ID3v24FrameId.URL_ARTIST_WEB.id, frame.getIdentifier())
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, frame.frameBody?.getTextEncoding())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(
             UNICODE_ENCODED,

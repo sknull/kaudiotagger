@@ -13,7 +13,7 @@ class FrameSYLTTest : AbstractTestCase() {
     @Test
     fun testWriteFrame() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         val id3 = ID3v24Tag()
 
@@ -49,7 +49,7 @@ class FrameSYLTTest : AbstractTestCase() {
         mp3File.setTag(id3)
         mp3File.save()
 
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         frame = mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.SYNC_LYRIC.id) as ID3v24Frame

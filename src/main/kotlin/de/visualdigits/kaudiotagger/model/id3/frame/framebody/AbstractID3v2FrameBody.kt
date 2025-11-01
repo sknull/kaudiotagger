@@ -47,9 +47,6 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
      *
      * @param byteBuffer file to read
      */
-    // TODO why don't we just slice byteBuffer, set limit to size and convert readByteArray to take a ByteBuffer
-    // then we wouldn't have to temporary allocate space for the buffer, using lots of needless memory
-    // and providing extra work for the garbage collector.
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null) {
             return false

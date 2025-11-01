@@ -12,14 +12,14 @@ class FrameBodyUFIDTest : AbstractTestCase() {
     fun testCreateFrameBody() {
         var fb: FrameBodyUFID? = null
         fb = FrameBodyUFID()
-        fb.setOwner(FrameBodyUFIDTest.Companion.TEST_OWNER)
-        fb.setUniqueIdentifier(FrameBodyUFIDTest.Companion.TEST_OBJECT_DATA)
+        fb.setOwner(TEST_OWNER)
+        fb.setUniqueIdentifier(TEST_OBJECT_DATA)
 
         assertEquals(ID3v24FrameId.UNIQUE_FILE_ID.id, fb!!.getIdentifier())
         assertEquals(TextEncoding.ISO_8859_1.id, fb.getTextEncoding())
-        assertEquals(FrameBodyUFIDTest.Companion.TEST_OWNER, fb.getOwner())
-        assertEquals(FrameBodyUFIDTest.Companion.TEST_OBJECT_DATA, fb.getObjectValue(DataTypes.OBJ_DATA))
-        assertEquals(FrameBodyUFIDTest.Companion.TEST_OBJECT_DATA, fb.getUniqueIdentifier())
+        assertEquals(TEST_OWNER, fb.getOwner())
+        assertEquals(TEST_OBJECT_DATA, fb.getObjectValue(DataTypes.OBJ_DATA))
+        assertEquals(TEST_OBJECT_DATA, fb.getUniqueIdentifier())
     }
 
     companion object {

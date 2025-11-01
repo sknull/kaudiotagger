@@ -3,7 +3,6 @@ package de.visualdigits.kaudiotagger.model.lyrics3.tag
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
-import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.lyrics3.field.Lyrics3v2Field
@@ -48,7 +47,7 @@ class Lyrics3v2 : AbstractLyrics3 {
             var newField: Lyrics3v2Field?
 
             ID3v24Tag(mp3tag).frameMap.values.forEach { frame ->
-                newField = Lyrics3v2Field(frame as AbstractID3v2Frame)
+                newField = Lyrics3v2Field(frame)
                 fieldMap[newField.getIdentifier()] = newField
             }
         }
@@ -92,27 +91,14 @@ class Lyrics3v2 : AbstractLyrics3 {
         return true
     }
 
-    /**
-     * @param field
-     */
     fun setField(field: Lyrics3v2Field) {
         fieldMap[field.getIdentifier()] = field
     }
 
-    /**
-     * TODO implement
-     *
-     * @param byteBuffer
-     * @return
-     */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
         return false
     }
 
-    /**
-     *
-     * @return
-     */
     private fun seekSize(): Int {
         return -1
     }
@@ -131,25 +117,14 @@ class Lyrics3v2 : AbstractLyrics3 {
         return fieldMap.size
     }
 
-    /**
-     * @param identifier
-     * @return
-     */
     fun hasField(identifier: String?): Boolean {
         return fieldMap.containsKey(identifier)
     }
 
-    /**
-     * @param identifier
-     */
     fun removeField(identifier: String?) {
         fieldMap.remove(identifier)
     }
 
-    /**
-     * @param file
-     * @return
-     */
     fun seek(file: RandomAccessFile): Boolean {
         val buffer = ByteArray(11)
         var lyricEnd: String?
@@ -222,9 +197,6 @@ class Lyrics3v2 : AbstractLyrics3 {
         return 11 + size
     }
 
-    /**
-     * @param file
-     */
     override fun write(file: RandomAccessFile) {
         var offset = 0
 
@@ -292,9 +264,6 @@ class Lyrics3v2 : AbstractLyrics3 {
 
     }
 
-    /**
-     * @param identifier
-     */
     fun updateField(identifier: String) {
         var lyrField: Lyrics3v2Field?
 

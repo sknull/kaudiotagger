@@ -72,9 +72,6 @@ class FrameBodyPRIV: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return getObjectValue(DataTypes.OBJ_DATA) as? ByteArray
     }
 
-    /**
-     * @param data
-     */
     fun setData(data: ByteArray?) {
         setObjectValue(DataTypes.OBJ_DATA, data)
     }
@@ -92,9 +89,6 @@ class FrameBodyPRIV: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return getObjectValue(DataTypes.OBJ_OWNER) as? String
     }
 
-    /**
-     * @param owner
-     */
     fun setOwner(owner: String?) {
         setObjectValue(DataTypes.OBJ_OWNER, owner)
     }

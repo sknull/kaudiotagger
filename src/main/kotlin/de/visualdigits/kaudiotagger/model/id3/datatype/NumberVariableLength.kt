@@ -99,7 +99,7 @@ class NumberVariableLength : AbstractDataType {
      *
      * @return the datatype converted to a byte array
      */
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         val size = getSize()
         val arr: ByteArray?
 
@@ -133,14 +133,13 @@ class NumberVariableLength : AbstractDataType {
      * @return the number of bytes required to write this to a file
      */
     override fun getSize(): Int {
-        when {
+        return when {
             getValue() == null -> {
-                return 0
+                0
             }
             else -> {
                 var temp = ID3Tags.getWholeNumber(getValue())
                 var size = 0
-
                 (MINIMUM_NO_OF_DIGITS..getMaximumLength()).forEach { i ->
                     val current = temp.toByte().toInt() and 0xFF
                     if (current != 0) {
@@ -148,8 +147,7 @@ class NumberVariableLength : AbstractDataType {
                     }
                     temp = temp shr getMaximumLength()
                 }
-
-                return if (this.minimumLength > size) this.minimumLength else size
+                if (this.minimumLength > size) this.minimumLength else size
             }
         }
     }

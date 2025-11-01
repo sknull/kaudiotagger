@@ -36,9 +36,6 @@ class FieldFrameBodyIND : AbstractLyrics3v2FieldFrameBody {
         return getObjectValue("Author") as? String
     }
 
-    /**
-     * @param author
-     */
     fun setAuthor(author: String?) {
         setObjectValue("Author", author)
     }

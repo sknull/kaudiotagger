@@ -44,8 +44,6 @@ object FileUtil {
         try {
             FileOutputStream(paddedFile).use { fouts ->
                 fouts.getChannel().use { fcOut ->
-                    // Create read channel from original file
-                    // TODO lock so cant be modified by anything else whilst reading from it ?
                     FileInputStream(file).use { fins ->
                         fins.getChannel().use { fcIn ->
                             // Write padding to new file (this is where the tag will be written to later)
@@ -95,9 +93,9 @@ object FileUtil {
 
             // Replace file with paddedFile
             replaceFile(file, paddedFile)
-            paddedFile.setLastModified(lastModified)
+            if (!paddedFile.setLastModified(lastModified)) log.warn("Could not set last modified: $lastModified")
         } catch (e: IOException) {
-            paddedFile.delete()
+            if (!paddedFile.delete()) log.warn("Could not delete file: $paddedFile")
             throw e
         }
     }
@@ -134,7 +132,7 @@ object FileUtil {
                 originalFile.absolutePath,
                 originalFileBackup.getName()
             ))
-            newFile.delete()
+            if (!newFile.delete()) log.warn("Could not delete new file: $newFile")
             error(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_FILE_TO_BACKUP.getMsg(originalFile.absolutePath, originalFileBackup.getName()))
         }
 
@@ -148,7 +146,6 @@ object FileUtil {
 
             // Rename the backup back to the original
             if (!originalFileBackup.renameTo(originalFile)) {
-                // TODO now if this happens we are left with testfile.old instead of testfile.mp3
                 log.warn(
                     ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_ORIGINAL_BACKUP_TO_ORIGINAL.getMsg(
                         originalFileBackup.absolutePath,
@@ -158,7 +155,7 @@ object FileUtil {
             }
 
             log.warn(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(originalFile.absolutePath, newFile.getName()))
-            newFile.delete()
+            if (!newFile.delete()) log.warn("Could not delete new file: $newFile")
             error(ErrorMessage.GENERAL_WRITE_FAILED_TO_RENAME_TO_ORIGINAL_FILE.getMsg(originalFile.absolutePath, newFile.getName()))
         } else {
             // Rename was okay so we can now deleteField the backup of the original
@@ -172,9 +169,6 @@ object FileUtil {
     /**
      * Get file lock for writing too file
      *
-     *
-     * TODO:this appears to have little effect on Windows Vista
-     *
      * @param fileChannel
      * @param filePath
      * @return lock or null if locking is not supported
@@ -187,7 +181,7 @@ object FileUtil {
         log.debug("locking fileChannel for $filePath")
         return try {
             fileChannel.tryLock()
-        } catch (exception: IOException) { // Assumes locking is not supported on this platform so just returns null
+        } catch (_: IOException) { // Assumes locking is not supported on this platform so just returns null
             null
         } ?: throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_FILE_LOCKED.getMsg(filePath))
     }

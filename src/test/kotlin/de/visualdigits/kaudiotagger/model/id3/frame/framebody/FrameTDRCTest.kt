@@ -16,11 +16,11 @@ class FrameTDRCTest : AbstractTestCase() {
             "testV1.mp3"
         )
 
-        val mp3File =  MP3File.Companion.read(testFile)
-        val v23frame =  mp3File
+        val mp3File =  MP3File.read(testFile)
+        mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v23FrameId.TYER.id) as? ID3v23Frame
-        val v24frame =  mp3File
+        mp3File
             .getID3v2TagAsv24()
             ?.getFrame(ID3v23FrameId.TYER.id) as? ID3v24Frame
     }

@@ -98,9 +98,6 @@ class FrameBodyGEOB: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return getObjectValue(DataTypes.OBJ_DESCRIPTION) as? String
     }
 
-    /**
-     * @param description
-     */
     fun setDescription(description: String?) {
         setObjectValue(DataTypes.OBJ_DESCRIPTION, description)
     }

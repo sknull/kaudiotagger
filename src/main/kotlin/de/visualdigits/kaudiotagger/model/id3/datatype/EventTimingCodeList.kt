@@ -20,7 +20,7 @@ class EventTimingCodeList : AbstractDataTypeList<EventTimingCode> {
 
     constructor(body: FrameBodyETCO) : super(DataTypes.OBJ_TIMED_EVENT_LIST, body)
 
-    override fun createListElement(): EventTimingCode? {
+    override fun createListElement(): EventTimingCode {
         return EventTimingCode(DataTypes.OBJ_TIMED_EVENT, getBody())
     }
 }

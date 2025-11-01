@@ -26,9 +26,6 @@ class StringDate : StringFixedLength {
         }
     }
 
-    /**
-     * @param value
-     */
     override fun setValue(value: Any?) {
         if (value != null) {
             setValue(ID3Tags.stripChar(value.toString(), '-'))

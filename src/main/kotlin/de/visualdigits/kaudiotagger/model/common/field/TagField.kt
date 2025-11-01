@@ -24,31 +24,6 @@ interface TagField {
     fun getRawContent(): ByteArray?
 
     /**
-     * Determines whether the represented field contains (is made up of) binary
-     * data, instead of text data.<br></br>
-     * Software can identify fields to be displayed because they are human
-     * readable if this method returns `false`.
-     *
-     * @return `true` if field represents binary data (not human
-     * readable).
-     */
-    fun isBinary(): Boolean
-
-    /**
-     * This method will set the field to represent binary data.<br></br>
-     *
-     *
-     * Some implementations may support conversions.<br></br>
-     * As of now (Octobre 2005) there is no implementation really using this
-     * method to perform useful operations.
-     *
-     * @param b `true`, if the field contains binary data.
-     * //@deprecated As for now is of no use. Implementations should use another
-     * //            way of setting this property.
-     */
-    fun isBinary(b: Boolean)
-
-    /**
      * Identifies a field to be of common use.<br></br>
      *
      *

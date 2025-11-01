@@ -41,9 +41,6 @@ class StringHashMap: StringFixedLength, HashMapInterface<String, String> {
         this.valueToKeyMap = copyObject.valueToKeyMap
     }
 
-    /**
-     * @param value
-     */
     override fun setValue(value: Any?) {
         if (value is String) {
             // Issue #273 temporary hack for MM

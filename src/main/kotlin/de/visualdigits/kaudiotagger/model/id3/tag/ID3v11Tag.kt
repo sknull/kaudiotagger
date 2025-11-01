@@ -430,7 +430,7 @@ class ID3v11Tag: ID3v1Tag {
         )
     }
 
-    override fun createCompilationField(value: Boolean): TagField? {
+    override fun createCompilationField(value: Boolean): TagField {
         throw java.lang.UnsupportedOperationException(
             ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
         )

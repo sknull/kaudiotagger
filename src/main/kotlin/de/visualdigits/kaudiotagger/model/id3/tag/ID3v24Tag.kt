@@ -655,13 +655,13 @@ class ID3v24Tag : AbstractID3v2Tag {
      * If the frame is already an ID3v24 frame we can add as is, if not we need to convert
      * to id3v24 frame(s)
      *
-     * @param frame
+     * @param newFrame
      */
-    override fun addFrame(frame: AbstractID3v2Frame) {
-        if (frame is ID3v24Frame) {
-            copyFrameIntoMap(frame)
+    override fun addFrame(newFrame: AbstractID3v2Frame) {
+        if (newFrame is ID3v24Frame) {
+            copyFrameIntoMap(newFrame)
         } else {
-            convertFrame(frame).forEach { next ->
+            convertFrame(newFrame).forEach { next ->
                 copyFrameIntoMap(next)
             }
         }
@@ -817,9 +817,6 @@ class ID3v24Tag : AbstractID3v2Tag {
      * Write the ID3 header to the ByteBuffer.
      *
      *
-     * TODO Calculate the CYC Data Check
-     * TODO Reintroduce Extended Header
-     *
      * @param padding is the size of the padding
      * @param size    is the size of the body data
      * @return ByteBuffer
@@ -927,7 +924,6 @@ class ID3v24Tag : AbstractID3v2Tag {
             // Write Tag Restriction
             if (isTagRestriction) {
                 extHeaderBuffer.put(TAG_EXT_HEADER_RESTRICTION_DATA_LENGTH.toByte())
-                // todo not currently setting restrictions
                 extHeaderBuffer.put(0)
             }
         }
@@ -954,24 +950,22 @@ class ID3v24Tag : AbstractID3v2Tag {
     override fun createField(artwork: Artwork): TagField {
         val frame = createFrame(getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART)?.frameId)
         val body: FrameBodyAPIC = frame.frameBody as FrameBodyAPIC
-        when {
-            !artwork.isLinked -> {
-                body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
-                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-                body.setObjectValue(DataTypes.OBJ_MIME_TYPE, artwork.mimeType)
-                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-                return frame
-            }
-            else -> {
-                body.setObjectValue(
-                    DataTypes.OBJ_PICTURE_DATA,
-                    artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
-                )
-                body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
-                body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
-                body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
-                return frame
-            }
+        return if (!artwork.isLinked) {
+            body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.binaryData)
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, artwork.mimeType)
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            frame
+        }
+        else {
+            body.setObjectValue(
+                DataTypes.OBJ_PICTURE_DATA,
+                artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
+            )
+            body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
+            body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
+            body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
+            frame
         }
     }
 

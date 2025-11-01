@@ -418,7 +418,7 @@ object Utils {
                 val deleteResult = fromFile.delete()
                 if (!deleteResult) {
                     log.error("Unable to delete File:" + fromFile)
-                    toFile.delete()
+                    if (!toFile.delete()) error("Could not delete to file: $toFile")
                     return false
                 }
                 true
@@ -432,8 +432,6 @@ object Utils {
     /**
      * Copy a File.
      *
-     *
-     * ToDo refactor AbstractTestCase to use this method as it contains an exact duplicate.
      *
      * @param fromFile The existing File
      * @param toFile   The new File

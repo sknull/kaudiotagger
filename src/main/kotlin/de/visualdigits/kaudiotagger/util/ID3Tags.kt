@@ -95,10 +95,10 @@ object ID3Tags {
         }
         // Has idv22 been mapped to v23
         val v23id = ID3Frames.convertv22Tov23[ID3v22FrameId.fromId(identifier?.take(3))]
-        if (v23id != null) {
+        return if (v23id != null) {
             // has v2.3 been mapped to v2.4
             val v24id = ID3Frames.convertv23Tov24[v23id]
-            return if (v24id == null) {
+            if (v24id == null) {
                 // if not it may be because v2.3 and and v2.4 are same so wont be
                 // in mapping
                 if (ID3v24FrameId.contains(v23id.id)) {
@@ -110,7 +110,7 @@ object ID3Tags {
                 v24id
             }
         } else {
-            return null
+            null
         }
     }
 

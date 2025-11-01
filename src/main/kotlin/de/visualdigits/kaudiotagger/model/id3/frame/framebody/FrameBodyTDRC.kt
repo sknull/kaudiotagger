@@ -153,29 +153,28 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * v4 value, if not this won't.
      */
     fun getFormattedText(): String {
-        val sb = StringBuilder();
-        if (originalID == null) {
-            return this.getText() ?: ""
-        }
-        else {
+        val sb = StringBuilder()
+        return if (originalID == null) {
+            this.getText() ?: ""
+        } else {
             if (year != null && year?.trim()?.isNotEmpty() == true) {
-                sb.append(formatAndParse(formatYearOut, formatYearIn, year));
+                sb.append(formatAndParse(formatYearOut, formatYearIn, year))
             }
             if (!date.equals("")) {
                 if (monthOnly) {
-                    sb.append(formatAndParse(formatMonthOut, formatDateIn, date));
+                    sb.append(formatAndParse(formatMonthOut, formatDateIn, date))
                 } else {
-                    sb.append(formatAndParse(formatDateOut, formatDateIn, date));
+                    sb.append(formatAndParse(formatDateOut, formatDateIn, date))
                 }
             }
             if (!time.equals("")) {
                 if (hoursOnly) {
-                    sb.append(formatAndParse(formatHoursOut, formatTimeIn, time));
+                    sb.append(formatAndParse(formatHoursOut, formatTimeIn, time))
                 } else {
-                    sb.append(formatAndParse(formatTimeOut, formatTimeIn, time));
+                    sb.append(formatAndParse(formatTimeOut, formatTimeIn, time))
                 }
             }
-            return sb.toString();
+            sb.toString()
         }
     }
 
@@ -219,8 +218,6 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      * @param dateRecord
      * @param precision
      */
-    // TODO currently if user has entered Year and Month, we only store in v23, should we store month with
-    // first day
     private fun extractID3v23Formats(
         dateRecord: Date,
         precision: Int
@@ -250,12 +247,7 @@ class FrameBodyTDRC: AbstractFrameBodyTextInfo, ID3v24FrameBody {
                 time = formatDateAsTime(d)
                 hoursOnly = true
             }
-            PRECISION_MINUTE -> {
-                year = formatDateAsYear(d)
-                date = formatDateAsDate(d)
-                time = formatDateAsTime(d)
-            }
-            PRECISION_SECOND -> {
+            PRECISION_MINUTE, PRECISION_SECOND -> {
                 year = formatDateAsYear(d)
                 date = formatDateAsDate(d)
                 time = formatDateAsTime(d)

@@ -37,7 +37,6 @@ import java.nio.ByteBuffer
  * @author : Paul Taylor
  * @author : Eric Farng
  * @version $Id$
- * TODO : Counter should be optional, whereas we always expect it although allow a size of zero
  * needs testing.
  */
 class FrameBodyPOPM: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
@@ -91,9 +90,6 @@ class FrameBodyPOPM: AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23FrameBody {
         return getObjectValue(DataTypes.OBJ_EMAIL) as? String
     }
 
-    /**
-     * @param description
-     */
     fun setEmailToUser(description: String?) {
         setObjectValue(DataTypes.OBJ_EMAIL, description)
     }

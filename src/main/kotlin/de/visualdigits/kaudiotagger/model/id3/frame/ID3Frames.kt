@@ -110,7 +110,6 @@ abstract class ID3Frames {
             convertv23Tov22[ID3v23FrameId.TITLE_SORT_ORDER_MUSICBRAINZ] = ID3v22FrameId.TITLE_SORT_ORDER_ITUNES
             convertv23Tov22[ID3v23FrameId.ARTIST_SORT_ORDER_MUSICBRAINZ] = ID3v22FrameId.ARTIST_SORT_ORDER_ITUNES
             convertv23Tov22[ID3v23FrameId.ALBUM_SORT_ORDER_MUSICBRAINZ] = ID3v22FrameId.ALBUM_SORT_ORDER_ITUNES
-            // TODO What does CRM Map to
             // Force v22 to v23,  Extra fields in v23 version
             forcev22Tov23[ID3v22FrameId.ATTACHED_PICTURE] = ID3v23FrameId.ATTACHED_PICTURE
             // Force v23 to v22
@@ -137,7 +136,6 @@ abstract class ID3Frames {
             forcev23Tov24[ID3v23FrameId.TYER] = ID3v24FrameId.YEAR
 
             // Note Force v24 to v23, TDRC is a 1M relationship handled specially.
-            // @TODO EQUALISATION
             forcev24Tov23[ID3v24FrameId.RELATIVE_VOLUME_ADJUSTMENT2] = ID3v23FrameId.RELATIVE_VOLUME_ADJUSTMENT
             // Used to be a special frame now a text frame
             forcev24Tov23[ID3v24FrameId.INVOLVED_PEOPLE] = ID3v23FrameId.INVOLVED_PEOPLE

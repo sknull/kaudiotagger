@@ -24,10 +24,10 @@ class FramePICAndAPICTest : AbstractTestCase() {
 
         Assertions.assertEquals(ID3v24FrameId.ATTACHED_PICTURE.id, frame.getIdentifier())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(FrameBodyAPICTest.DESCRIPTION, fb.getDescription())
     }
@@ -43,10 +43,10 @@ class FramePICAndAPICTest : AbstractTestCase() {
             frame.getIdentifier()
         )
         Assertions.assertFalse(
-            ID3v23FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v23FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v23FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v23FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(FrameBodyAPICTest.DESCRIPTION, fb.getDescription())
     }
@@ -62,10 +62,10 @@ class FramePICAndAPICTest : AbstractTestCase() {
             frame.getIdentifier()
         )
         Assertions.assertFalse(
-            ID3v22FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v22FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v22FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v22FrameId.isSupported(frame.getIdentifier())
         )
         Assertions.assertEquals(FrameBodyPICTest.DESCRIPTION, fb.getDescription())
     }
@@ -73,7 +73,7 @@ class FramePICAndAPICTest : AbstractTestCase() {
     @Test
     fun testSaveToFile() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -82,7 +82,7 @@ class FramePICAndAPICTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.ATTACHED_PICTURE.id) as ID3v24Frame
@@ -95,7 +95,7 @@ class FramePICAndAPICTest : AbstractTestCase() {
     @Test
     fun testConvertV24ToV23() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -105,12 +105,12 @@ class FramePICAndAPICTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload and convert to v23 and save
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         mp3File.setTag(ID3v23Tag(mp3File.getID3v2TagAsv24()))
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v23FrameId.ATTACHED_PICTURE.id) as ID3v23Frame
@@ -123,7 +123,7 @@ class FramePICAndAPICTest : AbstractTestCase() {
     @Test
     fun testConvertV24ToV22() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -133,12 +133,12 @@ class FramePICAndAPICTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload and convert to v22 and save
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         mp3File.setTag(ID3v22Tag(mp3File.getID3v2TagAsv24()))
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v22FrameId.ATTACHED_PICTURE.id) as ID3v22Frame
@@ -151,7 +151,7 @@ class FramePICAndAPICTest : AbstractTestCase() {
     @Test
     fun testConvertV22ToV24() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v22Tag()
@@ -163,12 +163,12 @@ class FramePICAndAPICTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload and convert from v22 to v24 and save
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         mp3File.setTag(ID3v24Tag(mp3File.getID3v2Tag()))
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.ATTACHED_PICTURE.id) as ID3v24Frame

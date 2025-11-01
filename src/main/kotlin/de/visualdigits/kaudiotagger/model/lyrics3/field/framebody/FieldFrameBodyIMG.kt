@@ -34,9 +34,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         readString(imageString)
     }
 
-    /**
-     * @param imageString
-     */
     private fun readString(imageString: String) {
         // now read each picture and put in the vector;
         var image: Lyrics3Image?
@@ -109,10 +106,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return false
     }
 
-    /**
-     * @param obj
-     * @return
-     */
     override fun isSubsetOf(obj: Any?): Boolean {
         if (obj !is FieldFrameBodyIMG) {
             return false
@@ -133,9 +126,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return writeString()
     }
 
-    /**
-     * @param value
-     */
     fun setValue(value: String) {
         readString(value)
     }
@@ -156,9 +146,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return str
     }
 
-    /**
-     * @param image
-     */
     fun addImage(image: Lyrics3Image) {
         images.add(image)
     }
@@ -177,9 +164,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return "IMG"
     }
 
-    /**
-     * @param file
-     */
     override fun write(file: RandomAccessFile) {
         val size: Int
         var offset = 0
@@ -225,9 +209,6 @@ class FieldFrameBodyIMG : AbstractLyrics3v2FieldFrameBody {
         return size - 2 // cut off trailing crlf pair
     }
 
-    /**
-     * TODO
-     */
     override fun setupObjectList() {
         // to be implemented
     }

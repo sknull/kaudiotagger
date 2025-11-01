@@ -24,10 +24,10 @@ class FrameTRCKTest : AbstractTestCase() {
         Assertions.assertEquals(TextEncoding.ISO_8859_1.id, fb.getTextEncoding())
         Assertions.assertEquals("1/11", (frame.frameBody as FrameBodyTRCK).getText())
         Assertions.assertFalse(
-            ID3v24FrameId.Companion.isExtension(frame.getIdentifier())
+            ID3v24FrameId.isExtension(frame.getIdentifier())
         )
         Assertions.assertTrue(
-            ID3v24FrameId.Companion.isSupported(frame.getIdentifier())
+            ID3v24FrameId.isSupported(frame.getIdentifier())
         )
     }
 
@@ -45,7 +45,7 @@ class FrameTRCKTest : AbstractTestCase() {
     @Test
     fun testSaveToFile() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         // Create and Save
         val tag = ID3v24Tag()
@@ -54,7 +54,7 @@ class FrameTRCKTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         val frame =  mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.TRACK.id) as ID3v24Frame
@@ -66,7 +66,7 @@ class FrameTRCKTest : AbstractTestCase() {
     @Test
     fun testSaveEmptyFrameToFile() {
         val testFile =  copyAudioToTmp("testV1.mp3")
-        var mp3File =  MP3File.Companion.read(testFile)
+        var mp3File =  MP3File.read(testFile)
 
         var frame = ID3v24Frame(ID3v24FrameId.TRACK.id)
         frame.frameBody = FrameBodyTRCK()
@@ -78,7 +78,7 @@ class FrameTRCKTest : AbstractTestCase() {
         mp3File.save()
 
         // Reload
-        mp3File = MP3File.Companion.read(testFile)
+        mp3File = MP3File.read(testFile)
         frame = mp3File
             .getID3v2Tag()
             ?.getFrame(ID3v24FrameId.TRACK.id) as ID3v24Frame

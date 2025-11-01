@@ -6,17 +6,12 @@ import java.io.RandomAccessFile
 
 abstract class AbstractLyrics3: AbstractTag {
 
-    companion object {
-
-    }
+    companion object;
 
     constructor()
 
     constructor(copyObject: AbstractLyrics3): super(copyObject)
 
-    /**
-     * @param file
-     */
     override fun delete(file: RandomAccessFile) {
         ID3v1Tag()
     }

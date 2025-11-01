@@ -42,9 +42,6 @@ class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
         }
     }
 
-    /**
-     * @param groupSymbol
-     */
     fun setGroupSymbol(groupSymbol: Byte) {
         setObjectValue(DataTypes.OBJ_GROUP_SYMBOL, groupSymbol)
     }
@@ -62,9 +59,6 @@ class FrameBodySIGN: AbstractID3v2FrameBody, ID3v24FrameBody {
         return getObjectValue(DataTypes.OBJ_SIGNATURE) as? ByteArray
     }
 
-    /**
-     * @param signature
-     */
     fun setSignature(signature: ByteArray?) {
         setObjectValue(DataTypes.OBJ_SIGNATURE, signature)
     }

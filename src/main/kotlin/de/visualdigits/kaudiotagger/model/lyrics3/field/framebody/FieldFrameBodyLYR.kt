@@ -63,9 +63,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         this.read(byteBuffer)
     }
 
-    /**
-     * @param sync
-     */
     fun addLyric(sync: FrameBodySYLT?) {
         // SYLT frames are made of individual lines
         var newLine: Lyrics3Line?
@@ -94,9 +91,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         }
     }
 
-    /**
-     * @param unsync
-     */
     fun addLyric(unsync: FrameBodyUSLT?) {
         // USLT frames are just long text string;
         val line = Lyrics3Line("Lyric Line", this)
@@ -134,9 +128,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         return false
     }
 
-    /**
-     * @param lineString
-     */
     private fun readString(lineString: String) {
         // now readString each line and put in the vector;
         var token: String?
@@ -181,17 +172,10 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         return writeString()
     }
 
-    /**
-     * @param str
-     */
     fun setLyric(str: String) {
         readString(str)
     }
 
-    /**
-     * @param obj
-     * @return
-     */
     override fun isSubsetOf(obj: Any?): Boolean {
         if (obj !is FieldFrameBodyLYR) {
             return false
@@ -237,9 +221,6 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
         // return size - 2; // cut off the last crlf pair
     }
 
-    /**
-     * TODO
-     */
     override fun setupObjectList() {
         // to be implemented
     }

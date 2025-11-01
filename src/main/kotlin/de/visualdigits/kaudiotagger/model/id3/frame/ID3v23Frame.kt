@@ -11,7 +11,6 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupport
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23StatusFlags
-import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.util.ID3Compression
@@ -129,8 +128,6 @@ class ID3v23Frame: AbstractID3v2Frame {
                     frameBody?.header = this
                     setIdentifier(frame.getIdentifier())
                     log.debug("UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-
-                    return
                 }
                 frame.frameBody is FrameBodyDeprecated -> {
                     // Was it valid for this tag version, if so try and reconstruct
@@ -157,8 +154,6 @@ class ID3v23Frame: AbstractID3v2Frame {
 
                         setIdentifier(frame.getIdentifier())
                         log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-
-                        return
                     }
                 }
                 ID3Tags.isID3v24FrameIdentifier(frame.getIdentifier()) -> {
@@ -175,8 +170,6 @@ class ID3v23Frame: AbstractID3v2Frame {
                                 frameBody?.getTextEncoding() ?: TextEncoding.ISO_8859_1.id
                             )
                         )
-
-                        return
                     } else {
                         // Is it a known v4 frame which needs forcing to v3 frame e.g. TDRC - TYER,TDAT
                         setIdentifier(ID3Tags.forceFrameID24To23(frame.getIdentifier()))
@@ -191,10 +184,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                                         frameBody?.getTextEncoding() ?: TextEncoding.ISO_8859_1.id
                                     )
                                 )
-
-                                return
                             }
-
                             else -> {
                                 val baos = ByteArrayOutputStream()
                                 (frame.frameBody as? AbstractID3v2FrameBody)?.write(baos)
@@ -203,8 +193,6 @@ class ID3v23Frame: AbstractID3v2Frame {
                                 frameBody = FrameBodyUnsupported(getIdentifier(), baos.toByteArray())
                                 frameBody?.header = this
                                 log.debug("V4:Orig id is:${frame.getIdentifier()}:New Id Unsupported is:${getIdentifier()}")
-
-                                return
                             }
                         }
                     }
@@ -221,27 +209,19 @@ class ID3v23Frame: AbstractID3v2Frame {
                     log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                     frameBody = ID3Tags.copyObject(frame.frameBody) as? AbstractTagFrameBody
                     frameBody?.header = this
-                    
-                    return
                 } else if (ID3Tags.isID3v22FrameIdentifier(frame.getIdentifier())) {
                     // Force v2 to v3
                     setIdentifier(ID3Tags.forceFrameID22To23(frame.getIdentifier()))
-                    when {
-                        getIdentifier() != null -> {
-                            log.debug("V22Orig id is:${frame.getIdentifier()}New id is:${getIdentifier()}")
-                            frameBody = readBody(getIdentifier(), frame.frameBody as? AbstractID3v2FrameBody)
-                            frameBody?.header = this
-
-                            return
-                        }
-                        else -> {
-                            frameBody = FrameBodyDeprecated(frame.frameBody as? AbstractID3v2FrameBody)
-                            frameBody?.header = this
-                            setIdentifier(frame.getIdentifier())
-                            log.debug("Deprecated:V22:orig id id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-
-                            return
-                        }
+                    if (getIdentifier() != null) {
+                        log.debug("V22Orig id is:${frame.getIdentifier()}New id is:${getIdentifier()}")
+                        frameBody = readBody(getIdentifier(), frame.frameBody as? AbstractID3v2FrameBody)
+                        frameBody?.header = this
+                    }
+                    else {
+                        frameBody = FrameBodyDeprecated(frame.frameBody as? AbstractID3v2FrameBody)
+                        frameBody?.header = this
+                        setIdentifier(frame.getIdentifier())
+                        log.debug("Deprecated:V22:orig id id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                     }
                 }
             } else {
@@ -249,8 +229,6 @@ class ID3v23Frame: AbstractID3v2Frame {
                 frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
                 log.debug("UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                
-                return
             }
         }
 
@@ -282,14 +260,13 @@ class ID3v23Frame: AbstractID3v2Frame {
         // Read the size field (as Big Endian Int - byte buffers always initialised to Big Endian order)
         frameSize = byteBuffer.getInt()// Update position of main buffer, so no attempt is made to reread these bytes
         // Create Buffer that only contains the body of this frame rather than the remainder of tag
-        // TODO code seems to assume that if the frame created is not a v23FrameBody
         // it should be deprecated, but what about if somehow a V24Frame has been put into a V23 Tag, shouldn't
         // it then be created as FrameBodyUnsupported
-// Probably corrupt so treat as a standard frame
+        // Probably corrupt so treat as a standard frame
 
         // Work out the real size of the frameBody data
         // Read the body data
-// Read the Grouping byte, but do nothing with it
+        // Read the Grouping byte, but do nothing with it
         // Consume the encryption byte
         // Read the Decompressed Size
         // It is a valid v23 identifier so should be able to find a
@@ -417,9 +394,6 @@ class ID3v23Frame: AbstractID3v2Frame {
                         frameBodyBuffer.limit(realFrameSize)
                         frameBody = readBody(id, frameBodyBuffer, realFrameSize)
                     }
-                    // TODO code seems to assume that if the frame created is not a v23FrameBody
-                    // it should be deprecated, but what about if somehow a V24Frame has been put into a V23 Tag, shouldn't
-                    // it then be created as FrameBodyUnsupported
                     if (frameBody !is ID3v23FrameBody) {
                         log.debug("Converted frameBody with:$identifier to deprecated frameBody")
                         this.frameBody = frameBody?.let { fb -> FrameBodyDeprecated(fb as? FrameBodyDeprecated) }
@@ -529,13 +503,6 @@ class ID3v23Frame: AbstractID3v2Frame {
      */
     override fun isCommon(): Boolean {
         return ID3v23FrameId.isCommon(getIdentifier())
-    }
-
-    /**
-     * @return true if considered a common frame
-     */
-    override fun isBinary(): Boolean {
-        return ID3v23FrameId.isBinary(getIdentifier())
     }
 
     /**

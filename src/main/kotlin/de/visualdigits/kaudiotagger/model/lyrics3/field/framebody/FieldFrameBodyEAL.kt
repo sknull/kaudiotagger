@@ -35,9 +35,6 @@ class FieldFrameBodyEAL : AbstractLyrics3v2FieldFrameBody {
         return getObjectValue("Album") as? String
     }
 
-    /**
-     * @param album
-     */
     fun setAlbum(album: String?) {
         setObjectValue("Album", album)
     }

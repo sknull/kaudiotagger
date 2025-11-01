@@ -26,17 +26,17 @@ object ID3TextEncodingConversion {
         textEncoding: Byte
     ): Byte {
         // Should not happen, assume v23 and provide a warning
-        when (header) {
+        return when (header) {
             null -> {
                 log.warn("Header has not yet been set for this framebody")
-                return if (TagOptionSingleton.resetTextEncodingForExistingFrames) {
+                if (TagOptionSingleton.resetTextEncodingForExistingFrames) {
                     TagOptionSingleton.id3v23DefaultTextEncoding.id
                 } else {
                     convertV24textEncodingToV23textEncoding(textEncoding)
                 }
             }
             is ID3v24Frame -> {
-                return if (TagOptionSingleton.resetTextEncodingForExistingFrames) {
+                if (TagOptionSingleton.resetTextEncodingForExistingFrames) {
                     // Replace with default
                     TagOptionSingleton.id3v24DefaultTextEncoding.id
                 } else {
@@ -46,7 +46,7 @@ object ID3TextEncodingConversion {
             }
 
             else -> {
-                return if (TagOptionSingleton.resetTextEncodingForExistingFrames) {
+                if (TagOptionSingleton.resetTextEncodingForExistingFrames) {
                     // Replace with default
                     TagOptionSingleton.id3v23DefaultTextEncoding.id
                 } else {

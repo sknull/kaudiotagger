@@ -61,7 +61,7 @@ class BooleanByte : AbstractDataType {
         return getValue().toString()
     }
 
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         val retValue = ByteArray(1)
         if (getValue() != null) {
             retValue[0] = (if (getValue() as Boolean) 1 else 0).toByte()

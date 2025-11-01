@@ -213,7 +213,7 @@ class FrameBodyPIC: AbstractID3v2FrameBody, ID3v22FrameBody {
         return if (isImageUrl()) {
             String((getObjectValue(DataTypes.OBJ_PICTURE_DATA) as? ByteArray) ?: byteArrayOf(), StandardCharsets.ISO_8859_1)
         } else {
-            "";
+            ""
         }
     }
 

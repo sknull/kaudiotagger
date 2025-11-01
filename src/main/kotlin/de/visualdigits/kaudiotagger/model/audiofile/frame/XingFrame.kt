@@ -137,9 +137,6 @@ class XingFrame {
             setAudioSize()
         }
 
-        // TODO TOC
-        // TODO VBR Quality
-
         // Look for LAME Header as long as we have enough bytes to do it properly
         if (header.limit() >=
             XING_HEADER_BUFFER_SIZE + LameFrame.LAME_HEADER_BUFFER_SIZE

@@ -118,9 +118,6 @@ class FrameBodyCTOC: AbstractID3v2FrameBody, ID3v2ChapterFrameBody {
         return ID3v2ChapterFrameId.TABLE_OF_CONTENT.id
     }
 
-    /**
-     * TODO:proper mapping
-     */
     override fun setupObjectList() {
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }

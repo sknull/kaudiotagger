@@ -30,9 +30,6 @@ abstract class AbstractTagItem {
      */
     abstract fun getSize(): Int
 
-    /**
-     * @param byteBuffer file to read from
-     */
     abstract fun read(byteBuffer: ByteBuffer?): Boolean
 
     /**

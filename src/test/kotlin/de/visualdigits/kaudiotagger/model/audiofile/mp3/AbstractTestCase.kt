@@ -6,8 +6,6 @@ import de.visualdigits.kaudiotagger.util.PadNumberOption
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File

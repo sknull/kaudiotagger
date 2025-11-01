@@ -25,11 +25,6 @@ class Lyrics3TimeStamp : AbstractDataType {
         this.second = copyObject.second
     }
 
-    /**
-     * Todo this is wrong
-     *
-     * @param s
-     */
     fun readString(s: String) {
         // to be implemented
     }
@@ -42,9 +37,6 @@ class Lyrics3TimeStamp : AbstractDataType {
      * @param timeStamp
      */
     fun setTimeStamp(timeStamp: Long) {
-        /**
-         * @todo convert both types of formats
-         */
         var timeStamp = timeStamp / 1000
         minute = timeStamp / 60
         second = timeStamp % 60

@@ -113,7 +113,7 @@ class PartOfSet : AbstractString {
      *
      * @return the data as a byte array in format to write to file
      */
-    override fun writeByteArray(): ByteArray? {
+    override fun writeByteArray(): ByteArray {
         var value = getValue().toString()
         val data: ByteArray?
         // Try and write to buffer using the CharSet defined by getTextEncodingCharSet()

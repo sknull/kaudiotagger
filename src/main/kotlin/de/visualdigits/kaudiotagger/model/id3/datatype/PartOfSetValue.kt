@@ -128,29 +128,29 @@ class PartOfSetValue {
     fun getCount(): Int? = count
 
     fun setCount(count: Int?) {
-        this.count = count;
-        this.rawCount = count.toString();
-        resetValueFromCounts();
+        this.count = count
+        this.rawCount = count.toString()
+        resetValueFromCounts()
     }
 
     fun setCount(count: String?) {
         this.count = count?.toInt()
-        this.rawCount = count;
-        resetValueFromCounts();
+        this.rawCount = count
+        resetValueFromCounts()
     }
 
     fun getTotal(): Int? = total
 
     fun setTotal(total: Int?) {
-        this.total = total;
-        this.rawTotal = total.toString();
-        resetValueFromCounts();
+        this.total = total
+        this.rawTotal = total.toString()
+        resetValueFromCounts()
     }
 
     fun setTotal(total: String?) {
         this.total = total?.toInt()
-        this.rawTotal = total;
-        resetValueFromCounts();
+        this.rawTotal = total
+        resetValueFromCounts()
     }
 
     override fun toString(): String {

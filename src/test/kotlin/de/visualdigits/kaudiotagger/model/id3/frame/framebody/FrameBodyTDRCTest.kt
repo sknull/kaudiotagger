@@ -11,11 +11,11 @@ class FrameBodyTDRCTest : AbstractTestCase() {
     fun testCreateFrameBody() {
         var fb: FrameBodyTDRC? = null
         fb = FrameBodyTDRC()
-        fb.date = FrameBodyTDRCTest.Companion.TEST_YEAR
+        fb.date = TEST_YEAR
 
         assertEquals(ID3v24FrameId.YEAR.id, fb!!.getIdentifier())
         assertEquals(TextEncoding.ISO_8859_1.id, fb.getTextEncoding())
-        assertEquals(FrameBodyTDRCTest.Companion.TEST_YEAR, fb.date)
+        assertEquals(TEST_YEAR, fb.date)
     }
 
     companion object {

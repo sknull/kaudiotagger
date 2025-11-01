@@ -113,7 +113,6 @@ object TagOptionSingleton {
      * if we should save empty Lyrics3 field or not. Defaults to false.
      *
      *
-     * todo I don't think this is implemented yet.
      */
     var lyrics3SaveEmptyField = false
 
@@ -204,13 +203,6 @@ object TagOptionSingleton {
      * written as Little Endian or Big Endian, its defaults to little Endian
      */
     var isEncodeUTF16BomAsLittleEndian = true
-
-    /**
-     * When this is set and using the generic interface jaudiotagger will make some adjustments
-     * when saving field so they work best with the specified Tagger
-     */
-    // TODO Not Actually Used yet, originally intended for dealing with ratings and genres
-    var playerCompatability = -1
 
     /**
      * max size of data to copy when copying audiodata from one file to , default to 4mb

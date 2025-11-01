@@ -37,9 +37,6 @@ class FrameBodyEncrypted: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBo
         this.identifier = identifier
     }
 
-    /**
-     * TODO:proper mapping
-     */
     override fun setupObjectList() {
         objectList.add(ByteArraySizeTerminated(DataTypes.OBJ_DATA, this))
     }

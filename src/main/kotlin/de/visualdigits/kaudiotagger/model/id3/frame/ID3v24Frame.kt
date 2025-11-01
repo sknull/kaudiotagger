@@ -546,15 +546,11 @@ class ID3v24Frame: AbstractID3v2Frame {
 
                                 // ok found a valid identifier using non-syncsafe so assume non-syncsafe size
                                 // and continue
-                                if (isValidID3v2FrameIdentifier(readAheadIdentifier)) {
-                                    frameSize = nonSyncSafeFrameSize
-                                    log.warn("Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}")
-                                }
                                 // no data found so assume entered padding in which case assume it is last
                                 // frame and we are ok whereas we didn't hit padding when using syncsafe integer
                                 // or we wouldn't have got to this point. So assume syncsafe integer ended within
                                 // the frame data whereas this has reached end of frames.
-                                else if (ID3SyncSafeInteger.isBufferEmpty(readAheadbuffer)) {
+                                if (isValidID3v2FrameIdentifier(readAheadIdentifier) || ID3SyncSafeInteger.isBufferEmpty(readAheadbuffer)) {
                                     frameSize = nonSyncSafeFrameSize
                                     log.warn("Assuming frame size is NOT stored as a sync safe integer:${getIdentifier()}")
                                 }
@@ -667,13 +663,6 @@ class ID3v24Frame: AbstractID3v2Frame {
      */
     override fun isCommon(): Boolean {
         return ID3v24FrameId.isCommon(getIdentifier())
-    }
-
-    /**
-     * @return true if considered a common frame
-     */
-    override fun isBinary(): Boolean {
-        return ID3v24FrameId.isBinary(getIdentifier())
     }
 
     /**
