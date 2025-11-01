@@ -222,7 +222,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     var duplicateBytes: Int = 0
     var emptyFrameBytes: Int = 0
     var fileReadBytes: Int = 0
-    var invalidFrames: Int = 0
 
     /**
      * Empty Constructor
@@ -285,7 +284,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         this.duplicateBytes = copyObject.duplicateBytes
         this.emptyFrameBytes = copyObject.emptyFrameBytes
         this.fileReadBytes = copyObject.fileReadBytes
-        this.invalidFrames = copyObject.invalidFrames
     }
 
     /**
@@ -1570,10 +1568,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         MP3File.tagFormatter?.addElement(
             TYPE_FILEREADSIZE,
             this.fileReadBytes
-        )
-        MP3File.tagFormatter?.addElement(
-            TYPE_INVALIDFRAMES,
-            this.invalidFrames
         )
     }
 

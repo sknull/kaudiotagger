@@ -348,19 +348,15 @@ class ID3v22Tag : AbstractID3v2Tag {
                 this.emptyFrameBytes += ID3v22Frame.FRAME_HEADER_SIZE
             } catch (ifie: InvalidFrameIdentifierException) {
                 log.debug("Invalid Frame Identifier:${ifie.message}")
-                this.invalidFrames++
                 // Dont try and find any more frames
                 break
             } catch (ife: InvalidFrameException) { // Problem trying to find frame
                 log.warn("Invalid Frame:${ife.message}")
-                this.invalidFrames++
                 // Dont try and find any more frames
                 break
             } // in case we can read the next frame // Failed reading frame but may just have invalid data but correct length so lets carry on
             catch (idete: InvalidDataTypeException) {
                 log.warn("Corrupt Frame:${idete.message}")
-                this.invalidFrames++
-                continue
             }
         }
     }
