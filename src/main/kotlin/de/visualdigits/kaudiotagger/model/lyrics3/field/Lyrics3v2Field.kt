@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.field
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyTextInfo
@@ -88,9 +87,7 @@ class Lyrics3v2Field: AbstractTagFrame {
                 }
             }
             else -> {
-                throw TagException(
-                    "Cannot createField Lyrics3v2 field from given ID3v2 frame"
-                )
+                log.warn("Cannot createField Lyrics3v2 field from given ID3v2 frame")
             }
         }
     }

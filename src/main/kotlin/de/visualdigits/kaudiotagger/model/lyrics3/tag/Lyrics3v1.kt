@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.tag
 
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyLYR
@@ -44,11 +43,7 @@ class Lyrics3v1: AbstractLyrics3 {
      * @param byteBuffer
      */
     constructor(byteBuffer: ByteBuffer) {
-        try {
-            this.read(byteBuffer)
-        } catch (e: TagException) {
-            log.error("Something went wrong", e)
-        }
+        this.read(byteBuffer)
     }
 
     override fun supportedTag(): SupportedTag = SupportedTag.Lyrics3V1Tag

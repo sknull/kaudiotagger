@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
@@ -132,15 +131,7 @@ class ID3v11Tag: ID3v1Tag {
             if (id3tag.hasFrame(ID3v24FrameId.GENRE.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.GENRE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTCON).getText()
-                try {
-                    setGenre(ID3Tags.findNumber(text?:"0").toInt())
-                } catch (ex: TagException) {
-                    log.warn(
-                        "Unable to convert TCON frame to format suitable for v11 tag",
-                        ex
-                    )
-                    setGenre(GENRE_UNDEFINED)
-                }
+                setGenre(ID3Tags.findNumber(text?:"0")?.toInt()?:GENRE_UNDEFINED)
             }
             if (id3tag.hasFrame(ID3v24FrameId.TRACK.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.TRACK.id) as ID3v24Frame

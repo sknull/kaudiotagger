@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.id3.datatype.BooleanByte
 import de.visualdigits.kaudiotagger.model.id3.datatype.BooleanString
 import de.visualdigits.kaudiotagger.model.id3.datatype.ByteArraySizeTerminated
@@ -298,7 +297,7 @@ object ID3Tags {
      * @param str string to search
      * @return first whole number that can be parsed from the string
      */
-    fun findNumber(str: String): Long {
+    fun findNumber(str: String): Long? {
         return findNumber(str, 0)
     }
 
@@ -310,14 +309,12 @@ object ID3Tags {
      * @param offset start seaching from this index
      * @return first whole number that can be parsed from the string
      */
-    fun findNumber(str: String, offset: Int): Long {
+    fun findNumber(str: String, offset: Int): Long? {
         if ((offset < 0) || (offset >= str.length)) {
-            throw IndexOutOfBoundsException(
-                "Offset to image string is out of bounds: offset = $offset, string.length${str.length}"
-            )
+            throw IndexOutOfBoundsException("Offset to image string is out of bounds: offset = $offset, string.length${str.length}")
         }
         var i: Int = offset
-        var num: Long
+        var num: Long?
         while (i < str.length) {
             if (
                     ((str[i] >= '0') && (str[i] <= '9')) ||
@@ -337,7 +334,7 @@ object ID3Tags {
         if ((j <= str.length) && (j > i)) {
             num = str.substring(i, j).toLong()
         } else {
-            throw TagException("Unable to find integer in string: $str")
+            num = null
         }
 
         return num

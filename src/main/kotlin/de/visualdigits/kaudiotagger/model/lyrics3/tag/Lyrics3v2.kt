@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.tag
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
-import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
@@ -49,12 +48,8 @@ class Lyrics3v2 : AbstractLyrics3 {
             var newField: Lyrics3v2Field?
 
             ID3v24Tag(mp3tag).frameMap.values.forEach { frame ->
-                try {
-                    newField = Lyrics3v2Field(frame as AbstractID3v2Frame)
-                    fieldMap[newField.getIdentifier()] = newField
-                } catch (ex: TagException) {
-                    // invalid frame to createField lyrics3 field. ignore and keep going
-                }
+                newField = Lyrics3v2Field(frame as AbstractID3v2Frame)
+                fieldMap[newField.getIdentifier()] = newField
             }
         }
     }
@@ -65,11 +60,7 @@ class Lyrics3v2 : AbstractLyrics3 {
      * @param byteBuffer
      */
     constructor(byteBuffer: ByteBuffer) {
-        try {
-            this.read(byteBuffer)
-        } catch (e: TagException) {
-            log.error("Something went wrong", e)
-        }
+        this.read(byteBuffer)
     }
 
     override fun supportedTag(): SupportedTag = SupportedTag.Lyrics3V2Tag
