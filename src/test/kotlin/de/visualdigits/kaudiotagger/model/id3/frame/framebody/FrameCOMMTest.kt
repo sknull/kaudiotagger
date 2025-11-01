@@ -68,9 +68,9 @@ class FrameCOMMTest : AbstractTestCase() {
             val commFrame =  mp3File
                 .getID3v2Tag()
                 ?.getFrame("COMM") as ID3v24Frame
-            val frameBody =  commFrame.frameBody as FrameBodyCOMM
+            val frameBody =  commFrame.frameBody as? FrameBodyCOMM
 
-            assertEquals(INVALID_LANG_CODE, frameBody.getLanguage())
+            assertEquals(INVALID_LANG_CODE, frameBody?.getLanguage())
         } catch (ie: java.lang.Exception) {
             e = ie
         }
@@ -96,18 +96,18 @@ class FrameCOMMTest : AbstractTestCase() {
             var commFrame =  mp3File
                 .getID3v2Tag()
                 ?.getFrame("COMM") as ID3v24Frame
-            var frameBody =  commFrame.frameBody as FrameBodyCOMM
+            var frameBody =  commFrame.frameBody as? FrameBodyCOMM
 
             // Set language to null, this is common problem for new frames might null lang codes
-            frameBody.setLanguage(null)
+            frameBody?.setLanguage(null)
             mp3File.save()
             mp3File = MP3File.read(testFile)
             commFrame = mp3File.getID3v2Tag()?.getFrame("COMM") as ID3v24Frame
-            frameBody = commFrame.frameBody as FrameBodyCOMM
-            assertEquals(SAFE_LANG_CODE, frameBody.getLanguage())
+            frameBody = commFrame.frameBody as? FrameBodyCOMM
+            assertEquals(SAFE_LANG_CODE, frameBody?.getLanguage())
 
             // Set language to too short a value
-            frameBody.setLanguage("aa")
+            frameBody?.setLanguage("aa")
             mp3File.save()
             mp3File = MP3File.read(testFile)
             commFrame = mp3File.getID3v2Tag()?.getFrame("COMM") as ID3v24Frame

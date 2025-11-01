@@ -6,6 +6,7 @@ import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameExceptio
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.common.frame.AbstractTagFrame
+import de.visualdigits.kaudiotagger.model.common.frame.MultiFrame
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyEncrypted
@@ -13,6 +14,8 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupport
 import de.visualdigits.kaudiotagger.util.EncodingFlags
 import de.visualdigits.kaudiotagger.util.StatusFlags
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.lang.reflect.Constructor
 import java.lang.reflect.InvocationTargetException
@@ -22,6 +25,8 @@ import java.nio.charset.Charset
 abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
 
     companion object {
+
+
         const val TYPE_FRAME: String = "frame"
         const val TYPE_FRAME_SIZE: String = "frameSize"
         const val UNSUPPORTED_ID: String = "Unsupported"
@@ -44,6 +49,8 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      */
     var encodingFlags: EncodingFlags? = null
 
+    constructor()
+
     /**
      * Create a frame based on another frame
      *
@@ -60,7 +67,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
         this.frameBody = body
         this.frameBody?.header = this
     }
-
     /**
      * Create a new frame with empty body based on identifier
      *
@@ -194,10 +200,14 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      * @param body
      * @return newly created framebody for this type
      */
-    @Suppress("UNCHECKED_CAST")    fun readBody(
+    @Suppress("UNCHECKED_CAST")
+    fun readBody(
         identifier: String?,
-        body: AbstractID3v2FrameBody
-    ): AbstractID3v2FrameBody {
+        body: AbstractID3v2FrameBody?
+    ): AbstractID3v2FrameBody? {
+        if (body == null) {
+            return null
+        }
         /* Use reflection to map id to frame body, which makes things much easier
          * to keep things up to date, although slight performance hit.
          */

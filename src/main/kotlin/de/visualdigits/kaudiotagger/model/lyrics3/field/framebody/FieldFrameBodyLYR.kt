@@ -66,14 +66,14 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
     /**
      * @param sync
      */
-    fun addLyric(sync: FrameBodySYLT) {
+    fun addLyric(sync: FrameBodySYLT?) {
         // SYLT frames are made of individual lines
         var newLine: Lyrics3Line?
         var currentLine: ID3v2LyricLine?
         var timeStamp: Lyrics3TimeStamp?
         val lineMap: MutableMap<String?, Lyrics3Line> = mutableMapOf()
 
-        sync.objectList.forEach { cl ->
+        sync?.objectList?.forEach { cl ->
             // createField copy to use in tag
             currentLine = ID3v2LyricLine(cl as ID3v2LyricLine)
             timeStamp = Lyrics3TimeStamp("Time Stamp", this)
@@ -97,10 +97,10 @@ class FieldFrameBodyLYR: AbstractLyrics3v2FieldFrameBody {
     /**
      * @param unsync
      */
-    fun addLyric(unsync: FrameBodyUSLT) {
+    fun addLyric(unsync: FrameBodyUSLT?) {
         // USLT frames are just long text string;
         val line = Lyrics3Line("Lyric Line", this)
-        line.lyric = unsync.getLyric()
+        line.lyric = unsync?.getLyric()
         lines.add(line)
     }
 

@@ -70,7 +70,6 @@ class ID3v24Frame: AbstractID3v2Frame {
     var groupIdentifier = 0
 
     constructor()
-
     /**
      * Creates a ID3v2_4Frame of type identifier. An empty
      * body of the correct type will be automatically created.
@@ -90,11 +89,9 @@ class ID3v24Frame: AbstractID3v2Frame {
      * @param frame
      */
     constructor(frame: ID3v24Frame): super(frame) {
-
         statusFlags = ID3v24StatusFlags(this, frame.statusFlags?.originalFlags?:0)
         encodingFlags = ID3v24EncodingFlags(this, frame.encodingFlags?.flags?:0)
     }
-
     /**
      * Partially construct ID3v24 Frame form an IS3v23Frame
      *
@@ -158,7 +155,6 @@ class ID3v24Frame: AbstractID3v2Frame {
     constructor(byteBuffer: ByteBuffer) {
         read(byteBuffer)
     }
-
     /**
      * Creates a new ID3v2_4Frame datatype based on Lyrics3.
      *
@@ -174,8 +170,8 @@ class ID3v24Frame: AbstractID3v2Frame {
                 )
             }
             "LYR" -> {
-                val lyric = field.frameBody as FieldFrameBodyLYR
-                val hasTimeStamp = lyric.hasTimeStamp()
+                val lyric = field.frameBody as? FieldFrameBodyLYR
+                val hasTimeStamp = lyric?.hasTimeStamp()
                 // we'll create only one frame here.
                 // if there is any timestamp at all, we will create a sync'ed frame.
                 val sync = FrameBodySYLT(
@@ -187,12 +183,12 @@ class ID3v24Frame: AbstractID3v2Frame {
                     ByteArray(0)
                 )
                 val unsync = FrameBodyUSLT(0, "ENG", "", "")
-                lyric.lines.forEach { line ->
-                    if (!hasTimeStamp) {
+                lyric?.lines?.forEach { line ->
+                    if (hasTimeStamp == false) {
                         unsync.addLyric(line)
                     }
                 }
-                if (hasTimeStamp) {
+                if (hasTimeStamp == true) {
                     this.frameBody = sync
                     frameBody?.header = this
                 } else {
@@ -201,27 +197,27 @@ class ID3v24Frame: AbstractID3v2Frame {
                 }
             }
             "INF" -> {
-                value = (field.frameBody as FieldFrameBodyINF).getAdditionalInformation()
+                value = (field.frameBody as? FieldFrameBodyINF)?.getAdditionalInformation()
                 this.frameBody = FrameBodyCOMM(0, "ENG", "", value)
                 frameBody?.header = this
             }
             "AUT" -> {
-                value = (field.frameBody as FieldFrameBodyAUT).getAuthor()
+                value = (field.frameBody as? FieldFrameBodyAUT)?.getAuthor()
                 this.frameBody = FrameBodyTCOM(0, value)
                 frameBody?.header = this
             }
             "EAL" -> {
-                value = (field.frameBody as FieldFrameBodyEAL).getAlbum()
+                value = (field.frameBody as? FieldFrameBodyEAL)?.getAlbum()
                 this.frameBody = FrameBodyTALB(0, value)
                 frameBody?.header = this
             }
             "EAR" -> {
-                value = (field.frameBody as FieldFrameBodyEAR).getArtist()
+                value = (field.frameBody as? FieldFrameBodyEAR)?.getArtist()
                 this.frameBody = FrameBodyTPE1(0, value)
                 frameBody?.header = this
             }
             "ETT" -> {
-                value = (field.frameBody as FieldFrameBodyETT).getTitle()
+                value = (field.frameBody as? FieldFrameBodyETT)?.getTitle()
                 this.frameBody = FrameBodyTIT2(0, value)
                 frameBody?.header = this
             }
@@ -242,9 +238,7 @@ class ID3v24Frame: AbstractID3v2Frame {
         // We cant convert unsupported bodies properly
         when {
             frame.frameBody is FrameBodyUnsupported -> {
-                this.frameBody = FrameBodyUnsupported(
-                    frame.frameBody as FrameBodyUnsupported
-                )
+                this.frameBody = FrameBodyUnsupported(frame.frameBody as? FrameBodyUnsupported)
                 this.frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
                 log.debug("V3:UnsupportedBody:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
@@ -252,9 +246,9 @@ class ID3v24Frame: AbstractID3v2Frame {
             getIdentifier() != null -> {
                 // Special Case
                 if ((frame.getIdentifier() == ID3v23FrameId.USER_DEFINED_INFO.id) &&
-                    ((frame.frameBody as FrameBodyTXXX).getDescription() == FrameBodyTXXX.MOOD)
+                    ((frame.frameBody as? FrameBodyTXXX)?.getDescription() == FrameBodyTXXX.MOOD)
                 ) {
-                    this.frameBody = FrameBodyTMOO(frame.frameBody as FrameBodyTXXX)
+                    this.frameBody = FrameBodyTMOO(frame.frameBody as? FrameBodyTXXX)
                     this.frameBody?.header = this
                     setIdentifier(frameBody?.getIdentifier())
                 } else {
@@ -269,24 +263,17 @@ class ID3v24Frame: AbstractID3v2Frame {
                 setIdentifier(ID3Tags.forceFrameID23To24(frame.getIdentifier()))
                 if (getIdentifier() != null) {
                     log.debug("V3:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                    this.frameBody = this.readBody(
-                        getIdentifier(),
-                        frame.frameBody as AbstractID3v2FrameBody
-                    )
+                    this.frameBody = this.readBody(getIdentifier(), frame.frameBody as? AbstractID3v2FrameBody)
                     this.frameBody?.header = this
                 } else {
-                    this.frameBody = FrameBodyDeprecated(
-                        frame.frameBody as AbstractID3v2FrameBody
-                    )
+                    this.frameBody = FrameBodyDeprecated(frame.frameBody as? AbstractID3v2FrameBody)
                     this.frameBody?.header = this
                     setIdentifier(frame.getIdentifier())
                     log.debug("V3:Deprecated:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                 }
             }
             else -> {
-                this.frameBody = FrameBodyUnsupported(
-                    frame.frameBody as FrameBodyUnsupported
-                )
+                this.frameBody = FrameBodyUnsupported(frame.frameBody as? FrameBodyUnsupported)
                 this.frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
                 log.debug("V3:Unknown:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
@@ -368,14 +355,14 @@ class ID3v24Frame: AbstractID3v2Frame {
 
         // Read the body data
         try {
-            if ((encodingFlags as ID3v24EncodingFlags).isCompression()) {
+            if ((encodingFlags as? ID3v24EncodingFlags)?.isCompression() == true) {
                 frameBodyBuffer = ID3Compression.uncompress(
                     identifier,
                     byteBuffer,
                     dataLengthSize,
                     realFrameSize
                 )
-                frameBody = if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
+                frameBody = if ((encodingFlags as? ID3v24EncodingFlags)?.isEncryption() == true) {
                     readEncryptedBody(
                         identifier,
                         frameBodyBuffer,
@@ -384,7 +371,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                 } else {
                     readBody(identifier, frameBodyBuffer, dataLengthSize)
                 }
-            } else if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
+            } else if ((encodingFlags as? ID3v24EncodingFlags)?.isEncryption() == true) {
                 frameBodyBuffer = byteBuffer.slice()
                 frameBodyBuffer.limit(realFrameSize)
                 frameBody = readEncryptedBody(identifier, byteBuffer, frameSize)
@@ -395,7 +382,7 @@ class ID3v24Frame: AbstractID3v2Frame {
                 log.debug(
                     "Converted frame body with:${getIdentifier()} to deprecated framebody"
                 )
-                frameBody = FrameBodyDeprecated((frameBody as AbstractID3v2FrameBody))
+                frameBody = FrameBodyDeprecated((frameBody as? AbstractID3v2FrameBody))
             }
         } finally {
             // Update position of main buffer, so no attempt is made to reread these bytes
@@ -605,7 +592,7 @@ class ID3v24Frame: AbstractID3v2Frame {
 
         // Write Frame Body Data to a stream
         val bodyOutputStream = ByteArrayOutputStream()
-        (frameBody as AbstractID3v2FrameBody).write(bodyOutputStream)
+        (frameBody as? AbstractID3v2FrameBody)?.write(bodyOutputStream)
 
         // Does it need unsynchronizing, and are we allowing unsychronizing
         var bodyBuffer = bodyOutputStream.toByteArray()
@@ -642,28 +629,28 @@ class ID3v24Frame: AbstractID3v2Frame {
         headerBuffer.put((statusFlags?.writeFlags?:0).toByte())
 
         // Remove any non standard flags
-        (encodingFlags as ID3v24EncodingFlags).unsetNonStandardFlags()
+        (encodingFlags as? ID3v24EncodingFlags)?.unsetNonStandardFlags()
 
         // Encoding we only support unsynchronization
         if (unsynchronization) {
-            (encodingFlags as ID3v24EncodingFlags).setUnsynchronised()
+            (encodingFlags as? ID3v24EncodingFlags)?.setUnsynchronised()
         } else {
-            (encodingFlags as ID3v24EncodingFlags).unsetUnsynchronised()
+            (encodingFlags as? ID3v24EncodingFlags)?.unsetUnsynchronised()
         }
         // These are not currently supported on write
-        (encodingFlags as ID3v24EncodingFlags).unsetCompression()
-        (encodingFlags as ID3v24EncodingFlags).unsetDataLengthIndicator()
+        (encodingFlags as? ID3v24EncodingFlags)?.unsetCompression()
+        (encodingFlags as? ID3v24EncodingFlags)?.unsetDataLengthIndicator()
         headerBuffer.put((encodingFlags?.flags?:0).toByte())
 
         try {
             // Add header to the Byte Array Output Stream
             tagBuffer.write(headerBuffer.array())
 
-            if ((encodingFlags as ID3v24EncodingFlags).isEncryption()) {
+            if ((encodingFlags as? ID3v24EncodingFlags)?.isEncryption() == true) {
                 tagBuffer.write(encryptionMethod)
             }
 
-            if ((encodingFlags as ID3v24EncodingFlags).isGrouping()) {
+            if ((encodingFlags as? ID3v24EncodingFlags)?.isGrouping() == true) {
                 tagBuffer.write(groupIdentifier)
             }
 

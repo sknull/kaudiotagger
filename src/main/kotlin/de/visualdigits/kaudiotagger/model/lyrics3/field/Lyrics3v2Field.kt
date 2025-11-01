@@ -51,14 +51,14 @@ class Lyrics3v2Field: AbstractTagFrame {
         when {
             frameIdentifier.startsWith("USLT") -> {
                 frameBody = FieldFrameBodyLYR("")
-                (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodyUSLT)
+                (frameBody as? FieldFrameBodyLYR)?.addLyric(frame.frameBody as? FrameBodyUSLT)
             }
             frameIdentifier.startsWith("SYLT") -> {
                 frameBody = FieldFrameBodyLYR("")
-                (frameBody as FieldFrameBodyLYR).addLyric(frame.frameBody as FrameBodySYLT)
+                (frameBody as? FieldFrameBodyLYR)?.addLyric(frame.frameBody as? FrameBodySYLT)
             }
             frameIdentifier.startsWith("COMM") -> {
-                val text = (frame.frameBody as FrameBodyCOMM).getText()
+                val text = (frame.frameBody as? FrameBodyCOMM)?.getText()
                 frameBody = FieldFrameBodyINF(text)
             }
             frameIdentifier == "TCOM" -> {

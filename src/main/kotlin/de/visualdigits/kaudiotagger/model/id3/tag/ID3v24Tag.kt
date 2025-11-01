@@ -470,7 +470,6 @@ class ID3v24Tag : AbstractID3v2Tag {
     fun readFrames(byteBuffer: ByteBuffer, size: Int) {
         log.debug("Start of frame body at${byteBuffer.position()}")
         // Now start looking for frames
-        var next: ID3v24Frame
         frameMap.clear()
         encryptedFrameMap.clear()
 
@@ -479,13 +478,12 @@ class ID3v24Tag : AbstractID3v2Tag {
         // Read the frames until got to upto the size as specified in header
         log.debug("Start of frame body at:${byteBuffer.position()},frames data size is:$size")
         while (byteBuffer.position() <= size) {
-            val id: String?
             try {
                 // Read Frame
                 log.debug("looking for next frame at:${byteBuffer.position()}")
-                next = ID3v24Frame(byteBuffer)
-                id = next.getIdentifier()
-                loadFrameIntoMap(id, next)
+                val newFram = ID3v24Frame(byteBuffer)
+                val identifier = newFram.getIdentifier()
+                loadFrameIntoMap(identifier, newFram)
             } catch (ex: EmptyFrameException) { // Found Empty Frame
                 log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += TAG_HEADER_LENGTH

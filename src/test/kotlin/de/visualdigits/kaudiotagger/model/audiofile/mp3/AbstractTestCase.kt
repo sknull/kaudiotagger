@@ -19,8 +19,6 @@ abstract class AbstractTestCase {
 
     private var tempDirectory = Files.createTempDirectory("kaudiotagger_").toFile()
 
-    protected val log: Logger = LoggerFactory.getLogger(javaClass)
-
     @BeforeEach
     fun setUp() {
         setOptionsToStandard()

@@ -27,14 +27,7 @@ enum class SupportedFileFormat(filesuffix: String) {
     /**
      * Returns the file suffix (lower case without initial .) associated with the format.
      */
-    val filesuffix: String
-
-    /**
-     * Constructor for internal use by this enum.
-     */
-    init {
-        this.filesuffix = filesuffix.lowercase() // ensure lowercase
-    }
+    val filesuffix: String = filesuffix.lowercase() // ensure lowercase
 
     companion object {
         val extensionMap: MutableMap<String?, SupportedFileFormat?>

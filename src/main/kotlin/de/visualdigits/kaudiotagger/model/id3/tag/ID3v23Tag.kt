@@ -629,7 +629,6 @@ class ID3v23Tag : AbstractID3v2Tag {
      */
     fun readFrames(byteBuffer: ByteBuffer, size: Int) {
         // Now start looking for frames
-        var next: ID3v23Frame?
         frameMap.clear()
         encryptedFrameMap.clear()
 
@@ -642,15 +641,14 @@ class ID3v23Tag : AbstractID3v2Tag {
         // Read the frames until got to up to the size as specified in header or until
         // we hit an invalid frame identifier or padding
         while (byteBuffer.position() < size) {
-            val id: String?
             try {
                 // Read Frame
                 val posBeforeRead = byteBuffer.position()
                 log.debug("Looking for next frame at:$posBeforeRead")
-                next = ID3v23Frame(byteBuffer)
-                id = next.getIdentifier()
-                log.debug("Found $id at frame at:$posBeforeRead")
-                loadFrameIntoMap(id, next)
+                val newFrame = ID3v23Frame(byteBuffer)
+                val identifier = newFrame?.getIdentifier()
+                log.debug("Found $identifier at frame at:$posBeforeRead")
+                loadFrameIntoMap(identifier, newFrame)
             } catch (ex: EmptyFrameException) { // Found Empty Frame, log it - empty frames should not exist
                 log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += ID3v23Frame.FRAME_HEADER_SIZE

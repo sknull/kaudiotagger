@@ -11,6 +11,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupport
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.ID3v23FrameBody
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23StatusFlags
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24StatusFlags
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.util.ID3Compression
@@ -78,7 +79,6 @@ class ID3v23Frame: AbstractID3v2Frame {
         statusFlags = ID3v23StatusFlags(this, frame.statusFlags?.originalFlags ?: 0)
         encodingFlags = ID3v23EncodingFlags(this, frame.encodingFlags?.flags?:0)
     }
-
     /**
      * Partially construct ID3v24 Frame form an IS3v23Frame
      *
@@ -125,7 +125,7 @@ class ID3v23Frame: AbstractID3v2Frame {
             // Unknown Frame e.g NCON, also protects when known id but has unsupported frame body
             when {
                 frame.frameBody is FrameBodyUnsupported -> {
-                    frameBody = FrameBodyUnsupported(frame.frameBody as FrameBodyUnsupported)
+                    frameBody = FrameBodyUnsupported(frame.frameBody as? FrameBodyUnsupported)
                     frameBody?.header = this
                     setIdentifier(frame.getIdentifier())
                     log.debug("UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
@@ -135,7 +135,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                 frame.frameBody is FrameBodyDeprecated -> {
                     // Was it valid for this tag version, if so try and reconstruct
                     if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
-                        frameBody = (frame.frameBody as FrameBodyDeprecated).originalFrameBody
+                        frameBody = (frame.frameBody as? FrameBodyDeprecated)?.originalFrameBody
                         frameBody?.header = this
                         frameBody?.setTextEncoding(
                             ID3TextEncodingConversion.getTextEncoding(
@@ -146,7 +146,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                         setIdentifier(frame.getIdentifier())
                         log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                     } else {
-                        frameBody = FrameBodyDeprecated(frame.frameBody as FrameBodyDeprecated)
+                        frameBody = FrameBodyDeprecated(frame.frameBody as? FrameBodyDeprecated)
                         frameBody?.header = this
                         frameBody?.setTextEncoding(
                             ID3TextEncodingConversion.getTextEncoding(
@@ -167,7 +167,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                     setIdentifier(ID3Tags.convertFrameID24To23(frame.getIdentifier()))
                     if (getIdentifier() != null) {
                         log.debug("V4:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                        frameBody = ID3Tags.copyObject(frame.frameBody) as AbstractTagFrameBody
+                        frameBody = ID3Tags.copyObject(frame.frameBody) as? AbstractTagFrameBody
                         frameBody?.header = this
                         frameBody?.setTextEncoding(
                             ID3TextEncodingConversion.getTextEncoding(
@@ -183,7 +183,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                         when {
                             getIdentifier() != null -> {
                                 log.debug("V4:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                                frameBody = readBody(getIdentifier(), frame.frameBody as AbstractID3v2FrameBody)
+                                frameBody = readBody(getIdentifier(), frame.frameBody as? AbstractID3v2FrameBody)
                                 frameBody?.header = this
                                 frameBody?.setTextEncoding(
                                     ID3TextEncodingConversion.getTextEncoding(
@@ -197,7 +197,7 @@ class ID3v23Frame: AbstractID3v2Frame {
 
                             else -> {
                                 val baos = ByteArrayOutputStream()
-                                (frame.frameBody as AbstractID3v2FrameBody).write(baos)
+                                (frame.frameBody as? AbstractID3v2FrameBody)?.write(baos)
 
                                 setIdentifier(frame.getIdentifier())
                                 frameBody = FrameBodyUnsupported(getIdentifier(), baos.toByteArray())
@@ -229,13 +229,13 @@ class ID3v23Frame: AbstractID3v2Frame {
                     when {
                         getIdentifier() != null -> {
                             log.debug("V22Orig id is:${frame.getIdentifier()}New id is:${getIdentifier()}")
-                            frameBody = readBody(getIdentifier(), frame.frameBody as AbstractID3v2FrameBody)
+                            frameBody = readBody(getIdentifier(), frame.frameBody as? AbstractID3v2FrameBody)
                             frameBody?.header = this
 
                             return
                         }
                         else -> {
-                            frameBody = FrameBodyDeprecated(frame.frameBody as AbstractID3v2FrameBody)
+                            frameBody = FrameBodyDeprecated(frame.frameBody as? AbstractID3v2FrameBody)
                             frameBody?.header = this
                             setIdentifier(frame.getIdentifier())
                             log.debug("Deprecated:V22:orig id id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
@@ -245,7 +245,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                     }
                 }
             } else {
-                frameBody = FrameBodyUnsupported(frame.frameBody as FrameBodyUnsupported)
+                frameBody = FrameBodyUnsupported(frame.frameBody as? FrameBodyUnsupported)
                 frameBody?.header = this
                 setIdentifier(frame.getIdentifier())
                 log.debug("UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
@@ -265,7 +265,6 @@ class ID3v23Frame: AbstractID3v2Frame {
     constructor(byteBuffer: ByteBuffer) {
         read(byteBuffer)
     }
-
     /**
      * Read the frame from a byteBuffer
      *
@@ -350,7 +349,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                 var extraHeaderBytesCount = 0
                 var decompressedFrameSize = -1
 
-                if ((encodingFlags as ID3v23EncodingFlags).isCompression()) {
+                if ((encodingFlags as? ID3v23EncodingFlags)?.isCompression() == true) {
                     // Read the Decompressed Size
                     decompressedFrameSize = byteBuffer.getInt()
                     extraHeaderBytesCount = FRAME_COMPRESSION_UNCOMPRESSED_SIZE
@@ -359,26 +358,26 @@ class ID3v23Frame: AbstractID3v2Frame {
                     )
                 }
 
-                if ((encodingFlags as ID3v23EncodingFlags).isEncryption()) {
+                if ((encodingFlags as? ID3v23EncodingFlags)?.isEncryption() == true) {
                     // Consume the encryption byte
                     extraHeaderBytesCount += FRAME_ENCRYPTION_INDICATOR_SIZE
                     encryptionMethod = byteBuffer.get().toInt()
                 }
 
-                if ((encodingFlags as ID3v23EncodingFlags).isGrouping()) {
+                if ((encodingFlags as? ID3v23EncodingFlags)?.isGrouping() == true) {
                     // Read the Grouping byte, but do nothing with it
                     extraHeaderBytesCount += FRAME_GROUPING_INDICATOR_SIZE
                     groupIdentifier = byteBuffer.get().toInt()
                 }
 
-                if ((encodingFlags as ID3v23EncodingFlags).isNonStandardFlags()) {
+                if ((encodingFlags as? ID3v23EncodingFlags)?.isNonStandardFlags() == true) {
                     // Probably corrupt so treat as a standard frame
                     log.error(
                         "InvalidEncodingFlags:${encodingFlags?.flags?.toHexString()}"
                     )
                 }
 
-                if ((encodingFlags as ID3v23EncodingFlags).isCompression() && decompressedFrameSize > (100 * frameSize)) {
+                if ((encodingFlags as? ID3v23EncodingFlags)?.isCompression() == true && decompressedFrameSize > (100 * frameSize)) {
                     throw InvalidFrameException("$identifier is invalid frame, frame size $frameSize cannot be:$decompressedFrameSize when uncompressed")
                 }
 
@@ -392,14 +391,14 @@ class ID3v23Frame: AbstractID3v2Frame {
                 val frameBodyBuffer: ByteBuffer
                 // Read the body data
                 try {
-                    if ((encodingFlags as ID3v23EncodingFlags).isCompression()) {
+                    if ((encodingFlags as? ID3v23EncodingFlags)?.isCompression() == true) {
                         frameBodyBuffer = ID3Compression.uncompress(
                             identifier,
                             byteBuffer,
                             decompressedFrameSize,
                             realFrameSize
                         )
-                        if ((encodingFlags as ID3v23EncodingFlags).isEncryption()) {
+                        if ((encodingFlags as? ID3v23EncodingFlags)?.isEncryption() == true) {
                             frameBody = readEncryptedBody(
                                 id,
                                 frameBodyBuffer,
@@ -408,7 +407,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                         } else {
                             frameBody = readBody(id, frameBodyBuffer, decompressedFrameSize)
                         }
-                    } else if ((encodingFlags as ID3v23EncodingFlags).isEncryption()) {
+                    } else if ((encodingFlags as? ID3v23EncodingFlags)?.isEncryption() == true) {
                         frameBodyBuffer = byteBuffer.slice()
                         frameBodyBuffer.limit(frameSize)
                         frameBody = readEncryptedBody(identifier, frameBodyBuffer, frameSize)
@@ -423,7 +422,7 @@ class ID3v23Frame: AbstractID3v2Frame {
                     // it then be created as FrameBodyUnsupported
                     if (frameBody !is ID3v23FrameBody) {
                         log.debug("Converted frameBody with:$identifier to deprecated frameBody")
-                        this.frameBody = frameBody?.let { fb -> FrameBodyDeprecated(fb as FrameBodyDeprecated) }
+                        this.frameBody = frameBody?.let { fb -> FrameBodyDeprecated(fb as? FrameBodyDeprecated) }
                     }
                 } finally {
                     // Update position of main buffer, so no attempt is made to reread these bytes
@@ -479,7 +478,7 @@ class ID3v23Frame: AbstractID3v2Frame {
 
         // Write Frame Body Data
         val bodyOutputStream = ByteArrayOutputStream()
-        (frameBody as AbstractID3v2FrameBody).write(bodyOutputStream)
+        (frameBody as? AbstractID3v2FrameBody)?.write(bodyOutputStream)
         // Write Frame Header write Frame ID
         if (getIdentifier()?.length == 3) {
             setIdentifier(getIdentifier() + ' ')
@@ -499,21 +498,21 @@ class ID3v23Frame: AbstractID3v2Frame {
         headerBuffer.put((statusFlags?.writeFlags?:0).toByte())
 
         // Remove any non standard flags
-        (encodingFlags as ID3v23EncodingFlags).unsetNonStandardFlags()
+        (encodingFlags as? ID3v23EncodingFlags)?.unsetNonStandardFlags()
 
         // Unset Compression flag if previously set because we uncompress previously compressed frames on write.
-        (encodingFlags as ID3v23EncodingFlags).unsetCompression()
+        (encodingFlags as? ID3v23EncodingFlags)?.unsetCompression()
         headerBuffer.put((encodingFlags?.flags?:0).toByte())
 
         try {
             // Add header to the Byte Array Output Stream
             tagBuffer.write(headerBuffer.array())
 
-            if ((encodingFlags as ID3v23EncodingFlags).isEncryption()) {
+            if ((encodingFlags as? ID3v23EncodingFlags)?.isEncryption() == true) {
                 tagBuffer.write(encryptionMethod)
             }
 
-            if ((encodingFlags as ID3v23EncodingFlags).isGrouping()) {
+            if ((encodingFlags as? ID3v23EncodingFlags)?.isGrouping() == true) {
                 tagBuffer.write(groupIdentifier)
             }
 

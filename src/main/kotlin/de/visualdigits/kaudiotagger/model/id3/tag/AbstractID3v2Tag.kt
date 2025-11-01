@@ -259,13 +259,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * Add frame to the frame map
      *
      * @param frameId
-     * @param next
+     * @param frame
      */
-    open fun loadFrameIntoMap(frameId: String?, next: AbstractID3v2Frame) {
-        if (next.frameBody is FrameBodyEncrypted) {
-            loadFrameIntoSpecifiedMap(encryptedFrameMap, frameId, next)
+    open fun loadFrameIntoMap(frameId: String?, frame: AbstractID3v2Frame?) {
+        if (frame?.frameBody is FrameBodyEncrypted) {
+            loadFrameIntoSpecifiedMap(encryptedFrameMap, frameId, frame)
         } else {
-            loadFrameIntoSpecifiedMap(frameMap, frameId, next)
+            loadFrameIntoSpecifiedMap(frameMap, frameId, frame)
         }
     }
 
@@ -421,9 +421,10 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     open fun loadFrameIntoSpecifiedMap(
         map: MutableMap<String, AbstractID3v2Frame>,
         identifier: String?,
-        newFrame: AbstractID3v2Frame
+        newFrame: AbstractID3v2Frame?
     ) {
         requireNotNull(identifier) { "No identifier" }
+        requireNotNull(newFrame) { "No frame to add" }
 
         val existingFrame = map[identifier]
         if ((ID3v22FrameId.isMultipleAllowed(identifier)) ||

@@ -35,7 +35,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
      *
      * @param copyObject
      */
-    constructor(copyObject: AbstractID3v2FrameBody): super(copyObject)
+    constructor(copyObject: AbstractID3v2FrameBody?): super(copyObject)
 
     /**
      * This reads a frame body from a ByteBuffer into the appropriate FrameBody class and update the position of the

@@ -12,7 +12,7 @@ class MultiFrame : AbstractID3v2Frame {
 
     constructor(
         identifier: String?,
-        frames: Set<AbstractID3v2Frame> = setOf()
+            frames: Set<AbstractID3v2Frame> = setOf()
     ): super(identifier) {
         this.frames.addAll(frames)
     }

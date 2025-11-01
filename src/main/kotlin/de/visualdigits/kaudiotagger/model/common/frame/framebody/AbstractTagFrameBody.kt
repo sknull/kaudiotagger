@@ -32,8 +32,8 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      *
      * @param copyObject
      */
-    constructor(copyObject: AbstractTagFrameBody) {
-        copyObject.objectList.forEach { o ->
+    constructor(copyObject: AbstractTagFrameBody?) {
+        copyObject?.objectList?.forEach { o ->
             val newObject = ID3Tags.copyObject(o) as AbstractDataType
             newObject.setBody(this)
             this.objectList.add(newObject)

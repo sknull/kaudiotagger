@@ -32,8 +32,8 @@ class FrameBodyUnsupported: AbstractID3v2FrameBody, ID3v22FrameBody, ID3v23Frame
      *
      * @param copyObject a copy is made of this
      */
-    constructor(copyObject: FrameBodyUnsupported): super(copyObject) {
-        this.identifier = copyObject.identifier
+    constructor(copyObject: FrameBodyUnsupported?): super(copyObject) {
+        this.identifier = copyObject?.identifier
     }
 
     /**

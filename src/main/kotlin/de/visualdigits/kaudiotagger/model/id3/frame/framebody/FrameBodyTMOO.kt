@@ -19,10 +19,10 @@ class FrameBodyTMOO: AbstractFrameBodyTextInfo, ID3v24FrameBody {
      */
     constructor(textEncoding: Byte, text: String): super(textEncoding, text)
 
-    constructor(body: FrameBodyTXXX) {
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding())
+    constructor(body: FrameBodyTXXX?) {
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body?.getTextEncoding())
         this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1.id)
-        this.setObjectValue(DataTypes.OBJ_TEXT, body.getText())
+        this.setObjectValue(DataTypes.OBJ_TEXT, body?.getText())
     }
 
     constructor(

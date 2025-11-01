@@ -313,18 +313,12 @@ class ID3v22Tag : AbstractID3v2Tag {
      */
     fun readFrames(byteBuffer: ByteBuffer, size: Int) {
         // Now start looking for frames
-        var next: ID3v22Frame?
         frameMap.clear()
         encryptedFrameMap.clear()
 
         // Read the size from the Tag Header
         this.fileReadBytes = size
-        log.debug(
-            "Start of frame body at:" +
-                    byteBuffer.position() +
-                    ",frames sizes and padding is:" +
-                    size
-        )
+        log.debug("Start of frame body at:${byteBuffer.position()},frames sizes and padding is:$size")
         /* todo not done yet. Read the first Frame, there seems to be quite a
          ** common case of extra data being between the tag header and the first
          ** frame so should we allow for this when reading first frame, but not subsequent frames
@@ -334,9 +328,9 @@ class ID3v22Tag : AbstractID3v2Tag {
             try {
                 // Read Frame
                 log.debug("looking for next frame at:${byteBuffer.position()}")
-                next = ID3v22Frame(byteBuffer)
-                val id = next.getIdentifier()
-                loadFrameIntoMap(id, next)
+                val newFrame = ID3v22Frame(byteBuffer)
+                val identifier = newFrame?.getIdentifier()
+                loadFrameIntoMap(identifier, newFrame)
             } catch (ex: EmptyFrameException) { // Found Empty Frame
                 log.warn("Empty Frame:${ex.message}")
                 this.emptyFrameBytes += ID3v22Frame.FRAME_HEADER_SIZE
@@ -351,9 +345,9 @@ class ID3v22Tag : AbstractID3v2Tag {
         }
     }
 
-    override fun loadFrameIntoMap(frameId: String?, next: AbstractID3v2Frame) {
-        (next.frameBody as? FrameBodyTCON)?.also { fb -> fb.setV23Format() }
-        super.loadFrameIntoMap(frameId, next)
+    override fun loadFrameIntoMap(frameId: String?, newFrame: AbstractID3v2Frame?) {
+        (newFrame?.frameBody as? FrameBodyTCON)?.also { fb -> fb.setV23Format() }
+        super.loadFrameIntoMap(frameId, newFrame)
     }
 
     override fun addFrame(frame: AbstractID3v2Frame) {

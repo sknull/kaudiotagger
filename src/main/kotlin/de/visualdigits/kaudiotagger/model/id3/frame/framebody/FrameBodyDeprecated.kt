@@ -15,7 +15,7 @@ class FrameBodyDeprecated : AbstractID3v2FrameBody, ID3v24FrameBody, ID3v23Frame
      *
      * @param frameBody
      */
-    constructor(frameBody:AbstractID3v2FrameBody) {
+    constructor(frameBody:AbstractID3v2FrameBody?) {
         this.originalFrameBody = frameBody
     }
 

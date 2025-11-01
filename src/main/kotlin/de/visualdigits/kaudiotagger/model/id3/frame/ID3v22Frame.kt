@@ -3,6 +3,8 @@ package de.visualdigits.kaudiotagger.model.id3.frame
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
+import de.visualdigits.kaudiotagger.model.common.frame.MultiFrame
+import de.visualdigits.kaudiotagger.model.id3.frame.ID3v22Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractID3v2FrameBody
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyUnsupported
@@ -24,6 +26,7 @@ class ID3v22Frame: AbstractID3v2Frame {
         const val FRAME_SIZE_SIZE: Int = 3
         const val FRAME_HEADER_SIZE: Int = FRAME_ID_SIZE + FRAME_SIZE_SIZE
         val validFrameIdentifier: Pattern = Pattern.compile("[A-Z][0-9A-Z]{2}")
+
     }
 
     constructor()
@@ -38,7 +41,6 @@ class ID3v22Frame: AbstractID3v2Frame {
     constructor(byteBuffer: ByteBuffer): this() {
         read(byteBuffer)
     }
-
     /**
      * Creates a new ID3v22 Frame of type identifier.
      *
@@ -122,7 +124,7 @@ class ID3v22Frame: AbstractID3v2Frame {
         when {
             getIdentifier() != null -> {
                 log.debug("V2:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
-                this.frameBody = ID3Tags.copyObject(frame.frameBody) as AbstractID3v2FrameBody
+                this.frameBody = ID3Tags.copyObject(frame.frameBody) as? AbstractID3v2FrameBody
             }
             ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier()) -> {
                 setIdentifier(ID3Tags.forceFrameID23To22(frame.getIdentifier()))
@@ -143,17 +145,13 @@ class ID3v22Frame: AbstractID3v2Frame {
                     setIdentifier(frame.getIdentifier())
                     log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                 } else {
-                    this.frameBody = FrameBodyDeprecated(
-                        frame.frameBody as FrameBodyDeprecated
-                    )
+                    this.frameBody = FrameBodyDeprecated(frame.frameBody as? FrameBodyDeprecated)
                     setIdentifier(frame.getIdentifier())
                     log.debug("DEPRECATED:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
                 }
             }
             else -> {
-                this.frameBody = FrameBodyUnsupported(
-                    frame.frameBody as FrameBodyUnsupported
-                )
+                this.frameBody = FrameBodyUnsupported(frame.frameBody as? FrameBodyUnsupported)
                 setIdentifier(frame.getIdentifier())
                 log.debug("v2:UNKNOWN:Orig id is:${frame.getIdentifier()}:New id is:${getIdentifier()}")
             }
@@ -290,7 +288,7 @@ class ID3v22Frame: AbstractID3v2Frame {
 
         // Write Frame Body Data
         val bodyOutputStream = ByteArrayOutputStream()
-        (frameBody as AbstractID3v2FrameBody).write(bodyOutputStream)
+        (frameBody as? AbstractID3v2FrameBody)?.write(bodyOutputStream)
 
         // Write Frame Header
         // Write Frame ID must adjust can only be 3 bytes long
