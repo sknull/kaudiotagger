@@ -294,9 +294,9 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * Create Tag Field using generic key
      */
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
-        val value = values[0]
-        val idv1FieldKey = tagFieldToID3v1Field[genericKey]
-        return ID3v1TagField(idv1FieldKey?.name?:error("No id"), value)
+        return tagFieldToID3v1Field[genericKey]?.let { idv1FieldKey ->
+            ID3v1TagField(idv1FieldKey.name, values[0])
+        }
     }
 
     override fun addField(newFrame: TagField?) {
@@ -314,8 +314,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     override fun setField(genericKey: GenericFieldKey, vararg values: String) {
-        val tagfield = createField(genericKey, *values)
-        setField(tagfield)
+        setField(createField(genericKey, *values))
     }
 
     override fun setField(field: TagField?) {
@@ -336,15 +335,16 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     /**
      * @return album within list or empty if does not exist
      */
-    open fun getAlbumTag(): List<TagField> {
+    open fun getAlbumTag(): List<ID3v1TagField> {
         return if (album.isNotEmpty()) {
-            val field = ID3v1TagField(
-                ID3v1FieldKey.ALBUM.name,
-                album
+            listOf(
+                ID3v1TagField(
+                    ID3v1FieldKey.ALBUM.name,
+                    album
+                )
             )
-            mutableListOf(field)
         } else {
-            mutableListOf()
+            listOf()
         }
     }
 
@@ -362,15 +362,16 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     /**
      * @return Artist within list or empty if does not exist
      */
-    open fun getArtistTag(): List<TagField> {
+    open fun getArtistTag(): List<ID3v1TagField> {
         return if (artist.isNotEmpty()) {
-            val field = ID3v1TagField(
-                ID3v1FieldKey.ARTIST.name,
-                artist
+            listOf(
+                ID3v1TagField(
+                    ID3v1FieldKey.ARTIST.name,
+                    artist
+                )
             )
-            mutableListOf(field)
         } else {
-            mutableListOf()
+            listOf()
         }
     }
 
@@ -386,15 +387,16 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     /**
      * @return comment within list or empty if does not exist
      */
-    open fun getCommentTag(): List<TagField> {
+    open fun getCommentTag(): List<ID3v1TagField> {
         return if (comment.isNotEmpty()) {
-            val field = ID3v1TagField(
-                ID3v1FieldKey.COMMENT.name,
-                comment
+            listOf(
+                ID3v1TagField(
+                    ID3v1FieldKey.COMMENT.name,
+                    comment
+                )
             )
-            mutableListOf(field)
         } else {
-            mutableListOf()
+            listOf()
         }
     }
 
@@ -419,7 +421,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @return
      */
-    open fun getGenreTag(): List<TagField> {
+    open fun getGenreTag(): List<ID3v1TagField> {
         return getFirst(GenericFieldKey.GENRE)
             ?.let { f -> listOf(ID3v1TagField(ID3v1FieldKey.GENRE.name, f)) }
             ?:listOf()
@@ -458,7 +460,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @return
      */
-    open fun getTitleTag(): List<TagField> {
+    open fun getTitleTag(): List<ID3v1TagField> {
         return getFirst(GenericFieldKey.TITLE)
             ?.let { f -> listOf(ID3v1TagField(ID3v1FieldKey.TITLE.name, f)) }
             ?:listOf()
@@ -483,7 +485,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @return
      */
-    open fun getYearTag(): List<TagField> {
+    open fun getYearTag(): List<ID3v1TagField> {
         return getFirst(GenericFieldKey.YEAR)
             ?.let { f -> listOf(ID3v1TagField(ID3v1FieldKey.YEAR.name, f)) }
             ?:listOf()
@@ -508,8 +510,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         return getFirst(genericKey)?.let { f -> listOf(f) }?:listOf()
     }
 
-    override fun getFirst(id: String): String? {
-        return getFirst(GenericFieldKey.valueOf(id))
+    override fun getFirst(identifier: String): String? {
+        return getFirst(GenericFieldKey.valueOf(identifier))
     }
 
     /**
@@ -534,8 +536,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         return getFields(genericKey)[0]
     }
 
-    override fun getFirstField(id: String?): TagField? {
-        return id?.let { i -> getFirstField(GenericFieldKey.valueOf(i)) }
+    override fun getFirstField(identifier: String?): TagField? {
+        return identifier?.let { i -> getFirstField(GenericFieldKey.valueOf(i)) }
     }
 
     /**
@@ -554,8 +556,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         )
     }
 
-    override fun deleteField(key: String) {
-        deleteField(GenericFieldKey.valueOf(key.uppercase()))
+    override fun deleteField(identifier: String) {
+        deleteField(GenericFieldKey.valueOf(identifier.uppercase()))
     }
 
     /**
@@ -579,9 +581,9 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         return true
     }
 
-    override fun hasField(id: String): Boolean {
+    override fun hasField(identifier: String): Boolean {
         try {
-            val key = GenericFieldKey.valueOf(id.uppercase())
+            val key = GenericFieldKey.valueOf(identifier.uppercase())
             return hasField(key)
         } catch (_: IllegalArgumentException) {
             return false
@@ -626,9 +628,36 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     /**
+     * Count number of frames/fields in this tag
+     *
+     * @return
+     */
+    fun getFieldCount(): Int {
+        return getFields().size
+    }
+
+    /**
+     * Returns a [list][List] of [TagField] objects whose &quot;[id][TagField.getId]&quot;
+     * is the specified one.<br></br>
+     *
+     * @param genericKey The generic field key
+     * @return A list of [TagField] objects with the given &quot;id&quot;.
+     */
+    open fun getFields(): List<ID3v1TagField> {
+        return listOf(
+            getArtistTag(),
+            getAlbumTag(),
+            getTitleTag(),
+            getGenreTag(),
+            getYearTag(),
+            getCommentTag()
+        ).flatten().sortedBy { t -> t.getIdentifier() }
+    }
+
+    /**
      * Create structured representation of this item.
      */
-    open fun createStructure() {
+    fun createStructure() {
         MP3File.tagFormatter?.openHeadingElement(
             TYPE_TAG,
             getIdentifier()?:""
@@ -641,5 +670,9 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         MP3File.tagFormatter?.addElement(TYPE_COMMENT, this.comment)
         MP3File.tagFormatter?.addElement(TYPE_GENRE, this.genre.toInt())
         MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
+    }
+
+    override fun toString(): String {
+        return getFields().joinToString("\n") { field -> "${field.getIdentifier()}:TextEncoding=\"ISO-8859-1\"; Text=\"${field.getContent()}\"" }
     }
 }

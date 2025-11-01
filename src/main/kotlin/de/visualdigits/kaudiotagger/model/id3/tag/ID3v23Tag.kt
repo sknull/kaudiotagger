@@ -667,10 +667,10 @@ class ID3v23Tag : AbstractID3v2Tag {
     /**
      * Delete fields with this (frame) id
      *
-     * @param key
+     * @param identifier
      */
-    override fun deleteField(key: String) {
-        super.doDeleteTagField(FrameAndSubId(null, key, null))
+    override fun deleteField(identifier: String) {
+        super.doDeleteTagField(FrameAndSubId(null, identifier, null))
     }
 
     /**

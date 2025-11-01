@@ -62,9 +62,9 @@ interface Tag {
     /**
      * Delete any fields with this Flac (Vorbis Comment) id
      *
-     * @param key
+     * @param identifier
      */
-    fun deleteField(key: String)
+    fun deleteField(identifier: String)
 
     /**
      * Create the field based on the generic key and set it in the tag
@@ -107,11 +107,11 @@ interface Tag {
      * Determines whether the tag has at least one field with the specified
      * &quot;id&quot;.
      *
-     * @param id The field id to look for.
+     * @param identifier The field id to look for.
      * @return `true` if tag contains a [TagField] with the
      * given [id][TagField.getIdentifier].
      */
-    fun hasField(id: String): Boolean
+    fun hasField(identifier: String): Boolean
 
     /**
      * Determines whether the tag has no fields specified.<br></br>
@@ -130,7 +130,7 @@ interface Tag {
 
     fun getFirst(genericKey: GenericFieldKey?): String?
 
-    fun getFirst(id: String): String?
+    fun getFirst(identifier: String): String?
 
     /**
      * Retrieve the first field that exists for this format specific key
@@ -138,10 +138,10 @@ interface Tag {
      *
      * Can be used to retrieve fields with any identifier, useful if the identifier is not within [FieldKey]
      *
-     * @param id audio specific key
+     * @param identifier audio specific key
      * @return tag field or null if doesn't exist
      */
-    fun getFirstField(id: String?): TagField?
+    fun getFirstField(identifier: String?): TagField?
 
     /**
      * Delete any instance of tag fields used to store artwork

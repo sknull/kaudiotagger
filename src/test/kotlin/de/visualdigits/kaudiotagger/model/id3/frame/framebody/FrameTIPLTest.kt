@@ -143,7 +143,7 @@ class FrameTIPLTest : AbstractTestCase() {
         val v23Tag = ID3v23Tag(mp3File.getID3v2TagAsv24())
         mp3File.setTag(v23Tag)
 
-        Assertions.assertTrue(v23Tag.hasFrame("IPLS"))
+        Assertions.assertTrue(v23Tag.hasField("IPLS"))
         mp3File.save()
 
         // Reload

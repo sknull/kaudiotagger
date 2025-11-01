@@ -63,7 +63,7 @@ class FrameCOMMTest : AbstractTestCase() {
             )
             val mp3File =  MP3File.read(testFile)
 
-            assertTrue(mp3File.getID3v2Tag()?.hasFrame("COMM") == true)
+            assertTrue(mp3File.getID3v2Tag()?.hasField("COMM") == true)
 
             val commFrame =  mp3File
                 .getID3v2Tag()

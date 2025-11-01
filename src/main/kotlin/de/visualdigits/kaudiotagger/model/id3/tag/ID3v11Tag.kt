@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
@@ -98,28 +97,28 @@ class ID3v11Tag: ID3v1Tag {
             }
             var frame: ID3v24Frame
             var text: String?
-            if (id3tag.hasFrame(ID3v24FrameId.TITLE.id)) {
+            if (id3tag.hasField(ID3v24FrameId.TITLE.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.TITLE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTIT2).getText()
                 setTitle(ID3Tags.truncate(text, FIELD_TITLE_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24FrameId.ARTIST.id)) {
+            if (id3tag.hasField(ID3v24FrameId.ARTIST.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.ARTIST.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTPE1).getText()
                 setArtist(ID3Tags.truncate(text, FIELD_ARTIST_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24FrameId.ALBUM.id)) {
+            if (id3tag.hasField(ID3v24FrameId.ALBUM.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.ALBUM.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTALB).getText()
                 setAlbum(ID3Tags.truncate(text, FIELD_ALBUM_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24FrameId.YEAR.id)) {
+            if (id3tag.hasField(ID3v24FrameId.YEAR.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.YEAR.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTDRC).getText()
                 setYear(ID3Tags.truncate(text, FIELD_YEAR_LENGTH))
             }
 
-            if (id3tag.hasFrame(ID3v24FrameId.COMMENT.id)) {
+            if (id3tag.hasField(ID3v24FrameId.COMMENT.id)) {
                 text = ""
                 id3tag.getFrameOfType(
                     ID3v24FrameId.COMMENT.id
@@ -128,12 +127,12 @@ class ID3v11Tag: ID3v1Tag {
                 }
                 setComment(ID3Tags.truncate(text, FIELD_COMMENT_LENGTH))
             }
-            if (id3tag.hasFrame(ID3v24FrameId.GENRE.id)) {
+            if (id3tag.hasField(ID3v24FrameId.GENRE.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.GENRE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTCON).getText()
                 setGenre(ID3Tags.findNumber(text?:"0")?.toInt()?:GENRE_UNDEFINED)
             }
-            if (id3tag.hasFrame(ID3v24FrameId.TRACK.id)) {
+            if (id3tag.hasField(ID3v24FrameId.TRACK.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.TRACK.id) as ID3v24Frame
                 this.track = (frame.frameBody as FrameBodyTRCK).getTrackNo()
             }
@@ -340,74 +339,23 @@ class ID3v11Tag: ID3v1Tag {
         setField(genericKey, *values)
     }
 
-    override fun setField(genericKey: GenericFieldKey, vararg values: String) {
-        setField(createField(genericKey, *values))
-    }
-
-    override fun setField(field: TagField?) {
-        val genericKey = GenericFieldKey.valueOf(field?.getIdentifier()?:error("No id"))
-        when (genericKey) {
-            GenericFieldKey.ARTIST -> setArtist(field.toString())
-            GenericFieldKey.ALBUM -> setAlbum(field.toString())
-            GenericFieldKey.TITLE -> setTitle(field.toString())
-            GenericFieldKey.GENRE -> setGenreVal(field.toString())
-            GenericFieldKey.YEAR -> setYear(field.toString())
-            GenericFieldKey.COMMENT -> setComment(field.toString())
-            else -> { log.warn("Unknown field key '$genericKey'") }
-        }
-    }
-
-    /**
-     * Create Tag Field using generic key
-     */
-    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
-        return tagFieldToID3v1Field[genericKey]?.let { idv1FieldKey ->
-            ID3v1TagField(idv1FieldKey.name, values[0])
-        }
-    }
-
-    /**
-     * @return album within list or empty if does not exist
-     */
-    override fun getAlbumTag(): List<TagField> {
-        return if (getAlbum().isNotEmpty()) {
-            val field = ID3v1TagField(
-                ID3v1FieldKey.ALBUM.name,
-                getAlbum()
-            )
-            listOf(field)
-        } else {
-            mutableListOf()
-        }
+    override fun getFields(): List<ID3v1TagField> {
+        return (super.getFields() + getTrackTag()).sortedBy { t -> t.getIdentifier() }
     }
 
     /**
      * @return Artist within list or empty if does not exist
      */
-    override fun getArtistTag(): List<TagField> {
-        return if (getArtist().isNotEmpty()) {
-            val field: ID3v1TagField = ID3v1TagField(
-                ID3v1FieldKey.ARTIST.name,
-                getArtist()
+    open fun getTrackTag(): List<ID3v1TagField> {
+        return if (track != TRACK_UNDEFINED) {
+            listOf(
+                ID3v1TagField(
+                    ID3v1FieldKey.TRACK.name,
+                    track.toString()
+                )
             )
-            listOf(field)
         } else {
-            mutableListOf()
-        }
-    }
-
-    /**
-     * @return comment within list or empty if does not exist
-     */
-    override fun getCommentTag(): List<TagField> {
-        return if (getComment().isNotEmpty()) {
-            val field: ID3v1TagField = ID3v1TagField(
-                ID3v1FieldKey.COMMENT.name,
-                getComment()
-            )
-            listOf(field)
-        } else {
-            mutableListOf()
+            listOf()
         }
     }
 
@@ -434,21 +382,5 @@ class ID3v11Tag: ID3v1Tag {
         throw java.lang.UnsupportedOperationException(
             ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
         )
-    }
-
-    override fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_TAG,
-            getIdentifier()?:""
-        )
-        // Header
-        MP3File.tagFormatter?.addElement(TYPE_TITLE, this.getTitle())
-        MP3File.tagFormatter?.addElement(TYPE_ARTIST, this.getArtist())
-        MP3File.tagFormatter?.addElement(TYPE_ALBUM, this.getAlbum())
-        MP3File.tagFormatter?.addElement(TYPE_YEAR, this.getYear())
-        MP3File.tagFormatter?.addElement(TYPE_COMMENT, this.getComment())
-        MP3File.tagFormatter?.addElement(TYPE_TRACK, this.track?:0)
-        MP3File.tagFormatter?.addElement(TYPE_GENRE, this.getGenre())
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
     }
 }

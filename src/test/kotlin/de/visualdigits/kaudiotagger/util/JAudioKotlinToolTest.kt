@@ -6,7 +6,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -23,9 +22,10 @@ class JAudioKotlinToolTest : AbstractTestCase() {
         println("## $indent${directory.canonicalPath}")
         metaData.putAll(directory.listFiles { f -> f.isFile && f.name.endsWith(".mp3", ignoreCase = true) }
             ?.associate { f ->
-//                println("## $indent - ${f.name}")
-                val mP3File = MP3File.read(f)
-                Pair(f, mP3File)
+                val mp3File = MP3File.read(f)
+                println(mp3File.toString().split("\n").joinToString("\n") { line -> "## $indent$line" })
+
+                Pair(f, mp3File)
             }
             ?:mapOf()
         )

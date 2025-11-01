@@ -25,17 +25,14 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
 
     companion object {
 
-
         const val TYPE_FRAME: String = "frame"
         const val TYPE_FRAME_SIZE: String = "frameSize"
         const val UNSUPPORTED_ID: String = "Unsupported"
 
     }
 
-    // Frame identifier
     private var identifier: String? = ""
 
-    // Frame Size
     var frameSize: Int = 0
 
     /**

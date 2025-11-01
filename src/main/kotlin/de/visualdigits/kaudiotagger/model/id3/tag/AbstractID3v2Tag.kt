@@ -2,7 +2,7 @@ package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.field.TagField
-import de.visualdigits.kaudiotagger.model.common.frame.MultiFrame
+import de.visualdigits.kaudiotagger.model.id3.frame.MultiID3v2Frame
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.StandardIPLSKey
@@ -308,7 +308,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         existingFrame: AbstractID3v2Frame,
         newFrame: AbstractID3v2Frame
     ) {
-        frameMap[newFrame.getIdentifier() ?: error("No identifier")] = MultiFrame(newFrame.getIdentifier(), existingFrame, newFrame)
+        frameMap[newFrame.getIdentifier() ?: error("No identifier")] = MultiID3v2Frame(newFrame.getIdentifier(), existingFrame, newFrame)
     }
 
     /**
@@ -325,7 +325,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         copyObject.frameMap.values.forEach { value ->
             // SingleFrames
             when (value) {
-                is MultiFrame -> {
+                is MultiID3v2Frame -> {
                     value.frames.forEach { frame ->
                         addFrame(frame)
                     }
@@ -343,20 +343,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param newFrame
      */
     abstract fun addFrame(newFrame: AbstractID3v2Frame)
-
-    /**
-     * Return whether tag has frame with this identifier
-     *
-     *
-     * Warning the match is only done against the identifier so if a tag contains a frame with an unsupported body
-     * but happens to have an identifier that is valid for another version of the tag it will return true
-     *
-     * @param identifier frameId to lookup
-     * @return true if tag has frame with this identifier
-     */
-    fun hasFrame(identifier: String): Boolean {
-        return frameMap.containsKey(identifier)
-    }
 
     /**
      * For single frames return the frame in this tag with given identifier if it exists, if multiple frames
@@ -386,13 +372,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param identifier
      * @return an iterator of all the frames starting with a particular identifier
      */
-    fun getFrameOfType(identifier: String): Set<AbstractID3v2Frame> {
+    fun getFrameOfType(identifier: String): List<AbstractID3v2Frame> {
         return frameMap[identifier]?.let { frame ->
             when (frame) {
-                is MultiFrame -> frame.frames
-                else -> setOf(frame)
+                is MultiID3v2Frame -> frame.frames
+                else -> listOf(frame)
             }
-        }?:setOf()
+        }?:listOf()
     }
 
     /**
@@ -421,11 +407,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         ) {
             // If a frame already exists of this type
             if (existingFrame != null) {
-                if (existingFrame is MultiFrame) {
+                if (existingFrame is MultiID3v2Frame) {
                     existingFrame.addFrame(newFrame)
                     log.debug("Adding Multi Frame(1)$identifier")
                 } else {
-                    map[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                    map[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                     log.debug("Adding Multi Frame(2)$identifier")
                 }
             } else {
@@ -684,7 +670,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         newFrame: AbstractID3v2Frame
     ) {
         when (existingFrame) {
-            is MultiFrame -> existingFrame.addFrame(newFrame)
+            is MultiID3v2Frame -> existingFrame.addFrame(newFrame)
             else -> {
                 when (val newFrameBody = newFrame.frameBody) {
                     is FrameBodyTXXX -> {
@@ -692,7 +678,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if (newFrameBody.getDescription() == existingFrameBody?.getDescription()) {
                             newFrameBody.getText()?.also { t -> existingFrameBody?.addTextValue(t) }
                         } else {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         }
                     }
                     is FrameBodyWXXX -> {
@@ -700,7 +686,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if (newFrameBody.getDescription() == existingFrameBody?.getDescription()) {
                             existingFrameBody?.addUrlLink(newFrameBody.getUrlLink())
                         } else {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         }
                     }
                     is AbstractFrameBodyTextInfo -> {
@@ -725,7 +711,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         }
                     }
                     else -> {
-                        frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                        frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                     }
                 }
             }
@@ -914,11 +900,11 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * If the value is a String it returns that, otherwise returns a summary of the fields information
      *
-     * @param id
+     * @param identifier
      * @return
      */
-    override fun getFirst(id: String): String? {
-        return getFirstField(id)?.let { id -> getTextValueForFrame(id) } ?: ""
+    override fun getFirst(identifier: String): String? {
+        return getFirstField(identifier)?.let { id -> getTextValueForFrame(id) } ?: ""
     }
 
     fun setFrame(frame: AbstractID3v2Frame) {
@@ -991,7 +977,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     open fun getFields(id: String?): List<TagField> {
         return when (val frame = getFrame(id)) {
             null -> listOf()
-            is MultiFrame -> frame.frames.toList()
+            is MultiID3v2Frame -> frame.frames.toList()
             is AbstractID3v2Frame -> listOf(frame as TagField)
         }
     }
@@ -1001,8 +987,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @see Tag.hasField
      */
-    override fun hasField(id: String): Boolean {
-        return hasFrame(id)
+    override fun hasField(identifier: String): Boolean {
+        return frameMap.containsKey(identifier)
     }
 
     /**
@@ -1312,16 +1298,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     /**
      * Retrieve the first tag field that exists for this identifier
      *
-     * @param id
+     * @param identifier
      * @return tag field or null if doesn't exist
      */
     @Suppress("UNCHECKED_CAST")
-    override fun getFirstField(id: String?): AbstractID3v2Frame? {
-        val obj = getFrame(id) ?: return null
-        return if (obj is MutableList<*>) {
-            (obj as? MutableList<AbstractID3v2Frame>)?.get(0)
-        } else {
-            obj
+    override fun getFirstField(identifier: String?): AbstractID3v2Frame? {
+        return when(val frame = getFrame(identifier)) {
+            is MultiID3v2Frame -> frame.frames.firstOrNull()
+            else -> frame
         }
     }
 
@@ -1478,7 +1462,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     ) {
         val identifier = newFrame.getIdentifier() ?: error("No identifier")
         when (existingFrame) {
-            is MultiFrame -> {
+            is MultiID3v2Frame -> {
                 existingFrame.addFrame(newFrame)
             }
             is AbstractID3v2Frame -> {
@@ -1488,7 +1472,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if ((newFrame.frameBody as FrameBodyTXXX).getDescription().equals((newFrame.frameBody as FrameBodyTXXX).getDescription())) {
                             frameMap[identifier] = existingFrame
                         } else if (isMultipleAllowed(identifier)) {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         } else {
                             frameMap[identifier] = newFrame
                         }
@@ -1498,7 +1482,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if ((newFrame.frameBody as FrameBodyWXXX).getDescription().equals((newFrame.frameBody as FrameBodyWXXX).getDescription())) {
                             frameMap[identifier] = existingFrame
                         } else if (isMultipleAllowed(identifier)) {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         } else {
                             frameMap[identifier] = newFrame
                         }
@@ -1507,7 +1491,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if ((newFrame.frameBody as FrameBodyCOMM).getDescription().equals((newFrame.frameBody as FrameBodyCOMM).getDescription())) {
                             frameMap[identifier] = existingFrame
                         } else if (isMultipleAllowed(identifier)) {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         } else {
                             frameMap[identifier] = newFrame
                         }
@@ -1516,7 +1500,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if ((newFrame.frameBody as FrameBodyUFID).getOwner().equals((newFrame.frameBody as FrameBodyUFID).getOwner())) {
                             frameMap[identifier] = existingFrame
                         } else if (isMultipleAllowed(identifier)) {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         } else {
                             frameMap[identifier] = newFrame
                         }
@@ -1525,7 +1509,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if ((newFrame.frameBody as FrameBodyUSLT).getDescription().equals((newFrame.frameBody as FrameBodyUSLT).getDescription())) {
                             frameMap[identifier] = existingFrame
                         } else if (isMultipleAllowed(identifier)) {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         } else {
                             frameMap[identifier] = newFrame
                         }
@@ -1534,7 +1518,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                         if ((newFrame.frameBody as FrameBodyPOPM).getEmailToUser().equals((newFrame.frameBody as FrameBodyPOPM).getEmailToUser())) {
                             frameMap[identifier] = existingFrame
                         } else if (isMultipleAllowed(identifier)) {
-                            frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                            frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                         } else {
                             frameMap[identifier] = newFrame
                         }
@@ -1549,7 +1533,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     }
                 }
                 if (isMultipleAllowed(identifier)) {
-                    frameMap[identifier] = MultiFrame(identifier, existingFrame, newFrame)
+                    frameMap[identifier] = MultiID3v2Frame(identifier, existingFrame, newFrame)
                 }
             }
         }
@@ -1590,14 +1574,18 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         return frameMap.size
     }
 
+    fun getFields(): List<AbstractID3v2Frame> {
+        return frameMap.values.toList()
+    }
+
     @Suppress("UNCHECKED_CAST")
     override fun toString(): String {
         return frameMap.values.map { v ->
             when (v) {
-                is MultiFrame -> v.frames
+                is MultiID3v2Frame -> v.frames
                 is AbstractID3v2Frame -> listOf(v)
             }
         }.flatten()
-            .joinToString("\n") { frame -> "\t${frame.getIdentifier() ?: "UNSET"}:$frame" }
+            .joinToString("\n") { frame -> "${frame.getIdentifier() ?: "UNSET"}:$frame" }
     }
 }

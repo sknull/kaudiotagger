@@ -19,7 +19,7 @@ class ID3v1TagField : TagTextField {
     /**
      * Stores the id (name) of the tag field. <br></br>
      */
-    val id: String
+    private val identifier: String
 
     /**
      * If `true`, the id of the current encapsulated tag field is
@@ -46,10 +46,10 @@ class ID3v1TagField : TagTextField {
         val i = field.indexOf('=')
         if (i == -1) {
             // Beware that ogg ID, must be capitalized and contain no space..
-            this.id = "ERRONEOUS"
+            this.identifier = "ERRONEOUS"
             this.content = field
         } else {
-            this.id = field.take(i).uppercase(Locale.getDefault())
+            this.identifier = field.take(i).uppercase(Locale.getDefault())
             if (field.length > i) {
                 this.content = field.substring(i + 1)
             } else {
@@ -67,13 +67,13 @@ class ID3v1TagField : TagTextField {
      */
     private fun checkCommon() {
         this.common =
-            id == ID3v1FieldKey.TITLE.name ||
-                    id == ID3v1FieldKey.ALBUM.name ||
-                    id == ID3v1FieldKey.ARTIST.name ||
-                    id == ID3v1FieldKey.GENRE.name ||
-                    id == ID3v1FieldKey.YEAR.name ||
-                    id == ID3v1FieldKey.COMMENT.name ||
-                    id == ID3v1FieldKey.TRACK.name
+            identifier == ID3v1FieldKey.TITLE.name ||
+                    identifier == ID3v1FieldKey.ALBUM.name ||
+                    identifier == ID3v1FieldKey.ARTIST.name ||
+                    identifier == ID3v1FieldKey.GENRE.name ||
+                    identifier == ID3v1FieldKey.YEAR.name ||
+                    identifier == ID3v1FieldKey.COMMENT.name ||
+                    identifier == ID3v1FieldKey.TRACK.name
     }
 
     /**
@@ -83,13 +83,13 @@ class ID3v1TagField : TagTextField {
      * @param fieldContent Content of the field.
      */
     constructor(fieldId: String, fieldContent: String) {
-        this.id = fieldId.uppercase(Locale.getDefault())
+        this.identifier = fieldId.uppercase(Locale.getDefault())
         this.content = fieldContent
         checkCommon()
     }
 
     override fun getIdentifier(): String {
-        return id
+        return identifier
     }
 
     override fun getEncoding(): Charset {
@@ -102,7 +102,7 @@ class ID3v1TagField : TagTextField {
 
     override fun getRawContent(): ByteArray {
         val size = ByteArray(4)
-        val idBytes = this.id.toByteArray(StandardCharsets.ISO_8859_1)
+        val idBytes = this.identifier.toByteArray(StandardCharsets.ISO_8859_1)
         val contentBytes = this.content?.toByteArray(StandardCharsets.ISO_8859_1)
         val b = ByteArray(4 + idBytes.size + 1 + (contentBytes?.size?:0))
 

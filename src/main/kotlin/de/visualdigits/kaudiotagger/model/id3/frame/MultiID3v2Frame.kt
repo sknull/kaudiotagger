@@ -1,18 +1,17 @@
-package de.visualdigits.kaudiotagger.model.common.frame
+package de.visualdigits.kaudiotagger.model.id3.frame
 
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
-class MultiFrame : AbstractID3v2Frame {
+class MultiID3v2Frame : AbstractID3v2Frame {
 
-    val frames: MutableSet<AbstractID3v2Frame> = mutableSetOf()
+    val frames: MutableList<AbstractID3v2Frame> = mutableListOf()
 
     constructor(
         identifier: String?,
-            frames: Set<AbstractID3v2Frame> = setOf()
+        frames: Set<AbstractID3v2Frame> = setOf()
     ): super(identifier) {
         this.frames.addAll(frames)
     }
@@ -23,7 +22,7 @@ class MultiFrame : AbstractID3v2Frame {
     ): this(identifier, frames.toSet())
 
     fun addFrame(frame: AbstractID3v2Frame) {
-        frames.add(frame)
+        if (!frames.contains(frame)) frames.add(frame)
     }
 
     /**
@@ -53,7 +52,7 @@ class MultiFrame : AbstractID3v2Frame {
         return frames.firstOrNull()
             ?.frameBody?.getTextEncoding()
             ?.let { te ->
-                TextEncoding.fromId(te)
+                TextEncoding.Companion.fromId(te)
             }
             ?.charSet
             ?: TextEncoding.ISO_8859_1.charSet

@@ -47,7 +47,7 @@ open class AudioFile {
     constructor()
 
     override fun toString(): String {
-        return ("AudioFile ${file?.name}  --------\n$audioHeader\n${tags.map { (k, v) -> "${k.name}:\n$v\n-------------------"}}\n=============")
+        return ("===================\nFilename: ${file?.name}\nHeader: $audioHeader\n-------------------\n${tags.toList().joinToString("\n-------------------\n") { (k, v) -> "${k.name}:\n$v" }}\n===================")
     }
 
     fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
