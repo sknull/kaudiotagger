@@ -3,7 +3,6 @@ package de.visualdigits.kaudiotagger.model.audiofile.header.mp3
 import de.visualdigits.kaudiotagger.model.audiofile.frame.VbriFrame
 import de.visualdigits.kaudiotagger.model.audiofile.frame.XingFrame
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -90,21 +89,33 @@ open class MP3AudioHeader : AudioHeader {
      */
     var encoder: String? = ""
 
-    constructor()
+    companion object {
 
-    /**
-     * Search for the first MP3Header in the file
-     *
-     *
-     * The search starts from the start of the file, it is usually safer to use the alternative constructor that
-     * allows you to provide the length of the tag header as a parameter so the tag can be skipped over.
-     *
-     * @param seekFile
-     */
-    constructor(seekFile: File?) {
-        if (seekFile == null || !seek(seekFile, 0)) {
-            throw InvalidAudioFrameException("No audio header found within${seekFile?.getName() ?: "No file given"}")
-        }
+        val timeInFormat = SimpleDateFormat(
+            "ss",
+            Locale.UK
+        )
+
+        val timeOutFormat = SimpleDateFormat(
+            "mm:ss",
+            Locale.UK
+        )
+
+        val timeOutOverAnHourFormat = SimpleDateFormat("kk:mm:ss", Locale.UK)
+
+        private const val isVbrIdentifier = '~'
+        private const val CONVERT_TO_KILOBITS = 1000
+        private const val TYPE_MP3 = "mp3"
+        private const val CONVERTS_BYTE_TO_BITS = 8
+
+        /**
+         * After testing the average location of the first MP3Header bit was at 5000 bytes so this is
+         * why chosen as a default.
+         */
+        private const val FILE_BUFFER_SIZE = 5000
+        val MIN_BUFFER_REMAINING_REQUIRED =
+            MPEGFrameHeader.HEADER_SIZE + XingFrame.MAX_BUFFER_SIZE_NEEDED_TO_READ_XING
+        private const val NO_SECONDS_IN_HOUR = 3600
     }
 
     /**
@@ -124,9 +135,9 @@ open class MP3AudioHeader : AudioHeader {
      * @param seekFile
      * @param startByte
      */
-    constructor(seekFile: File?, startByte: Long) {
+    constructor(seekFile: File?, startByte: Long = 0) {
         if (seekFile == null || !seek(seekFile, startByte)) {
-            throw InvalidAudioFrameException(ErrorMessage.NO_AUDIO_HEADER_FOUND.getMsg(seekFile?.getName() ?: "No file given"))
+            error(ErrorMessage.NO_AUDIO_HEADER_FOUND.getMsg(seekFile?.getName() ?: "No file given"))
         }
     }
 
@@ -172,44 +183,29 @@ open class MP3AudioHeader : AudioHeader {
                             }
                         }
                         if (MPEGFrameHeader.isMPEGFrame(bb)) {
-                            try {
-                                log.debug("Found Possible header at:$filePointerCount")
+                            log.debug("Found Possible header at:$filePointerCount")
 
-                                mp3FrameHeader = MPEGFrameHeader.parseMPEGHeader(bb)
-                                syncFound = true
+                            mp3FrameHeader = MPEGFrameHeader.parseMPEGHeader(bb)
+                            syncFound = true
 
-                                // if(2==1) use this line when you want to test getting the next frame without using xing
-                                var header: ByteBuffer? = null
-                                if ((XingFrame.isXingFrame(bb, mp3FrameHeader)?.also { header = it }) != null) {
-                                    log.debug("Found Possible XingHeader")
-                                    try {
-                                        // Parses Xing frame without modifying position of main buffer
-                                        mp3XingFrame = XingFrame.parseXingFrame(header)
-                                    } catch (ex: InvalidAudioFrameException) {
-                                        // We Ignore because even if Xing Header is corrupted
-                                        // doesn't mean file is corrupted
-                                    }
+                            // if(2==1) use this line when you want to test getting the next frame without using xing
+                            var header: ByteBuffer? = null
+                            if ((XingFrame.isXingFrame(bb, mp3FrameHeader)?.also { header = it }) != null) {
+                                log.debug("Found Possible XingHeader")
+                                // Parses Xing frame without modifying position of main buffer
+                                mp3XingFrame = XingFrame.parseXingFrame(header)
+                                break
+                            } else if ((VbriFrame.isVbriFrame(bb)?.also { header = it }) != null
+                            ) {
+                                log.debug("Found Possible VbriHeader")
+                                // Parses Vbri frame without modifying position of main buffer
+                                mp3VbriFrame = VbriFrame.parseVBRIFrame(header)
+                                break
+                            } else {
+                                syncFound = isNextFrameValid(seekFile, filePointerCount, bb, fc)
+                                if (syncFound) {
                                     break
-                                } else if ((VbriFrame.isVbriFrame(bb)?.also { header = it }) != null
-                                ) {
-                                    log.debug("Found Possible VbriHeader")
-                                    try {
-                                        // Parses Vbri frame without modifying position of main buffer
-                                        mp3VbriFrame = VbriFrame.parseVBRIFrame(header)
-                                    } catch (ex: InvalidAudioFrameException) {
-                                        // We Ignore because even if Vbri Header is corrupted
-                                        // doesn't mean file is corrupted
-                                    }
-                                    break
-                                } else {
-                                    syncFound = isNextFrameValid(seekFile, filePointerCount, bb, fc)
-                                    if (syncFound) {
-                                        break
-                                    }
                                 }
-                            } catch (ex: InvalidAudioFrameException) {
-                                // We Ignore because likely to be incorrect sync bits ,
-                                // will just continue in loop
                             }
                         }
 
@@ -308,14 +304,7 @@ open class MP3AudioHeader : AudioHeader {
         // Position bb to the start of the alleged next frame
         bb.position(bb.position() + (mp3FrameHeader?.getFrameLength()?:0))
         if (MPEGFrameHeader.isMPEGFrame(bb)) {
-            try {
-                MPEGFrameHeader.parseMPEGHeader(bb)
-                log.debug("Check next frame confirms is an audio header ")
-                result = true
-            } catch (ex: InvalidAudioFrameException) {
-                log.debug("Check next frame has identified this is not an audio header")
-                result = false
-            }
+            result = MPEGFrameHeader.parseMPEGHeader(bb) != null
         } else {
             log.debug("isMPEGFrame has identified this is not an audio header")
         }
@@ -575,31 +564,6 @@ open class MP3AudioHeader : AudioHeader {
      */
     override fun getPreciseTrackLength(): Double {
         return trackLength
-    }
-
-    companion object {
-        val timeInFormat = SimpleDateFormat(
-            "ss",
-            Locale.UK
-        )
-        val timeOutFormat = SimpleDateFormat(
-            "mm:ss",
-            Locale.UK
-        )
-        val timeOutOverAnHourFormat = SimpleDateFormat("kk:mm:ss", Locale.UK)
-        private const val isVbrIdentifier = '~'
-        private const val CONVERT_TO_KILOBITS = 1000
-        private const val TYPE_MP3 = "mp3"
-        private const val CONVERTS_BYTE_TO_BITS = 8
-
-        /**
-         * After testing the average location of the first MP3Header bit was at 5000 bytes so this is
-         * why chosen as a default.
-         */
-        private const val FILE_BUFFER_SIZE = 5000
-        val MIN_BUFFER_REMAINING_REQUIRED =
-            MPEGFrameHeader.HEADER_SIZE + XingFrame.MAX_BUFFER_SIZE_NEEDED_TO_READ_XING
-        private const val NO_SECONDS_IN_HOUR = 3600
     }
 
     /**

@@ -2,7 +2,6 @@ package de.visualdigits.kaudiotagger.model.audiofile.mp3
 
 import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MP3AudioHeader
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.tag.Tag
 import de.visualdigits.kaudiotagger.model.common.types.LoadOptions
@@ -332,8 +331,6 @@ class MP3File : AudioFile {
                 audioHeader = checkAudioStart(startByte, audioHeader)
             }
             return audioHeader.mp3StartByte
-        } catch (iafe: InvalidAudioFrameException) {
-            throw iafe
         } catch (ioe: IOException) {
             throw ioe
         }

@@ -1,8 +1,9 @@
 package de.visualdigits.kaudiotagger.model.audiofile.header.mp3
 
-import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidAudioFrameException
 import de.visualdigits.kaudiotagger.util.AbstractTagDisplayFormatter
 import de.visualdigits.kaudiotagger.util.FileConstants
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.nio.ByteBuffer
 
 /**
@@ -10,6 +11,8 @@ import java.nio.ByteBuffer
  * byte frame header.
  */
 class MPEGFrameHeader {
+
+    private val log: Logger = LoggerFactory.getLogger(javaClass)
 
     var mpegBytes: ByteArray = byteArrayOf()
 
@@ -105,286 +108,8 @@ class MPEGFrameHeader {
 
     var samplingRate: Int? = null
 
-    /**
-     * Hide Constructor
-     */
-    private constructor()
-
-    /**
-     * Try and create a new MPEG frame with the given byte array and decodes its contents
-     * If decoding header causes a problem it is not a valid header
-     *
-     * @param b the array of bytes representing this mpeg frame
-     */
-    private constructor(b: ByteArray) {
-        mpegBytes = b
-        setBitrate()
-        setVersion()
-        setLayer()
-        setProtected()
-        setSamplingRate()
-        setPadding()
-        setPrivate()
-        setChannelMode()
-        setModeExtension()
-        setCopyrighted()
-        setOriginal()
-        setEmphasis()
-    }
-
-    /**
-     * Gets the copyrighted attribute of the MPEGFrame object
-     */
-    private fun setCopyrighted() {
-        isCopyrighted = (mpegBytes[BYTE_4].toInt() and MASK_MP3_COPY) != 0
-    }
-
-    /**
-     * Set the version of this frame as an int value (see constants)
-     *
-     */
-    private fun setVersion() {
-        // MPEG Version
-        version = ((mpegBytes[BYTE_2].toInt() and MASK_MP3_VERSION) shr 3).toByte().toInt()
-        versionAsString = mpegVersionMap[version]
-        if (versionAsString == null) {
-            throw InvalidAudioFrameException("Invalid mpeg version")
-        }
-    }
-
-    /**
-     * Sets the original attribute of the MPEGFrame object
-     */
-    private fun setOriginal() {
-        isOriginal = (mpegBytes[BYTE_4].toInt() and MASK_MP3_HOME) != 0
-    }
-
-    /**
-     * Sets the attribute of the MPEGFrame object
-     */
-    private fun setProtected() {
-        isProtected = (mpegBytes[BYTE_2].toInt() and MASK_MP3_PROTECTION) == 0x00
-    }
-
-    /**
-     * Sets the private attribute of the MPEGFrame object
-     */
-    private fun setPrivate() {
-        isPrivate = (mpegBytes[BYTE_3].toInt() and MASK_MP3_PRIVACY) != 0
-    }
-
-    /**
-     * Get the setBitrate of this frame
-     *
-     */
-    private fun setBitrate() {
-        /* BitRate, get by checking header setBitrate bits and MPEG Version and Layer */
-        val bitRateIndex =
-            (mpegBytes[BYTE_3].toInt() and MASK_MP3_BITRATE) or
-                    (mpegBytes[BYTE_2].toInt() and MASK_MP3_ID) or
-                    (mpegBytes[BYTE_2].toInt() and MASK_MP3_LAYER)
-
-        bitRate = bitrateMap[bitRateIndex]
-        if (bitRate == null) {
-            throw InvalidAudioFrameException("Invalid bitrate")
-        }
-    }
-
-    /**
-     * Set the Mpeg channel mode of this frame as a constant (see constants)
-     *
-     */
-    private fun setChannelMode() {
-        channelMode = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE) ushr 6
-        channelModeAsString = modeMap[channelMode]
-        if (channelModeAsString == null) {
-            throw InvalidAudioFrameException("Invalid channel mode")
-        }
-    }
-
-    /**
-     * Get the setEmphasis mode of this frame in a string representation
-     *
-     */
-    private fun setEmphasis() {
-        emphasis = mpegBytes[BYTE_4].toInt() and MASK_MP3_EMPHASIS
-        emphasisAsString = emphasisMap[emphasis]
-        if (this.emphasisAsString == null) {
-            throw InvalidAudioFrameException("Invalid emphasis")
-        }
-    }
-
-    /**
-     * Set whether this frame uses padding bytes
-     */
-    private fun setPadding() {
-        isPadding = (mpegBytes[BYTE_3].toInt() and MASK_MP3_PADDING) != 0
-    }
-
-    /**
-     * Get the layer version of this frame as a constant int value (see constants)
-     *
-     */
-    private fun setLayer() {
-        layer = (mpegBytes[BYTE_2].toInt() and MASK_MP3_LAYER) ushr 1
-        layerAsString = mpegLayerMap[layer]
-        if (layerAsString == null) {
-            throw InvalidAudioFrameException("Invalid Layer")
-        }
-    }
-
-    /**
-     * Sets the string representation of the mode extension of this frame
-     *
-     */
-    private fun setModeExtension() {
-        val index = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE_EXTENSION) shr 4
-        if (layer == LAYER_III) {
-            modeExtension = modeExtensionLayerIIIMap[index]
-            if (this.modeExtension == null) {
-                throw InvalidAudioFrameException("Invalid Mode Extension")
-            }
-        } else {
-            modeExtension = modeExtensionMap[index]
-            if (this.modeExtension == null) {
-                throw InvalidAudioFrameException("Invalid Mode Extension")
-            }
-        }
-    }
-
-    /**
-     * set the sampling rate in Hz of this frame
-     *
-     */
-    private fun setSamplingRate() {
-        // Frequency
-        val index = (mpegBytes[BYTE_3].toInt() and MASK_MP3_FREQUENCY) ushr 2
-        val samplingRateMapForVersion = samplingRateMap[version] ?: throw InvalidAudioFrameException("Invalid version")
-        samplingRate = samplingRateMapForVersion[index]
-        if (samplingRate == null) {
-            throw InvalidAudioFrameException("Invalid sampling rate")
-        }
-    }
-
-    /**
-     * Gets the number of channels
-     *
-     * @return The setChannelMode value
-     */
-    fun getNumberOfChannels(): Int {
-        return when (channelMode) {
-            MODE_DUAL_CHANNEL -> 2
-            MODE_JOINT_STEREO -> 2
-            MODE_MONO -> 1
-            MODE_STEREO -> 2
-            else -> 0
-        }
-    }
-
-    /*
-     * Gets this frame length in bytes, value should always be rounded down to the nearest byte (not rounded up)
-     *
-     * Calculation is Bitrate (scaled to bps) divided by sampling frequency (in Hz), The larger the bitrate the larger
-     * the frame but the more samples per second the smaller the value, also have to take into account frame padding
-     * Have to multiple by a coefficient constant depending upon the layer it is encoded in,
-
-     */
-    fun getFrameLength(): Int {
-        when (version) {
-            VERSION_2, VERSION_2_5 -> when (layer) {
-                LAYER_I -> return (((LAYER_I_FRAME_SIZE_COEFFICIENT *
-                        (getBitRate() * SCALE_BY_THOUSAND)) /
-                        getSamplingRate() +
-                        getPaddingLength()) *
-                        LAYER_I_SLOT_SIZE
-                        )
-
-                LAYER_II -> return (((LAYER_II_FRAME_SIZE_COEFFICIENT) *
-                        (getBitRate() * SCALE_BY_THOUSAND)) /
-                        getSamplingRate() +
-                        getPaddingLength() * LAYER_II_SLOT_SIZE
-                        )
-
-                LAYER_III -> return if (this.channelMode == MODE_MONO) {
-                    (((LAYER_III_FRAME_SIZE_COEFFICIENT / 2) *
-                            (getBitRate() * SCALE_BY_THOUSAND)) /
-                            getSamplingRate() +
-                            getPaddingLength() * LAYER_III_SLOT_SIZE
-                            )
-                } else {
-                    (((LAYER_III_FRAME_SIZE_COEFFICIENT) *
-                            (getBitRate() * SCALE_BY_THOUSAND)) /
-                            getSamplingRate() +
-                            getPaddingLength() * LAYER_III_SLOT_SIZE
-                            )
-                }
-
-                else -> throw RuntimeException("Mp3 Unknown Layer:" + layer)
-            }
-
-            VERSION_1 -> when (layer) {
-                LAYER_I -> return (((LAYER_I_FRAME_SIZE_COEFFICIENT *
-                        (getBitRate() * SCALE_BY_THOUSAND)) /
-                        getSamplingRate() +
-                        getPaddingLength()) *
-                        LAYER_I_SLOT_SIZE
-                        )
-
-                LAYER_II -> return ((LAYER_II_FRAME_SIZE_COEFFICIENT *
-                        (getBitRate() * SCALE_BY_THOUSAND)) /
-                        getSamplingRate() +
-                        getPaddingLength() * LAYER_II_SLOT_SIZE
-                        )
-
-                LAYER_III -> return ((LAYER_III_FRAME_SIZE_COEFFICIENT *
-                        (getBitRate() * SCALE_BY_THOUSAND)) /
-                        getSamplingRate() +
-                        getPaddingLength() * LAYER_III_SLOT_SIZE
-                        )
-
-                else -> throw RuntimeException("Mp3 Unknown Layer:" + layer)
-            }
-
-            else -> throw RuntimeException("Mp3 Unknown Version:" + version)
-        }
-    }
-
-    /**
-     * Gets the paddingLength attribute of the MPEGFrame object
-     *
-     * @return The paddingLength value
-     */
-    fun getPaddingLength(): Int {
-        return if (isPadding) {
-            1
-        } else {
-            0
-        }
-    }
-
-    fun getBitRate(): Int {
-        return bitRate ?: 0
-    }
-
-    fun getSamplingRate(): Int {
-        return samplingRate ?: 0
-    }
-
-    /**
-     * Get the number of samples in a frame, all frames in a file have a set number of samples as defined by their MPEG Versiona
-     * and Layer
-     *
-     * @return
-     */
-    fun getNoOfSamples(): Int {
-        return samplesPerFrameMap[version]?.get(layer) ?: 0
-    }
-
-    fun isVariableBitRate(): Boolean {
-        return false
-    }
-
     companion object {
+
         const val HEADER_SIZE: Int = 4
 
         /**
@@ -705,14 +430,48 @@ class MPEGFrameHeader {
          *
          * @param bb the byte buffer containing the header
          * @return
-             */
-        fun parseMPEGHeader(bb: ByteBuffer): MPEGFrameHeader {
+         */
+        fun parseMPEGHeader(bb: ByteBuffer): MPEGFrameHeader? {
             val position = bb.position()
-            bb[header, 0, HEADER_SIZE]
+            bb.get(header, 0, HEADER_SIZE)
             bb.position(position)
-            val frameHeader = MPEGFrameHeader(header)
 
-            return frameHeader
+            return instance(header)
+        }
+
+        /**
+         * Try and create a new MPEG frame with the given byte array and decodes its contents
+         * If decoding header causes a problem it is not a valid header
+         *
+         * @param b the array of bytes representing this mpeg frame
+         */
+        private fun instance(b: ByteArray): MPEGFrameHeader? {
+            val frameHeader = MPEGFrameHeader()
+
+            frameHeader.mpegBytes = b
+            frameHeader.setBitrate()
+            frameHeader.setVersion()
+            frameHeader.setLayer()
+            frameHeader.setProtected()
+            frameHeader.setSamplingRate()
+            frameHeader.setPadding()
+            frameHeader.setPrivate()
+            frameHeader.setChannelMode()
+            frameHeader.setModeExtension()
+            frameHeader.setCopyrighted()
+            frameHeader.setOriginal()
+            frameHeader.setEmphasis()
+
+            return if (frameHeader.versionAsString == null
+                || frameHeader.bitRate == null
+                || frameHeader.channelModeAsString == null
+                || frameHeader.emphasisAsString == null
+                || frameHeader.layerAsString == null
+                || frameHeader.samplingRate == null) {
+                null
+            } else {
+                frameHeader
+            }
         }
 
         /**
@@ -729,6 +488,262 @@ class MPEGFrameHeader {
                             SYNC_BIT_ANDSAMPING_BYTE3)
                     )
         }
+    }
+
+    /**
+     * Hide Constructor
+     */
+    private constructor()
+
+    /**
+     * Gets the copyrighted attribute of the MPEGFrame object
+     */
+    private fun setCopyrighted() {
+        isCopyrighted = (mpegBytes[BYTE_4].toInt() and MASK_MP3_COPY) != 0
+    }
+
+    /**
+     * Set the version of this frame as an int value (see constants)
+     *
+     */
+    private fun setVersion() {
+        // MPEG Version
+        version = ((mpegBytes[BYTE_2].toInt() and MASK_MP3_VERSION) shr 3).toByte().toInt()
+        versionAsString = mpegVersionMap[version]
+        if (versionAsString == null) {
+            log.warn("Invalid mpeg version")
+        }
+    }
+
+    /**
+     * Sets the original attribute of the MPEGFrame object
+     */
+    private fun setOriginal() {
+        isOriginal = (mpegBytes[BYTE_4].toInt() and MASK_MP3_HOME) != 0
+    }
+
+    /**
+     * Sets the attribute of the MPEGFrame object
+     */
+    private fun setProtected() {
+        isProtected = (mpegBytes[BYTE_2].toInt() and MASK_MP3_PROTECTION) == 0x00
+    }
+
+    /**
+     * Sets the private attribute of the MPEGFrame object
+     */
+    private fun setPrivate() {
+        isPrivate = (mpegBytes[BYTE_3].toInt() and MASK_MP3_PRIVACY) != 0
+    }
+
+    /**
+     * Get the setBitrate of this frame
+     *
+     */
+    private fun setBitrate() {
+        /* BitRate, get by checking header setBitrate bits and MPEG Version and Layer */
+        val bitRateIndex =
+            (mpegBytes[BYTE_3].toInt() and MASK_MP3_BITRATE) or
+                    (mpegBytes[BYTE_2].toInt() and MASK_MP3_ID) or
+                    (mpegBytes[BYTE_2].toInt() and MASK_MP3_LAYER)
+
+        bitRate = bitrateMap[bitRateIndex]
+        if (bitRate == null) {
+            log.warn("Invalid bitrate")
+        }
+    }
+
+    /**
+     * Set the Mpeg channel mode of this frame as a constant (see constants)
+     *
+     */
+    private fun setChannelMode() {
+        channelMode = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE) ushr 6
+        channelModeAsString = modeMap[channelMode]
+        if (channelModeAsString == null) {
+            log.warn("Invalid channel mode")
+        }
+    }
+
+    /**
+     * Get the setEmphasis mode of this frame in a string representation
+     *
+     */
+    private fun setEmphasis() {
+        emphasis = mpegBytes[BYTE_4].toInt() and MASK_MP3_EMPHASIS
+        emphasisAsString = emphasisMap[emphasis]
+        if (this.emphasisAsString == null) {
+            log.warn("Invalid emphasis")
+        }
+    }
+
+    /**
+     * Set whether this frame uses padding bytes
+     */
+    private fun setPadding() {
+        isPadding = (mpegBytes[BYTE_3].toInt() and MASK_MP3_PADDING) != 0
+    }
+
+    /**
+     * Get the layer version of this frame as a constant int value (see constants)
+     *
+     */
+    private fun setLayer() {
+        layer = (mpegBytes[BYTE_2].toInt() and MASK_MP3_LAYER) ushr 1
+        layerAsString = mpegLayerMap[layer]
+        if (layerAsString == null) {
+            log.warn("Invalid Layer")
+        }
+    }
+
+    /**
+     * Sets the string representation of the mode extension of this frame
+     *
+     */
+    private fun setModeExtension() {
+        val index = (mpegBytes[BYTE_4].toInt() and MASK_MP3_MODE_EXTENSION) shr 4
+        if (layer == LAYER_III) {
+            modeExtension = modeExtensionLayerIIIMap[index]
+            if (this.modeExtension == null) {
+                log.warn("Invalid Mode Extension")
+            }
+        } else {
+            modeExtension = modeExtensionMap[index]
+            if (this.modeExtension == null) {
+                log.warn("Invalid Mode Extension")
+            }
+        }
+    }
+
+    /**
+     * set the sampling rate in Hz of this frame
+     *
+     */
+    private fun setSamplingRate() {
+        // Frequency
+        val index = (mpegBytes[BYTE_3].toInt() and MASK_MP3_FREQUENCY) ushr 2
+        samplingRate = samplingRateMap[version]?.let { samplingRateMapForVersion -> samplingRateMapForVersion[index] }
+        if (samplingRate == null) {
+            log.warn("Invalid sampling rate")
+        }
+    }
+
+    /**
+     * Gets the number of channels
+     *
+     * @return The setChannelMode value
+     */
+    fun getNumberOfChannels(): Int {
+        return when (channelMode) {
+            MODE_DUAL_CHANNEL -> 2
+            MODE_JOINT_STEREO -> 2
+            MODE_MONO -> 1
+            MODE_STEREO -> 2
+            else -> 0
+        }
+    }
+
+    /*
+     * Gets this frame length in bytes, value should always be rounded down to the nearest byte (not rounded up)
+     *
+     * Calculation is Bitrate (scaled to bps) divided by sampling frequency (in Hz), The larger the bitrate the larger
+     * the frame but the more samples per second the smaller the value, also have to take into account frame padding
+     * Have to multiple by a coefficient constant depending upon the layer it is encoded in,
+
+     */
+    fun getFrameLength(): Int {
+        when (version) {
+            VERSION_2, VERSION_2_5 -> when (layer) {
+                LAYER_I -> return (((LAYER_I_FRAME_SIZE_COEFFICIENT *
+                        (getBitRate() * SCALE_BY_THOUSAND)) /
+                        getSamplingRate() +
+                        getPaddingLength()) *
+                        LAYER_I_SLOT_SIZE
+                        )
+
+                LAYER_II -> return (((LAYER_II_FRAME_SIZE_COEFFICIENT) *
+                        (getBitRate() * SCALE_BY_THOUSAND)) /
+                        getSamplingRate() +
+                        getPaddingLength() * LAYER_II_SLOT_SIZE
+                        )
+
+                LAYER_III -> return if (this.channelMode == MODE_MONO) {
+                    (((LAYER_III_FRAME_SIZE_COEFFICIENT / 2) *
+                            (getBitRate() * SCALE_BY_THOUSAND)) /
+                            getSamplingRate() +
+                            getPaddingLength() * LAYER_III_SLOT_SIZE
+                            )
+                } else {
+                    (((LAYER_III_FRAME_SIZE_COEFFICIENT) *
+                            (getBitRate() * SCALE_BY_THOUSAND)) /
+                            getSamplingRate() +
+                            getPaddingLength() * LAYER_III_SLOT_SIZE
+                            )
+                }
+
+                else -> throw RuntimeException("Mp3 Unknown Layer:" + layer)
+            }
+
+            VERSION_1 -> when (layer) {
+                LAYER_I -> return (((LAYER_I_FRAME_SIZE_COEFFICIENT *
+                        (getBitRate() * SCALE_BY_THOUSAND)) /
+                        getSamplingRate() +
+                        getPaddingLength()) *
+                        LAYER_I_SLOT_SIZE
+                        )
+
+                LAYER_II -> return ((LAYER_II_FRAME_SIZE_COEFFICIENT *
+                        (getBitRate() * SCALE_BY_THOUSAND)) /
+                        getSamplingRate() +
+                        getPaddingLength() * LAYER_II_SLOT_SIZE
+                        )
+
+                LAYER_III -> return ((LAYER_III_FRAME_SIZE_COEFFICIENT *
+                        (getBitRate() * SCALE_BY_THOUSAND)) /
+                        getSamplingRate() +
+                        getPaddingLength() * LAYER_III_SLOT_SIZE
+                        )
+
+                else -> throw RuntimeException("Mp3 Unknown Layer:" + layer)
+            }
+
+            else -> throw RuntimeException("Mp3 Unknown Version:" + version)
+        }
+    }
+
+    /**
+     * Gets the paddingLength attribute of the MPEGFrame object
+     *
+     * @return The paddingLength value
+     */
+    fun getPaddingLength(): Int {
+        return if (isPadding) {
+            1
+        } else {
+            0
+        }
+    }
+
+    fun getBitRate(): Int {
+        return bitRate ?: 0
+    }
+
+    fun getSamplingRate(): Int {
+        return samplingRate ?: 0
+    }
+
+    /**
+     * Get the number of samples in a frame, all frames in a file have a set number of samples as defined by their MPEG Versiona
+     * and Layer
+     *
+     * @return
+     */
+    fun getNoOfSamples(): Int {
+        return samplesPerFrameMap[version]?.get(layer) ?: 0
+    }
+
+    fun isVariableBitRate(): Boolean {
+        return false
     }
 
     /**
