@@ -44,14 +44,10 @@ open class StringFixedLength : AbstractString {
 
             // Decode buffer if runs into problems should through exception which we
             // catch and then set value to empty string.
-            log.debug(
-                "Array length is:${byteArray.size}offset is:${offset}Size is:${getSize()}()"
-            )
+            log.debug("Array length is:${byteArray.size}offset is:${offset}Size is:${getSize()}()")
 
             if (byteArray.size - offset < getSize()) {
-                throw InvalidDataTypeException(
-                    "byte array is to small to retrieve string of declared length:${getSize()}"
-                )
+                throw InvalidDataTypeException("byte array is to small to retrieve string of declared length:${getSize()}")
             }
             val str = decoder
                 ?.decode(ByteBuffer.wrap(byteArray, offset, getSize()))
@@ -64,7 +60,7 @@ open class StringFixedLength : AbstractString {
             log.error(ce.message)
             setValue("")
         }
-        log.debug("Read StringFixedLength:${getValue()}")
+        log.debug("Read StringFixedLength:{}", getValue())
     }
 
     /**

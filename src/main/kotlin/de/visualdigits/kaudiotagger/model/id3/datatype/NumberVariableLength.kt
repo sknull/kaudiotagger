@@ -67,9 +67,7 @@ class NumberVariableLength : AbstractDataType {
                 setValue(0L)
                 return
             } else {
-                throw InvalidDataTypeException(
-                    "Offset to byte array is out of bounds: offset = $offset, array.length = ${byteArray.size}"
-                )
+                throw InvalidDataTypeException("Offset to byte array is out of bounds: offset = $offset, array.length = ${byteArray.size}")
             }
         }
 

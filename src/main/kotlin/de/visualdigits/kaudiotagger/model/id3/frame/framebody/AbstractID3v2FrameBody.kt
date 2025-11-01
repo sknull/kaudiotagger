@@ -82,9 +82,7 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
             try {
                 o.readByteArray(buffer, offset)
             } catch (e: InvalidDataTypeException) {
-                log.warn(
-                    "Problem reading datatype within Frame Body:${e.message}"
-                )
+                log.warn("Problem reading datatype within Frame Body:${e.message}")
                 throw e
             }
             // Increment Offset to start of next datatype.

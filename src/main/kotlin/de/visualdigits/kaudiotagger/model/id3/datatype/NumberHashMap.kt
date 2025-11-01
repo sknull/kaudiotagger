@@ -118,9 +118,7 @@ class NumberHashMap: NumberFixedLength, HashMapInterface<Long, String>  {
         val value = (getValue() as Long)
         if (!keyToValueMap.containsKey(value)) {
             if (!hasEmptyValue) {
-                throw InvalidDataTypeException(
-                    ErrorMessage.MP3_REFERENCE_KEY_INVALID.getMsg(identifier, value)
-                )
+                throw InvalidDataTypeException(ErrorMessage.MP3_REFERENCE_KEY_INVALID.getMsg(identifier, value))
             } else if (identifier == DataTypes.OBJ_PICTURE_TYPE) {
                 log.warn(ErrorMessage.MP3_PICTURE_TYPE_INVALID.getMsg(getValue()))
             }

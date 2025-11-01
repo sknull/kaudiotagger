@@ -79,7 +79,7 @@ class PairedTextEncodedStringNullTerminated : AbstractDataType {
                         (key.getValue() as? String) ?: "",
                         (result.getValue() as? String) ?: ""
                     )
-                } catch (idte: InvalidDataTypeException) {
+                } catch (_: InvalidDataTypeException) {
                     // Value may not be null terminated if it is the last value
                     // Read Value
                     if (offset >= byteArray.size) {

@@ -40,15 +40,11 @@ open class NumberFixedLength: AbstractDataType {
      */
     override fun readByteArray(byteArray: ByteArray, offset: Int) {
         if ((offset < 0) || (offset >= byteArray.size)) {
-            throw InvalidDataTypeException(
-                "Offset to byte array is out of bounds: offset = $offset, array.length = ${byteArray.size}"
-            )
+            throw InvalidDataTypeException("Offset to byte array is out of bounds: offset = $offset, array.length = ${byteArray.size}")
         }
 
         if (offset + getSize() > byteArray.size) {
-            throw InvalidDataTypeException(
-                "Offset plus size to byte array is out of bounds: offset = $offset, size = ${getSize()}() + arr.length ${byteArray.size}"
-            )
+            throw InvalidDataTypeException("Offset plus size to byte array is out of bounds: offset = $offset, size = ${getSize()}() + arr.length ${byteArray.size}")
         }
 
         var lvalue: Long = 0
@@ -57,7 +53,7 @@ open class NumberFixedLength: AbstractDataType {
             lvalue += (byteArray[i].toInt() and 0xff).toLong()
         }
         setValue(lvalue)
-        log.debug("Read NumberFixedlength:${getValue()}")
+        log.debug("Read NumberFixedlength:{}", getValue())
     }
 
     /**
