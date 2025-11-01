@@ -349,9 +349,7 @@ class ID3v23Frame: AbstractID3v2Frame {
 
                 if ((encodingFlags as? ID3v23EncodingFlags)?.isNonStandardFlags() == true) {
                     // Probably corrupt so treat as a standard frame
-                    log.error(
-                        "InvalidEncodingFlags:${encodingFlags?.flags?.toHexString()}"
-                    )
+                    log.error("InvalidEncodingFlags: ${encodingFlags?.flags?.toHexString()}")
                 }
 
                 if ((encodingFlags as? ID3v23EncodingFlags)?.isCompression() == true && decompressedFrameSize > (100 * frameSize)) {

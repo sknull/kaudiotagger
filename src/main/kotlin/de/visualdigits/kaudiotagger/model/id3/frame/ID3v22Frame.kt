@@ -10,6 +10,7 @@ import de.visualdigits.kaudiotagger.model.id3.types.FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.util.ID3Tags
+import de.visualdigits.kaudiotagger.util.ReflectionUtils.callDefaultConstructor
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.math.BigInteger
@@ -76,23 +77,10 @@ class ID3v22Frame: AbstractID3v2Frame {
 
         // Use reflection to map id to frame body, which makes things much easier
         // to keep things up to date.
-        try {
-            val c = Class.forName("${AbstractID3v2FrameBody.FRAME_BODY_PACKAGE}.FrameBody$bodyIdentifier") as Class<AbstractID3v2FrameBody>
-            frameBody = c.getDeclaredConstructor().newInstance()
-        } catch (cnfe: ClassNotFoundException) {
-            log.error(cnfe.message, cnfe)
-            frameBody = FrameBodyUnsupported(identifier)
-        } catch (ie: InstantiationException) { // Instantiate Interface/Abstract should not happen
-            log.error(ie.message, ie)
-            throw java.lang.RuntimeException(ie)
-        } catch (iae: IllegalAccessException) { // Private Constructor shouild not happen
-            log.error(iae.message, iae)
-            throw java.lang.RuntimeException(iae)
-        }
+        frameBody = callDefaultConstructor(bodyIdentifier)
+        if (frameBody == null) frameBody = FrameBodyUnsupported(bodyIdentifier)
         frameBody?.header = this
-        log.debug(
-            "Created empty frame of type${this.getIdentifier()}with frame body of$bodyIdentifier"
-        )
+        log.debug("Created empty frame of type${this.getIdentifier()}with frame body of$bodyIdentifier")
     }
 
     /**

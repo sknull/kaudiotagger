@@ -18,9 +18,7 @@ class ID3v24FrameBodyTest {
             ) {
                 val frameID = field.get(null) as? String
                 val packageName = ID3v24FrameBody::class.java.getPackage().name
-                val bodyClass = Class.forName(
-                    packageName + ".FrameBody" + frameID
-                )
+                val bodyClass = Class.forName("$packageName.FrameBody$frameID")
                 success = success and isCompatible(ID3v24FrameBody::class.java, bodyClass)
             }
         }
