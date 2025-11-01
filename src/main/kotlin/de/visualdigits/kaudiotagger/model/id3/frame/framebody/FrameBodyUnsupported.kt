@@ -22,7 +22,7 @@ class FrameBodyUnsupported: AbstractID3v2FrameBody, ID3v22FrameBody, ID3v23Frame
      * @param identifier
      * @param value
      */
-    constructor(identifier: String?, value: ByteArray?) {
+    constructor(identifier: String?, value: ByteArray? = null) {
         this.identifier = identifier
         setObjectValue(DataTypes.OBJ_DATA, value)
     }
@@ -34,15 +34,6 @@ class FrameBodyUnsupported: AbstractID3v2FrameBody, ID3v22FrameBody, ID3v23Frame
      */
     constructor(copyObject: FrameBodyUnsupported): super(copyObject) {
         this.identifier = copyObject.identifier
-    }
-
-    /**
-     * Creates a new FrameBodyUnsupported
-     *
-     * @param identifier
-     */
-    constructor(identifier: String) {
-        this.identifier = identifier
     }
 
     /**

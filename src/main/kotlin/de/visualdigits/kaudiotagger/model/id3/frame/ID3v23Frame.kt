@@ -61,7 +61,7 @@ class ID3v23Frame: AbstractID3v2Frame {
      *
      * @param identifier
      */
-    constructor(identifier: String): super(identifier) {
+    constructor(identifier: String?): super(identifier) {
         statusFlags = ID3v23StatusFlags()
         encodingFlags = ID3v23EncodingFlags()
     }

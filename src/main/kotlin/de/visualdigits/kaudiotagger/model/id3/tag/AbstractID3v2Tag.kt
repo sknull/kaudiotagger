@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.frame.AggregatedFrame
 import de.visualdigits.kaudiotagger.model.common.frame.TyerTdatAggregatedFrame
@@ -688,8 +687,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
     }
 
     override fun addField(genericKey: GenericFieldKey, vararg values: String) {
-        val tagfield: TagField = createField(genericKey, *values)
-        addField(tagfield)
+        addField(createField(genericKey, *values))
     }
 
     /**
@@ -711,7 +709,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param tagField
      */
     @Suppress("UNCHECKED_CAST")
-    override fun addField(tagField: TagField) {
+    override fun addField(tagField: TagField?) {
         if ((tagField !is AbstractID3v2Frame) &&
             (tagField !is AggregatedFrame)
         ) {
@@ -864,7 +862,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param id
      * @return
      */
-    abstract fun createFrame(id: String): AbstractID3v2Frame
+    abstract fun createFrame(id: String?): AbstractID3v2Frame
 
     /**
      * Create Frame for Id3 Key
@@ -877,31 +875,31 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param values
      * @return
      */
-    fun doCreateTagField(formatKey: FrameAndSubId, vararg values: String): TagField {
+    fun doCreateTagField(formatKey: FrameAndSubId?, vararg values: String): TagField {
         val value: String = values[0]
 
-        val frame = createFrame(formatKey.frameId)
+        val frame = createFrame(formatKey?.frameId)
         when (frame.frameBody) {
             is FrameBodyUFID -> {
-                (frame.frameBody as FrameBodyUFID).setOwner(formatKey.subId)
+                (frame.frameBody as FrameBodyUFID).setOwner(formatKey?.subId)
                 (frame.frameBody as FrameBodyUFID).setUniqueIdentifier(
                     value.toByteArray(StandardCharsets.ISO_8859_1)
                 )
             }
 
             is FrameBodyTXXX -> {
-                (frame.frameBody as? FrameBodyTXXX)?.setDescription(formatKey.subId)
+                (frame.frameBody as? FrameBodyTXXX)?.setDescription(formatKey?.subId)
                 (frame.frameBody as FrameBodyTXXX).setText(value)
             }
 
             is FrameBodyWXXX -> {
-                (frame.frameBody as FrameBodyWXXX).setDescription(formatKey.subId)
+                (frame.frameBody as FrameBodyWXXX).setDescription(formatKey?.subId)
                 (frame.frameBody as FrameBodyWXXX).setUrlLink(value)
             }
 
             is FrameBodyCOMM -> {
                 // Set description if set
-                if (formatKey.subId != null) {
+                if (formatKey?.subId != null) {
                     (frame.frameBody as FrameBodyCOMM).setDescription(formatKey.subId)
                     // Special Handling for Media Monkey Compatability
                     if ((frame.frameBody as FrameBodyCOMM).isMediaMonkeyFrame()) {
@@ -931,7 +929,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
 
             is FrameBodyIPLS -> {
-                if (formatKey.subId != null) {
+                if (formatKey?.subId != null) {
                     ((frame.frameBody) as FrameBodyIPLS).addPair(
                         formatKey.subId,
                         value
@@ -946,7 +944,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
 
             is FrameBodyTIPL -> {
-                ((frame.frameBody) as? FrameBodyTIPL)?.addPair(formatKey.subId, value)
+                ((frame.frameBody) as? FrameBodyTIPL)?.addPair(formatKey?.subId, value)
             }
 
             is FrameBodyTMCL -> {
@@ -964,13 +962,13 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
             }
 
             else -> {
-                error("Field with key of:${formatKey.frameId}:does not accept cannot parse data:$value")
+                error("Field with key of:${formatKey?.frameId}:does not accept cannot parse data:$value")
             }
         }
         return frame
     }
 
-    abstract fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId
+    abstract fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId?
 
     // TODO
     /**
@@ -1102,14 +1100,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return List<TagField>
      */
     override fun getFields(genericKey: GenericFieldKey?): List<TagField> {
-        return getFields(getFrameAndSubIdFromGenericKey(genericKey).frameId)
+        return getFields(getFrameAndSubIdFromGenericKey(genericKey)?.frameId)
     }
 
     /**
      * Retrieve the values that exists for this id3 frame id
      */
     @Suppress("UNCHECKED_CAST")
-    open fun getFields(id: String): List<TagField> {
+    open fun getFields(id: String?): List<TagField> {
         return when (val o = getFrame(id)) {
             null -> listOf()
             is List<*> -> (o as List<TagField>).toList()
@@ -1136,23 +1134,21 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param formatKey
      * @return
      */
-    fun doGetValues(formatKey: FrameAndSubId): List<String> {
+    fun doGetValues(formatKey: FrameAndSubId?): List<String> {
         val values = mutableListOf<String>()
-        if (formatKey.subId != null) {
+        if (formatKey?.subId != null) {
             // Get list of frames that this uses
             getFields(formatKey.frameId).forEach { field ->
                 val next = (field as AbstractID3v2Frame).frameBody
                 when (next) {
                     is FrameBodyTXXX -> {
-                        if (next.getDescription() == formatKey.subId
-                        ) {
+                        if (next.getDescription() == formatKey.subId) {
                             values.addAll((next.getValues()))
                         }
                     }
 
                     is FrameBodyWXXX -> {
-                        if (next.getDescription() == formatKey.subId
-                        ) {
+                        if (next.getDescription() == formatKey.subId) {
                             values.addAll((next.getUrlLinks()))
                         }
                     }
@@ -1182,8 +1178,8 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                     }
                 }
             }
-        } else if ((formatKey.genericKey == GenericFieldKey.PERFORMER) ||
-            (formatKey.genericKey == GenericFieldKey.INVOLVED_PERSON)
+        } else if ((formatKey?.genericKey == GenericFieldKey.PERFORMER) ||
+            (formatKey?.genericKey == GenericFieldKey.INVOLVED_PERSON)
         ) {
             getFields(formatKey.frameId).forEach { field ->
                 val next = (field as AbstractID3v2Frame).frameBody
@@ -1200,7 +1196,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 }
             }
         } else {
-            getFields(formatKey.frameId).forEach { next ->
+            getFields(formatKey?.frameId).forEach { next ->
                 val frame = next as? AbstractID3v2Frame
                 if (frame != null) {
                     val fb = frame.frameBody
@@ -1232,7 +1228,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param index     the index specified by the user
      * @return
      */
-    fun doGetValueAtIndex(formatKey: FrameAndSubId, index: Int): String? {
+    fun doGetValueAtIndex(formatKey: FrameAndSubId?, index: Int): String? {
         val values = doGetValues(formatKey)
         if (values.size > index) {
             return values[index]
@@ -1248,9 +1244,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return
      */
     fun createLinkedArtworkField(url: String): TagField {
-        val frame = createFrame(
-            getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART).frameId
-        )
+        val frame = createFrame(getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART)?.frameId)
         val body = frame.frameBody
         if (body is FrameBodyAPIC) {
             body.setObjectValue(
@@ -1283,7 +1277,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param deleteNumberFieldKey
      */
     private fun deleteNumberTotalFrame(
-        formatKey: FrameAndSubId,
+        formatKey: FrameAndSubId?,
         deleteNumberFieldKey: Boolean
     ) {
         if (deleteNumberFieldKey) {
@@ -1291,7 +1285,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 doDeleteTagField(formatKey)
             } else {
                 val frame = this.getFrame(
-                    formatKey.frameId
+                    formatKey?.frameId
                 ) as AbstractID3v2Frame
                 val frameBody =
                     frame.frameBody as AbstractFrameBodyNumberTotal
@@ -1302,7 +1296,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
                 doDeleteTagField(formatKey)
             } else {
                 val frame = this.getFrame(
-                    formatKey.frameId
+                    formatKey?.frameId
                 ) as AbstractID3v2Frame
                 val frameBody =
                     frame.frameBody as AbstractFrameBodyNumberTotal
@@ -1321,7 +1315,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      */
     override fun deleteField(genericKey: GenericFieldKey) {
         val formatKey = getFrameAndSubIdFromGenericKey(genericKey)
-
         when (genericKey) {
             GenericFieldKey.TRACK -> deleteNumberTotalFrame(
                 formatKey,
@@ -1362,49 +1355,49 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      *
      * @param formatKey
      */
-    fun doDeleteTagField(formatKey: FrameAndSubId) {
+    fun doDeleteTagField(formatKey: FrameAndSubId?) {
         // Get list of frames that this uses
-        val list = getFields(formatKey.frameId)
+        val list = getFields(formatKey?.frameId)
         list.forEach { field ->
             val next = (field as AbstractID3v2Frame).frameBody
             when (next) {
                 is FrameBodyTXXX -> {
-                    if (next.getDescription() == formatKey.subId && list.size == 1) {
-                        removeFrame(formatKey.frameId)
+                    if (next.getDescription() == formatKey?.subId && list.size == 1) {
+                        removeFrame(formatKey?.frameId)
                     }
                 }
 
                 is FrameBodyCOMM -> {
-                    if (next.getDescription() == formatKey.subId && list.size == 1) {
-                        removeFrame(formatKey.frameId)
+                    if (next.getDescription() == formatKey?.subId && list.size == 1) {
+                        removeFrame(formatKey?.frameId)
                     }
                 }
 
                 is FrameBodyWXXX -> {
-                    if (next.getDescription() == formatKey.subId && list.size == 1) {
-                        removeFrame(formatKey.frameId)
+                    if (next.getDescription() == formatKey?.subId && list.size == 1) {
+                        removeFrame(formatKey?.frameId)
                     }
                 }
 
                 is FrameBodyUFID -> {
-                    if (next.getOwner() == formatKey.subId && list.size == 1) {
-                        removeFrame(formatKey.frameId)
+                    if (next.getOwner() == formatKey?.subId && list.size == 1) {
+                        removeFrame(formatKey?.frameId)
                     }
                 }
 
                 is FrameBodyTIPL -> {
                     val nextPairing = next.getPairing()?.mapping
-                        ?.filter { nextPair -> nextPair.first != formatKey.subId }
+                        ?.filter { nextPair -> nextPair.first != formatKey?.subId }
                     if (nextPairing?.isEmpty() == true) {
-                        removeFrame(formatKey.frameId)
+                        removeFrame(formatKey?.frameId)
                     }
                 }
 
                 is FrameBodyIPLS -> {
                     val nextPairing = next.getPairing()?.mapping
-                        ?.filter { nextPair -> nextPair.first != formatKey.subId }
+                        ?.filter { nextPair -> nextPair.first != formatKey?.subId }
                     if (nextPairing?.isEmpty() == true) {
-                        removeFrame(formatKey.frameId)
+                        removeFrame(formatKey?.frameId)
                     }
                 }
 
@@ -1435,12 +1428,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return true if has field , false if does not or if no mapping for key exists
      */
     override fun hasField(genericKey: GenericFieldKey): Boolean {
-        try {
-            return getFirstField(genericKey) != null
-        } catch (knfe: KeyNotFoundException) {
-            log.error(knfe.message, knfe)
-            return false
-        }
+        return getFirstField(genericKey) != null
     }
 
     override fun getFirstField(genericKey: GenericFieldKey): TagField? {
@@ -1487,7 +1475,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @param values
      * @return
      */
-    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
+    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
         val value: String = values[0]
         val formatKey = getFrameAndSubIdFromGenericKey(genericKey)
 
@@ -1495,14 +1483,14 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         // that is why we need the extra processing here instead of doCreateTagField()
         return when {
             ID3NumberTotalFields.isNumber(genericKey) -> {
-                val frame = createFrame(formatKey.frameId)
+                val frame = createFrame(formatKey?.frameId)
                 val framebody =
                     frame.frameBody as AbstractFrameBodyNumberTotal
                 framebody.setNumber(value)
                 frame
             }
             ID3NumberTotalFields.isTotal(genericKey) -> {
-                val frame = createFrame(formatKey.frameId)
+                val frame = createFrame(formatKey?.frameId)
                 val framebody =
                     frame.frameBody as AbstractFrameBodyNumberTotal
                 framebody.setTotal(value)
@@ -1514,7 +1502,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         }
     }
 
-    override fun createCompilationField(value: Boolean): TagField {
+    override fun createCompilationField(value: Boolean): TagField? {
         return if (value) {
             createField(GenericFieldKey.IS_COMPILATION, "1")
         } else {
@@ -1601,7 +1589,7 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @throws FieldDataInvalidException
      */
     @Suppress("UNCHECKED_CAST")
-    override fun setField(field: TagField) {
+    override fun setField(field: TagField?) {
         if ((field !is AbstractID3v2Frame) && (field !is AggregatedFrame)) {
             error("Field $field is not of type AbstractID3v2Frame nor AggregatedFrame")
         }

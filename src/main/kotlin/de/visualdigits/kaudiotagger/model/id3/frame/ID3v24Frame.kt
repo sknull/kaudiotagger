@@ -79,7 +79,7 @@ class ID3v24Frame: AbstractID3v2Frame {
      *
      * @param identifier defines the type of body to be created
      */
-    constructor(identifier: String): super(identifier) {
+    constructor(identifier: String?): super(identifier) {
         statusFlags = ID3v24StatusFlags(this)
         encodingFlags = ID3v24EncodingFlags(this)
     }

@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.exceptions.TagException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
@@ -351,12 +350,11 @@ class ID3v11Tag: ID3v1Tag {
     }
 
     override fun setField(genericKey: GenericFieldKey, vararg values: String) {
-        val tagfield = createField(genericKey, *values)
-        setField(tagfield)
+        setField(createField(genericKey, *values))
     }
 
-    override fun setField(field: TagField) {
-        val genericKey: GenericFieldKey = GenericFieldKey.valueOf(field.getIdentifier()?:error("No id"))
+    override fun setField(field: TagField?) {
+        val genericKey = GenericFieldKey.valueOf(field?.getIdentifier()?:error("No id"))
         when (genericKey) {
             GenericFieldKey.ARTIST -> setArtist(field.toString())
             GenericFieldKey.ALBUM -> setAlbum(field.toString())
@@ -371,12 +369,10 @@ class ID3v11Tag: ID3v1Tag {
     /**
      * Create Tag Field using generic key
      */
-    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
-        val value = values[0]
-        val idv1FieldKey = tagFieldToID3v1Field[genericKey] ?: throw KeyNotFoundException(
-            ErrorMessage.INVALID_FIELD_FOR_ID3V1TAG.getMsg(genericKey.name)
-        )
-        return ID3v1TagField(idv1FieldKey.name, value)
+    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
+        return tagFieldToID3v1Field[genericKey]?.let { idv1FieldKey ->
+            ID3v1TagField(idv1FieldKey.name, values[0])
+        }
     }
 
     /**
@@ -443,7 +439,7 @@ class ID3v11Tag: ID3v1Tag {
         )
     }
 
-    override fun createCompilationField(value: Boolean): TagField {
+    override fun createCompilationField(value: Boolean): TagField? {
         throw java.lang.UnsupportedOperationException(
             ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
         )

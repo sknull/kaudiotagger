@@ -293,13 +293,13 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     /**
      * Create Tag Field using generic key
      */
-    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
+    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
         val value = values[0]
         val idv1FieldKey = tagFieldToID3v1Field[genericKey]
         return ID3v1TagField(idv1FieldKey?.name?:error("No id"), value)
     }
 
-    override fun addField(tagField: TagField) {
+    override fun addField(tagField: TagField?) {
         // to be implemented
     }
 
@@ -318,8 +318,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         setField(tagfield)
     }
 
-    override fun setField(field: TagField) {
-        val genericKey: GenericFieldKey = GenericFieldKey.valueOf(field.getIdentifier()?:error("No id"))
+    override fun setField(field: TagField?) {
+        val genericKey = GenericFieldKey.valueOf(field?.getIdentifier()?:error("No id"))
         when (genericKey) {
             GenericFieldKey.ARTIST -> setArtist(field.toString())
             GenericFieldKey.ALBUM -> setAlbum(field.toString())
@@ -548,7 +548,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         )
     }
 
-    override fun createCompilationField(value: Boolean): TagField {
+    override fun createCompilationField(value: Boolean): TagField? {
         throw java.lang.UnsupportedOperationException(
             ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg()
         )

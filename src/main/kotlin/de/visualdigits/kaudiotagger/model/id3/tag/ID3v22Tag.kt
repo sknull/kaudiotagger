@@ -4,7 +4,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
-import de.visualdigits.kaudiotagger.model.common.exceptions.KeyNotFoundException
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
@@ -500,13 +499,14 @@ class ID3v22Tag : AbstractID3v2Tag {
         }
     }
 
-    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId {
-        val id3v22FieldKey = ID3v22FrameId.fromFieldKey(genericKey) ?: throw KeyNotFoundException(genericKey?.name)
-        return FrameAndSubId(
-            genericKey,
-            id3v22FieldKey.id,
-            id3v22FieldKey.fieldKey?.subId
-        )
+    override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId? {
+        return ID3v22FrameId.fromFieldKey(genericKey)?.let { id3v22FieldKey ->
+            FrameAndSubId(
+                genericKey,
+                id3v22FieldKey.id,
+                id3v22FieldKey.fieldKey?.subId
+            )
+        }
     }
 
     /**
@@ -515,15 +515,15 @@ class ID3v22Tag : AbstractID3v2Tag {
      * @param id frameid
      * @return
      */
-    override fun createFrame(id: String): ID3v22Frame {
+    override fun createFrame(id: String?): ID3v22Frame {
         return ID3v22Frame(id)
     }
 
-    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField {
+    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
         val value: String = values[0]
         return if (genericKey == GenericFieldKey.GENRE) {
             val formatKey = getFrameAndSubIdFromGenericKey(genericKey)
-            val frame: AbstractID3v2Frame = createFrame(formatKey.frameId)
+            val frame: AbstractID3v2Frame = createFrame(formatKey?.frameId)
             val framebody = frame.frameBody as FrameBodyTCON
             framebody.setV23Format()
             framebody.setText(FrameBodyTCON.convertGenericToID3v22Genre(value))
@@ -538,9 +538,7 @@ class ID3v22Tag : AbstractID3v2Tag {
      * {@inheritDoc}
      */
     override fun createField(artwork: Artwork): TagField {
-        val frame: AbstractID3v2Frame = createFrame(
-            getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART).frameId
-        )
+        val frame = createFrame(getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART)?.frameId)
         val body = frame.frameBody as FrameBodyPIC
         when {
             !artwork.isLinked -> {
@@ -570,9 +568,7 @@ class ID3v22Tag : AbstractID3v2Tag {
     }
 
     fun createArtworkField(data: ByteArray?, mimeType: String?): TagField {
-        val frame: AbstractID3v2Frame = createFrame(
-            getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART).frameId
-        )
+        val frame: AbstractID3v2Frame = createFrame(getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART)?.frameId)
         val body = frame.frameBody as FrameBodyPIC
         body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, data)
         body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, PictureTypes.DEFAULT_ID)

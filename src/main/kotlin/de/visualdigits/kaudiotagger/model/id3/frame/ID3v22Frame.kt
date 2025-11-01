@@ -49,7 +49,7 @@ class ID3v22Frame: AbstractID3v2Frame {
      * @param identifier
      */
     @Suppress("UNCHECKED_CAST")
-    constructor(identifier: String) {
+    constructor(identifier: String?) {
         log.debug("Creating empty frame of type$identifier")
         this.setIdentifier(identifier)
         var bodyIdentifier = identifier

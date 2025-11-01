@@ -72,7 +72,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      */
     // TODO the identifier checks should be done in the relevent subclasses
     @Suppress("UNCHECKED_CAST")
-    constructor(identifier: String) {
+    constructor(identifier: String?) {
         this.identifier = identifier
         log.debug("Creating empty frame of type$identifier")
 

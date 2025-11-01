@@ -82,7 +82,7 @@ interface Tag {
      * @param field The field to add.
      * @throws FieldDataInvalidException
      */
-    fun setField(field: TagField)
+    fun setField(field: TagField?)
 
     /**
      * Returns `true`, if at least one of the contained
@@ -173,7 +173,7 @@ interface Tag {
      *
      * @param tagField The field to add.
      */
-    fun addField(tagField: TagField)
+    fun addField(tagField: TagField?)
 
     /**
      * Create a new field based on generic key, used internally by the library
@@ -191,7 +191,7 @@ interface Tag {
      * @param values      to store
      * @return
      */
-    fun createField(genericKey: GenericFieldKey, vararg values: String): TagField
+    fun createField(genericKey: GenericFieldKey, vararg values: String): TagField?
 
     /**
      * Creates isCompilation field
@@ -203,7 +203,7 @@ interface Tag {
      * @param value
      * @return
      */
-    fun createCompilationField(value: Boolean): TagField
+    fun createCompilationField(value: Boolean): TagField?
 
     /**
      * @return a list of all artwork in this file using the format independent Artwork class
