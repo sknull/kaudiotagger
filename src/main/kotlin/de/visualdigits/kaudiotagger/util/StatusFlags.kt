@@ -14,8 +14,4 @@ open class StatusFlags(
 
         const val TYPE_FLAGS: String = "statusFlags"
     }
-
-    open fun createStructure() {
-        // to be implemented
-    }
 }

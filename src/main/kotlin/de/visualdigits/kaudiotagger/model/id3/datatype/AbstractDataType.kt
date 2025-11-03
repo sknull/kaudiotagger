@@ -127,14 +127,4 @@ abstract class AbstractDataType {
      * @return the array of bytes representing this datatype that should be written to file
      */
     abstract fun writeByteArray(): ByteArray?
-
-    /**
-     * Return String Representation of Datatype     *
-     */
-    fun createStructure() {
-        MP3File.tagFormatter?.addElement(
-            identifier?:error("No identifier"),
-            value.toString()
-        )
-    }
 }

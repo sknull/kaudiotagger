@@ -102,8 +102,4 @@ class MultiID3v2Frame : AbstractID3v2Frame {
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         return false
     }
-
-    override fun createStructure() {
-        frames.forEach { frame -> frame.createStructure() }
-    }
 }

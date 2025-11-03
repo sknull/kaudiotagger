@@ -189,8 +189,4 @@ abstract class AbstractTagFrameBody : AbstractTagItem {
      * expects in the correct order This method needs to be implemented by concrete subclasses
      */
     abstract fun setupObjectList()
-
-    open fun createStructure() {
-        // to be implemented
-    }
 }

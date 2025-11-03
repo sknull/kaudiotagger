@@ -1390,40 +1390,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
         }
     }
 
-    open fun createStructure() {
-        createStructureHeader()
-        createStructureBody()
-    }
-
-    fun createStructureHeader() {
-        MP3File.tagFormatter?.addElement(
-            TYPE_DUPLICATEBYTES,
-            this.duplicateBytes
-        )
-        MP3File.tagFormatter?.addElement(
-            TYPE_DUPLICATEFRAMEID,
-            this.duplicateFrameId
-        )
-        MP3File.tagFormatter?.addElement(
-            TYPE_EMPTYFRAMEBYTES,
-            this.emptyFrameBytes
-        )
-        MP3File.tagFormatter?.addElement(
-            TYPE_FILEREADSIZE,
-            this.fileReadBytes
-        )
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    fun createStructureBody() {
-        MP3File.tagFormatter?.openHeadingElement(TYPE_BODY, "")
-
-        for (frame in frameMap.values) {
-            frame.createStructure()
-        }
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_BODY)
-    }
-
     override fun setField(genericKey: GenericFieldKey, vararg values: String) {
         setField(createField(genericKey, *values))
     }
@@ -1571,7 +1537,12 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, Tag {
      * @return
      */
     fun getFieldCount(): Int {
-        return frameMap.size
+        return frameMap.values.sumOf { frame ->
+            when (frame) {
+                is MultiID3v2Frame -> frame.frames.size
+                else -> 1
+            }
+        }
     }
 
     fun getFields(): List<AbstractID3v2Frame> {

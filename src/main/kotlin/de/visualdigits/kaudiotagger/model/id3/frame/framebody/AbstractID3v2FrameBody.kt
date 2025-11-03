@@ -156,15 +156,4 @@ abstract class AbstractID3v2FrameBody : AbstractTagFrameBody {
             addSize(`object`.getSize())
         }
     }
-
-    /**
-     * Return String Representation of Datatype     *
-     */
-    override fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(TYPE_BODY, "")
-        for (nextObject in objectList) {
-            nextObject.createStructure()
-        }
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_BODY)
-    }
 }

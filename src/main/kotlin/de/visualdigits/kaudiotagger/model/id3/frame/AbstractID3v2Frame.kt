@@ -303,15 +303,4 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
 
         return frameBody
     }
-
-    /**
-     * Return String Representation of frame
-     */
-    open fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_FRAME,
-            getIdentifier() ?:""
-        )
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_FRAME)
-    }
 }

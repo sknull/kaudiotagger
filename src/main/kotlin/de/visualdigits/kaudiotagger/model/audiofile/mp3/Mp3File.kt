@@ -440,10 +440,14 @@ class MP3File : AudioFile {
      */
     fun getID3v1Tag(): AbstractID3v1Tag? = (tags[SupportedTag.ID3v11Tag]?:tags[SupportedTag.ID3v1Tag]) as? AbstractID3v1Tag
 
+    fun hasID3v1Tag(): Boolean = getID3v1Tag() != null
+
     /**
      * Returns the highest v2 tag.
      */
     fun getID3v2Tag(): AbstractID3v2Tag? = (tags[SupportedTag.ID3v24Tag]?:tags[SupportedTag.ID3v23Tag]?:tags[SupportedTag.ID3v22Tag]) as? AbstractID3v2Tag
+
+    fun hasID3v2Tag(): Boolean = getID3v2Tag() != null
 
     fun getLyrics3Tag(): AbstractLyrics3? = (tags[SupportedTag.Lyrics3V2Tag]?:tags[SupportedTag.Lyrics3V1Tag]) as? AbstractLyrics3
 
@@ -466,9 +470,9 @@ class MP3File : AudioFile {
      *
      * @return
      */
-    fun getTagAndConvertOrCreateAndSetDefault(): Tag? {
+    fun getTagAndConvertOrCreateAndSetDefault(): Tag {
         convertID3Tag(getTagOrCreateDefault(), TagOptionSingleton.id3v2Version)?.also { t -> setTag(t) }
-        return getTag()
+        return getTag()?:error("Could create tag")
     }
 
     /**
@@ -501,35 +505,5 @@ class MP3File : AudioFile {
         } catch (e: Exception) {
             log.error("Could not commit file", e)
         }
-    }
-
-    /**
-     * Displays MP3File Structure
-     */
-    override fun displayStructureAsXML(): String {
-        createXMLStructureFormatter()
-        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?: "")
-        tags[SupportedTag.ID3v1Tag]?.also { tag -> (tag as ID3v1Tag).createStructure() }
-        tags[SupportedTag.ID3v11Tag]?.also { tag -> (tag as ID3v11Tag).createStructure() }
-        tags[SupportedTag.ID3v22Tag]?.also { tag -> (tag as ID3v22Tag).createStructure() }
-        tags[SupportedTag.ID3v23Tag]?.also { tag -> (tag as ID3v23Tag).createStructure() }
-        tags[SupportedTag.ID3v24Tag]?.also { tag -> (tag as ID3v24Tag).createStructure() }
-        tagFormatter?.closeHeadingElement("file")
-        return tagFormatter.toString()
-    }
-
-    /**
-     * Displays MP3File Structure
-     */
-    override fun displayStructureAsPlainText(): String {
-        createPlainTextStructureFormatter()
-        tagFormatter?.openHeadingElement("file", this.file?.absolutePath ?: "")
-        tags[SupportedTag.ID3v1Tag]?.also { tag -> (tag as ID3v1Tag).createStructure() }
-        tags[SupportedTag.ID3v11Tag]?.also { tag -> (tag as ID3v11Tag).createStructure() }
-        tags[SupportedTag.ID3v22Tag]?.also { tag -> (tag as ID3v22Tag).createStructure() }
-        tags[SupportedTag.ID3v23Tag]?.also { tag -> (tag as ID3v23Tag).createStructure() }
-        tags[SupportedTag.ID3v24Tag]?.also { tag -> (tag as ID3v24Tag).createStructure() }
-        tagFormatter?.closeHeadingElement("file")
-        return tagFormatter.toString()
     }
 }

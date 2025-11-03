@@ -502,19 +502,4 @@ class ID3v23Frame: AbstractID3v2Frame {
     override fun isCommon(): Boolean {
         return ID3v23FrameId.isCommon(getIdentifier())
     }
-
-    /**
-     * Return String Representation of body
-     */
-    override fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_FRAME,
-            getIdentifier() ?:""
-        )
-        MP3File.tagFormatter?.addElement(TYPE_FRAME_SIZE, frameSize)
-        statusFlags?.createStructure()
-        encodingFlags?.createStructure()
-        frameBody?.createStructure()
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_FRAME)
-    }
 }

@@ -780,38 +780,5 @@ class ID3v23Tag : AbstractID3v2Tag {
         }
     }
 
-    /**
-     * For representing the MP3File in an XML Format
-     */
-    override fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_TAG,
-            getIdentifier()
-        )
-
-        super.createStructureHeader()
-
-        // Header
-        MP3File.tagFormatter?.openHeadingElement(TYPE_HEADER, "")
-        MP3File.tagFormatter?.addElement(
-            TYPE_UNSYNCHRONISATION,
-            this.isUnsynchronization
-        )
-        MP3File.tagFormatter?.addElement(TYPE_EXTENDED, this.isExtended)
-        MP3File.tagFormatter?.addElement(
-            TYPE_EXPERIMENTAL,
-            this.isExperimental
-        )
-        MP3File.tagFormatter?.addElement(TYPE_CRCDATA, this.crc32)
-        MP3File.tagFormatter?.addElement(
-            TYPE_PADDINGSIZE,
-            this.paddingSize
-        )
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_HEADER)
-        // Body
-        super.createStructureBody()
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
-    }
-
     override fun isMultipleAllowed(identifier: String?): Boolean = ID3v23FrameId.isMultipleAllowed(identifier)
 }

@@ -334,17 +334,4 @@ class ID3v22Frame: AbstractID3v2Frame {
     override fun getFrameSizeSize(): Int {
         return FRAME_SIZE_SIZE
     }
-
-    /**
-     * Return String Representation of body
-     */
-    override fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_FRAME,
-            getIdentifier() ?:""
-        )
-        MP3File.tagFormatter?.addElement(TYPE_FRAME_SIZE, frameSize)
-        frameBody?.createStructure()
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_FRAME)
-    }
 }

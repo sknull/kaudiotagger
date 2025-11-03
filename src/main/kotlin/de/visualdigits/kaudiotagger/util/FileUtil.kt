@@ -93,7 +93,7 @@ object FileUtil {
 
             // Replace file with paddedFile
             replaceFile(file, paddedFile)
-            if (!paddedFile.setLastModified(lastModified)) log.warn("Could not set last modified: $lastModified")
+            if (!paddedFile.setLastModified(lastModified)) log.warn("Could not set last modified: $file")
         } catch (e: IOException) {
             if (!paddedFile.delete()) log.warn("Could not delete file: $paddedFile")
             throw e

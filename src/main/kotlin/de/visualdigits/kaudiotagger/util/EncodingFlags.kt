@@ -14,10 +14,6 @@ open class EncodingFlags(
         const val TYPE_FLAGS: String = "encodingFlags"
     }
 
-    open fun createStructure() {
-        // to be implemented
-    }
-
     fun resetFlags() {
         flags = 0
     }

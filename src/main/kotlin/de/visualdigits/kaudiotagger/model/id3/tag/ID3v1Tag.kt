@@ -654,24 +654,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         ).flatten().sortedBy { t -> t.getIdentifier() }
     }
 
-    /**
-     * Create structured representation of this item.
-     */
-    fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_TAG,
-            getIdentifier()?:""
-        )
-        // Header
-        MP3File.tagFormatter?.addElement(TYPE_TITLE, this.title)
-        MP3File.tagFormatter?.addElement(TYPE_ARTIST, this.artist)
-        MP3File.tagFormatter?.addElement(TYPE_ALBUM, this.album)
-        MP3File.tagFormatter?.addElement(TYPE_YEAR, this.year)
-        MP3File.tagFormatter?.addElement(TYPE_COMMENT, this.comment)
-        MP3File.tagFormatter?.addElement(TYPE_GENRE, this.genre.toInt())
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
-    }
-
     override fun toString(): String {
         return getFields().joinToString("\n") { field -> "${field.getIdentifier()}:TextEncoding=\"ISO-8859-1\"; Text=\"${field.getContent()}\"" }
     }

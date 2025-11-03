@@ -4,10 +4,8 @@ import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v2Version
 import de.visualdigits.kaudiotagger.util.PadNumberOption
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
-import java.io.BufferedInputStream
-import java.io.BufferedOutputStream
+import org.junit.jupiter.api.fail
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -18,7 +16,7 @@ abstract class AbstractTestCase {
     private var tempDirectory = Files.createTempDirectory("kaudiotagger_").toFile()
 
     @BeforeEach
-    fun setUp() {
+    open fun setUp() {
         setOptionsToStandard()
     }
 
@@ -72,8 +70,14 @@ abstract class AbstractTestCase {
         if (!outputFile.getParentFile().exists()) {
             outputFile.getParentFile().mkdirs()
         }
-        val result: Boolean = append(inputTagFile, inputFile, outputFile)
-        Assertions.assertTrue(result)
+        FileOutputStream(outputFile).use { fouts ->
+            FileInputStream(inputTagFile).use { fins -> fins.transferTo(fouts) }
+            FileInputStream(inputFile).use { fins -> fins.transferTo(fouts) }
+        }
+        if ((inputTagFile.length() + inputFile.length()) != outputFile.length()) {
+            outputFile.delete()
+            fail { "Output file size not as expected" }
+        }
         return outputFile
     }
 
@@ -101,37 +105,6 @@ abstract class AbstractTestCase {
         }
         
         return file
-    }
-
-    private fun append(fromFile1: File, fromFile2: File, toFile: File): Boolean {
-        var theByte: Int
-        FileInputStream(fromFile1).use { fins ->
-            FileInputStream(fromFile2).use { fins2 ->
-                FileOutputStream(toFile).use { fouts ->
-                    BufferedInputStream(fins).use { inBuffer ->
-                        BufferedInputStream(fins2).use { inBuffer2 ->
-                            BufferedOutputStream(fouts).use { outBuffer ->
-                                while ((inBuffer.read().also { theByte = it }) > -1) {
-                                    outBuffer.write(theByte)
-                                }
-                                while ((inBuffer2.read().also { theByte = it }) > -1) {
-                                    outBuffer.write(theByte)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // cleanupif files are not the same length
-        if ((fromFile1.length() + fromFile2.length()) != toFile.length()) {
-            toFile.delete()
-
-            return false
-        }
-
-        return true
     }
 
     private fun setOptionsToStandard() {

@@ -577,30 +577,5 @@ class ID3v22Tag : AbstractID3v2Tag {
         super.doDeleteTagField(FrameAndSubId(null, identifier, null))
     }
 
-    override fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_TAG,
-            getIdentifier()
-        )
-
-        super.createStructureHeader()
-
-        // Header
-        MP3File.tagFormatter?.openHeadingElement(TYPE_HEADER, "")
-        MP3File.tagFormatter?.addElement(
-            TYPE_COMPRESSION,
-            this.isCompression
-        )
-        MP3File.tagFormatter?.addElement(
-            TYPE_SYNCHRONIZATION,
-            this.isUnsynchronization
-        )
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_HEADER)
-        // Body
-        super.createStructureBody()
-
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_TAG)
-    }
-
     override fun isMultipleAllowed(identifier: String?): Boolean = ID3v22FrameId.isMultipleAllowed(identifier)
 }

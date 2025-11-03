@@ -676,19 +676,4 @@ class ID3v24Frame: AbstractID3v2Frame {
             this.frameBody?.setTextEncoding(encodingId)
         }
     }
-
-    /**
-     * Return String Representation of body
-     */
-    override fun createStructure() {
-        MP3File.tagFormatter?.openHeadingElement(
-            TYPE_FRAME,
-            getIdentifier() ?:""
-        )
-        MP3File.tagFormatter?.addElement(TYPE_FRAME_SIZE, frameSize)
-        statusFlags?.createStructure()
-        encodingFlags?.createStructure()
-        frameBody?.createStructure()
-        MP3File.tagFormatter?.closeHeadingElement(TYPE_FRAME)
-    }
 }
