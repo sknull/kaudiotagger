@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
-class FrameCOMMTest : AbstractTestCase() {
+class FrameBodyCOMMTest : AbstractTestCase() {
 
     /**
      * Should run without throwing Runtime excception, although COMMFrame wont be loaded and will

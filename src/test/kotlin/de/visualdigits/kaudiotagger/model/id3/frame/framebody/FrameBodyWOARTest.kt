@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-class FrameWOARTest : AbstractTestCase() {
+class FrameBodyWOARTest : AbstractTestCase() {
 
     @Test
     fun testCreateID3v24Frame() {

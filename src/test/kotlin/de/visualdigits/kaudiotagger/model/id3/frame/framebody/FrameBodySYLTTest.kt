@@ -8,7 +8,7 @@ import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
-class FrameSYLTTest : AbstractTestCase() {
+class FrameBodySYLTTest : AbstractTestCase() {
 
     @Test
     fun testWriteFrame() {

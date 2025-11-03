@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTIT2Test : AbstractTestCase() {
+class FrameBodyTIT2Test : AbstractTestCase() {
 
     @Test
     fun testGeneric() {

@@ -13,16 +13,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTMEDTest : AbstractTestCase() {
+class FrameBodyTPE4Test : AbstractTestCase() {
 
     @Test
     fun testGenericv22() {
         var e: Exception? = null
         try {
-            val tag = ID3v22Tag()
-            tag.addField(GenericFieldKey.MEDIA, "testMEDIA")
-            assertEquals("testMEDIA", tag.getFirst(GenericFieldKey.MEDIA))
-            assertEquals("testMEDIA", tag.getFirst("TMT"))
+            val tag =  ID3v22Tag()
+            tag.addField(GenericFieldKey.REMIXER, "testREMIXER")
+            assertEquals("testREMIXER", tag.getFirst(GenericFieldKey.REMIXER))
+            assertEquals("testREMIXER", tag.getFirst("TP4"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -35,11 +35,11 @@ class FrameTMEDTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v22Tag()
-            val frame =  ID3v22Frame("TMT")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testMedia")
+            val frame =  ID3v22Frame("TP4")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testRemixer")
             tag.addFrame(frame)
-            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
-            assertEquals("testMedia", tag.getFirst("TMT"))
+            assertEquals("testRemixer", tag.getFirst(GenericFieldKey.REMIXER))
+            assertEquals("testRemixer", tag.getFirst("TP4"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -51,10 +51,10 @@ class FrameTMEDTest : AbstractTestCase() {
     fun testGenericv23() {
         var e: Exception? = null
         try {
-            val tag = ID3v23Tag()
-            tag.addField(GenericFieldKey.MEDIA, "testMedia")
-            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
-            assertEquals("testMedia", tag.getFirst("TMED"))
+            val tag =  ID3v23Tag()
+            tag.addField(GenericFieldKey.REMIXER, "testRemixer")
+            assertEquals("testRemixer", tag.getFirst(GenericFieldKey.REMIXER))
+            assertEquals("testRemixer", tag.getFirst("TPE4"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -67,11 +67,11 @@ class FrameTMEDTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v23Tag()
-            val frame =  ID3v23Frame("TMED")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testMedia")
+            val frame =  ID3v23Frame("TPE4")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testRemixer")
             tag.addFrame(frame)
-            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
-            assertEquals("testMedia", tag.getFirst("TMED"))
+            assertEquals("testRemixer", tag.getFirst(GenericFieldKey.REMIXER))
+            assertEquals("testRemixer", tag.getFirst("TPE4"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -84,9 +84,9 @@ class FrameTMEDTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v24Tag()
-            tag.addField(GenericFieldKey.MEDIA, "testMedia")
-            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
-            assertEquals("testMedia", tag.getFirst("TMED"))
+            tag.addField(GenericFieldKey.REMIXER, "testRemixer")
+            assertEquals("testRemixer", tag.getFirst(GenericFieldKey.REMIXER))
+            assertEquals("testRemixer", tag.getFirst("TPE4"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -99,11 +99,11 @@ class FrameTMEDTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v24Tag()
-            val frame =  ID3v24Frame("TMED")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testMedia")
+            val frame =  ID3v24Frame("TPE4")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testRemixer")
             tag.addFrame(frame)
-            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
-            assertEquals("testMedia", tag.getFirst("TMED"))
+            assertEquals("testRemixer", tag.getFirst(GenericFieldKey.REMIXER))
+            assertEquals("testRemixer", tag.getFirst("TPE4"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()

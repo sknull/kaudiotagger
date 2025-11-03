@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTPE2Test : AbstractTestCase() {
+class FrameBodyTPE2Test : AbstractTestCase() {
 
     @Test
     fun testID3Specific() {

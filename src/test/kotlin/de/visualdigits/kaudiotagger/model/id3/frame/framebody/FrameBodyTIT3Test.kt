@@ -7,7 +7,7 @@ import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class FrameTIT3Test : AbstractTestCase() {
+class FrameBodyTIT3Test : AbstractTestCase() {
 
     @Test
     fun testID3Specific() {

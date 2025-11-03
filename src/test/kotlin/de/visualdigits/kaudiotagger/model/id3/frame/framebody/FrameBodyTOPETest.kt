@@ -9,7 +9,7 @@ import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Test
 
-class FrameTOPETest : AbstractTestCase() {
+class FrameBodyTOPETest : AbstractTestCase() {
 
     @Test
     fun testSavingV24ToV23() {

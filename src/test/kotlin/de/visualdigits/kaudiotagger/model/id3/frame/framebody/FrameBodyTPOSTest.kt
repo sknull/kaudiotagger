@@ -1,15 +1,29 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
+import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
 class FrameBodyTPOSTest : AbstractTestCase() {
-    
+
+    @Test
+    fun testMergingMultipleFrames() {
+        val tag = ID3v24Tag()
+        tag.setField(tag.createField(GenericFieldKey.DISC_NO, "1"))
+        tag.setField(tag.createField(GenericFieldKey.DISC_TOTAL, "10"))
+        assertEquals("1", tag.getFirst(GenericFieldKey.DISC_NO))
+        assertEquals("10", tag.getFirst(GenericFieldKey.DISC_TOTAL))
+        Assertions.assertInstanceOf(AbstractID3v2Frame::class.java, tag?.getFrame("TPOS"))
+    }
+
     @Test
     fun testCreateFrameBodyStringConstructor() {
         TagOptionSingleton.padNumbers = false

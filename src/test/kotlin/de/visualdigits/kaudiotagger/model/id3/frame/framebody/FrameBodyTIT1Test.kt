@@ -8,17 +8,17 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameGRP1Test : AbstractTestCase() {
+class FrameBodyTIT1Test : AbstractTestCase() {
 
     @Test
     fun testID3Specific() {
         var e: Exception? = null
         try {
-            val tag =  ID3v23Tag()
-            val frame =  ID3v23Frame("GRP1")
-            frame.frameBody = FrameBodyTPE1(TextEncoding.ISO_8859_1.id, "testsubtitle")
+            val tag = ID3v23Tag()
+            val frame =  ID3v23Frame("TIT1")
+            frame.frameBody = FrameBodyTPE1(TextEncoding.ISO_8859_1.id, "testgrouping")
             tag.addFrame(frame)
-            assertEquals("testsubtitle", tag.getFirst("GRP1"))
+            assertEquals("testgrouping", tag.getFirst("TIT1"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()

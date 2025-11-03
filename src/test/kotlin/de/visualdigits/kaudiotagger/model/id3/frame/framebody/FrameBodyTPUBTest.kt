@@ -13,16 +13,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTEXTTest : AbstractTestCase() {
+class FrameBodyTPUBTest : AbstractTestCase() {
 
     @Test
     fun testGenericv22() {
         var e: Exception? = null
         try {
-            val tag = ID3v22Tag()
-            tag.addField(GenericFieldKey.LYRICIST, "testlyricist")
-            assertEquals("testlyricist", tag.getFirst(GenericFieldKey.LYRICIST))
-            assertEquals("testlyricist", tag.getFirst("TXT"))
+            val tag =  ID3v22Tag()
+            tag.addField(GenericFieldKey.RECORD_LABEL, "testrecordlabel")
+            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
+            assertEquals("testrecordlabel", tag.getFirst("TPB"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -35,11 +35,11 @@ class FrameTEXTTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v22Tag()
-            val frame =  ID3v22Frame("TXT")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testlyricist")
+            val frame =  ID3v22Frame("TPB")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testrecordlabel")
             tag.addFrame(frame)
-            assertEquals("testlyricist", tag.getFirst(GenericFieldKey.LYRICIST))
-            assertEquals("testlyricist", tag.getFirst("TXT"))
+            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
+            assertEquals("testrecordlabel", tag.getFirst("TPB"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -51,10 +51,10 @@ class FrameTEXTTest : AbstractTestCase() {
     fun testGenericv23() {
         var e: Exception? = null
         try {
-            val tag = ID3v23Tag()
-            tag.addField(GenericFieldKey.LYRICIST, "testlyricist")
-            assertEquals("testlyricist", tag.getFirst(GenericFieldKey.LYRICIST))
-            assertEquals("testlyricist", tag.getFirst("TEXT"))
+            val tag =  ID3v23Tag()
+            tag.addField(GenericFieldKey.RECORD_LABEL, "testrecordlabel")
+            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
+            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -67,11 +67,11 @@ class FrameTEXTTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v23Tag()
-            val frame =  ID3v23Frame("TEXT")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testlyricist")
+            val frame =  ID3v23Frame("TPUB")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testrecordlabel")
             tag.addFrame(frame)
-            assertEquals("testlyricist", tag.getFirst(GenericFieldKey.LYRICIST))
-            assertEquals("testlyricist", tag.getFirst("TEXT"))
+            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
+            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -84,9 +84,9 @@ class FrameTEXTTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v24Tag()
-            tag.addField(GenericFieldKey.LYRICIST, "testlyricist")
-            assertEquals("testlyricist", tag.getFirst(GenericFieldKey.LYRICIST))
-            assertEquals("testlyricist", tag.getFirst("TEXT"))
+            tag.addField(GenericFieldKey.RECORD_LABEL, "testrecordlabel")
+            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
+            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -99,11 +99,11 @@ class FrameTEXTTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v24Tag()
-            val frame =  ID3v24Frame("TEXT")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testlyricist")
+            val frame =  ID3v24Frame("TPUB")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testrecordlabel")
             tag.addFrame(frame)
-            assertEquals("testlyricist", tag.getFirst(GenericFieldKey.LYRICIST))
-            assertEquals("testlyricist", tag.getFirst("TEXT"))
+            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
+            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()

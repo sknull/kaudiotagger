@@ -9,16 +9,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTPE1Test : AbstractTestCase() {
+class FrameBodyTPE3Test : AbstractTestCase() {
 
     @Test
     fun testGeneric() {
         var e: Exception? = null
         try {
-            val tag = ID3v23Tag()
-            tag.addField(GenericFieldKey.ARTIST, "testartist")
-            assertEquals("testartist", tag.getFirst(GenericFieldKey.ARTIST))
-            assertEquals("testartist", tag.getFirst("TPE1"))
+            val tag =  ID3v23Tag()
+            tag.addField(GenericFieldKey.CONDUCTOR, "testconductor")
+            assertEquals("testconductor", tag.getFirst(GenericFieldKey.CONDUCTOR))
+            assertEquals("testconductor", tag.getFirst("TPE3"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -31,11 +31,11 @@ class FrameTPE1Test : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v23Tag()
-            val frame =  ID3v23Frame("TPE1")
-            frame.frameBody = FrameBodyTPE1(TextEncoding.ISO_8859_1.id, "testartist")
+            val frame =  ID3v23Frame("TPE3")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testconductor")
             tag.addFrame(frame)
-            assertEquals("testartist", tag.getFirst(GenericFieldKey.ARTIST))
-            assertEquals("testartist", tag.getFirst("TPE1"))
+            assertEquals("testconductor", tag.getFirst(GenericFieldKey.CONDUCTOR))
+            assertEquals("testconductor", tag.getFirst("TPE3"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()

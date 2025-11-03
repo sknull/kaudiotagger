@@ -2,23 +2,23 @@ package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
-import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
+import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTIT1Test : AbstractTestCase() {
+class FrameBodyTDENTest : AbstractTestCase() {
 
     @Test
     fun testID3Specific() {
         var e: Exception? = null
         try {
-            val tag = ID3v23Tag()
-            val frame =  ID3v23Frame("TIT1")
-            frame.frameBody = FrameBodyTPE1(TextEncoding.ISO_8859_1.id, "testgrouping")
+            val tag =  ID3v24Tag()
+            val frame =  ID3v24Frame("TDEN")
+            frame.frameBody = FrameBodyTDEN(TextEncoding.ISO_8859_1.id, "11:10")
             tag.addFrame(frame)
-            assertEquals("testgrouping", tag.getFirst("TIT1"))
+            assertEquals("11:10", tag.getFirst("TDEN"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()

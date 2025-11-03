@@ -4,7 +4,7 @@ import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import org.junit.jupiter.api.Test
 
-class FrameTLANTest : AbstractTestCase() {
+class FrameBodyTLANTest : AbstractTestCase() {
 
     @Test
     fun testWriteFileContainingTLANFrame() {

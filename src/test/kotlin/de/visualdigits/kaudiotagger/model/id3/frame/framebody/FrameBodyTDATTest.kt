@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class FrameTDATTest : AbstractTestCase() {
+class FrameBodyTDATTest : AbstractTestCase() {
 
     @Test
     fun testID3Specific() {

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTIMETest : AbstractTestCase() {
+class FrameBodyTIMETest : AbstractTestCase() {
 
     @Test
     fun testID3Specific() {

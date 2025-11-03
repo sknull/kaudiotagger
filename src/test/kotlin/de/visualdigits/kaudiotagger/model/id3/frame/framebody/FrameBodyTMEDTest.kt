@@ -13,16 +13,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 
-class FrameTPUBTest : AbstractTestCase() {
+class FrameBodyTMEDTest : AbstractTestCase() {
 
     @Test
     fun testGenericv22() {
         var e: Exception? = null
         try {
-            val tag =  ID3v22Tag()
-            tag.addField(GenericFieldKey.RECORD_LABEL, "testrecordlabel")
-            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
-            assertEquals("testrecordlabel", tag.getFirst("TPB"))
+            val tag = ID3v22Tag()
+            tag.addField(GenericFieldKey.MEDIA, "testMEDIA")
+            assertEquals("testMEDIA", tag.getFirst(GenericFieldKey.MEDIA))
+            assertEquals("testMEDIA", tag.getFirst("TMT"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -35,11 +35,11 @@ class FrameTPUBTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v22Tag()
-            val frame =  ID3v22Frame("TPB")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testrecordlabel")
+            val frame =  ID3v22Frame("TMT")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testMedia")
             tag.addFrame(frame)
-            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
-            assertEquals("testrecordlabel", tag.getFirst("TPB"))
+            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
+            assertEquals("testMedia", tag.getFirst("TMT"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -51,10 +51,10 @@ class FrameTPUBTest : AbstractTestCase() {
     fun testGenericv23() {
         var e: Exception? = null
         try {
-            val tag =  ID3v23Tag()
-            tag.addField(GenericFieldKey.RECORD_LABEL, "testrecordlabel")
-            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
-            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
+            val tag = ID3v23Tag()
+            tag.addField(GenericFieldKey.MEDIA, "testMedia")
+            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
+            assertEquals("testMedia", tag.getFirst("TMED"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -67,11 +67,11 @@ class FrameTPUBTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v23Tag()
-            val frame =  ID3v23Frame("TPUB")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testrecordlabel")
+            val frame =  ID3v23Frame("TMED")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testMedia")
             tag.addFrame(frame)
-            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
-            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
+            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
+            assertEquals("testMedia", tag.getFirst("TMED"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -84,9 +84,9 @@ class FrameTPUBTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v24Tag()
-            tag.addField(GenericFieldKey.RECORD_LABEL, "testrecordlabel")
-            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
-            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
+            tag.addField(GenericFieldKey.MEDIA, "testMedia")
+            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
+            assertEquals("testMedia", tag.getFirst("TMED"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
@@ -99,11 +99,11 @@ class FrameTPUBTest : AbstractTestCase() {
         var e: Exception? = null
         try {
             val tag =  ID3v24Tag()
-            val frame =  ID3v24Frame("TPUB")
-            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testrecordlabel")
+            val frame =  ID3v24Frame("TMED")
+            frame.frameBody = FrameBodyTPE3(TextEncoding.ISO_8859_1.id, "testMedia")
             tag.addFrame(frame)
-            assertEquals("testrecordlabel", tag.getFirst(GenericFieldKey.RECORD_LABEL))
-            assertEquals("testrecordlabel", tag.getFirst("TPUB"))
+            assertEquals("testMedia", tag.getFirst(GenericFieldKey.MEDIA))
+            assertEquals("testMedia", tag.getFirst("TMED"))
         } catch (ex: java.lang.Exception) {
             e = ex
             ex.printStackTrace()
