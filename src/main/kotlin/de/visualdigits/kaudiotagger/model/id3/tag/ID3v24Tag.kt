@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
@@ -40,6 +39,7 @@ import de.visualdigits.kaudiotagger.model.lyrics3.tag.Lyrics3v2
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.FileConstants
 import de.visualdigits.kaudiotagger.util.ID3SyncSafeInteger
+import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.File
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -314,42 +314,42 @@ class ID3v24Tag : AbstractID3v2Tag {
                     // convert id3v1 tags.
                     var newFrame: ID3v24Frame?
                     var newBody: AbstractID3v2FrameBody?
-                    if (mp3tag.getTitle().isNotEmpty()) {
-                        newBody = FrameBodyTIT2(0, mp3tag.getTitle())
+                    mp3tag.getTitle()?.also { v ->
+                        newBody = FrameBodyTIT2(0, v)
                         newFrame = ID3v24Frame(ID3v24FrameId.TITLE.id)
                         newFrame.frameBody = newBody
                         frameMap[newFrame.getIdentifier() ?: error("No identifier")] = newFrame
                     }
-                    if (mp3tag.getArtist().isNotEmpty()) {
-                        newBody = FrameBodyTPE1(0, mp3tag.getArtist())
+                    mp3tag.getArtist()?.also { v ->
+                        newBody = FrameBodyTPE1(0, v)
                         newFrame = ID3v24Frame(ID3v24FrameId.ARTIST.id)
                         newFrame.frameBody = newBody
                         frameMap[newFrame.getIdentifier() ?: error("No identifier")] = newFrame
                     }
-                    if (mp3tag.getAlbum().isNotEmpty()) {
-                        newBody = FrameBodyTALB(0, mp3tag.getAlbum())
+                   mp3tag.getAlbum()?.also { v ->
+                        newBody = FrameBodyTALB(0, v)
                         newFrame = ID3v24Frame(ID3v24FrameId.ALBUM.id)
                         newFrame.frameBody = newBody
                         frameMap[newFrame.getIdentifier() ?: error("No identifier")] = newFrame
                     }
-                    if (mp3tag.getYear().isNotEmpty()) {
-                        newBody = FrameBodyTDRC(0, mp3tag.getYear())
+                    mp3tag.getYear()?.also { v ->
+                        newBody = FrameBodyTDRC(0, v)
                         newFrame = ID3v24Frame(ID3v24FrameId.YEAR.id)
                         newFrame.frameBody = newBody
                         frameMap[newFrame.getIdentifier() ?: error("No identifier")] = newFrame
                     }
-                    if (mp3tag.getComment().isNotEmpty()) {
-                        newBody = FrameBodyCOMM(0, "ENG", "", mp3tag.getComment())
+                    mp3tag.getComment()?.also { v ->
+                        newBody = FrameBodyCOMM(0, "ENG", "", v)
                         newFrame = ID3v24Frame(ID3v24FrameId.COMMENT.id)
                         newFrame.frameBody = newBody
                         frameMap[newFrame.getIdentifier() ?: error("No identifier")] = newFrame
                     }
-                    if (((mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED) >= 0) &&
-                        ((mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED) !=
+                    if (((mp3tag.getGenre().id and ID3v1Tag.BYTE_TO_UNSIGNED) >= 0) &&
+                        ((mp3tag.getGenre().id and ID3v1Tag.BYTE_TO_UNSIGNED) !=
                                 ID3v1Tag.BYTE_TO_UNSIGNED)
                     ) {
-                        val genreId: Int = (mp3tag.getGenre() and ID3v1Tag.BYTE_TO_UNSIGNED)
-                        val genre = "($genreId) ${GenreTypes.fromId(genreId)}"
+                        val genreId: Int = (mp3tag.getGenre().id and ID3v1Tag.BYTE_TO_UNSIGNED)
+                        val genre = "($genreId) ${GenreTypes.fromId(genreId)?.friendlyName}"
 
                         newBody = FrameBodyTCON(0, genre)
                         newFrame = ID3v24Frame(ID3v24FrameId.GENRE.id)
@@ -947,6 +947,33 @@ class ID3v24Tag : AbstractID3v2Tag {
         super.doDeleteTagField(FrameAndSubId(null, identifier, null))
     }
 
+    /**
+     * Overridden for special Genre support
+     *
+     * @param genericKey is the generic key
+     * @param values
+     * @return
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
+        if (genericKey == GenericFieldKey.GENRE) {
+            val value: String = values[0]
+            val formatKey: FrameAndSubId = getFrameAndSubIdFromGenericKey(genericKey)!!
+            val frame: AbstractID3v2Frame = createFrame(formatKey.frameId)
+            val framebody = frame.frameBody as FrameBodyTCON
+
+            if (TagOptionSingleton.isWriteMp3GenresAsText) {
+                framebody.setText(value)
+            } else {
+                framebody.setText(FrameBodyTCON.convertGenericToID3v24Genre(value))
+            }
+            return frame
+        } else {
+            return super.createField(genericKey, *values)
+        }
+    }
+
     override fun createField(artwork: Artwork): TagField {
         val frame = createFrame(getFrameAndSubIdFromGenericKey(GenericFieldKey.COVER_ART)?.frameId)
         val body: FrameBodyAPIC = frame.frameBody as FrameBodyAPIC
@@ -1016,21 +1043,32 @@ class ID3v24Tag : AbstractID3v2Tag {
     }
 
     override fun getFrameAndSubIdFromGenericKey(genericKey: GenericFieldKey?): FrameAndSubId? {
-        when (genericKey) {
-            null -> {
-                throw IllegalArgumentException(
-                    ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg()
+        requireNotNull(genericKey) { "No generic key" }
+        val fromFieldKey = ID3v24FrameId.fromFieldKey(genericKey)
+        return fromFieldKey?.let { id3v24FieldKey ->
+            FrameAndSubId(
+                genericKey,
+                id3v24FieldKey.id,
+                id3v24FieldKey.fieldKey?.subId
+            )
+        }
+    }
+
+    override fun getValue(genericKey: GenericFieldKey?, index: Int): String? {
+        requireNotNull(genericKey) { "No generic key" }
+        return if (genericKey == GenericFieldKey.GENRE) {
+            val fields = getFields(genericKey)
+            if (fields.isNotEmpty()) {
+                val frame = fields.get(0) as AbstractID3v2Frame
+                val body = frame.frameBody as FrameBodyTCON
+                FrameBodyTCON.convertID3v22GenreToGeneric(
+                    body.getValues()[index]
                 )
+            } else {
+                null
             }
-            else -> {
-                return ID3v24FrameId.fromFieldKey(genericKey)?.let { id3v24FieldKey ->
-                    FrameAndSubId(
-                        genericKey,
-                        id3v24FieldKey.id,
-                        id3v24FieldKey.fieldKey?.subId
-                    )
-                }
-            }
+        } else {
+            return super.getValue(genericKey, index)
         }
     }
 

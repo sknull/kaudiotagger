@@ -235,9 +235,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      * @param content fields content.
      */
     override fun setContent(content: String) {
-        throw UnsupportedOperationException(
-            "Not implemented please use the generic tag methods for setting content"
-        )
     }
 
     /**

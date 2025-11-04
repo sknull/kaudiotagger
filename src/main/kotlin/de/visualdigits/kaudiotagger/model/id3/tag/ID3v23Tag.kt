@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
@@ -11,8 +10,11 @@ import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.AggregatedFrame
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.TyerTdatAggregatedFrame
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.AbstractFrameBodyTextInfo
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyIPLS
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTCON
@@ -674,6 +676,87 @@ class ID3v23Tag : AbstractID3v2Tag {
     }
 
     /**
+     * Overridden to allow special handling for mapping YEAR to TYER and TDAT Frames
+     *
+     * @param genericKey is the generic key
+     * @param values     to store
+     * @return
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
+        val value: String = values[0]
+        if (genericKey == GenericFieldKey.GENRE) {
+            val formatKey: FrameAndSubId = getFrameAndSubIdFromGenericKey(genericKey)!!
+            val frame: AbstractID3v2Frame = createFrame(formatKey.frameId)
+            val framebody = frame.frameBody as FrameBodyTCON
+            framebody.setV23Format()
+
+            if (TagOptionSingleton.isWriteMp3GenresAsText) {
+                framebody.setText(value)
+            } else {
+                framebody.setText(FrameBodyTCON.convertGenericToID3v23Genre(value))
+            }
+            return frame
+        } else if (genericKey == GenericFieldKey.YEAR) {
+            if (value.length == 1) {
+                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                (tyer.frameBody as AbstractFrameBodyTextInfo).setText("000$value")
+                return tyer
+            } else if (value.length == 2) {
+                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                (tyer.frameBody as AbstractFrameBodyTextInfo).setText("00$value")
+                return tyer
+            } else if (value.length == 3) {
+                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                (tyer.frameBody as AbstractFrameBodyTextInfo).setText("0$value")
+                return tyer
+            } else if (value.length == 4) {
+                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                (tyer.frameBody as AbstractFrameBodyTextInfo).setText(value)
+                return tyer
+            } else if (value.length > 4) {
+                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                (tyer.frameBody as AbstractFrameBodyTextInfo).setText(
+                    value.take(4)
+                )
+
+                if (value.length >= 10) {
+                    //Have a full yyyy-mm-dd value that needs storing in two frames in ID3
+                    val month = value.substring(5, 7)
+                    val day = value.substring(8, 10)
+                    val tdat: AbstractID3v2Frame = createFrame(ID3v23FrameId.TDAT.id)
+                    (tdat.frameBody as AbstractFrameBodyTextInfo).setText(day + month)
+
+                    val ag = TyerTdatAggregatedFrame()
+                    ag.addFrame(tyer)
+                    ag.addFrame(tdat)
+                    return ag
+                } else if (value.length >= 7) {
+                    //TDAT frame requires both month and day so if we only have the month we just have to make
+                    //the day up
+                    val month = value.substring(5, 7)
+                    val day = "01"
+                    val tdat: AbstractID3v2Frame = createFrame(ID3v23FrameId.TDAT.id)
+                    (tdat.frameBody as AbstractFrameBodyTextInfo).setText(day + month)
+
+                    val ag = TyerTdatAggregatedFrame()
+                    ag.addFrame(tyer)
+                    ag.addFrame(tdat)
+                    return ag
+                } else {
+                    //We only have year data
+                    return tyer
+                }
+            } else {
+                return null
+            }
+        } else {
+            return super.createField(genericKey, *values)
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     override fun createField(artwork: Artwork): TagField {
@@ -687,14 +770,87 @@ class ID3v23Tag : AbstractID3v2Tag {
             frame
         }
         else {
-            body.setObjectValue(
-                DataTypes.OBJ_PICTURE_DATA,
-                artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1)
-            )
+            body.setObjectValue(DataTypes.OBJ_PICTURE_DATA, artwork.imageUrl?.toByteArray(StandardCharsets.ISO_8859_1))
             body.setObjectValue(DataTypes.OBJ_PICTURE_TYPE, artwork.pictureType)
             body.setObjectValue(DataTypes.OBJ_MIME_TYPE, FrameBodyAPIC.IMAGE_IS_URL)
             body.setObjectValue(DataTypes.OBJ_DESCRIPTION, "")
             frame
+        }
+    }
+
+    override fun getFields(genericKey: GenericFieldKey?): List<TagField> {
+        requireNotNull(genericKey) { "No generic key" }
+
+        return if (genericKey == GenericFieldKey.YEAR) {
+            val af = getFrame(TyerTdatAggregatedFrame.ID_TYER_TDAT) as? AggregatedFrame
+            if (af != null) {
+                listOf(af)
+            } else {
+                super.getFields(genericKey)
+            }
+        } else {
+            super.getFields(genericKey)
+        }
+    }
+
+    override fun loadFrameIntoMap(frameId: String?, newFrame: AbstractID3v2Frame?) {
+        (newFrame?.frameBody as? FrameBodyTCON)?.also { fb -> fb.setV23Format() }
+        super.loadFrameIntoMap(frameId, newFrame)
+    }
+
+    override fun loadFrameIntoSpecifiedMap(
+        map: MutableMap<String, AbstractID3v2Frame>,
+        identifier: String?,
+        newFrame: AbstractID3v2Frame?
+    ) {
+        requireNotNull(identifier) { "No identifier" }
+        requireNotNull(newFrame) { "No frame to add" }
+
+        if (identifier != ID3v23FrameId.TYER.id && identifier != ID3v23FrameId.TDAT.id) {
+            super.loadFrameIntoSpecifiedMap(map, identifier, newFrame)
+            return
+        }
+
+        if (identifier == ID3v23FrameId.TDAT.id) {
+            if (newFrame.getContent()?.isEmpty() == true) {
+                //Discard not useful to complicate by trying to map it
+                log.warn("TDAT is empty so just ignoring")
+                return
+            }
+        }
+        if (map.containsKey(identifier) ||
+            map.containsKey(TyerTdatAggregatedFrame.ID_TYER_TDAT)
+        ) {
+            //If we have multiple duplicate frames in a tag separate them with semicolons
+            if (this.duplicateFrameId.isNotEmpty()) {
+                this.duplicateFrameId += ";"
+            }
+            this.duplicateFrameId += identifier
+            this.duplicateBytes += newFrame.getSize()
+        } else if (identifier == ID3v23FrameId.TYER.id) {
+            if (map.containsKey(ID3v23FrameId.TDAT.id)) {
+                val ag = TyerTdatAggregatedFrame()
+                ag.addFrame(newFrame)
+                ag.addFrame(
+                    map[ID3v23FrameId.TDAT.id]!!
+                )
+                map.remove(ID3v23FrameId.TDAT.id)
+                map[TyerTdatAggregatedFrame.ID_TYER_TDAT] = ag
+            } else {
+                map[ID3v23FrameId.TYER.id] = newFrame
+            }
+        } else if (identifier == ID3v23FrameId.TDAT.id) {
+            if (map.containsKey(ID3v23FrameId.TYER.id)) {
+                val ag = TyerTdatAggregatedFrame()
+                ag.addFrame(
+                    map[ID3v23FrameId.TYER.id]!!
+                )
+                ag.addFrame(newFrame)
+                map.remove(ID3v23FrameId.TYER.id)
+                map[TyerTdatAggregatedFrame.ID_TYER_TDAT] = ag
+            } else {
+                map[ID3v23FrameId.TDAT.id] = newFrame
+            }
         }
     }
 
@@ -777,6 +933,28 @@ class ID3v23Tag : AbstractID3v2Tag {
                 id3v23FieldKey.id,
                 id3v23FieldKey.fieldKey?.subId
             )
+        }
+    }
+
+    override fun getValue(genericKey: GenericFieldKey?, index: Int): String? {
+        requireNotNull(genericKey) { "No generic key" }
+        return if (genericKey == GenericFieldKey.YEAR) {
+            val af = getFrame(TyerTdatAggregatedFrame.ID_TYER_TDAT) as AggregatedFrame?
+            af?.getContent() ?: super.getValue(genericKey, index)
+        } else if (genericKey == GenericFieldKey.GENRE) {
+            val fields = getFields(genericKey)
+            if (fields.isNotEmpty()) {
+                val frame = fields[0] as AbstractID3v2Frame
+                val body = frame.frameBody as FrameBodyTCON
+                val values = body.getValues()
+                val value = values[index]
+                val text = FrameBodyTCON.convertID3v23GenreToGeneric(value)
+                text
+            } else {
+                null
+            }
+        } else {
+            super.getValue(genericKey, index)
         }
     }
 

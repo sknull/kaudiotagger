@@ -15,6 +15,7 @@
  */
 package de.visualdigits.kaudiotagger.model.audiofile.mp3
 
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MP3AudioHeader
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MPEGFrameHeader
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey

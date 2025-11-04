@@ -1,7 +1,6 @@
 package de.visualdigits.kaudiotagger.model.lyrics3.tag
 
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
-import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.lyrics3.field.framebody.FieldFrameBodyLYR
 import de.visualdigits.kaudiotagger.util.ID3Tags
 import java.io.RandomAccessFile
@@ -45,8 +44,6 @@ class Lyrics3v1: AbstractLyrics3 {
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)
     }
-
-    override fun supportedTag(): SupportedTag = SupportedTag.Lyrics3V1Tag
 
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null || !seek(byteBuffer)) {
@@ -124,7 +121,7 @@ class Lyrics3v1: AbstractLyrics3 {
     }
 
     override fun write(file: RandomAccessFile) {
-        var str: String
+        var str: String?
         var offset: Int
         val buffer: ByteArray?
 
@@ -143,15 +140,15 @@ class Lyrics3v1: AbstractLyrics3 {
 
         str = ID3Tags.truncate(lyric, 5100)
 
-        for (i in 0..<str.length) {
-            buffer[i + offset] = str[i].code.toByte()
+        for (i in 0..< (str?.length?:0)) {
+            buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
         }
 
-        offset += str.length
+        offset += (str?.length?:0)
 
         str = "LYRICSEND"
 
-        for (i in 0..<str.length) {
+        for (i in 0..< str.length) {
             buffer[i + offset] = str[i].code.toByte()
         }
 

@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidDataTypeException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
@@ -575,6 +574,24 @@ class ID3v22Tag : AbstractID3v2Tag {
      */
     override fun deleteField(identifier: String) {
         super.doDeleteTagField(FrameAndSubId(null, identifier, null))
+    }
+
+    override fun getValue(genericKey: GenericFieldKey?, index: Int): String? {
+        requireNotNull(genericKey) { "No generic key" }
+        return if (genericKey == GenericFieldKey.GENRE) {
+            val fields = getFields(genericKey)
+            if (fields.isNotEmpty()) {
+                val frame = fields.get(0) as AbstractID3v2Frame
+                val body = frame.frameBody as FrameBodyTCON
+                FrameBodyTCON.convertID3v22GenreToGeneric(
+                    body.getValues()[index]
+                )
+            } else {
+                null
+            }
+        } else {
+            super.getValue(genericKey, index)
+        }
     }
 
     override fun isMultipleAllowed(identifier: String?): Boolean = ID3v22FrameId.isMultipleAllowed(identifier)

@@ -5,6 +5,8 @@ enum class GenreTypes(
     val friendlyName: String
 ) {
 
+    UNKNOWN(-1, "UNKNOWN"),
+
     BLUES(0, "Blues"),
     CLASSIC_ROCK(1, "Classic Rock"),
     COUNTRY(2, "Country"),
@@ -206,9 +208,11 @@ enum class GenreTypes(
         const val MAX_STANDARD_GENRE_ID: Int = 125
         const val MAX_GENRE_ID: Int = 191
 
-        fun fromId(id: Int): GenreTypes? = entries.find { e -> id == e.id }
+        fun fromId(id: Int?): GenreTypes? = entries.find { e -> id == e.id }
 
-        fun fromName(name: String): GenreTypes? = entries.find { e -> name == e.name }
+        fun fromName(name: String?): GenreTypes? = entries.find { e -> name == e.name }
+
+        fun fromFriendlyName(friendlyName: String?): GenreTypes? = entries.find { e -> friendlyName == e.friendlyName }
 
         fun getValueToIdMap(): Map<String, Long> = entries.associate { e -> Pair(e.friendlyName, e.id.toLong()) }
 

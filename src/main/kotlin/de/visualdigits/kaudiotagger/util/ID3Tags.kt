@@ -347,15 +347,15 @@ object ID3Tags {
      * @param len maximum desired length of string
      * @return
      */
-    fun truncate(str: String?, len: Int): String {
+    fun truncate(str: String?, len: Int): String? {
         if (len < 0) {
-            return ""
+            return null
         }
         return if ((str?.length ?: Int.MIN_VALUE) > len) {
             str?.take(len)
         } else {
             str
-        }?:""
+        }?:null
     }
 
     /**

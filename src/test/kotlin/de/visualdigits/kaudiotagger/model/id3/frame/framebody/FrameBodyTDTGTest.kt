@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame

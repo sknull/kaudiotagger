@@ -1,6 +1,6 @@
-package de.visualdigits.kaudiotagger.model.id3.frame.framebody
+package de.visualdigits.kaudiotagger.model.id3.frame
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import org.junit.jupiter.api.AfterEach

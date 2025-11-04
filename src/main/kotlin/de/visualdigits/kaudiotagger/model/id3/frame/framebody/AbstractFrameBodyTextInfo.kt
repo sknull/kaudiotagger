@@ -108,14 +108,12 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      * @return value at index
      */
     fun getValueAtIndex(index: Int): String? {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
+        val text = getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
         return text.getValueAtIndex(index)
     }
 
     fun getValues(): MutableList<String> {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
+        val text = getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
         return text.getValues()
     }
 
@@ -125,8 +123,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      * @param value at index
      */
     fun addTextValue(value: String) {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
+        val text = getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
         text.addValue(value)
     }
 
@@ -134,8 +131,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      * @return number of text values, usually one
      */
     fun getNumberOfValues(): Int {
-        val text =
-            getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
+        val text = getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
         return text.getNumberOfValues()
     }
 
@@ -147,9 +143,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
      */
     override fun write(tagBuffer: ByteArrayOutputStream) {
         // Ensure valid for type
-        setTextEncoding(
-            ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding())
-        )
+        setTextEncoding(ID3TextEncodingConversion.getTextEncoding(header, getTextEncoding()))
 
         // Ensure valid for data
         val terminated = getObject(DataTypes.OBJ_TEXT) as? TextEncodedStringSizeTerminated

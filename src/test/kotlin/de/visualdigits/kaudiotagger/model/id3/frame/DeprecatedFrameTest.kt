@@ -1,18 +1,17 @@
-package de.visualdigits.kaudiotagger.model.id3.frame.framebody
+package de.visualdigits.kaudiotagger.model.id3.frame
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.id3.frame.AbstractID3v2Frame
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
-import de.visualdigits.kaudiotagger.model.id3.frame.MultiID3v2Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyDeprecated
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIME
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTYER
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import java.io.File
+import java.lang.Exception
 
 class DeprecatedFrameTest : AbstractTestCase() {
     
@@ -88,7 +87,6 @@ class DeprecatedFrameTest : AbstractTestCase() {
     }
 
     @Test
-    @Throws(java.lang.Exception::class)
     fun testSavingV24DeprecatedEmptyTDATTagToV23() {
         val testFile = prependAudioToTmp(
             "Issue122-2.id3",

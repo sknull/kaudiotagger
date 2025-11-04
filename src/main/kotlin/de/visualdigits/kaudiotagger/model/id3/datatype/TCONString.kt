@@ -10,13 +10,15 @@ class TCONString : TextEncodedStringSizeTerminated {
 
         fun splitV23(value: String): List<String> {
             val valuesarray = value
-                .replace("(\\(\\d+\\)|\\(RX\\)|\\(CR\\)\\w*)".toRegex(), "$1\u0000")
+                .replace("(\\(\\d+\\)|\\(RX\\)|\\(CR\\)\\w*)".toRegex(), "\u0000$1")
                 .split("\u0000")
+                .filter { v -> v.isNotEmpty() }
             var values = valuesarray.toList()
-            // Read only list so if empty have to create new list
+            //Read only list so if empty have to create new list
             if (values.isEmpty()) {
                 values = listOf("")
             }
+
             return values
         }
     }
@@ -44,14 +46,14 @@ class TCONString : TextEncodedStringSizeTerminated {
     override fun addValue(value: String) {
         // For ID3v24 we separate each value by a null
         if (isNullSeperateMultipleValues) {
-            setValue("${value}\u0000$value")
+            setValue("${getValue()}\u0000$value")
         } else {
             // For ID3v23 if they pass a numeric value in brackets this indicates a mapping to an ID3v2 genre and
             // can be seen as a refinement and therefore do not need the non-standard (for ID3v23) null seperator
             if (value.startsWith("(")) {
-                setValue("${value}$value")
+                setValue("${getValue()}$value")
             } else {
-                setValue("${value}\u0000$value")
+                setValue("${getValue()}\u0000$value")
             }
         }
     }
@@ -68,7 +70,7 @@ class TCONString : TextEncodedStringSizeTerminated {
     /**
      * @return list of all values
      */
-    override fun getValues(): MutableList<String> {
+    override fun getValues(): List<String> {
         return (getValue() as? String)?.let { s ->
             if (isNullSeperateMultipleValues) {
                 splitByNullSeperator(s)
@@ -87,8 +89,7 @@ class TCONString : TextEncodedStringSizeTerminated {
      */
     override fun getValueAtIndex(index: Int): String? {
         // Split String into separate components
-        val values: MutableList<*> = getValues()
-        return values[index] as? String
+        return getValues()[index]
     }
 
     /**
@@ -97,7 +98,7 @@ class TCONString : TextEncodedStringSizeTerminated {
      * @return
      */
     override fun getValueWithoutTrailingNull(): String {
-        val values: MutableList<String> = getValues()
+        val values = getValues()
         val sb = StringBuffer()
         for (i in values.indices) {
             if (i != 0) {

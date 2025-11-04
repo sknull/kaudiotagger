@@ -1,4 +1,4 @@
-package de.visualdigits.kaudiotagger.model.audiofile.mp3
+package de.visualdigits.kaudiotagger
 
 import de.visualdigits.kaudiotagger.model.common.types.TextEncoding
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v2Version
@@ -92,7 +92,7 @@ abstract class AbstractTestCase {
         } else {
             ClassLoader.getSystemResource(dir + fileName)?.toURI()
         }
-        
+
         return  resource?.let { r -> File(r) }?:error("File not found: $directory/$fileName")
     }
 
@@ -103,7 +103,7 @@ abstract class AbstractTestCase {
         } else {
             file = File(tempDirectory, fileName)
         }
-        
+
         return file
     }
 

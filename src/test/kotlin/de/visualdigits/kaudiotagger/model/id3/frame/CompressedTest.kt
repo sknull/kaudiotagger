@@ -1,9 +1,10 @@
-package de.visualdigits.kaudiotagger.model.id3.frame.framebody
+package de.visualdigits.kaudiotagger.model.id3.frame
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v23Frame
-import de.visualdigits.kaudiotagger.model.id3.frame.ID3v24Frame
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyAPIC
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyCOMM
+import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23EncodingFlags
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24EncodingFlags

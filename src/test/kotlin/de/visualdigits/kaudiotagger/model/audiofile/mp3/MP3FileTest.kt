@@ -1,5 +1,6 @@
 package de.visualdigits.kaudiotagger.model.audiofile.mp3
 
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import java.io.File

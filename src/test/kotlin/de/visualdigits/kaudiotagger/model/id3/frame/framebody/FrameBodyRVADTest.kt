@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.id3.datatype.DataTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import org.junit.jupiter.api.Assertions.assertEquals

@@ -21,7 +21,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
          * @return list of values, guaranteed to be at least one value
          */
         fun splitByNullSeperator(value: String): MutableList<String> {
-            val valuesarray = value.split("\\u0000")
+            val valuesarray = value.split("\u0000")
             var values = valuesarray.toMutableList()
             // Read only list so if empty have to create new list
             if (values.isEmpty()) {
@@ -258,10 +258,14 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * Removing trailing null from end of String, this should not be there but some applications continue to write
      * this unnecessary null char.
      */
-    fun stripTrailingNull() {
+    protected fun stripTrailingNull() {
         if (TagOptionSingleton.removeTrailingTerminatorOnWrite) {
-            (getValue() as? String)?.also { s ->
-                setValue(s.substringBefore('\u0000'))
+            var stringValue = getValue() as? String
+            if (stringValue?.isNotEmpty() == true) {
+                if (stringValue[stringValue.length - 1] == '\u0000') {
+                    stringValue = (stringValue).take(stringValue.length - 1)
+                    setValue(stringValue)
+                }
             }
         }
     }
@@ -287,7 +291,7 @@ open class TextEncodedStringSizeTerminated : AbstractString {
      * @param value
      */
     open fun addValue(value: String) {
-        setValue("${value}\u0000$value")
+        setValue("${getValue()}\u0000$value")
     }
 
     /**
@@ -314,8 +318,8 @@ open class TextEncodedStringSizeTerminated : AbstractString {
     /**
      * @return list of all values
      */
-    open fun getValues(): MutableList<String> {
-        return splitByNullSeperator(getValue() as String)
+    open fun getValues(): List<String> {
+        return (getValue() as? String)?.let { s -> splitByNullSeperator(s) }?:listOf()
     }
 
     /**

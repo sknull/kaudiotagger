@@ -76,7 +76,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                 } else {
                     value
                 }
-            } catch (nfe: NumberFormatException) {
+            } catch (_: NumberFormatException) {
                 // If passed String, use matching integral value if can
                 val genreId = GenreTypes.fromName(value)
                 // to preserve iTunes compatibility, don't write genre ids higher than getMaxStandardGenreId, rather use string
@@ -97,7 +97,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                         ID3v2ExtendedGenreTypes.CR.name
                     }
                     else -> {
-                        ""
+                        value
                     }
                 }
             }
@@ -118,12 +118,12 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                 } else {
                     value
                 }
-            } catch (nfe: NumberFormatException) {
+            } catch (_: NumberFormatException) {
                 // if passed text try and find integral value otherwise use text
-                val genreId = GenreTypes.fromName(value)
+                val genreId = GenreTypes.fromFriendlyName(value)?.id
                 // to preserve iTunes compatibility, don't write genre ids higher than getMaxStandardGenreId, rather use string
                 return when {
-                    genreId != null && genreId.id <= GenreTypes.MAX_GENRE_ID -> {
+                    genreId != null && genreId <= GenreTypes.MAX_GENRE_ID -> {
                         return bracketWrap(genreId.toString())
                     }
                     value.equals(ID3v2ExtendedGenreTypes.RX.description, ignoreCase = true) -> {
@@ -139,7 +139,7 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
                         bracketWrap(ID3v2ExtendedGenreTypes.CR.name)
                     }
                     else -> {
-                        ""
+                        value
                     }
                 }
             }
@@ -166,12 +166,8 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
      * @return
      */
     fun convertID3v23GenreToGeneric(value: String): String? {
-        return if (value.contains(")") && value.lastIndexOf(')') < value.length - 1) {
-            (
-                    checkBracketed(value.substring(0, value.lastIndexOf(')'))) +
-                            ' ' +
-                            value.substring(value.lastIndexOf(')') + 1)
-                    )
+        return if (value.contains(")") && value.lastIndexOf(')') < value.length) {
+            checkBracketed(value.take(value.lastIndexOf(')'))) + value.substring(value.lastIndexOf(')') + 1)
         } else {
             checkBracketed(value)
         }
@@ -181,15 +177,16 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
         var value1 = value
             .replace("(", "")
             .replace(")", "")
-        return try {
+        try {
             val genreId = value1.toInt()
             if (genreId <= GenreTypes.MAX_GENRE_ID) {
-                GenreTypes.fromId(genreId)?.name
+                val fromId = GenreTypes.fromId(genreId)
+                return fromId?.friendlyName
             } else {
-                value1
+                return value1
             }
-        } catch (nfe: NumberFormatException) {
-            if (value1.equals(ID3v2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
+        } catch (_: NumberFormatException) {
+            return if (value1.equals(ID3v2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
                 ID3v2ExtendedGenreTypes.RX.description
             } else if (value1.equals(ID3v2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
                 ID3v2ExtendedGenreTypes.CR.description

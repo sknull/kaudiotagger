@@ -2,7 +2,6 @@ package de.visualdigits.kaudiotagger.model.lyrics3.tag
 
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidTagException
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
-import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.lyrics3.field.Lyrics3v2Field
@@ -61,8 +60,6 @@ class Lyrics3v2 : AbstractLyrics3 {
     constructor(byteBuffer: ByteBuffer) {
         this.read(byteBuffer)
     }
-
-    override fun supportedTag(): SupportedTag = SupportedTag.Lyrics3V2Tag
 
     override fun read(byteBuffer: ByteBuffer?): Boolean {
         if (byteBuffer == null || !seek(byteBuffer)) {

@@ -1,7 +1,7 @@
 package de.visualdigits.kaudiotagger.util
 
 import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.AbstractTestCase
 import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId

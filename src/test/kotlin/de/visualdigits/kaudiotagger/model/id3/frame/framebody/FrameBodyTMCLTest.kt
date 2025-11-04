@@ -1,6 +1,6 @@
 package de.visualdigits.kaudiotagger.model.id3.frame.framebody
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.AbstractTestCase
+import de.visualdigits.kaudiotagger.AbstractTestCase
 
 class FrameBodyTMCLTest : AbstractTestCase() {
 

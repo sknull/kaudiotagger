@@ -1,13 +1,15 @@
 package de.visualdigits.kaudiotagger.model.audiofile
 
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
-import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
+import de.visualdigits.kaudiotagger.model.common.tag.ID3Tag
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v2Version
+import de.visualdigits.kaudiotagger.model.lyrics3.tag.AbstractLyrics3
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import org.slf4j.Logger
@@ -42,12 +44,16 @@ open class AudioFile {
      */
     var audioHeader: AudioHeader? = null
 
-    val tags: MutableMap<SupportedTag, AbstractTag> = mutableMapOf()
+    var tagV1: ID3v1Tag? = null
+
+    var tagV2: AbstractID3v2Tag? = null
+
+    var lyrics3: AbstractLyrics3? = null
 
     constructor()
 
     override fun toString(): String {
-        return ("===================\nFilename: ${file?.name}\nHeader: $audioHeader\n-------------------\n${tags.toList().joinToString("\n-------------------\n") { (k, v) -> "${k.name}:\n$v" }}\n===================")
+        return ("===================\nFilename: ${file?.name}\nHeader: $audioHeader\n-------------------\n${listOfNotNull(tagV1, tagV2).joinToString("\n-------------------\n") { t -> "${t.javaClass.simpleName}:\n$t" }}\n===================")
     }
 
     fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {

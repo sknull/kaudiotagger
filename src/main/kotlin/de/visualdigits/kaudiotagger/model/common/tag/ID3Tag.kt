@@ -2,6 +2,7 @@ package de.visualdigits.kaudiotagger.model.common.tag
 
 import de.visualdigits.kaudiotagger.model.common.field.TagField
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
+import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.images.Artwork
 
 /**
@@ -29,7 +30,9 @@ import de.visualdigits.kaudiotagger.model.images.Artwork
  * @author Raphael Slinckx
  * @author Paul Taylor
  */
-interface Tag {
+interface ID3Tag {
+
+    fun supportedTag(): SupportedTag
 
     /**
      * Returns a [list][List] of [TagField] objects whose &quot;[id][TagField.getId]&quot;
@@ -101,7 +104,7 @@ interface Tag {
      */
     fun hasField(genericKey: GenericFieldKey): Boolean
 
-    fun getFirstField(genericKey: GenericFieldKey): TagField?
+    fun getFirstField(genericKey: GenericFieldKey?): TagField?
 
     /**
      * Determines whether the tag has at least one field with the specified
@@ -130,7 +133,13 @@ interface Tag {
 
     fun getFirst(genericKey: GenericFieldKey?): String?
 
+    fun getValue(genericKey: GenericFieldKey?, index: Int): String?
+
     fun getFirst(identifier: String): String?
+
+    fun getFieldCount(): Int
+
+    fun getUniqueFieldCount(): Int
 
     /**
      * Retrieve the first field that exists for this format specific key

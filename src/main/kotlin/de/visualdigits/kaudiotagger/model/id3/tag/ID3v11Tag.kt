@@ -12,6 +12,7 @@ import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTDRC
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTIT2
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTPE1
 import de.visualdigits.kaudiotagger.model.id3.frame.framebody.FrameBodyTRCK
+import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v1FieldKey
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
 import de.visualdigits.kaudiotagger.model.images.Artwork
@@ -27,7 +28,6 @@ class ID3v11Tag: ID3v1Tag {
     companion object {
         // For writing output
         const val TYPE_TRACK: String = "track"
-        const val TRACK_UNDEFINED: Int = 0
         const val TRACK_MAX_VALUE: Int = 255
         const val TRACK_MIN_VALUE: Int = 1
         const val FIELD_COMMENT_LENGTH: Int = 28
@@ -57,7 +57,7 @@ class ID3v11Tag: ID3v1Tag {
     /**
      * Track is held as a single byte in v1.1
      */
-    var track: Int? = TRACK_UNDEFINED
+    var track: Int? = null
 
     /**
      * Creates a new ID3v11 datatype.
@@ -86,7 +86,7 @@ class ID3v11Tag: ID3v1Tag {
             setAlbum(mp3tag.getAlbum())
             setComment(mp3tag.getComment())
             setYear(mp3tag.getYear())
-            setGenre(mp3tag.getGenre())
+            setGenre(mp3tag.getGenre()?.id)
         } else {
             val id3tag: ID3v24Tag
             // first change the tag to ID3v2_4 tag if not one already
@@ -130,7 +130,7 @@ class ID3v11Tag: ID3v1Tag {
             if (id3tag.hasField(ID3v24FrameId.GENRE.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.GENRE.id) as ID3v24Frame
                 text = (frame.frameBody as FrameBodyTCON).getText()
-                setGenre(ID3Tags.findNumber(text?:"0")?.toInt()?:GENRE_UNDEFINED)
+                setGenre(ID3Tags.findNumber(text?:"0")?.toInt()?:GenreTypes.UNKNOWN.id)
             }
             if (id3tag.hasField(ID3v24FrameId.TRACK.id)) {
                 frame = id3tag.getFrame(ID3v24FrameId.TRACK.id) as ID3v24Frame
@@ -183,9 +183,9 @@ class ID3v11Tag: ID3v1Tag {
             FIELD_TITLE_LENGTH,
             StandardCharsets.ISO_8859_1
         ).trim { it <= ' ' })
-        var m = endofStringPattern.matcher(getTitle())
+        var m = endofStringPattern.matcher(getTitle()?:"")
         if (m.find()) {
-            setTitle(getTitle().substring(0, m.start()))
+            setTitle(getTitle()?.substring(0, m.start()))
         }
         setArtist(String(
             dataBuffer,
@@ -193,9 +193,9 @@ class ID3v11Tag: ID3v1Tag {
             FIELD_ARTIST_LENGTH,
             StandardCharsets.ISO_8859_1
         ).trim { it <= ' ' })
-        m = endofStringPattern.matcher(getArtist())
+        m = endofStringPattern.matcher(getArtist()?:"")
         if (m.find()) {
-            setArtist(getArtist().substring(0, m.start()))
+            setArtist(getArtist()?.substring(0, m.start()))
         }
         setAlbum(String(
             dataBuffer,
@@ -203,9 +203,9 @@ class ID3v11Tag: ID3v1Tag {
             FIELD_ALBUM_LENGTH,
             StandardCharsets.ISO_8859_1
         ).trim { it <= ' ' })
-        m = endofStringPattern.matcher(getAlbum())
+        m = endofStringPattern.matcher(getAlbum()?:"")
         if (m.find()) {
-            setAlbum(getAlbum().substring(0, m.start()))
+            setAlbum(getAlbum()?.substring(0, m.start()))
         }
         setYear(String(
             dataBuffer,
@@ -213,9 +213,9 @@ class ID3v11Tag: ID3v1Tag {
             FIELD_YEAR_LENGTH,
             StandardCharsets.ISO_8859_1
         ).trim { it <= ' ' })
-        m = endofStringPattern.matcher(getYear())
+        m = endofStringPattern.matcher(getYear()?:"")
         if (m.find()) {
-            setYear(getYear().substring(0, m.start()))
+            setYear(getYear()?.substring(0, m.start()))
         }
         setComment(String(
             dataBuffer,
@@ -223,9 +223,9 @@ class ID3v11Tag: ID3v1Tag {
             FIELD_COMMENT_LENGTH,
             StandardCharsets.ISO_8859_1
         ).trim { it <= ' ' })
-        m = endofStringPattern.matcher(getComment())
+        m = endofStringPattern.matcher(getComment()?:"")
         if (m.find()) {
-            setComment(getComment().substring(0, m.start()))
+            setComment(getComment()?.substring(0, m.start()))
         }
         track = dataBuffer[FIELD_TRACK_POS].toInt()
         setGenre(dataBuffer[FIELD_GENRE_POS].toInt())
@@ -261,7 +261,7 @@ class ID3v11Tag: ID3v1Tag {
      */
     override fun write(file: RandomAccessFile) {
         log.debug("Saving ID3v11 tag to file")
-        val buffer = ByteArray(TAG_LENGTH)
+        var buffer = ByteArray(TAG_LENGTH)
         var i: Int
         var str: String?
         delete(file)
@@ -277,8 +277,8 @@ class ID3v11Tag: ID3v1Tag {
         if (TagOptionSingleton.id3v1SaveTitle) {
             str = ID3Tags.truncate(getTitle(), FIELD_TITLE_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -286,8 +286,8 @@ class ID3v11Tag: ID3v1Tag {
         if (TagOptionSingleton.id3v1SaveArtist) {
             str = ID3Tags.truncate(getArtist(), FIELD_ARTIST_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -295,8 +295,8 @@ class ID3v11Tag: ID3v1Tag {
         if (TagOptionSingleton.id3v1SaveAlbum) {
             str = ID3Tags.truncate(getAlbum(), FIELD_ALBUM_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -304,8 +304,8 @@ class ID3v11Tag: ID3v1Tag {
         if (TagOptionSingleton.id3v1SaveYear) {
             str = ID3Tags.truncate(getYear(), FIELD_YEAR_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -313,8 +313,8 @@ class ID3v11Tag: ID3v1Tag {
         if (TagOptionSingleton.id3v1SaveComment) {
             str = ID3Tags.truncate(getComment(), FIELD_COMMENT_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -322,7 +322,7 @@ class ID3v11Tag: ID3v1Tag {
         buffer[offset] = track?.toByte()?:0.toByte() // skip one byte extra blank for 1.1 definition
         offset = FIELD_GENRE_POS
         if (TagOptionSingleton.id3v1SaveGenre) {
-            buffer[offset] = getGenre().toByte()
+            buffer[offset] = getGenre().id.toByte()
         }
         file.write(buffer)
 
@@ -339,15 +339,38 @@ class ID3v11Tag: ID3v1Tag {
         setField(genericKey, *values)
     }
 
+    override fun setField(genericKey: GenericFieldKey, vararg values: String) {
+        when (genericKey) {
+            GenericFieldKey.TRACK -> setTrackValue(values.firstOrNull())
+            else -> super.setField(createField(genericKey, *values))
+        }
+    }
+
+    override fun isEmpty(): Boolean {
+        return super.isEmpty() && track == null
+    }
+
     override fun getFields(): List<ID3v1TagField> {
         return (super.getFields() + getTrackTag()).sortedBy { t -> t.getIdentifier() }
+    }
+
+    /**
+     * Delete any instance of tag fields with this key
+     *
+     * @param genericKey
+     */
+    override fun deleteField(genericKey: GenericFieldKey) {
+        when (genericKey) {
+            GenericFieldKey.TRACK -> setTrackValue(null)
+            else -> super.deleteField(genericKey)
+        }
     }
 
     /**
      * @return Artist within list or empty if does not exist
      */
     open fun getTrackTag(): List<ID3v1TagField> {
-        return if (track != TRACK_UNDEFINED) {
+        return if (track != null) {
             listOf(
                 ID3v1TagField(
                     ID3v1FieldKey.TRACK.name,
@@ -357,6 +380,38 @@ class ID3v11Tag: ID3v1Tag {
         } else {
             listOf()
         }
+    }
+
+    override fun getFields(genericKey: GenericFieldKey?): List<TagField> {
+        return when (genericKey) {
+            GenericFieldKey.TRACK -> getTrackTag()
+            else -> super.getFields(genericKey)
+        }
+    }
+
+    override fun setField(field: TagField?) {
+        val genericKey = GenericFieldKey.valueOf(field?.getIdentifier()?:error("No id"))
+        when (genericKey) {
+            GenericFieldKey.TRACK -> setTrackValue(getValue(field))
+            else -> super.setField(field)
+        }
+    }
+
+    /**
+     * Retrieve the first value that exists for this generic key
+     *
+     * @param genericKey
+     * @return
+     */
+    override fun getFirst(genericKey: GenericFieldKey?): String? {
+        return when (genericKey) {
+            GenericFieldKey.TRACK -> getValue(GenericFieldKey.TRACK, 0)
+            else -> super.getFirst(genericKey)
+        }
+    }
+
+    fun setTrackValue(trackValue: String?) {
+        this.track = trackValue?.toIntOrNull()
     }
 
     /**

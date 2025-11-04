@@ -1,9 +1,9 @@
 package de.visualdigits.kaudiotagger.model.id3.tag
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.field.TagField
+import de.visualdigits.kaudiotagger.model.common.field.TagTextField
 import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
-import de.visualdigits.kaudiotagger.model.common.tag.Tag
+import de.visualdigits.kaudiotagger.model.common.tag.ID3Tag
 import de.visualdigits.kaudiotagger.model.common.types.GenericFieldKey
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.types.GenreTypes
@@ -16,7 +16,7 @@ import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
 
-open class ID3v1Tag: AbstractID3v1Tag, Tag {
+open class ID3v1Tag: AbstractID3v1Tag, ID3Tag {
     
     companion object {
         // For writing output
@@ -24,7 +24,6 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         const val FIELD_COMMENT_LENGTH: Int = 30
         const val FIELD_COMMENT_POS: Int = 97
         const val BYTE_TO_UNSIGNED: Int = 0xff
-        const val GENRE_UNDEFINED: Int = 0xff
         const val RELEASE: Int = 1
         const val MAJOR_VERSION: Int = 0
         const val REVISION: Int = 0
@@ -53,12 +52,12 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         }
     }
 
-    private var album: String = ""
-    private var artist: String = ""
-    private var comment: String = ""
-    private var title: String = ""
-    private var year: String = ""
-    private var genre: Int = -1
+    private var album: String? = null
+    private var artist: String? = null
+    private var comment: String? = null
+    private var title: String? = null
+    private var year: String? = null
+    private var genre: GenreTypes? = null
 
     var dataBuffer: ByteArray = byteArrayOf()
 
@@ -143,7 +142,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         ).trim()
         var m = endofStringPattern.matcher(title)
         if (m.find()) {
-            title = title.take(m.start())
+            title = title?.take(m.start())
         }
 
         artist = String(
@@ -154,7 +153,18 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         ).trim()
         m = endofStringPattern.matcher(artist)
         if (m.find()) {
-            artist = artist.take(m.start())
+            artist = artist?.take(m.start())
+        }
+
+        album = String(
+            dataBuffer,
+            FIELD_ALBUM_POS,
+            FIELD_ALBUM_LENGTH,
+            StandardCharsets.ISO_8859_1
+        ).trim()
+        m = endofStringPattern.matcher(album)
+        if (m.find()) {
+            album = album?.take(m.start())
         }
 
         year = String(
@@ -165,7 +175,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         ).trim()
         m = endofStringPattern.matcher(year)
         if (m.find()) {
-            year = year.take(m.start())
+            year = year?.take(m.start())
         }
 
         comment = String(
@@ -176,10 +186,10 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         ).trim()
         m = endofStringPattern.matcher(comment)
         if (m.find()) {
-            comment = comment.take(m.start())
+            comment = comment?.take(m.start())
         }
 
-        genre = dataBuffer[FIELD_GENRE_POS].toInt()
+        genre = GenreTypes.fromId(dataBuffer[FIELD_GENRE_POS].toInt())
 
         return true
     }
@@ -220,8 +230,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         if (TagOptionSingleton.id3v1SaveTitle) {
             str = ID3Tags.truncate(title, FIELD_TITLE_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -229,8 +239,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         if (TagOptionSingleton.id3v1SaveArtist) {
             str = ID3Tags.truncate(artist, FIELD_ARTIST_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -238,8 +248,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         if (TagOptionSingleton.id3v1SaveAlbum) {
             str = ID3Tags.truncate(album, FIELD_ALBUM_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -247,8 +257,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         if (TagOptionSingleton.id3v1SaveYear) {
             str = ID3Tags.truncate(year, FIELD_YEAR_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
@@ -256,32 +266,17 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         if (TagOptionSingleton.id3v1SaveComment) {
             str = ID3Tags.truncate(comment, FIELD_COMMENT_LENGTH)
             i = 0
-            while (i < str.length) {
-                buffer[i + offset] = str[i].code.toByte()
+            while (i < (str?.length?:0)) {
+                buffer[i + offset] = str?.get(i)?.code?.toByte()?:0.toByte()
                 i++
             }
         }
         offset = FIELD_GENRE_POS
         if (TagOptionSingleton.id3v1SaveGenre) {
-            buffer[offset] = genre.toByte()
+            buffer[offset] = genre?.id?.toByte()?: GenreTypes.UNKNOWN.id.toByte()
         }
         file.write(buffer)
         log.debug("Saved ID3v1 tag to file")
-    }
-
-    /**
-     * Get Genre
-     *
-     * @return genre or empty string if not valid
-     */
-    fun getFirstGenre(): String {
-        val genreId = (genre and BYTE_TO_UNSIGNED).toInt()
-        val genreValue = GenreTypes.fromId(genreId)
-        return if (genreValue == null) {
-            ""
-        } else {
-            genreValue.friendlyName
-        }
     }
 
     override fun createField(artwork: Artwork): TagField {
@@ -318,34 +313,41 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     override fun setField(field: TagField?) {
+        val value = getValue(field)
         val genericKey = GenericFieldKey.valueOf(field?.getIdentifier()?:error("No id"))
         when (genericKey) {
-            GenericFieldKey.ARTIST -> setArtist(field.toString())
-            GenericFieldKey.ALBUM -> setAlbum(field.toString())
-            GenericFieldKey.TITLE -> setTitle(field.toString())
-            GenericFieldKey.GENRE -> setGenreVal(field.toString())
-            GenericFieldKey.YEAR -> setYear(field.toString())
-            GenericFieldKey.COMMENT -> setComment(field.toString())
+            GenericFieldKey.ARTIST -> setArtist(value)
+            GenericFieldKey.ALBUM -> setAlbum(value)
+            GenericFieldKey.TITLE -> setTitle(value)
+            GenericFieldKey.GENRE -> setGenreVal(value)
+            GenericFieldKey.YEAR -> setYear(value)
+            GenericFieldKey.COMMENT -> setComment(value)
             else -> { log.warn("Unknown key '$genericKey'") }
         }
     }
 
-    fun getAlbum(): String = album
+    fun getValue(field: TagField?): String? {
+        val value = when (field) {
+            is TagTextField -> field.getContent()
+            else -> field?.getRawContent()?.let { rc -> String(rc) }
+        }
+        return value
+    }
+
+    fun getAlbum(): String? = album
 
     /**
      * @return album within list or empty if does not exist
      */
     open fun getAlbumTag(): List<ID3v1TagField> {
-        return if (album.isNotEmpty()) {
+        return album?.let { a ->
             listOf(
                 ID3v1TagField(
                     ID3v1FieldKey.ALBUM.name,
-                    album
+                    a
                 )
             )
-        } else {
-            listOf()
-        }
+        }?:listOf()
     }
 
     /**
@@ -353,26 +355,24 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @param album
      */
-    open fun setAlbum(album: String) {
+    open fun setAlbum(album: String?) {
         this.album = ID3Tags.truncate(album, FIELD_ALBUM_LENGTH)
     }
 
-    fun getArtist(): String = artist
+    fun getArtist(): String? = artist
 
     /**
      * @return Artist within list or empty if does not exist
      */
     open fun getArtistTag(): List<ID3v1TagField> {
-        return if (artist.isNotEmpty()) {
+        return artist?.let { a ->
             listOf(
                 ID3v1TagField(
                     ID3v1FieldKey.ARTIST.name,
-                    artist
+                    a
                 )
             )
-        } else {
-            listOf()
-        }
+        }?:listOf()
     }
 
     /**
@@ -380,7 +380,7 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @param artist
      */
-    open fun setArtist(artist: String) {
+    open fun setArtist(artist: String?) {
         this.artist = ID3Tags.truncate(artist, FIELD_ARTIST_LENGTH)
     }
 
@@ -388,30 +388,28 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      * @return comment within list or empty if does not exist
      */
     open fun getCommentTag(): List<ID3v1TagField> {
-        return if (comment.isNotEmpty()) {
+        return comment?.let { a ->
             listOf(
                 ID3v1TagField(
                     ID3v1FieldKey.COMMENT.name,
-                    comment
+                    a
                 )
             )
-        } else {
-            listOf()
-        }
+        }?:listOf()
     }
 
-    fun getComment(): String = comment
+    fun getComment(): String? = comment
 
     /**
      * Set Comment
      *
      * @param comment
      */
-    open fun setComment(comment: String) {
+    open fun setComment(comment: String?) {
         this.comment = ID3Tags.truncate(comment, FIELD_COMMENT_LENGTH)
     }
 
-    fun getGenre(): Int = genre
+    fun getGenre(): GenreTypes = genre?: GenreTypes.UNKNOWN
 
     /**
      * Get Genre field
@@ -427,8 +425,8 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             ?:listOf()
     }
 
-    fun setGenre(genre: Int) {
-        this.genre = genre
+    fun setGenre(genre: Int?) {
+        this.genre = GenreTypes.fromId(genre)
     }
 
     /**
@@ -441,16 +439,11 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @param genreVal
      */
-    open fun setGenreVal(genreVal: String) {
-        val genreID = GenreTypes.fromName(genreVal)?.id
-        if (genreID != null) {
-            this.genre = genreID
-        } else {
-            this.genre = GENRE_UNDEFINED
-        }
+    open fun setGenreVal(genreVal: String?) {
+        this.genre = GenreTypes.fromFriendlyName(genreVal)
     }
 
-    fun getTitle(): String = title
+    fun getTitle(): String? = title
 
     /**
      * Get title field
@@ -471,11 +464,11 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      *
      * @param title
      */
-    open fun setTitle(title: String) {
+    open fun setTitle(title: String?) {
         this.title = ID3Tags.truncate(title, FIELD_TITLE_LENGTH)
     }
 
-    fun getYear(): String = year
+    fun getYear(): String? = year
 
     /**
      * Get year field
@@ -525,14 +518,23 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
             GenericFieldKey.ARTIST -> artist
             GenericFieldKey.ALBUM -> album
             GenericFieldKey.TITLE -> title
-            GenericFieldKey.GENRE -> getFirstGenre()
+            GenericFieldKey.GENRE -> genre?.friendlyName
             GenericFieldKey.YEAR -> year
             GenericFieldKey.COMMENT -> comment
-            else -> ""
+            else -> null
         }
     }
 
-    override fun getFirstField(genericKey: GenericFieldKey): TagField? {
+    override fun getValue(genericKey: GenericFieldKey?, index: Int): String? {
+        return getFirstField(genericKey)?.let { field ->
+            when(field) {
+                is TagTextField -> field.getContent()
+                else -> field.getRawContent()?.let { rc -> String(rc) }
+            }
+        }
+    }
+
+    override fun getFirstField(genericKey: GenericFieldKey?): TagField? {
         return getFields(genericKey)[0]
     }
 
@@ -567,12 +569,12 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
      */
     override fun deleteField(genericKey: GenericFieldKey) {
         when (genericKey) {
-            GenericFieldKey.ARTIST -> setArtist("")
-            GenericFieldKey.ALBUM -> setAlbum("")
-            GenericFieldKey.TITLE -> setTitle("")
-            GenericFieldKey.GENRE -> setGenreVal("")
-            GenericFieldKey.YEAR -> setYear("")
-            GenericFieldKey.COMMENT -> setComment("")
+            GenericFieldKey.ARTIST -> setArtist(null)
+            GenericFieldKey.ALBUM -> setAlbum(null)
+            GenericFieldKey.TITLE -> setTitle(null)
+            GenericFieldKey.GENRE -> setGenreVal(null)
+            GenericFieldKey.YEAR -> setYear(null)
+            GenericFieldKey.COMMENT -> setComment(null)
             else -> { log.warn("Unknown key '$genericKey'") }
         }
     }
@@ -595,12 +597,12 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
     }
 
     override fun isEmpty(): Boolean {
-        return !(getFirst(GenericFieldKey.TITLE)?.isNotEmpty() == true
-                || artist.isNotEmpty()
-                || album.isNotEmpty()
-                || getFirst(GenericFieldKey.GENRE)?.isNotEmpty() == true
-                || getFirst(GenericFieldKey.YEAR)?.isNotEmpty() == true
-                || comment.isNotEmpty()
+        return ((title == null || title?.isEmpty() == true)
+                && (artist == null || artist?.isEmpty() == true)
+                && (album == null || album?.isEmpty() == true)
+                && genre == null
+                && (year == null || year?.isEmpty() == true)
+                && (comment == null || comment?.isEmpty() == true)
                 )
     }
 
@@ -627,12 +629,16 @@ open class ID3v1Tag: AbstractID3v1Tag, Tag {
         }
     }
 
+    override fun getUniqueFieldCount(): Int {
+        return getFieldCount()
+    }
+
     /**
      * Count number of frames/fields in this tag
      *
      * @return
      */
-    fun getFieldCount(): Int {
+    override fun getFieldCount(): Int {
         return getFields().size
     }
 

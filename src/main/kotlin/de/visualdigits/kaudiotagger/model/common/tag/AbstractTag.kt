@@ -15,8 +15,6 @@ abstract class AbstractTag : AbstractTagItem {
 
     constructor(copyObject: AbstractTag): super(copyObject)
 
-    abstract fun supportedTag(): SupportedTag
-
     /**
      * Looks for this tag in the buffer
      *
