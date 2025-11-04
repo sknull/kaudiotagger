@@ -210,7 +210,7 @@ class FrameBodyCOMM: AbstractID3v2FrameBody, ID3v23FrameBody, ID3v24FrameBody {
         return (getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated).getValueAtIndex(index)
     }
 
-    fun getValues(): MutableList<String> {
+    fun getValues(): List<String> {
         return (getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated).getValues()
     }
 }

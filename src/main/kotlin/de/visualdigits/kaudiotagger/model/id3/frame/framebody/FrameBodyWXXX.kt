@@ -148,9 +148,8 @@ class FrameBodyWXXX: AbstractFrameBodyUrlLink, ID3v24FrameBody, ID3v23FrameBody 
         return text.getValueAtIndex(index)
     }
 
-    fun getUrlLinks(): MutableList<String> {
-        val text =
-            getObject(DataTypes.OBJ_URLLINK) as TextEncodedStringSizeTerminated
+    fun getUrlLinks(): List<String> {
+        val text = getObject(DataTypes.OBJ_URLLINK) as TextEncodedStringSizeTerminated
         return text.getValues()
     }
 

@@ -112,7 +112,7 @@ abstract class AbstractFrameBodyTextInfo: AbstractID3v2FrameBody {
         return text.getValueAtIndex(index)
     }
 
-    fun getValues(): MutableList<String> {
+    fun getValues(): List<String> {
         val text = getObject(DataTypes.OBJ_TEXT) as TextEncodedStringSizeTerminated
         return text.getValues()
     }
