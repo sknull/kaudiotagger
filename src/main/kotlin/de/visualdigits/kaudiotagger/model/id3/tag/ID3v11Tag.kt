@@ -86,15 +86,10 @@ class ID3v11Tag: ID3v1Tag {
             setAlbum(mp3tag.getAlbum())
             setComment(mp3tag.getComment())
             setYear(mp3tag.getYear())
-            setGenre(mp3tag.getGenre()?.id)
+            setGenre(mp3tag.getGenre().id)
         } else {
-            val id3tag: ID3v24Tag
             // first change the tag to ID3v2_4 tag if not one already
-            if (mp3tag !is ID3v24Tag) {
-                id3tag = ID3v24Tag(mp3tag)
-            } else {
-                id3tag = mp3tag
-            }
+            val id3tag: ID3v24Tag = mp3tag as? ID3v24Tag ?: ID3v24Tag(mp3tag)
             var frame: ID3v24Frame
             var text: String?
             if (id3tag.hasField(ID3v24FrameId.TITLE.id)) {
@@ -237,7 +232,7 @@ class ID3v11Tag: ID3v1Tag {
      * Find identifier within byteBuffer to indicate that a v11 tag exists within the buffer
      *
      * @param byteBuffer
-     * @return true if find header for v11 tag within buffer
+     * @return true if find header for v11 tag is within buffer
      */
     override fun seek(byteBuffer: ByteBuffer): Boolean {
         if(!super.seek(byteBuffer)) {

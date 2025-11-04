@@ -11,11 +11,8 @@ import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.lyrics3.tag.AbstractLyrics3
-import de.visualdigits.kaudiotagger.util.AbstractTagDisplayFormatter
 import de.visualdigits.kaudiotagger.util.ErrorMessage
-import de.visualdigits.kaudiotagger.util.PlainTextTagDisplayFormatter
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
-import de.visualdigits.kaudiotagger.util.XMLTagDisplayFormatter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -32,15 +29,6 @@ class MP3File : AudioFile {
     companion object {
 
         private const val MINIMUM_FILESIZE = 150
-        var tagFormatter: AbstractTagDisplayFormatter? = null
-
-        private fun createXMLStructureFormatter() {
-            tagFormatter = XMLTagDisplayFormatter()
-        }
-
-        private fun createPlainTextStructureFormatter() {
-            tagFormatter = PlainTextTagDisplayFormatter()
-        }
 
         fun read(file: File?, readOnly: Boolean = false, loadOptions: LoadOptions = LoadOptions.LOAD_ALL): MP3File {
             return file?.let { f ->
@@ -139,83 +127,26 @@ class MP3File : AudioFile {
         startByte: Long,
         firstHeaderAfterTag: MP3AudioHeader
     ): MP3AudioHeader {
-        val headerOne: MP3AudioHeader
-        val headerTwo: MP3AudioHeader?
-
-        log.warn(
-            ErrorMessage.MP3_ID3TAG_LENGTH_INCORRECT.getMsg(
-                file?.path,
-                startByte.toHexString(),
-                firstHeaderAfterTag.mp3StartByte.toHexString()
-            )
-        )
+        log.warn(ErrorMessage.MP3_ID3TAG_LENGTH_INCORRECT.getMsg(file?.path, startByte.toHexString(), firstHeaderAfterTag.mp3StartByte.toHexString()))
 
         // because we cant agree on start location we reread the audioheader from the start of the file, at least
         // this way we cant overwrite the audio although we might overwrite part of the tag if we write this file
         // back later
-        headerOne = MP3AudioHeader(file, 0)
+        val headerOne = MP3AudioHeader(file, 0)
         log.debug("Checking from start:" + headerOne)
 
         // Although the id3 tag size appears to be incorrect at least we have found the same location for the start
         // of audio whether we start searching from start of file or at the end of the alleged of file so no real
         // problem
-        if (firstHeaderAfterTag.mp3StartByte == headerOne.mp3StartByte) {
-            log.debug(
-                ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(
-                    file?.path,
-                    headerOne.mp3StartByte.toHexString()
-                )
-            )
-            return firstHeaderAfterTag
+        return if (firstHeaderAfterTag.mp3StartByte == headerOne.mp3StartByte) {
+            log.debug(ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(file?.path, headerOne.mp3StartByte.toHexString()))
+            firstHeaderAfterTag
         } else {
             // We get a different value if read from start, can't guarantee 100% correct lets do some more checks
-            log.debug(
-                (ErrorMessage.MP3_RECALCULATED_POSSIBLE_START_OF_MP3_AUDIO.getMsg(
-                    file?.path,
-                    headerOne.mp3StartByte.toHexString()
-                ))
-            )
+            log.debug((ErrorMessage.MP3_RECALCULATED_POSSIBLE_START_OF_MP3_AUDIO.getMsg(file?.path, headerOne.mp3StartByte.toHexString())))
 
             // Same frame count so probably both audio headers with newAudioHeader being the first one
-            if (firstHeaderAfterTag.numberOfFrames == headerOne.numberOfFrames
-            ) {
-                log.warn(
-                    (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                        file?.path,
-                        headerOne.mp3StartByte.toHexString()
-                    ))
-                )
-                return headerOne
-            }
-
-            // If the size reported by the tag header is a little short and there is only nulls between the recorded value
-            // and the start of the first audio found then we stick with the original header as more likely that currentHeader
-            // DataInputStream not really a header
-            if (isFilePortionNull(
-                    startByte.toInt(),
-                    firstHeaderAfterTag.mp3StartByte.toInt()
-                )
-            ) {
-                return firstHeaderAfterTag
-            }
-
-            // Skip to the next header (header 2, counting from start of file)
-            headerTwo = MP3AudioHeader(
-                file,
-                headerOne.mp3StartByte + (headerOne.mp3FrameHeader?.getFrameLength() ?: 0)
-            )
-
-            // It matches the header we found when doing the original search from after the ID3Tag therefore it
-            // seems that newAudioHeader was a false match and the original header was correct
-            return if (headerTwo.mp3StartByte == firstHeaderAfterTag.mp3StartByte) {
-                log.warn(
-                    (ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(
-                        file?.path,
-                        firstHeaderAfterTag.mp3StartByte.toHexString()
-                    ))
-                )
-                firstHeaderAfterTag
-            }else if (headerTwo.numberOfFrames == headerOne.numberOfFrames) {
+            if (firstHeaderAfterTag.numberOfFrames == headerOne.numberOfFrames) {
                 log.warn(
                     (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
                         file?.path,
@@ -223,14 +154,30 @@ class MP3File : AudioFile {
                     ))
                 )
                 headerOne
-            } else {
-                log.warn(
-                    (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(
-                        file?.path,
-                        firstHeaderAfterTag.mp3StartByte.toHexString()
-                    ))
+            } else if (isFilePortionNull(
+                    startByte.toInt(),
+                    firstHeaderAfterTag.mp3StartByte.toInt()
                 )
+            ) {
                 firstHeaderAfterTag
+            } else {
+                // Skip to the next header (header 2, counting from start of file)
+                val headerTwo = MP3AudioHeader(file, headerOne.mp3StartByte + (headerOne.mp3FrameHeader?.getFrameLength() ?: 0))
+
+                // It matches the header we found when doing the original search from after the ID3Tag therefore it
+                // seems that newAudioHeader was a false match and the original header was correct
+                if (headerTwo.mp3StartByte == firstHeaderAfterTag.mp3StartByte) {
+                    log.warn((ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(file?.path, firstHeaderAfterTag.mp3StartByte.toHexString())))
+                    firstHeaderAfterTag
+                } else if (headerTwo.numberOfFrames == headerOne.numberOfFrames) {
+                    log.warn(
+                        (ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file?.path, headerOne.mp3StartByte.toHexString()))
+                    )
+                    headerOne
+                } else {
+                    log.warn((ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file?.path, firstHeaderAfterTag.mp3StartByte.toHexString())))
+                    firstHeaderAfterTag
+                }
             }
         }
     }

@@ -69,7 +69,7 @@ class SynchronisedTempoCode: AbstractDataType, Cloneable {
     }
 
     override fun getSize(): Int {
-        return this.tempo.getSize() + (this.timestamp.getSize()?:0)
+        return this.tempo.getSize() + (this.timestamp.getSize())
     }
 
     override fun writeByteArray(): ByteArray {

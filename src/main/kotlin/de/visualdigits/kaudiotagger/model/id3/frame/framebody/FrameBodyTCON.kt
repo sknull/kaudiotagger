@@ -177,16 +177,16 @@ class FrameBodyTCON: AbstractFrameBodyTextInfo, ID3v23FrameBody, ID3v24FrameBody
         var value1 = value
             .replace("(", "")
             .replace(")", "")
-        try {
+        return try {
             val genreId = value1.toInt()
             if (genreId <= GenreTypes.MAX_GENRE_ID) {
                 val fromId = GenreTypes.fromId(genreId)
-                return fromId?.friendlyName
+                fromId?.friendlyName
             } else {
-                return value1
+                value1
             }
         } catch (_: NumberFormatException) {
-            return if (value1.equals(ID3v2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
+            if (value1.equals(ID3v2ExtendedGenreTypes.RX.name, ignoreCase = true)) {
                 ID3v2ExtendedGenreTypes.RX.description
             } else if (value1.equals(ID3v2ExtendedGenreTypes.CR.name, ignoreCase = true)) {
                 ID3v2ExtendedGenreTypes.CR.description

@@ -261,11 +261,9 @@ open class TextEncodedStringSizeTerminated : AbstractString {
     protected fun stripTrailingNull() {
         if (TagOptionSingleton.removeTrailingTerminatorOnWrite) {
             var stringValue = getValue() as? String
-            if (stringValue?.isNotEmpty() == true) {
-                if (stringValue[stringValue.length - 1] == '\u0000') {
-                    stringValue = (stringValue).take(stringValue.length - 1)
-                    setValue(stringValue)
-                }
+            if (stringValue?.isNotEmpty() == true && stringValue[stringValue.length - 1] == '\u0000') {
+                stringValue = (stringValue).take(stringValue.length - 1)
+                setValue(stringValue)
             }
         }
     }

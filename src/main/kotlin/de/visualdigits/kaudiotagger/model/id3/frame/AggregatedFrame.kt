@@ -9,11 +9,10 @@ import java.nio.charset.Charset
  */
 abstract class AggregatedFrame : AbstractID3v2Frame() {
 
-    //TODO rather than just maintaining insertion order we want to define a preset order
     protected var frames = LinkedHashSet<AbstractID3v2Frame>()
 
-    fun addFrame(frame: AbstractID3v2Frame) {
-        frames.add(frame)
+    fun addFrame(frame: AbstractID3v2Frame?) {
+        frame?.also { f -> frames.add(f) }
     }
 
     fun getFrames(): MutableSet<AbstractID3v2Frame> {

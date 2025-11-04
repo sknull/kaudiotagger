@@ -433,7 +433,7 @@ class MPEGFrameHeader {
          */
         fun parseMPEGHeader(bb: ByteBuffer): MPEGFrameHeader? {
             val position = bb.position()
-            bb.get(header, 0, HEADER_SIZE)
+            bb[header, 0, HEADER_SIZE] // copies bb into header
             bb.position(position)
 
             return instance(header)

@@ -957,7 +957,7 @@ class ID3v24Tag : AbstractID3v2Tag {
      * @throws FieldDataInvalidException
      */
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
-        if (genericKey == GenericFieldKey.GENRE) {
+        return if (genericKey == GenericFieldKey.GENRE) {
             val value: String = values[0]
             val formatKey: FrameAndSubId = getFrameAndSubIdFromGenericKey(genericKey)!!
             val frame: AbstractID3v2Frame = createFrame(formatKey.frameId)
@@ -968,9 +968,9 @@ class ID3v24Tag : AbstractID3v2Tag {
             } else {
                 framebody.setText(FrameBodyTCON.convertGenericToID3v24Genre(value))
             }
-            return frame
+            frame
         } else {
-            return super.createField(genericKey, *values)
+            super.createField(genericKey, *values)
         }
     }
 
@@ -1059,7 +1059,7 @@ class ID3v24Tag : AbstractID3v2Tag {
         return if (genericKey == GenericFieldKey.GENRE) {
             val fields = getFields(genericKey)
             if (fields.isNotEmpty()) {
-                val frame = fields.get(0) as AbstractID3v2Frame
+                val frame = fields[0] as AbstractID3v2Frame
                 val body = frame.frameBody as FrameBodyTCON
                 FrameBodyTCON.convertID3v22GenreToGeneric(
                     body.getValues()[index]

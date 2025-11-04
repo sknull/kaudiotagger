@@ -19,7 +19,7 @@ class TyerTdatAggregatedFrame : AggregatedFrame() {
         val framesList = frames.toList()
         val tyer = framesList.firstOrNull()
         sb.append(tyer?.getContent()?:"")
-        val tdat = framesList.get(1)
+        val tdat = framesList[1]
         if (tdat.getContent()?.length == FrameBodyTDAT.DATA_SIZE) {
             sb.append("-")
             sb.append(

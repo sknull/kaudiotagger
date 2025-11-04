@@ -67,7 +67,6 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      *
      * @param identifier
      */
-    // TODO the identifier checks should be done in the relevent subclasses
     @Suppress("UNCHECKED_CAST")
     constructor(identifier: String? = null) {
         this.identifier = identifier
@@ -234,6 +233,7 @@ abstract class AbstractID3v2Frame: AbstractTagFrame, TagTextField {
      * @param content fields content.
      */
     override fun setContent(content: String) {
+        // to be implemented
     }
 
     /**

@@ -37,7 +37,6 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.lang.String
-import kotlin.Exception
 
 class ID3v24TagTest : AbstractTestCase() {
  

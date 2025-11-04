@@ -686,73 +686,89 @@ class ID3v23Tag : AbstractID3v2Tag {
      */
     override fun createField(genericKey: GenericFieldKey, vararg values: String): TagField? {
         val value: String = values[0]
-        if (genericKey == GenericFieldKey.GENRE) {
-            val formatKey: FrameAndSubId = getFrameAndSubIdFromGenericKey(genericKey)!!
-            val frame: AbstractID3v2Frame = createFrame(formatKey.frameId)
-            val framebody = frame.frameBody as FrameBodyTCON
-            framebody.setV23Format()
+        return when (genericKey) {
+            GenericFieldKey.GENRE -> {
+                val formatKey: FrameAndSubId = getFrameAndSubIdFromGenericKey(genericKey)!!
+                val frame: AbstractID3v2Frame = createFrame(formatKey.frameId)
+                val framebody = frame.frameBody as FrameBodyTCON
+                framebody.setV23Format()
 
-            if (TagOptionSingleton.isWriteMp3GenresAsText) {
-                framebody.setText(value)
-            } else {
-                framebody.setText(FrameBodyTCON.convertGenericToID3v23Genre(value))
-            }
-            return frame
-        } else if (genericKey == GenericFieldKey.YEAR) {
-            if (value.length == 1) {
-                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
-                (tyer.frameBody as AbstractFrameBodyTextInfo).setText("000$value")
-                return tyer
-            } else if (value.length == 2) {
-                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
-                (tyer.frameBody as AbstractFrameBodyTextInfo).setText("00$value")
-                return tyer
-            } else if (value.length == 3) {
-                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
-                (tyer.frameBody as AbstractFrameBodyTextInfo).setText("0$value")
-                return tyer
-            } else if (value.length == 4) {
-                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
-                (tyer.frameBody as AbstractFrameBodyTextInfo).setText(value)
-                return tyer
-            } else if (value.length > 4) {
-                val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
-                (tyer.frameBody as AbstractFrameBodyTextInfo).setText(
-                    value.take(4)
-                )
-
-                if (value.length >= 10) {
-                    //Have a full yyyy-mm-dd value that needs storing in two frames in ID3
-                    val month = value.substring(5, 7)
-                    val day = value.substring(8, 10)
-                    val tdat: AbstractID3v2Frame = createFrame(ID3v23FrameId.TDAT.id)
-                    (tdat.frameBody as AbstractFrameBodyTextInfo).setText(day + month)
-
-                    val ag = TyerTdatAggregatedFrame()
-                    ag.addFrame(tyer)
-                    ag.addFrame(tdat)
-                    return ag
-                } else if (value.length >= 7) {
-                    //TDAT frame requires both month and day so if we only have the month we just have to make
-                    //the day up
-                    val month = value.substring(5, 7)
-                    val day = "01"
-                    val tdat: AbstractID3v2Frame = createFrame(ID3v23FrameId.TDAT.id)
-                    (tdat.frameBody as AbstractFrameBodyTextInfo).setText(day + month)
-
-                    val ag = TyerTdatAggregatedFrame()
-                    ag.addFrame(tyer)
-                    ag.addFrame(tdat)
-                    return ag
+                if (TagOptionSingleton.isWriteMp3GenresAsText) {
+                    framebody.setText(value)
                 } else {
-                    //We only have year data
-                    return tyer
+                    framebody.setText(FrameBodyTCON.convertGenericToID3v23Genre(value))
                 }
-            } else {
-                return null
+                frame
             }
-        } else {
-            return super.createField(genericKey, *values)
+            GenericFieldKey.YEAR -> {
+                when {
+                    value.length == 1 -> {
+                        val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                        (tyer.frameBody as AbstractFrameBodyTextInfo).setText("000$value")
+                        tyer
+                    }
+
+                    value.length == 2 -> {
+                        val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                        (tyer.frameBody as AbstractFrameBodyTextInfo).setText("00$value")
+                        tyer
+                    }
+
+                    value.length == 3 -> {
+                        val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                        (tyer.frameBody as AbstractFrameBodyTextInfo).setText("0$value")
+                        tyer
+                    }
+
+                    value.length == 4 -> {
+                        val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                        (tyer.frameBody as AbstractFrameBodyTextInfo).setText(value)
+                        tyer
+                    }
+
+                    value.length > 4 -> {
+                        val tyer: AbstractID3v2Frame = createFrame(ID3v23FrameId.TYER.id)
+                        (tyer.frameBody as AbstractFrameBodyTextInfo).setText(
+                            value.take(4)
+                        )
+
+                        if (value.length >= 10) {
+                            //Have a full yyyy-mm-dd value that needs storing in two frames in ID3
+                            val month = value.substring(5, 7)
+                            val day = value.substring(8, 10)
+                            val tdat: AbstractID3v2Frame = createFrame(ID3v23FrameId.TDAT.id)
+                            (tdat.frameBody as AbstractFrameBodyTextInfo).setText(day + month)
+
+                            val ag = TyerTdatAggregatedFrame()
+                            ag.addFrame(tyer)
+                            ag.addFrame(tdat)
+                            ag
+                        } else if (value.length >= 7) {
+                            //TDAT frame requires both month and day so if we only have the month we just have to make
+                            //the day up
+                            val month = value.substring(5, 7)
+                            val day = "01"
+                            val tdat: AbstractID3v2Frame = createFrame(ID3v23FrameId.TDAT.id)
+                            (tdat.frameBody as AbstractFrameBodyTextInfo).setText(day + month)
+
+                            val ag = TyerTdatAggregatedFrame()
+                            ag.addFrame(tyer)
+                            ag.addFrame(tdat)
+                            ag
+                        } else {
+                            //We only have year data
+                            tyer
+                        }
+                    }
+
+                    else -> {
+                        null
+                    }
+                }
+            }
+            else -> {
+                super.createField(genericKey, *values)
+            }
         }
     }
 
@@ -811,16 +827,12 @@ class ID3v23Tag : AbstractID3v2Tag {
             return
         }
 
-        if (identifier == ID3v23FrameId.TDAT.id) {
-            if (newFrame.getContent()?.isEmpty() == true) {
-                //Discard not useful to complicate by trying to map it
-                log.warn("TDAT is empty so just ignoring")
-                return
-            }
+        if (identifier == ID3v23FrameId.TDAT.id && newFrame.getContent()?.isEmpty() == true) {
+            //Discard not useful to complicate by trying to map it
+            log.warn("TDAT is empty so just ignoring")
+            return
         }
-        if (map.containsKey(identifier) ||
-            map.containsKey(TyerTdatAggregatedFrame.ID_TYER_TDAT)
-        ) {
+        if (map.containsKey(identifier) || map.containsKey(TyerTdatAggregatedFrame.ID_TYER_TDAT)) {
             //If we have multiple duplicate frames in a tag separate them with semicolons
             if (this.duplicateFrameId.isNotEmpty()) {
                 this.duplicateFrameId += ";"
@@ -831,9 +843,7 @@ class ID3v23Tag : AbstractID3v2Tag {
             if (map.containsKey(ID3v23FrameId.TDAT.id)) {
                 val ag = TyerTdatAggregatedFrame()
                 ag.addFrame(newFrame)
-                ag.addFrame(
-                    map[ID3v23FrameId.TDAT.id]!!
-                )
+                ag.addFrame(map[ID3v23FrameId.TDAT.id])
                 map.remove(ID3v23FrameId.TDAT.id)
                 map[TyerTdatAggregatedFrame.ID_TYER_TDAT] = ag
             } else {
@@ -842,9 +852,7 @@ class ID3v23Tag : AbstractID3v2Tag {
         } else if (identifier == ID3v23FrameId.TDAT.id) {
             if (map.containsKey(ID3v23FrameId.TYER.id)) {
                 val ag = TyerTdatAggregatedFrame()
-                ag.addFrame(
-                    map[ID3v23FrameId.TYER.id]!!
-                )
+                ag.addFrame(map[ID3v23FrameId.TYER.id])
                 ag.addFrame(newFrame)
                 map.remove(ID3v23FrameId.TYER.id)
                 map[TyerTdatAggregatedFrame.ID_TYER_TDAT] = ag

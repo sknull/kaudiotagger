@@ -581,7 +581,7 @@ class ID3v22Tag : AbstractID3v2Tag {
         return if (genericKey == GenericFieldKey.GENRE) {
             val fields = getFields(genericKey)
             if (fields.isNotEmpty()) {
-                val frame = fields.get(0) as AbstractID3v2Frame
+                val frame = fields[0] as AbstractID3v2Frame
                 val body = frame.frameBody as FrameBodyTCON
                 FrameBodyTCON.convertID3v22GenreToGeneric(
                     body.getValues()[index]
