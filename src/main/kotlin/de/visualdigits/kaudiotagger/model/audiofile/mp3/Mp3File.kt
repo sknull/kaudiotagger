@@ -2,8 +2,7 @@ package de.visualdigits.kaudiotagger.model.audiofile.mp3
 
 import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MP3AudioHeader
-import de.visualdigits.kaudiotagger.model.common.tag.AbstractTag
-import de.visualdigits.kaudiotagger.model.common.tag.Tag
+import de.visualdigits.kaudiotagger.model.common.tag.ID3Tag
 import de.visualdigits.kaudiotagger.model.common.types.LoadOptions
 import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v1Tag
@@ -87,8 +86,8 @@ class MP3File : AudioFile {
     private fun readV1Tag(file: RandomAccessFile, loadOptions: LoadOptions) {
         if (loadOptions == LoadOptions.LOAD_IDV1TAG || loadOptions == LoadOptions.LOAD_ALL) {
             log.debug("Attempting to read id3v1tags")
-            ID3v1Tag.read(file)?.also { tag -> tags[SupportedTag.ID3v1Tag] = tag }
-            ID3v11Tag.read(file)?.also { tag -> tags[SupportedTag.ID3v11Tag] = tag }
+            ID3v1Tag.read(file)?.also { tag -> tagV1 = tag }
+            ID3v11Tag.read(file)?.also { tag -> tagV1 = tag }
         }
     }
 
@@ -118,9 +117,9 @@ class MP3File : AudioFile {
                 bb.rewind()
                 if ((loadOptions == LoadOptions.LOAD_IDV2TAG || loadOptions == LoadOptions.LOAD_ALL)) {
                     log.debug("Attempting to read id3v2tags")
-                    ID3v22Tag.read(bb)?.also { tag -> tags[SupportedTag.ID3v22Tag] = tag }
-                    ID3v23Tag.read(bb)?.also { tag -> tags[SupportedTag.ID3v23Tag] = tag }
-                    ID3v24Tag.read(bb)?.also { tag -> tags[SupportedTag.ID3v24Tag] = tag }
+                    ID3v22Tag.read(bb)?.also { tag -> tagV2 = tag }
+                    ID3v23Tag.read(bb)?.also { tag -> tagV2 = tag }
+                    ID3v24Tag.read(bb)?.also { tag -> tagV2 = tag }
                 }
             } finally {
                 bb.clear()
@@ -366,13 +365,12 @@ class MP3File : AudioFile {
                 log.debug("Deleting ID3v2 tag:" + file.getName())
             } else {
                 log.debug("Writing ID3v2 tag:" + file.getName())
-                val mp3AudioHeader =
-                    this.audioHeader as MP3AudioHeader
-                val mp3StartByte: Long = mp3AudioHeader.mp3StartByte
-                val newMp3StartByte: Long = id3v2tag.write(file, mp3StartByte)
-                if (mp3StartByte != newMp3StartByte) {
-                    log.debug("New mp3 start byte: $newMp3StartByte")
-                    mp3AudioHeader.mp3StartByte = newMp3StartByte
+                    val mp3AudioHeader = this.audioHeader as MP3AudioHeader
+                    val mp3StartByte: Long = mp3AudioHeader.mp3StartByte
+                    val newMp3StartByte: Long = id3v2tag.write(file, mp3StartByte)
+                    if (mp3StartByte != newMp3StartByte) {
+                        log.debug("New mp3 start byte: $newMp3StartByte")
+                        mp3AudioHeader.mp3StartByte = newMp3StartByte
                 }
             }
         }
@@ -390,15 +388,15 @@ class MP3File : AudioFile {
                     log.debug("Deleting ID3v1")
                     (ID3v1Tag()).delete(rfile)
                 } else {
-                    log.debug("Saving ID3v1")
-                    id3v1tag.write(rfile)
+                        log.debug("Saving ID3v1")
+                        id3v1tag.write(rfile)
                 }
             }
         }
     }
 
     private fun write(tag: AbstractID3v2Tag, file: File) {
-        log.debug("Writing ID3v2 tag:" + file.getName())
+        log.debug("Writing ID3v2 tag: ${file.getName()}")
         val mp3AudioHeader = this.audioHeader as? MP3AudioHeader
         val mp3StartByte = mp3AudioHeader?.mp3StartByte ?: 0
         val newMp3StartByte = tag.write(file, mp3StartByte)
@@ -433,23 +431,23 @@ class MP3File : AudioFile {
     /**
      * Returns the highest tag.
      */
-    fun getTag(): Tag? = (getID3v2Tag()?:getID3v1Tag()) as? Tag
+    fun getTag(): ID3Tag? = (tagV2?:tagV1) as? ID3Tag
 
     /**
      * Returns the highest v1 tag.
      */
-    fun getID3v1Tag(): AbstractID3v1Tag? = (tags[SupportedTag.ID3v11Tag]?:tags[SupportedTag.ID3v1Tag]) as? AbstractID3v1Tag
+    fun getID3v1Tag(): ID3v1Tag? = tagV1
 
-    fun hasID3v1Tag(): Boolean = getID3v1Tag() != null
+    fun hasID3v1Tag(): Boolean = tagV1 != null
 
     /**
      * Returns the highest v2 tag.
      */
-    fun getID3v2Tag(): AbstractID3v2Tag? = (tags[SupportedTag.ID3v24Tag]?:tags[SupportedTag.ID3v23Tag]?:tags[SupportedTag.ID3v22Tag]) as? AbstractID3v2Tag
+    fun getID3v2Tag(): AbstractID3v2Tag? = tagV2
 
-    fun hasID3v2Tag(): Boolean = getID3v2Tag() != null
+    fun hasID3v2Tag(): Boolean = tagV2 != null
 
-    fun getLyrics3Tag(): AbstractLyrics3? = (tags[SupportedTag.Lyrics3V2Tag]?:tags[SupportedTag.Lyrics3V1Tag]) as? AbstractLyrics3
+    fun getLyrics3Tag(): AbstractLyrics3? = lyrics3
 
     fun getID3v2TagAsv24(): ID3v24Tag {
         return when (val tag = getID3v2Tag()) {
@@ -458,9 +456,12 @@ class MP3File : AudioFile {
         }
     }
 
-    fun setTag(tag: AbstractTag) {
-        tags.clear()
-        tags[tag.supportedTag()] = tag
+    fun setTag(tag: ID3Tag?) {
+        when (tag) {
+            is ID3v1Tag -> tagV1 = tag
+            is AbstractID3v2Tag -> tagV2 = tag
+            is AbstractLyrics3 -> lyrics3 = tag
+        }
     }
 
     /**
@@ -470,7 +471,7 @@ class MP3File : AudioFile {
      *
      * @return
      */
-    fun getTagAndConvertOrCreateAndSetDefault(): Tag {
+    fun getTagAndConvertOrCreateAndSetDefault(): ID3Tag {
         convertID3Tag(getTagOrCreateDefault(), TagOptionSingleton.id3v2Version)?.also { t -> setTag(t) }
         return getTag()?:error("Could create tag")
     }
