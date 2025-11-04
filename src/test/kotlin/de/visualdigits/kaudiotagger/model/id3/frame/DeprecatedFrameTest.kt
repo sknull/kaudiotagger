@@ -11,7 +11,6 @@ import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import org.junit.jupiter.api.Assertions.assertInstanceOf
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
-import java.lang.Exception
 
 class DeprecatedFrameTest : AbstractTestCase() {
     

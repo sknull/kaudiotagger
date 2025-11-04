@@ -4,8 +4,6 @@ import de.visualdigits.kaudiotagger.model.audiofile.AudioFile
 import de.visualdigits.kaudiotagger.model.audiofile.header.mp3.MP3AudioHeader
 import de.visualdigits.kaudiotagger.model.common.tag.ID3Tag
 import de.visualdigits.kaudiotagger.model.common.types.LoadOptions
-import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
-import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v11Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag

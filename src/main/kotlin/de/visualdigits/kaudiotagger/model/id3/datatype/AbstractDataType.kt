@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.datatype
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
 import de.visualdigits.kaudiotagger.util.ID3Tags.copyValue
 import org.slf4j.Logger

@@ -1,8 +1,6 @@
 package de.visualdigits.kaudiotagger.model.audiofile
 
 import de.visualdigits.kaudiotagger.model.audiofile.header.AudioHeader
-import de.visualdigits.kaudiotagger.model.common.tag.ID3Tag
-import de.visualdigits.kaudiotagger.model.common.types.SupportedTag
 import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag

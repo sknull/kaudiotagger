@@ -87,7 +87,7 @@ class TCONString : TextEncodedStringSizeTerminated {
      * @param index
      * @return the nth value
      */
-    override fun getValueAtIndex(index: Int): String? {
+    override fun getValueAtIndex(index: Int): String {
         // Split String into separate components
         return getValues()[index]
     }

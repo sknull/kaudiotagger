@@ -52,7 +52,7 @@ class MultiID3v2Frame : AbstractID3v2Frame {
         return frames.firstOrNull()
             ?.frameBody?.getTextEncoding()
             ?.let { te ->
-                TextEncoding.Companion.fromId(te)
+                TextEncoding.fromId(te)
             }
             ?.charSet
             ?: TextEncoding.ISO_8859_1.charSet

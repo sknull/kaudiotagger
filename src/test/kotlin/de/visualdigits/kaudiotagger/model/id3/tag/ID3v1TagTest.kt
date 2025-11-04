@@ -190,7 +190,6 @@ class ID3v1TagTest : AbstractTestCase() {
 
     @Test
     fun testNewInterface() {
-        var exceptionCaught: Exception? = null
         val v1Tag = ID3v1Tag()
         assertTrue(v1Tag.isEmpty())
 

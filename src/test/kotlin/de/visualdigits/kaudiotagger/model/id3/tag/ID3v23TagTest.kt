@@ -41,10 +41,7 @@ import org.junit.jupiter.api.Test
 import java.lang.String
 import kotlin.ByteArray
 import kotlin.Exception
-import kotlin.Throws
 import kotlin.code
-import kotlin.collections.getValue
-import kotlin.getValue
 
 class ID3v23TagTest : AbstractTestCase() {
     

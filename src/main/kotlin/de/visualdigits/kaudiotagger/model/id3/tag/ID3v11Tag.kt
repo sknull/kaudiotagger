@@ -369,7 +369,7 @@ class ID3v11Tag: ID3v1Tag {
     /**
      * @return Artist within list or empty if does not exist
      */
-    open fun getTrackTag(): List<ID3v1TagField> {
+    fun getTrackTag(): List<ID3v1TagField> {
         return if (track != null) {
             listOf(
                 ID3v1TagField(

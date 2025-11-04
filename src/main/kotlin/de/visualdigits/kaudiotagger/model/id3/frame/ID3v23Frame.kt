@@ -1,6 +1,5 @@
 package de.visualdigits.kaudiotagger.model.id3.frame
 
-import de.visualdigits.kaudiotagger.model.audiofile.mp3.MP3File
 import de.visualdigits.kaudiotagger.model.common.exceptions.EmptyFrameException
 import de.visualdigits.kaudiotagger.model.common.exceptions.InvalidFrameException
 import de.visualdigits.kaudiotagger.model.common.frame.framebody.AbstractTagFrameBody
