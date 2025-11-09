@@ -30,4 +30,11 @@ TCO:TextEncoding="ISO-8859-1"; Text="TV & Film"
         val mP3File = MP3File.read(File(ClassLoader.getSystemResource("testdata/decisions-by-kevin-macleod.mp3").toURI()))
         assertEquals(expected, mP3File.toString())
     }
+
+    @Test
+    fun testArtworks() {
+        val mP3File = MP3File.read(File(ClassLoader.getSystemResource("testdata/2covers.mp3").toURI()))
+        val artworks = mP3File.getArtworkList()
+        assertEquals(2, artworks.size)
+    }
 }

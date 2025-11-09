@@ -1,12 +1,13 @@
 package de.visualdigits.kaudiotagger.util
 
-import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag.Companion.MAXIMUM_WRITABLE_CHUNK_SIZE
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
+import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.channels.FileLock
@@ -14,6 +15,66 @@ import java.nio.channels.FileLock
 object FileUtil {
 
     val log: Logger = LoggerFactory.getLogger(FileUtil.javaClass)
+
+    private const val MINIMUM_FILESIZE = 150
+
+    // The max size we try to write in one go to avoid out of memory errors (10mb)
+    const val MAXIMUM_WRITABLE_CHUNK_SIZE: Long = 10000000
+
+    /**
+     * Check can write to file
+     *
+     * @param file
+     */
+    fun precheckFile(file: File) {
+        if (!file.exists()) {
+            log.error(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()))
+            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()))
+        }
+
+        if (TagOptionSingleton.checkIsWritable && !file.canWrite()) {
+            log.error(ErrorMessage.GENERAL_WRITE_FAILED.getMsg(file.getName()))
+            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED.getMsg(file.getName()))
+        }
+
+        if (file.length() <= MINIMUM_FILESIZE) {
+            log.error(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_IS_TOO_SMALL.getMsg(file.getName()))
+            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_IS_TOO_SMALL.getMsg(file.getName()))
+        }
+    }
+
+    fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
+        val newFile: RandomAccessFile
+
+        // These exists(), can read, can write checks are sprinkled around the code. Are these necessary? Why not just treat them as
+        // exceptional conditions. They have to be handled anyway.
+        checkFileExists(file)
+        if (readOnly) {
+            if (!file.canRead()) {
+                log.error("Unable to read file:$file")
+                error(ErrorMessage.GENERAL_READ_FAILED_DO_NOT_HAVE_PERMISSION_TO_READ_FILE.getMsg(file))
+            }
+            newFile = RandomAccessFile(file, "r")
+        } else {
+            if (TagOptionSingleton.checkIsWritable && file.canWrite()
+            ) {
+                log.error("Unable to write file:$file")
+                error(ErrorMessage.NO_PERMISSIONS_TO_WRITE_TO_FILE.getMsg(file))
+            }
+            newFile = RandomAccessFile(file, "rw")
+        }
+        return newFile
+    }
+
+    fun checkFileExists(file: File) {
+        log.debug("Reading file:path${file.path}:abs:${file.absolutePath}")
+        if (!file.exists()) {
+            log.error("Unable to find:" + file.path)
+            throw FileNotFoundException(
+                ErrorMessage.UNABLE_TO_FIND_FILE.getMsg(file.path)
+            )
+        }
+    }
 
     /**
      * Adjust the length of the  padding at the beginning of the MP3 file, this is only called when there is currently

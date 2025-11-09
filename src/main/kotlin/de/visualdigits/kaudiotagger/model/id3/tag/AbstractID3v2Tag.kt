@@ -94,9 +94,6 @@ abstract class AbstractID3v2Tag : AbstractID3Tag, ID3Tag {
          */
         const val TYPE_INVALIDFRAMES: String = "invalidFrames"
 
-        // The max size we try to write in one go to avoid out of memory errors (10mb)
-        const val MAXIMUM_WRITABLE_CHUNK_SIZE: Long = 10000000
-
         /**
          * Determines if file contain an id3 tag and if so positions the file pointer just after the end
          * of the tag.

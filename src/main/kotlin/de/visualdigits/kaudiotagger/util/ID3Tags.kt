@@ -22,9 +22,14 @@ import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringNullTerm
 import de.visualdigits.kaudiotagger.model.id3.datatype.TextEncodedStringSizeTerminated
 import de.visualdigits.kaudiotagger.model.id3.datatype.ValuePairs
 import de.visualdigits.kaudiotagger.model.id3.frame.ID3Frames
+import de.visualdigits.kaudiotagger.model.id3.tag.AbstractID3v2Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
+import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v22FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v23FrameId
 import de.visualdigits.kaudiotagger.model.id3.types.ID3v24FrameId
+import de.visualdigits.kaudiotagger.model.id3.types.ID3v2Version
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.util.LinkedList
@@ -32,6 +37,44 @@ import java.util.LinkedList
 object ID3Tags {
 
     val log: Logger = LoggerFactory.getLogger(javaClass)
+
+    /**
+     * If using ID3 format convert tag from current version to another as specified by id3V2Version,
+     *
+     * @return the converted tag or the original if no conversion necessary
+     */
+    fun convertID3Tag(
+        tag: AbstractID3v2Tag,
+        id3V2Version: ID3v2Version
+    ): AbstractID3v2Tag? {
+        return when (tag) {
+            is ID3v24Tag -> {
+                when (id3V2Version) {
+                    ID3v2Version.ID3_V22 -> ID3v22Tag(tag)
+                    ID3v2Version.ID3_V23 -> ID3v23Tag(tag)
+                    ID3v2Version.ID3_V24 -> tag
+                }
+            }
+
+            is ID3v23Tag -> {
+                when (id3V2Version) {
+                    ID3v2Version.ID3_V22 -> ID3v22Tag(tag)
+                    ID3v2Version.ID3_V23 -> tag
+                    ID3v2Version.ID3_V24 -> ID3v24Tag(tag)
+                }
+            }
+
+            is ID3v22Tag -> {
+                when (id3V2Version) {
+                    ID3v2Version.ID3_V22 -> tag
+                    ID3v2Version.ID3_V23 -> ID3v23Tag(tag)
+                    ID3v2Version.ID3_V24 -> ID3v24Tag(tag)
+                }
+            }
+
+            else -> null
+        }
+    }
 
     /**
      * Returns true if the identifier is a valid ID3v2.2 frame identifier

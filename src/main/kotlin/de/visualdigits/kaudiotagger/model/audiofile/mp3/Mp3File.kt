@@ -10,8 +10,12 @@ import de.visualdigits.kaudiotagger.model.id3.tag.ID3v1Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v22Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v23Tag
 import de.visualdigits.kaudiotagger.model.id3.tag.ID3v24Tag
+import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.model.lyrics3.tag.AbstractLyrics3
 import de.visualdigits.kaudiotagger.util.ErrorMessage
+import de.visualdigits.kaudiotagger.util.FileUtil.checkFilePermissions
+import de.visualdigits.kaudiotagger.util.FileUtil.precheckFile
+import de.visualdigits.kaudiotagger.util.ID3Tags.convertID3Tag
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.File
 import java.io.FileInputStream
@@ -20,6 +24,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
+import java.security.MessageDigest
 
 /**
  * This class represents a physical MP3 File
@@ -27,8 +32,6 @@ import java.nio.ByteBuffer
 class MP3File : AudioFile {
 
     companion object {
-
-        private const val MINIMUM_FILESIZE = 150
 
         fun read(file: File?, readOnly: Boolean = false, loadOptions: LoadOptions = LoadOptions.LOAD_ALL): MP3File {
             return file?.let { f ->
@@ -250,12 +253,55 @@ class MP3File : AudioFile {
     }
 
     /**
+     * Calculates hash with algorithm "MD5", "SHA-1" or SHA-256".
+     * Hash is calculated EXCLUDING meta-data, like id3v1 or id3v2
+     *
+     * @return byte[] hash value in byte
+     */
+    fun getHash(algorithm: String, bufferSize: Int): ByteArray? {
+        val startByte = getMP3StartByte(file)
+
+        var id3v1TagSize = 0
+        if (hasID3v1Tag()) {
+            val id1tag: ID3v1Tag = getID3v1Tag()!!
+            id3v1TagSize = id1tag.getSize()
+        }
+
+        val hash = file?.let { f ->
+            FileInputStream(f).use { inStream ->
+                val buffer = ByteArray(bufferSize)
+                val digest = MessageDigest.getInstance(algorithm)
+
+                inStream.skip(startByte)
+
+                var read: Int
+                val totalSize = f.length() - startByte - id3v1TagSize
+                var pointer = buffer.size
+
+                while (pointer <= totalSize) {
+                    read = inStream.read(buffer)
+
+                    digest.update(buffer, 0, read)
+                    pointer += buffer.size
+                }
+
+                read = inStream.read(buffer, 0, totalSize.toInt() - pointer + buffer.size)
+                digest.update(buffer, 0, read)
+
+                digest.digest()
+            }
+        }
+
+        return hash
+    }
+
+    /**
      * Used by tags when writing to calculate the location of the music file
      *
      * @param file
      * @return the location within the file that the audio starts
      */
-    fun getMP3StartByte(file: File?): Long {
+    private fun getMP3StartByte(file: File?): Long {
         try {
             // Read ID3v2 tag size (if tag exists) to allow audio header parsing to skip over tag
             val startByte = AbstractID3v2Tag.getV2TagSizeIfExists(file)
@@ -296,7 +342,7 @@ class MP3File : AudioFile {
         log.debug("Saving  : " + file.path)
 
         // Checks before starting write
-        precheck(file)
+        precheckFile(file)
 
         // ID3v2 Tag
         if (TagOptionSingleton.id3v2Save) {
@@ -340,37 +386,8 @@ class MP3File : AudioFile {
         }
     }
 
-    private fun write(tag: AbstractID3v2Tag, file: File) {
-        log.debug("Writing ID3v2 tag: ${file.getName()}")
-        val mp3AudioHeader = this.audioHeader as? MP3AudioHeader
-        val mp3StartByte = mp3AudioHeader?.mp3StartByte ?: 0
-        val newMp3StartByte = tag.write(file, mp3StartByte)
-        if (mp3StartByte != newMp3StartByte) {
-            log.debug("New mp3 start byte: $newMp3StartByte")
-            mp3AudioHeader?.mp3StartByte = newMp3StartByte
-        }
-    }
-
-    /**
-     * Check can write to file
-     *
-     * @param file
-     */
-    fun precheck(file: File) {
-        if (!file.exists()) {
-            log.error(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()))
-            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()))
-        }
-
-        if (TagOptionSingleton.checkIsWritable && !file.canWrite()) {
-            log.error(ErrorMessage.GENERAL_WRITE_FAILED.getMsg(file.getName()))
-            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED.getMsg(file.getName()))
-        }
-
-        if (file.length() <= MINIMUM_FILESIZE) {
-            log.error(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_IS_TOO_SMALL.getMsg(file.getName()))
-            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_IS_TOO_SMALL.getMsg(file.getName()))
-        }
+    override fun getArtworkList(): List<Artwork> {
+        return getTag()?.getArtworkList()?:listOf()
     }
 
     /**
