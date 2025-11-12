@@ -14,7 +14,6 @@ import de.visualdigits.kaudiotagger.model.images.Artwork
 import de.visualdigits.kaudiotagger.model.lyrics3.tag.AbstractLyrics3
 import de.visualdigits.kaudiotagger.util.ErrorMessage
 import de.visualdigits.kaudiotagger.util.FileUtil.checkFilePermissions
-import de.visualdigits.kaudiotagger.util.FileUtil.precheckFile
 import de.visualdigits.kaudiotagger.util.ID3Tags.convertID3Tag
 import de.visualdigits.kaudiotagger.util.TagOptionSingleton
 import java.io.File
@@ -32,6 +31,8 @@ import java.security.MessageDigest
 class MP3File : AudioFile {
 
     companion object {
+
+        private const val MINIMUM_FILESIZE = 150
 
         fun read(file: File?, readOnly: Boolean = false, loadOptions: LoadOptions = LoadOptions.LOAD_ALL): MP3File {
             return file?.let { f ->
@@ -335,14 +336,13 @@ class MP3File : AudioFile {
      * @throws FileNotFoundException if unable to find file
      * @throws IOException           on any I/O error
      */
-    fun save(fileToSave: File) {
-        // Ensure we are dealing with absolute filepaths not relative ones
-        val file = fileToSave.getAbsoluteFile()
-
+    fun save(file: File) {
         log.debug("Saving  : " + file.path)
 
         // Checks before starting write
-        precheckFile(file)
+        require(file.exists()) { ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()) }
+        require(!TagOptionSingleton.checkIsWritable || file.canWrite()) { ErrorMessage.GENERAL_WRITE_FAILED.getMsg(file.getName()) }
+        require(file.length() > MINIMUM_FILESIZE) { ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_IS_TOO_SMALL.getMsg(file.getName()) }
 
         // ID3v2 Tag
         if (TagOptionSingleton.id3v2Save) {
@@ -356,12 +356,12 @@ class MP3File : AudioFile {
                 log.debug("Deleting ID3v2 tag:" + file.getName())
             } else {
                 log.debug("Writing ID3v2 tag:" + file.getName())
-                    val mp3AudioHeader = this.audioHeader as MP3AudioHeader
-                    val mp3StartByte: Long = mp3AudioHeader.mp3StartByte
-                    val newMp3StartByte: Long = id3v2tag.write(file, mp3StartByte)
-                    if (mp3StartByte != newMp3StartByte) {
-                        log.debug("New mp3 start byte: $newMp3StartByte")
-                        mp3AudioHeader.mp3StartByte = newMp3StartByte
+                val mp3AudioHeader = this.audioHeader as MP3AudioHeader
+                val mp3StartByte: Long = mp3AudioHeader.mp3StartByte
+                val newMp3StartByte: Long = id3v2tag.write(file, mp3StartByte)
+                if (mp3StartByte != newMp3StartByte) {
+                    log.debug("New mp3 start byte: $newMp3StartByte")
+                    mp3AudioHeader.mp3StartByte = newMp3StartByte
                 }
             }
         }
@@ -379,8 +379,8 @@ class MP3File : AudioFile {
                     log.debug("Deleting ID3v1")
                     (ID3v1Tag()).delete(rfile)
                 } else {
-                        log.debug("Saving ID3v1")
-                        id3v1tag.write(rfile)
+                    log.debug("Saving ID3v1")
+                    id3v1tag.write(rfile)
                 }
             }
         }

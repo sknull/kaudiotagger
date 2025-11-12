@@ -16,32 +16,8 @@ object FileUtil {
 
     val log: Logger = LoggerFactory.getLogger(FileUtil.javaClass)
 
-    private const val MINIMUM_FILESIZE = 150
-
     // The max size we try to write in one go to avoid out of memory errors (10mb)
     const val MAXIMUM_WRITABLE_CHUNK_SIZE: Long = 10000000
-
-    /**
-     * Check can write to file
-     *
-     * @param file
-     */
-    fun precheckFile(file: File) {
-        if (!file.exists()) {
-            log.error(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()))
-            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()))
-        }
-
-        if (TagOptionSingleton.checkIsWritable && !file.canWrite()) {
-            log.error(ErrorMessage.GENERAL_WRITE_FAILED.getMsg(file.getName()))
-            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED.getMsg(file.getName()))
-        }
-
-        if (file.length() <= MINIMUM_FILESIZE) {
-            log.error(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_IS_TOO_SMALL.getMsg(file.getName()))
-            throw IOException(ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_IS_TOO_SMALL.getMsg(file.getName()))
-        }
-    }
 
     fun checkFilePermissions(file: File, readOnly: Boolean): RandomAccessFile {
         val newFile: RandomAccessFile
